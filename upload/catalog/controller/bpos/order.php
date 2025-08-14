@@ -1,29 +1,41 @@
 <?php
 class ControllerBposOrder extends Controller {
+    public function __construct($registry) {
+        parent::__construct($registry);
+
+        // Load library user dari admin
+        $this->user = new Cart\User($this->registry);
+
+        // Cek login
+        if (!$this->user->isLogged()) {
+            $this->response->redirect($this->url->link('bpos/login', '', true));
+        }
+    }
+
     public function index() {
         $this->load->language('account/order');
-        $this->load->model('account/order');
+        $this->load->model('bpos/order');
 
         // Filter dari GET
-        $filter_order_status_id = isset($this->request->get['filter_order_status_id']) ? (int)$this->request->get['filter_order_status_id'] : '';
-        $filter_search = isset($this->request->get['filter_search']) ? $this->request->get['filter_search'] : '';
-        $filter_date_start = isset($this->request->get['filter_date_start']) ? $this->request->get['filter_date_start'] : '';
-        $filter_date_end = isset($this->request->get['filter_date_end']) ? $this->request->get['filter_date_end'] : '';
+        $filter_search = $this->request->get['filter_search'] ?? '';
+        $filter_date_start = $this->request->get['filter_date_start'] ?? '';
+        $filter_date_end = $this->request->get['filter_date_end'] ?? '';
+        $filter_status_id = $this->request->get['filter_status_id'] ?? '';
         $page = isset($this->request->get['page']) ? (int)$this->request->get['page'] : 1;
 
         $limit = 10;
 
         $filter_data = [
             'filter_order_status_id' => $filter_order_status_id,
-            'filter_search'          => $filter_search,
+            'filter_customer'          => $filter_search,
             'filter_date_start'      => $filter_date_start,
             'filter_date_end'        => $filter_date_end,
             'start'                  => ($page - 1) * $limit,
             'limit'                  => $limit
         ];
 
-        $order_total = $this->model_account_order->getTotalOrders($filter_data);
-        $results = $this->model_account_order->getOrders($filter_data);
+        $order_total = $this->model_bpos_order->getTotalOrders($filter_data);
+        $results = $this->model_bpos_order->getOrders($filter_data);
 
         $orders = [];
         foreach ($results as $result) {
@@ -31,10 +43,10 @@ class ControllerBposOrder extends Controller {
                 'order_id'      => $result['order_id'],
                 'firstname'     => $result['firstname'],
                 'lastname'      => $result['lastname'],
-                'status'        => $result['status'],
+                'status'        => $result['order_status'],
                 'total'         => $this->currency->format($result['total'], $result['currency_code'], $result['currency_value']),
                 'date_added'    => date($this->language->get('date_format_short'), strtotime($result['date_added'])),
-                'date_modified' => date($this->language->get('date_format_short'), strtotime($result['date_modified'])),
+                'date_modified' => $result['date_modified'] > 0 ? date($this->language->get('date_format_short'), strtotime($result['date_modified'])) : '-',
                 'invoice'       => $this->url->link('bpos/invoice', 'order_id=' . $result['order_id']),
                 'view'          => $this->url->link('bpos/order/view', 'order_id=' . $result['order_id']),
                 'delete'        => $this->url->link('bpos/order/delete', 'order_id=' . $result['order_id'])
@@ -68,7 +80,6 @@ class ControllerBposOrder extends Controller {
             ceil($order_total / $limit)
         );
 
-        // Data ke view order.twig
         $view_data = [
             'orders'           => $orders,
             'order_statuses'   => $order_statuses,
@@ -83,6 +94,7 @@ class ControllerBposOrder extends Controller {
 
         // Sesuai format POS layout
         $data['title'] = 'Orders - POS System';
+        $data['logout'] = $this->url->link('bpos/login/logout', '', true);
         $data['content'] = $this->load->view('bpos/order', $view_data);
 
         if (isset($this->request->get['format']) && $this->request->get['format'] == 'json') {
@@ -94,6 +106,7 @@ class ControllerBposOrder extends Controller {
     }
 
     public function view() {
+       
         if (!isset($this->request->get['order_id'])) {
             $this->response->redirect($this->url->link('bpos/order', '', true));
         }
@@ -197,6 +210,7 @@ class ControllerBposOrder extends Controller {
         // ---------------------------
         // Render content
         // ---------------------------
+        $data['logout'] = $this->url->link('bpos/login/logout', '', true);
         $data['content'] = $this->load->view('bpos/order_view', $data);
 
         if (isset($this->request->get['format']) && $this->request->get['format'] == 'json') {
@@ -210,10 +224,29 @@ class ControllerBposOrder extends Controller {
 
     public function delete() {
         if (isset($this->request->get['order_id'])) {
-            $this->load->model('bpos/order');
-            $this->model_bpos_order->deleteOrder($this->request->get['order_id']);
+            $this->load->model('checkout/order');
+            $this->model_checkout_order->deleteOrder($this->request->get['order_id']);
         }
         $this->response->redirect($this->url->link('bpos/order'));
+    }
+    public function deleteSelected() {
+        $this->load->language('bpos/order');
+        $json = [];
+
+        if (isset($this->request->post['order_ids']) && is_array($this->request->post['order_ids'])) {
+            $this->load->model('checkout/order');
+
+            foreach ($this->request->post['order_ids'] as $order_id) {
+                $this->model_checkout_order->deleteOrder((int)$order_id);
+            }
+
+            $json['success'] = 'Selected orders have been deleted successfully!';
+        } else if (isset($this->request->get['order_id'])) {} else {
+            $json['error'] = 'No orders selected for deletion.';
+        }
+
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode($json));
     }
 
     public function addOrder() {

@@ -1,47 +1,64 @@
 <div class="container-xxl py-4 orders-board">
   <div class="panel p-3 p-md-4">
-
+  <div class="col-6 col-md-12 col-lg-3 ms-lg-auto text-lg-end">
+        <a href="{{ add_order }}" class="btn btn-primary rounded-3">
+          <i class="bi bi-plus-lg me-1"></i> Add Order
+        </a>
+        <button type="button" id="delete-selected" class="btn btn-danger rounded-3">
+         <i class="bi bi-trash"></i> Delete
+      </button>
+      </div>
     <!-- Toolbar -->
     <div class="toolbar row g-2 align-items-center mb-3">
       <!-- Search -->
       <div class="col-12 col-md-5 col-lg-4">
-        <div class="input-group">
-          <span class="input-group-text"><i class="bi bi-search"></i></span>
-          <input type="text" class="form-control" placeholder="Search Order" id="search-order" value="{{ filter_search ?? '' }}">
-        </div>
+          <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input type="text" class="form-control" placeholder="Search Customer" id="search-order" value="{{ filter_search ?? '' }}">
+          </div>
       </div>
 
       <!-- Date Range Placeholder -->
       <div class="col-12 col-md-4 col-lg-3">
-        <div class="d-flex align-items-center gap-2 chip-input">
-          <i class="bi bi-calendar2"></i>
-          <span class="chip">
-            Date Range
-            <button class="btn-clear" type="button" data-clear="daterange" title="Clear">
-              <i class="bi bi-x"></i>
-            </button>
-          </span>
-        </div>
+          <div class="d-flex align-items-center gap-2 chip-input">
+              <i class="bi bi-calendar2"></i>
+              <span class="chip">
+                  <input 
+                      type="text" 
+                      id="filter-daterange" 
+                      class="form-control border-0 p-0" 
+                      placeholder="Date Range" 
+                      readonly
+                      value="{% if filter_date_start and filter_date_end %}{{ filter_date_start }} - {{ filter_date_end }}{% endif %}">
+                  <button class="btn-clear" type="button" data-clear="daterange" title="Clear">
+                      <i class="bi bi-x"></i>
+                  </button>
+              </span>
+          </div>
       </div>
 
       <!-- Filter Status -->
       <div class="col-6 col-md-3 col-lg-2">
-        <select class="form-select" id="filter-status">
-          <option value="">Status</option>
-          {% for status in order_statuses %}
-            <option value="{{ status.order_status_id }}" {% if filter_status_id == status.order_status_id %}selected{% endif %}>
-              {{ status.name }}
-            </option>
-          {% endfor %}
-        </select>
+          <select class="form-select" id="filter-status">
+              <option value="">Status</option>
+              {% for status in order_statuses %}
+                  <option value="{{ status.order_status_id }}" {% if filter_status_id == status.order_status_id %}selected{% endif %}>
+                      {{ status.name }}
+                  </option>
+              {% endfor %}
+          </select>
       </div>
 
-      <!-- Add Order -->
-      <div class="col-6 col-md-12 col-lg-3 ms-lg-auto text-lg-end">
-        <a href="{{ add_order }}" class="btn btn-primary rounded-3">
-          <i class="bi bi-plus-lg me-1"></i> Add Order
-        </a>
+      <!-- Filter Button -->
+      <div class="col-6 col-md-2 col-lg-1">
+          <button id="btn-filter" class="btn btn-primary w-100">
+              <i class="bi bi-funnel"></i> Filter
+          </button>
       </div>
+
+
+      <!-- Add Order -->
+      
     </div>
 
     <!-- Table -->
@@ -122,72 +139,51 @@
 </div>
 
 <script>
-$(function() {
+$(function(){
+    // Init Date Range Picker
+    $('#filter-daterange').daterangepicker({
+        autoUpdateInput: false,
+        locale: {
+            format: 'YYYY-MM-DD',
+            cancelLabel: 'Clear'
+        }
+    });
 
-  // Date Range Picker
-  var start = moment().startOf('month');
-  var end = moment().endOf('month');
+    $('#filter-daterange').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+    });
 
-  function cb(start, end) {
-    $('.chip').html(
-      start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD') +
-      ' <button class="btn-clear" type="button" data-clear="daterange" title="Clear"><i class="bi bi-x"></i></button>'
-    );
-  }
+    $('#filter-daterange').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+    });
 
-  $('.chip-input').daterangepicker({
-    startDate: start,
-    endDate: end,
-    locale: { format: 'YYYY-MM-DD' },
-    autoUpdateInput: false
-  }, cb);
+    // Set default value kalau ada dari PHP
+    {% if filter_date_start and filter_date_end %}
+    let start = moment('{{ filter_date_start }}', 'YYYY-MM-DD');
+    let end   = moment('{{ filter_date_end }}', 'YYYY-MM-DD');
+    $('#filter-daterange').data('daterangepicker').setStartDate(start);
+    $('#filter-daterange').data('daterangepicker').setEndDate(end);
+    $('#filter-daterange').val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+    {% endif %}
 
-  cb(start, end);
+    // Filter button click
+    $('#btn-filter').on('click', function(){
+        let url = 'index.php?route=bpos/order';
 
-  // Clear Date Range
-  $(document).on('click', '.btn-clear[data-clear="daterange"]', function() {
-    $('.chip').html('Date Range <button class="btn-clear" type="button" data-clear="daterange" title="Clear"><i class="bi bi-x"></i></button>');
-    $('.chip-input').val('');
-  });
+        let search = $('#search-order').val();
+        let daterange = $('#filter-daterange').val();
+        let status = $('#filter-status').val();
 
-  $('.chip-input').on('apply.daterangepicker', function(ev, picker) {
-    var start = picker.startDate.format('YYYY-MM-DD');
-    var end = picker.endDate.format('YYYY-MM-DD');
+        if(search) url += '&filter_search=' + encodeURIComponent(search);
+        if(daterange){
+            let dr = daterange.split(' - ');
+            url += '&filter_date_start=' + dr[0] + '&filter_date_end=' + dr[1];
+        }
+        if(status) url += '&filter_status_id=' + status;
 
-    var url = 'index.php?route=bpos/order';
-    var status = $('#filter-status').val();
-    var search = $('#search-order').val();
+        window.location = url;
+    });
 
-    if (status) url += '&filter_order_status_id=' + status;
-    if (search) url += '&filter_search=' + encodeURIComponent(search);
-    url += '&filter_date_start=' + start + '&filter_date_end=' + end;
-
-    window.location.href = url;
-});
-
-  // Filter Status
-  $('#filter-status').on('change', function() {
-    var status = $(this).val();
-    var url = 'index.php?route=bpos/order';
-    if (status) {
-      url += '&filter_order_status_id=' + status;
-    }
-    window.location.href = url;
-  });
-
-  // Search Orders
-  $('#search-order').on('keypress', function(e) {
-    if (e.which == 13) {
-      var url = 'index.php?route=bpos/order';
-      var status = $('#filter-status').val();
-      var search = $(this).val();
-
-      if (status) url += '&filter_order_status_id=' + status;
-      if (search) url += '&filter_search=' + encodeURIComponent(search);
-
-      window.location.href = url;
-    }
-  });
 
   // Check All
   $('#checkAll').on('change', function() {
@@ -195,5 +191,38 @@ $(function() {
   });
 
 });
+$(document).ready(function () {
+
+    // Delete selected
+    $('#delete-selected').on('click', function () {
+        let ids = $('.row-check:checked').map(function () {
+            return $(this).val();
+        }).get();
+
+        if (ids.length === 0) {
+            alert('Please select at least one order.');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to delete selected orders?')) {
+            return;
+        }
+
+        $.ajax({
+            url: 'index.php?route=bpos/order/deleteSelected',
+            type: 'POST',
+            data: { order_ids: ids },
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    location.reload();
+                } else if (response.error) {
+                    alert(response.error);
+                }
+            }
+        });
+    });
+});
+
 </script>
 

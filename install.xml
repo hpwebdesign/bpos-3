@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>BPOS</name>
+    <code>HPBPOS</code>
+    <version>1.0.0.0</version>
+    <author>HP Web Design</author>
+    <link>https://hpwebdesign.io</link>
+
+    <!-- Tambah link POS di header admin -->
+    <file path="admin/view/template/common/header.twig">
+        <operation>
+            <search><![CDATA[<ul class="nav navbar-nav navbar-right">]]></search>
+            <add position="after"><![CDATA[
+                <li class="dropdown">
+                    <a href="{{ link_pos }}" class="" data-toggle="">
+                        <span style="width: 30px;height: 30px;border-radius: 4px;background: linear-gradient(135deg,#6aa8ff,#2a6cf6);color: #fff;font-weight: 800;line-height: 30px;display: inline-block;padding: 0 10px;">B</span>
+                        <span>POS</span>
+                    </a>
+                </li>
+            ]]></add>
+        </operation>
+    </file>
+    <file path="admin/controller/common/header.php">
+        <operation>
+          <search><![CDATA[$data['home'] = $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true);]]></search>
+          <add position="after"><![CDATA[
+        // === POS link (prefer SEO URL if exists) ===
+        $catalog_base = HTTPS_CATALOG;
+        $keyword = '';
+
+        // Try SEO URL for current store & language
+        $seo_sql = "SELECT keyword FROM " . DB_PREFIX . "seo_url 
+                    WHERE query = 'bpos/home' 
+                      AND store_id = '" . (int)$this->config->get('config_store_id') . "' 
+                      AND language_id = '" . (int)$this->config->get('config_language_id') . "'
+                    LIMIT 1";
+        $seo_q = $this->db->query($seo_sql);
+        if ($seo_q->num_rows) {
+          $keyword = $seo_q->row['keyword'];
+        }
+
+        if (!$keyword) {
+          $seo_q2 = $this->db->query("SELECT keyword FROM " . DB_PREFIX . "seo_url WHERE query = 'bpos/home' ORDER BY store_id ASC LIMIT 1");
+          if ($seo_q2->num_rows) {
+            $keyword = $seo_q2->row['keyword'];
+          }
+        }
+
+        if ($keyword) {
+          $data['link_pos'] = rtrim($catalog_base, '/') . '/' . ltrim($keyword, '/');
+        } else {
+          $data['link_pos'] = rtrim($catalog_base, '/') . '/index.php?route=bpos/home';
+        }
+
+          ]]></add>
+        </operation>
+  </file>
+</modification>

@@ -1,10 +1,25 @@
 <?php
 class ControllerBposHome extends Controller {
+    public function __construct($registry) {
+        parent::__construct($registry);
+
+        // Load library user dari admin
+        $this->user = new Cart\User($this->registry);
+
+        // Cek login
+        if (!$this->user->isLogged()) {
+            $this->response->redirect($this->url->link('bpos/login', '', true));
+        }
+    }
+
     public function index() {
+        if (!$this->user->isLogged()) {
+            $this->response->redirect($this->url->link('bpos/login', '', true));
+        }
         $this->load->model('catalog/category');
         $this->load->model('catalog/product');
         $this->load->model('tool/image');
-
+        $data['logout'] = $this->url->link('bpos/login/logout', '', true);
         $data['categories'] = [];
         $data['products'] = [];
 

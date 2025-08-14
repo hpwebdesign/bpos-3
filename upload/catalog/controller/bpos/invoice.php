@@ -1,6 +1,9 @@
 <?php
 class ControllerBposInvoice extends Controller {
     public function index() {
+        if (!$this->user->isLogged()) {
+            $this->response->redirect($this->url->link('bpos/login', '', true));
+        }
         if (!isset($this->request->get['order_id'])) {
             return $this->response->redirect($this->url->link('bpos/home'));
         }

@@ -12,6 +12,10 @@ $(document).ready(function() {
         if (route) loadContent(route);
     });
 
+    $(document).on('click','#btn-logout', function() {
+        $('#logoutModal').modal('show');
+    });
+
     // Print Bills
     $(document).on('click', '.print', function(e) {
         e.preventDefault();

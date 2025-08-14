@@ -74,13 +74,14 @@
     --kt-gray-200: #eff2f5;
     --kt-gray-300: #e4e6ef;
     --kt-card-bg: #fff;
-    --kt-shadow: 0 10px 30px rgba(82, 63, 105, .05);
+    --kt-shadow: 0 8px 24px rgba(15, 21, 53, .06), 0 2px 6px rgba(15, 21, 53, .08);
     --kt-radius: 16px;
 }
 body {
     font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     background: #fff;
     color: var(--ink);
+    font-size: 14px;
 }
 .wrap {
     background: linear-gradient(180deg, var(--bg) 0 88px, #fff 88px);
@@ -162,6 +163,11 @@ body {
     color: #8892a7;
     border: 1px solid var(--line);
     margin-bottom: 16px;
+    cursor: pointer;
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin: 5px;
+    display: grid;
 }
 .bubble.active {
     background: #e7f0ff;
@@ -186,11 +192,13 @@ body {
 }
 .cat.active {
     outline: 2px solid #d7e6ff;
+    background-color: #f2fff7
 }
 .cat .name {
     display: block;
     margin-top: 8px;
     font-weight: 600;
+    text-align: left;
 }
 .cat .meta {
     display: block;
@@ -212,12 +220,12 @@ body {
     margin-bottom: 12px;
 }
 .food .plate {
-    width: 80%;
+    /*    width: 80%;*/
     aspect-ratio: 1;
     border-radius: 50%;
     background: #eee;
 }
-.name {
+.card .name {
     font-weight: 600;
     text-align: center;
 }
@@ -432,13 +440,6 @@ body {
     .flex-item {
         flex: 0 0 calc(20% - 9.6px);
     }
-}
-.bubble {
-    cursor: pointer;
-    padding: 10px;
-    border: 1px solid #ccc;
-    margin: 5px;
-    display: inline-block;
 }
 .active {
     background: #eee;
@@ -1053,7 +1054,7 @@ body {
     border-style: inherit;
     text-transform: inherit;
     font-weight: inherit;
-    font-size: inherit;
+    font-size: 14px;
     color: inherit;
     height: inherit;
     min-height: inherit
@@ -2944,10 +2945,11 @@ body {
     border: 1px solid transparent;
     border-radius: 10px;
     padding: .45rem .85rem;
-    font-weight: 600;
+    font-weight: 400;
     line-height: 1.3;
     cursor: pointer;
     text-decoration: none;
+    font-size: 0.9rem;
 }
 .btn-sm {
     padding: .35rem .65rem;
@@ -3209,4 +3211,7 @@ a.text-hover-primary:hover {
         scrollbar-width: thin;
         scrollbar-color: var(--bs-scrollbar-color) transparent;
     }
+}
+.sidebar .bi {
+    font-size: 15px;
 }
