@@ -3185,3 +3185,20 @@ a.text-hover-primary:hover {
   box-shadow: var(--shadow);
 }
 
+#mobile-menu .cart {
+    position: relative;
+}
+
+#mobile-menu .counter {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: red;
+  color: #fff;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+  padding: 3px;
+  font-size: 13px;
+}
