@@ -42,7 +42,7 @@
         {% if total.code == 'total' %}
           <div class="total"><span>{{ total.title }}</span><span>{{ total.value }}</span></div>
         {% else %}
-          <div class="row"><span>{{ total.title }}</span><span>{{ total.value }}</span></div>
+          <div class="subtotal"><span>{{ total.title }}</span><span>{{ total.value }}</span></div>
         {% endif %}
       {% endfor %}
     </div>
@@ -53,7 +53,7 @@
       <div class="row row-cols-3 g-2 mb-3">
         {% for payment_method in payment_methods %}
         <div class="col">
-          <button class="paybtn w-100" data-code="{{ payment_method.code }}">
+          <button class="paybtn w-100 {% if payment_method.code == default_payment %}active{% endif %}" data-code="{{ payment_method.code }}">
             <i class="bi bi-cash"></i><span>{{ payment_method.title }}</span>
           </button>
         </div>

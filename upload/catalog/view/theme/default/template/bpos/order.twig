@@ -1,1 +1,199 @@
-<h3>Order List</h3>
+<div class="container-xxl py-4 orders-board">
+  <div class="panel p-3 p-md-4">
+
+    <!-- Toolbar -->
+    <div class="toolbar row g-2 align-items-center mb-3">
+      <!-- Search -->
+      <div class="col-12 col-md-5 col-lg-4">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input type="text" class="form-control" placeholder="Search Order" id="search-order" value="{{ filter_search ?? '' }}">
+        </div>
+      </div>
+
+      <!-- Date Range Placeholder -->
+      <div class="col-12 col-md-4 col-lg-3">
+        <div class="d-flex align-items-center gap-2 chip-input">
+          <i class="bi bi-calendar2"></i>
+          <span class="chip">
+            Date Range
+            <button class="btn-clear" type="button" data-clear="daterange" title="Clear">
+              <i class="bi bi-x"></i>
+            </button>
+          </span>
+        </div>
+      </div>
+
+      <!-- Filter Status -->
+      <div class="col-6 col-md-3 col-lg-2">
+        <select class="form-select" id="filter-status">
+          <option value="">Status</option>
+          {% for status in order_statuses %}
+            <option value="{{ status.order_status_id }}" {% if filter_status_id == status.order_status_id %}selected{% endif %}>
+              {{ status.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Add Order -->
+      <div class="col-6 col-md-12 col-lg-3 ms-lg-auto text-lg-end">
+        <a href="{{ add_order }}" class="btn btn-primary rounded-3">
+          <i class="bi bi-plus-lg me-1"></i> Add Order
+        </a>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table align-middle table-hover">
+        <thead>
+          <tr>
+            <th style="width:40px;">
+              <input class="form-check-input" type="checkbox" id="checkAll">
+            </th>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Status</th>
+            <th>Total</th>
+            <th>Date Added</th>
+            <th>Date Modified</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if orders %}
+            {% for order in orders %}
+              <tr>
+                <td><input class="form-check-input row-check" type="checkbox" value="{{ order.order_id }}"></td>
+                <td>{{ order.order_id }}</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="avatar">{{ order.firstname|first }}</span>
+                    <div class="fw-semibold">{{ order.firstname }} {{ order.lastname }}</div>
+                  </div>
+                </td>
+                <td>
+                  {% set badge_class = 'badge-soft badge-pending' %}
+                  {% if order.status == 'Completed' %}{% set badge_class = 'badge-soft badge-completed' %}{% endif %}
+                  {% if order.status == 'Pending' %}{% set badge_class = 'badge-soft badge-pending' %}{% endif %}
+                  {% if order.status == 'Processing' %}{% set badge_class = 'badge-soft badge-delivering' %}{% endif %}
+                  {% if order.status == 'Cancelled' %}{% set badge_class = 'badge-soft badge-cancelled' %}{% endif %}
+                  {% if order.status == 'Failed' %}{% set badge_class = 'badge-soft badge-failed' %}{% endif %}
+                  {% if order.status == 'Expired' %}{% set badge_class = 'badge-soft badge-expired' %}{% endif %}
+                  <span class="{{ badge_class }}">{{ order.status }}</span>
+                </td>
+                <td>{{ order.total }}</td>
+                <td>{{ order.date_added }}</td>
+                <td>{{ order.date_modified }}</td>
+                <td class="text-end">
+                  <div class="dropdown">
+                    <button class="btn btn-actions dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Actions</button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                      <li><a class="dropdown-item" href="{{ order.invoice }}">Invoice</a></li>
+                      <li><a class="dropdown-item" href="{{ order.view }}">View</a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li>
+                        <a class="dropdown-item text-danger" href="{{ order.delete }}" onclick="return confirm('Delete this order?')">
+                          Delete
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="8" class="text-center text-muted">No orders found</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="table-footer d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3">
+      <div>{{ pagination }}</div>
+      <div class="text-muted">{{ results }}</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+$(function() {
+
+  // Date Range Picker
+  var start = moment().startOf('month');
+  var end = moment().endOf('month');
+
+  function cb(start, end) {
+    $('.chip').html(
+      start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD') +
+      ' <button class="btn-clear" type="button" data-clear="daterange" title="Clear"><i class="bi bi-x"></i></button>'
+    );
+  }
+
+  $('.chip-input').daterangepicker({
+    startDate: start,
+    endDate: end,
+    locale: { format: 'YYYY-MM-DD' },
+    autoUpdateInput: false
+  }, cb);
+
+  cb(start, end);
+
+  // Clear Date Range
+  $(document).on('click', '.btn-clear[data-clear="daterange"]', function() {
+    $('.chip').html('Date Range <button class="btn-clear" type="button" data-clear="daterange" title="Clear"><i class="bi bi-x"></i></button>');
+    $('.chip-input').val('');
+  });
+
+  $('.chip-input').on('apply.daterangepicker', function(ev, picker) {
+    var start = picker.startDate.format('YYYY-MM-DD');
+    var end = picker.endDate.format('YYYY-MM-DD');
+
+    var url = 'index.php?route=bpos/order';
+    var status = $('#filter-status').val();
+    var search = $('#search-order').val();
+
+    if (status) url += '&filter_order_status_id=' + status;
+    if (search) url += '&filter_search=' + encodeURIComponent(search);
+    url += '&filter_date_start=' + start + '&filter_date_end=' + end;
+
+    window.location.href = url;
+});
+
+  // Filter Status
+  $('#filter-status').on('change', function() {
+    var status = $(this).val();
+    var url = 'index.php?route=bpos/order';
+    if (status) {
+      url += '&filter_order_status_id=' + status;
+    }
+    window.location.href = url;
+  });
+
+  // Search Orders
+  $('#search-order').on('keypress', function(e) {
+    if (e.which == 13) {
+      var url = 'index.php?route=bpos/order';
+      var status = $('#filter-status').val();
+      var search = $(this).val();
+
+      if (status) url += '&filter_order_status_id=' + status;
+      if (search) url += '&filter_search=' + encodeURIComponent(search);
+
+      window.location.href = url;
+    }
+  });
+
+  // Check All
+  $('#checkAll').on('change', function() {
+    $('.row-check').prop('checked', this.checked);
+  });
+
+});
+</script>
+

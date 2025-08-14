@@ -1,0 +1,3212 @@
+:root {
+    --bg: #0f1535;
+    /* top bar */
+    --ink: #0a0f1e;
+    /* headings */
+    --muted: #7b8296;
+    /* captions */
+    --card: #ffffff;
+    /* cards */
+    --ui: #eef1f6;
+    /* soft bg */
+    --line: #e7ebf2;
+    /* borders */
+    --brand: #2a6cf6;
+    /* primary */
+    --good: #12bf55;
+    /* success */
+    --danger: #ff5d5d;
+    /* destructive */
+    --warning: #ffcc66;
+    --radius: 16px;
+    --shadow: 0 8px 24px rgba(15, 21, 53, .06), 0 2px 6px rgba(15, 21, 53, .08);
+    --bg-panel: #ffffff;
+    --bg-page: #f6f8fb;
+    --line: #eef2f7;
+    --text-500: #6b7a90;
+    --text-700: #1f2a37;
+    --chip: #f2f5f9;
+    --soft-blue-bg: #e9f2ff;
+    --soft-blue: #2f6fec;
+    --soft-green-bg: #e9f9ef;
+    --soft-green: #1a7f37;
+    --soft-yellow-bg: #fff6e5;
+    --soft-yellow: #b97706;
+    --soft-red-bg: #ffe9ea;
+    --soft-red: #d02c2c;
+    --soft-gray-bg: #f1f2f4;
+    --soft-gray: #7a8797;
+    --soft-pink-bg: #ffe9f3;
+    --soft-pink: #c21b64;
+    --bs-table-color-type: initial;
+    --bs-table-bg-type: initial;
+    --bs-table-color-state: initial;
+    --bs-table-bg-state: initial;
+    --bs-table-color: var(--bs-body-color);
+    --bs-table-bg: transparent;
+    --bs-table-border-color: var(--bs-border-color);
+    --bs-table-accent-bg: transparent;
+    --bs-table-striped-color: var(--bs-body-color);
+    --bs-table-striped-bg: rgba(var(--bs-gray-100-rgb), 0.75);
+    --bs-table-active-color: var(--bs-body-color);
+    --bs-table-active-bg: var(--bs-gray-100);
+    --bs-table-hover-color: var(--bs-body-color);
+    --bs-table-hover-bg: var(--bs-gray-100);
+    --bs-card-spacer-y: 1rem;
+    --bs-card-spacer-x: 1rem;
+    --bs-card-title-spacer-y: 0.5rem;
+    --bs-card-title-color: var(--bs-gray-900);
+    --bs-card-border-width: 1px;
+    --bs-card-border-color: #F1F1F4;
+    --bs-card-border-radius: 1.5rem;
+    --bs-card-box-shadow: 0px 3px 4px 0px rgba(0, 0, 0, 0.03);
+    --bs-card-inner-border-radius: calc(1.5rem - 1px);
+    --bs-card-cap-padding-y: 0.5rem;
+    --bs-card-cap-padding-x: 1rem;
+    --bs-card-cap-bg: transparent;
+    --bs-card-bg: var(--bs-body-bg);
+    --bs-card-img-overlay-padding: 1rem;
+    --bs-card-group-margin: 0.75rem;
+    --kt-head-bg: #201b45;
+    --kt-head-text: #fff;
+    --kt-text: #181c32;
+    --kt-muted: #7e8299;
+    --kt-gray-200: #eff2f5;
+    --kt-gray-300: #e4e6ef;
+    --kt-card-bg: #fff;
+    --kt-shadow: 0 10px 30px rgba(82, 63, 105, .05);
+    --kt-radius: 16px;
+}
+body {
+    font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    background: #fff;
+    color: var(--ink);
+}
+.wrap {
+    background: linear-gradient(180deg, var(--bg) 0 88px, #fff 88px);
+    min-height: 100vh;
+}
+/* Header */
+
+.header {
+    height: 88px;
+    background-color: var(--bg);
+}
+.logo {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #6aa8ff, #2a6cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 800;
+}
+.title {
+    color: #fff;
+    font-weight: 600;
+}
+.search input {
+    border-radius: 999px;
+    border: none;
+    padding-left: 40px;
+    background: rgba(255, 255, 255, .1);
+    color: #fff;
+}
+.search input::placeholder {
+    color: #cdd3e2;
+}
+.search .bi {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #cdd3e2;
+}
+.icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #cdd3e2;
+    border: 1px solid rgba(255, 255, 255, .18);
+}
+.pill {
+    background: #2d73ff;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-weight: 600;
+}
+/* Sidebar */
+
+.sidebar {
+    background: #fff;
+    border-radius: 20px;
+    padding: 12px;
+    box-shadow: var(--shadow);
+}
+.bubble {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: #f3f6fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8892a7;
+    border: 1px solid var(--line);
+    margin-bottom: 16px;
+}
+.bubble.active {
+    background: #e7f0ff;
+    color: var(--brand);
+    border-color: #cfe0ff;
+}
+/* Categories */
+
+.categories {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+}
+.cat {
+    min-width: 140px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 14px 16px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+}
+.cat.active {
+    outline: 2px solid #d7e6ff;
+}
+.cat .name {
+    display: block;
+    margin-top: 8px;
+    font-weight: 600;
+}
+.cat .meta {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 2px;
+}
+/* Products grid */
+
+.food {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 16px;
+    background: #f9fbff;
+    border: 1px dashed #e6eaf2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+.food .plate {
+    width: 80%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #eee;
+}
+.name {
+    font-weight: 600;
+    text-align: center;
+}
+.cook {
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+    margin-top: 2px;
+}
+.price {
+    color: var(--good);
+    font-weight: 700;
+    text-align: center;
+    margin-top: 8px;
+}
+/* Order panel */
+
+.panel {
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 20px;
+}
+.order-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px dashed #e9eef5;
+}
+.thumb {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #f1f4fa;
+}
+.qty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 8px;
+}
+.qty button {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: #f6f8fc;
+}
+.price-sm {
+    color: #1b2559;
+    font-weight: 600;
+}
+.summary {
+    background: #12bf55;
+    color: #fff;
+    border-radius: 16px;
+    padding: 14px 16px;
+    margin-top: 12px;
+}
+.summary .subtotal {
+    display: flex;
+    justify-content: space-between;
+    color: #d7fbe7;
+}
+.summary .total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-weight: 800;
+    color: #fff;
+}
+.paybtn {
+    border: 1px solid var(--line);
+    background: #f7f9fd;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 14px;
+}
+.paybtn.active {
+    outline: 2px solid #d4f1e1;
+    background: #f2fff7;
+}
+.print {
+    margin-top: 14px;
+    width: 100%;
+    border: none;
+    background: #1971ff;
+    color: #fff;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-weight: 700;
+}
+/* Responsive adjustments */
+
+@media (max-width: 992px) {
+    .panel {
+        position: static;
+    }
+}
+@media (max-width: 768px) {
+    .search {
+        display: none;
+    }
+    .sidebar {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        width: 100%;
+        border-radius: 16px;
+        position: sticky;
+        bottom: 12px;
+        background: #fff;
+    }
+    .bubble {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 0;
+    }
+}
+.card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+}
+/* Add this to your style section */
+
+.flex-item {
+    flex: 0 0 calc(25% - 12px);
+    /* 4 items per row with gap */
+    max-width: 235px;
+}
+@media (max-width: 992px) {
+    .flex-item {
+        flex: 0 0 calc(33.333% - 12px);
+        /* 3 items per row on medium screens */
+    }
+}
+@media (max-width: 768px) {
+    .flex-item {
+        flex: 0 0 calc(50% - 12px);
+        /* 2 items per row on small screens */
+    }
+}
+@media (max-width: 576px) {
+    .flex-item {
+        flex: 0 0 100%;
+        /* 1 item per row on extra small screens */
+        max-width: 235px;
+        margin: 0 auto;
+    }
+}
+/* Desktop Layout */
+
+@media (min-width: 992px) {
+    #checkout-summary {
+        position: absolute;
+        right: 20px;
+        top: 120px;
+    }
+}
+/* Mobile Layout */
+
+@media (max-width: 991.98px) {
+    #checkout-summary {
+        position: static;
+        width: 100%;
+        max-width: 100%;
+        margin-top: 20px;
+        order: 1;
+        /* Ensure it appears below content on mobile */
+    }
+}
+#products-list {
+    /* Base grid for all screens */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.flex-item {
+    /* Default for mobile (2 columns) */
+    flex: 0 0 calc(50% - 6px);
+    /* 50% width minus half the gap */
+    max-width: 235px;
+}
+/* Tablet (3 columns) */
+
+@media (min-width: 768px) {
+    .flex-item {
+        flex: 0 0 calc(33.333% - 8px);
+    }
+}
+/* Desktop (4 columns) */
+
+@media (min-width: 992px) {
+    .flex-item {
+        flex: 0 0 calc(25% - 9px);
+    }
+}
+/* Large desktop (5 columns) */
+
+@media (min-width: 1200px) {
+    .flex-item {
+        flex: 0 0 calc(20% - 9.6px);
+    }
+}
+.bubble {
+    cursor: pointer;
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin: 5px;
+    display: inline-block;
+}
+.active {
+    background: #eee;
+}
+.orders-board .panel {
+    background: var(--bg-panel);
+    border: 0;
+    border-radius: 1.25rem;
+    box-shadow: 0 1px 0 rgba(16, 24, 40, .04), 0 12px 24px rgba(16, 24, 40, .06);
+}
+/* ---------- TOP BAR ---------- */
+
+.orders-board .toolbar .input-group-text {
+    background: #fff;
+    border-color: var(--line);
+    color: var(--text-500);
+}
+.orders-board .form-control {
+    border-color: var(--line);
+}
+.orders-board .form-select, .orders-board .btn {
+    border-color: var(--line);
+}
+.orders-board .btn-primary {
+    border: 0;
+    padding-inline: 1rem;
+    box-shadow: 0 6px 14px rgba(47, 111, 236, .18);
+}
+/* "chip" look for the date range field */
+
+.orders-board .chip-input {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: .75rem;
+    padding: .25rem .5rem .25rem .5rem;
+}
+.orders-board .chip-input .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .375rem;
+    background: var(--chip);
+    border-radius: 999px;
+    padding: .375rem .625rem;
+    font-size: .875rem;
+    color: var(--text-700);
+}
+.orders-board .chip .btn-clear {
+    border: 0;
+    background: transparent;
+    color: var(--text-500);
+    line-height: 1;
+}
+/* ---------- TABLE ---------- */
+
+.orders-board table {
+    margin: 0;
+}
+.orders-board .table thead th {
+    border-bottom: 1px solid var(--line);
+    color: var(--text-500);
+    font-weight: 600;
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+    padding-block: 1rem;
+}
+.orders-board .table tbody td {
+    border-bottom: 1px dashed var(--line);
+    vertical-align: middle;
+    padding-block: 1rem;
+}
+.orders-board .table-hover>tbody>tr:hover>* {
+    background-color: #fafcff;
+}
+/* ---------- AVATAR ---------- */
+
+.orders-board .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex: 0 0 40px;
+    background: var(--soft-gray-bg);
+    display: grid;
+    place-items: center;
+    font-weight: 600;
+    color: var(--soft-gray);
+}
+.orders-board .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+/* ---------- BADGES (soft) ---------- */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+}
+.badge-soft {
+    font-size: .75rem;
+    font-weight: 600;
+    padding: .35rem .6rem;
+    border-radius: 999px;
+}
+.badge-delivering {
+    background: var(--soft-blue-bg);
+    color: var(--soft-blue);
+}
+.badge-completed {
+    background: var(--soft-green-bg);
+    color: var(--soft-green);
+}
+.badge-pending {
+    background: var(--soft-yellow-bg);
+    color: var(--soft-yellow);
+}
+.badge-failed {
+    background: var(--soft-red-bg);
+    color: var(--soft-red);
+}
+.badge-cancelled {
+    background: var(--soft-pink-bg);
+    color: var(--soft-pink);
+}
+.badge-expired {
+    background: var(--soft-gray-bg);
+    color: var(--soft-gray);
+}
+/* ---------- ACTIONS BUTTON ---------- */
+
+.btn-actions {
+    background: #fff;
+    border: 1px solid var(--line);
+    color: #1f2a37;
+    padding: .375rem .625rem;
+    border-radius: .6rem;
+}
+/* ---------- FOOTER (pagination) ---------- */
+
+.orders-board .table-footer {
+    border-top: 1px solid var(--line);
+    padding-top: 1rem;
+}
+.orders-board .pagination .page-link {
+    border-radius: 999px;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border: 0;
+}
+.orders-board .pagination .page-item.active .page-link {
+    background: #2f6fec;
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(47, 111, 236, .18);
+}
+.orders-board .dropdown-menu {
+    border-color: var(--line);
+    box-shadow: 0 12px 24px rgba(16, 24, 40, .08);
+}
+.menu-state-bg-light-primary .menu-item.hover:not(.here)>.menu-link:not(.disabled):not(.active):not(.here), .menu-state-bg-light-primary .menu-item:not(.here) .menu-link:hover:not(.disabled):not(.active):not(.here) {
+    transition: color .2s ease;
+    background-color: var(--bs-primary-light);
+    color: var(--bs-primary);
+}
+.g-5, .gy-5 {
+    --bs-gutter-y: 1.25rem
+}
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    vertical-align: top;
+    border-color: var(--bs-table-border-color)
+}
+.table>:not(caption)>*>* {
+    padding: .75rem .75rem;
+    color: var(--bs-table-color-state, var(--bs-table-color-type, var(--bs-table-color)));
+    background-color: var(--bs-table-bg);
+    border-bottom-width: 1px;
+    box-shadow: inset 0 0 0 9999px var(--bs-table-bg-state, var(--bs-table-bg-type, var(--bs-table-accent-bg)))
+}
+.table>tbody {
+    vertical-align: inherit
+}
+.table>thead {
+    vertical-align: bottom
+}
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch
+}
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    height: var(--bs-card-height);
+    color: var(--bs-body-color);
+    word-wrap: break-word;
+    background-color: var(--bs-card-bg);
+    background-clip: border-box;
+    border: var(--bs-card-border-width) solid var(--bs-card-border-color);
+    border-radius: var(--bs-card-border-radius);
+    box-shadow: var(--bs-card-box-shadow)
+}
+.card>hr {
+    margin-right: 0;
+    margin-left: 0
+}
+.card>.list-group {
+    border-top: inherit;
+    border-bottom: inherit
+}
+.card>.list-group:first-child {
+    border-top-width: 0;
+    border-top-left-radius: var(--bs-card-inner-border-radius);
+    border-top-right-radius: var(--bs-card-inner-border-radius)
+}
+.card>.list-group:last-child {
+    border-bottom-width: 0;
+    border-bottom-right-radius: var(--bs-card-inner-border-radius);
+    border-bottom-left-radius: var(--bs-card-inner-border-radius)
+}
+.card>.card-header+.list-group, .card>.list-group+.card-footer {
+    border-top: 0
+}
+.card-body {
+    flex: 1 1 auto;
+    padding: var(--bs-card-spacer-y) var(--bs-card-spacer-x);
+    color: var(--bs-card-color)
+}
+.card-title {
+    margin-bottom: var(--bs-card-title-spacer-y);
+    color: var(--bs-card-title-color)
+}
+.card-header {
+    padding: var(--bs-card-cap-padding-y) var(--bs-card-cap-padding-x);
+    margin-bottom: 0;
+    color: var(--bs-card-cap-color);
+    background-color: var(--bs-card-cap-bg);
+    border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color)
+}
+.card-header:first-child {
+    border-radius: var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius) 0 0
+}
+.card-group>.card {
+    margin-bottom: var(--bs-card-group-margin)
+}
+.card-group>.card {
+    flex: 1 0 0;
+    margin-bottom: 0
+}
+.card-group>.card+.card {
+    margin-left: 0;
+    border-left: 0
+}
+.card-group>.card:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0
+}
+.card-group>.card:not(:last-child)>.card-header, .card-group>.card:not(:last-child)>.card-img-top {
+    border-top-right-radius: 0
+}
+.card-group>.card:not(:last-child)>.card-footer, .card-group>.card:not(:last-child)>.card-img-bottom {
+    border-bottom-right-radius: 0
+}
+.card-group>.card:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0
+}
+.card-group>.card:not(:first-child)>.card-header, .card-group>.card:not(:first-child)>.card-img-top {
+    border-top-left-radius: 0
+}
+.card-group>.card:not(:first-child)>.card-footer, .card-group>.card:not(:first-child)>.card-img-bottom {
+    border-bottom-left-radius: 0
+}
+.align-middle {
+    vertical-align: middle!important
+}
+.mb-0 {
+    margin-bottom: 0!important
+}
+.py-4 {
+    padding-top: 1rem!important;
+    padding-bottom: 1rem!important
+}
+.pt-0 {
+    padding-top: 0!important
+}
+.fs-6 {
+    font-size: 1.075rem!important
+}
+.fw-semibold {
+    font-weight: 500!important
+}
+.fw-bold {
+    font-weight: 600!important
+}
+.text-end {
+    text-align: right!important
+}
+.text-muted {
+    --bs-text-opacity: 1;
+    color: var(--bs-secondary-color)!important
+}
+.min-w-300px {
+    min-width: 300px!important
+}
+.card {
+    --bs-card-box-shadow: var(--bs-root-card-box-shadow);
+    --bs-card-border-color: var(--bs-root-card-border-color);
+    border: 1px solid var(--bs-card-border-color)
+}
+.card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    flex-wrap: wrap;
+    min-height: 70px;
+    padding: 0 2.25rem;
+    color: var(--bs-card-cap-color);
+    background-color: var(--bs-card-cap-bg);
+    border-bottom: 1px solid var(--bs-card-border-color)
+}
+.card .card-header .card-title {
+    display: flex;
+    align-items: center;
+    margin: .5rem;
+    margin-left: 0
+}
+.card .card-header .card-title.flex-column {
+    align-items: flex-start;
+    justify-content: center
+}
+.card .card-header .card-title .card-icon {
+    margin-right: .75rem;
+    line-height: 0
+}
+.card .card-header .card-title .card-icon i {
+    font-size: 1.25rem;
+    color: var(--bs-gray-600);
+    line-height: 0
+}
+.card .card-header .card-title .card-icon i:after, .card .card-header .card-title .card-icon i:before {
+    line-height: 0
+}
+.card .card-header .card-title .card-icon .svg-icon {
+    color: var(--bs-gray-600)
+}
+.card .card-header .card-title .card-icon .svg-icon svg {
+    height: 24px;
+    width: 24px
+}
+.card .card-header .card-title, .card .card-header .card-title .card-label {
+    font-weight: 500;
+    font-size: 1.275rem;
+    color: var(--bs-text-gray-900)
+}
+.card .card-header .card-title .card-label {
+    margin: 0 .75rem 0 0;
+    flex-wrap: wrap
+}
+.card .card-header .card-title .small, .card .card-header .card-title small {
+    color: var(--bs-text-muted);
+    font-size: 1rem
+}
+.card .card-header .card-title .h1, .card .card-header .card-title .h2, .card .card-header .card-title .h3, .card .card-header .card-title .h4, .card .card-header .card-title .h5, .card .card-header .card-title .h6, .card .card-header .card-title h1, .card .card-header .card-title h2, .card .card-header .card-title h3, .card .card-header .card-title h4, .card .card-header .card-title h5, .card .card-header .card-title h6 {
+    margin-bottom: 0
+}
+.card .card-header .card-toolbar {
+    display: flex;
+    align-items: center;
+    margin: .5rem 0;
+    flex-wrap: wrap
+}
+.card .card-body {
+    padding: 2rem 2.25rem;
+    color: var(--bs-card-color)
+}
+.card .card-footer {
+    padding: 2rem 2.25rem;
+    color: var(--bs-card-cap-color);
+    background-color: var(--bs-card-cap-bg);
+    border-top: 1px solid var(--bs-card-border-color)
+}
+.card .card-scroll {
+    position: relative;
+    overflow: auto
+}
+.card.card-px-0 .card-body, .card.card-px-0 .card-footer, .card.card-px-0 .card-header {
+    padding-left: 0;
+    padding-right: 0
+}
+.card.card-py-0 .card-body, .card.card-py-0 .card-footer, .card.card-py-0 .card-header {
+    padding-top: 0;
+    padding-bottom: 0
+}
+.card.card-p-0 .card-body, .card.card-p-0 .card-footer, .card.card-p-0 .card-header {
+    padding: 0
+}
+.card.card-dashed {
+    box-shadow: none;
+    border: 1px dashed var(--bs-border-dashed-color)
+}
+.card.card-dashed>.card-header {
+    border-bottom: 1px dashed var(--bs-border-dashed-color)
+}
+.card.card-dashed>.card-footer {
+    border-top: 1px dashed var(--bs-border-dashed-color)
+}
+.card.card-bordered {
+    box-shadow: none;
+    border: 1px solid #f1f1f4
+}
+.card.card-flush>.card-header {
+    border-bottom: 0!important
+}
+.card.card-flush>.card-footer {
+    border-top: 0!important
+}
+.card.card-shadow {
+    box-shadow: var(--bs-card-box-shadow);
+    border: 0
+}
+.card.card-reset {
+    border: 0!important;
+    box-shadow: none!important;
+    background-color: transparent!important
+}
+.card.card-reset>.card-header {
+    border-bottom: 0!important
+}
+.card.card-reset>.card-footer {
+    border-top: 0!important
+}
+.card.card-borderless {
+    border: 0!important
+}
+.card.card-borderless>.card-header {
+    border-bottom: 0!important
+}
+.card.card-borderless>.card-footer {
+    border-top: 0!important
+}
+.card.card-border-0 {
+    border: 0!important
+}
+.card.card-stretch {
+    height: calc(100% - var(--bs-gutter-y))
+}
+.card.card-stretch-75 {
+    height: calc(75% - var(--bs-gutter-y))
+}
+.card.card-stretch-50 {
+    height: calc(50% - var(--bs-gutter-y))
+}
+.card.card-stretch-33 {
+    height: calc(33.333% - var(--bs-gutter-y))
+}
+.card.card-stretch-25 {
+    height: calc(25% - var(--bs-gutter-y))
+}
+.card .card-header-stretch {
+    padding-top: 0!important;
+    padding-bottom: 0!important;
+    align-items: stretch
+}
+.card .card-header-stretch .card-toolbar {
+    margin: 0;
+    align-items: stretch
+}
+.card.card-sm-stretch {
+    height: calc(100% - var(--bs-gutter-y))
+}
+.card.card-sm-stretch-75 {
+    height: calc(75% - var(--bs-gutter-y))
+}
+.card.card-sm-stretch-50 {
+    height: calc(50% - var(--bs-gutter-y))
+}
+.card.card-sm-stretch-33 {
+    height: calc(33.333% - var(--bs-gutter-y))
+}
+.card.card-sm-stretch-25 {
+    height: calc(25% - var(--bs-gutter-y))
+}
+.card .card-header-sm-stretch {
+    padding-top: 0!important;
+    padding-bottom: 0!important;
+    align-items: stretch
+}
+.card .card-header-sm-stretch .card-toolbar {
+    margin: 0;
+    align-items: stretch
+}
+.card.card-md-stretch {
+    height: calc(100% - var(--bs-gutter-y))
+}
+.card.card-md-stretch-75 {
+    height: calc(75% - var(--bs-gutter-y))
+}
+.card.card-md-stretch-50 {
+    height: calc(50% - var(--bs-gutter-y))
+}
+.card.card-md-stretch-33 {
+    height: calc(33.333% - var(--bs-gutter-y))
+}
+.card.card-md-stretch-25 {
+    height: calc(25% - var(--bs-gutter-y))
+}
+.card .card-header-md-stretch {
+    padding-top: 0!important;
+    padding-bottom: 0!important;
+    align-items: stretch
+}
+.card .card-header-md-stretch .card-toolbar {
+    margin: 0;
+    align-items: stretch
+}
+.card.card-lg-stretch {
+    height: calc(100% - var(--bs-gutter-y))
+}
+.card.card-lg-stretch-75 {
+    height: calc(75% - var(--bs-gutter-y))
+}
+.card.card-lg-stretch-50 {
+    height: calc(50% - var(--bs-gutter-y))
+}
+.card.card-lg-stretch-33 {
+    height: calc(33.333% - var(--bs-gutter-y))
+}
+.card.card-lg-stretch-25 {
+    height: calc(25% - var(--bs-gutter-y))
+}
+.card .card-header-lg-stretch {
+    padding-top: 0!important;
+    padding-bottom: 0!important;
+    align-items: stretch
+}
+.card .card-header-lg-stretch .card-toolbar {
+    margin: 0;
+    align-items: stretch
+}
+.card.card-xl-stretch {
+    height: calc(100% - var(--bs-gutter-y))
+}
+.card.card-xl-stretch-75 {
+    height: calc(75% - var(--bs-gutter-y))
+}
+.card.card-xl-stretch-50 {
+    height: calc(50% - var(--bs-gutter-y))
+}
+.card.card-xl-stretch-33 {
+    height: calc(33.333% - var(--bs-gutter-y))
+}
+.card.card-xl-stretch-25 {
+    height: calc(25% - var(--bs-gutter-y))
+}
+.card .card-header-xl-stretch {
+    padding-top: 0!important;
+    padding-bottom: 0!important;
+    align-items: stretch
+}
+.card .card-header-xl-stretch .card-toolbar {
+    margin: 0;
+    align-items: stretch
+}
+.card.card-xxl-stretch {
+    height: calc(100% - var(--bs-gutter-y))
+}
+.card.card-xxl-stretch-75 {
+    height: calc(75% - var(--bs-gutter-y))
+}
+.card.card-xxl-stretch-50 {
+    height: calc(50% - var(--bs-gutter-y))
+}
+.card.card-xxl-stretch-33 {
+    height: calc(33.333% - var(--bs-gutter-y))
+}
+.card.card-xxl-stretch-25 {
+    height: calc(25% - var(--bs-gutter-y))
+}
+.card .card-header-xxl-stretch {
+    padding-top: 0!important;
+    padding-bottom: 0!important;
+    align-items: stretch
+}
+.card .card-header-xxl-stretch .card-toolbar {
+    margin: 0;
+    align-items: stretch
+}
+.card>.card-header:not(.flex-nowrap) {
+    padding-top: .5rem;
+    padding-bottom: .5rem
+}
+[data-bs-theme=dark] .card {
+    --bs-card-box-shadow: none
+}
+.table:not(.table-bordered)>:not(:first-child) {
+    border-color: transparent;
+    border-width: 0;
+    border-style: none
+}
+.table:not(.table-bordered)>:not(:last-child)>:last-child>* {
+    border-bottom-color: inherit
+}
+.table:not(.table-bordered) td, .table:not(.table-bordered) th, .table:not(.table-bordered) tr {
+    border-color: inherit;
+    border-width: inherit;
+    border-style: inherit;
+    text-transform: inherit;
+    font-weight: inherit;
+    font-size: inherit;
+    color: inherit;
+    height: inherit;
+    min-height: inherit
+}
+.table:not(.table-bordered) td:first-child, .table:not(.table-bordered) th:first-child, .table:not(.table-bordered) tr:first-child {
+    padding-left: 0
+}
+.table:not(.table-bordered) td:last-child, .table:not(.table-bordered) th:last-child, .table:not(.table-bordered) tr:last-child {
+    padding-right: 0
+}
+.table:not(.table-bordered) tbody tr:last-child, .table:not(.table-bordered) tfoot tr:last-child {
+    border-bottom: 0!important
+}
+.table:not(.table-bordered) tbody tr:last-child td, .table:not(.table-bordered) tbody tr:last-child th, .table:not(.table-bordered) tfoot tr:last-child td, .table:not(.table-bordered) tfoot tr:last-child th {
+    border-bottom: 0!important
+}
+.table:not(.table-bordered) tfoot td, .table:not(.table-bordered) tfoot th {
+    border-top: inherit
+}
+.table:not(.table-bordered).table-rounded {
+    border-radius: .95rem;
+    border-spacing: 0;
+    border-collapse: separate
+}
+.table:not(.table-bordered).table-rows-rounded td:first-child, .table:not(.table-bordered).table-rows-rounded th:first-child {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px
+}
+.table:not(.table-bordered).table-rows-rounded td:last-child, .table:not(.table-bordered).table-rows-rounded th:last-child {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px
+}
+.table:not(.table-bordered).table-flush td, .table:not(.table-bordered).table-flush th, .table:not(.table-bordered).table-flush tr {
+    padding: inherit
+}
+.table:not(.table-bordered).table-row-bordered tr {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: var(--bs-border-color)
+}
+.table:not(.table-bordered).table-row-bordered tfoot td, .table:not(.table-bordered).table-row-bordered tfoot th {
+    border-top-width: 1px!important
+}
+.table:not(.table-bordered).table-row-dashed tr {
+    border-bottom-width: 1px;
+    border-bottom-style: dashed;
+    border-bottom-color: var(--bs-border-color)
+}
+.table:not(.table-bordered).table-row-dashed tfoot td, .table:not(.table-bordered).table-row-dashed tfoot th {
+    border-top-width: 1px!important
+}
+.table:not(.table-bordered).table-row-gray-100 tr {
+    border-bottom-color: var(--bs-gray-100)
+}
+.table:not(.table-bordered).table-row-gray-200 tr {
+    border-bottom-color: var(--bs-gray-200)
+}
+.table:not(.table-bordered).table-row-gray-300 tr {
+    border-bottom-color: var(--bs-gray-300)
+}
+.table:not(.table-bordered).table-row-gray-400 tr {
+    border-bottom-color: var(--bs-gray-400)
+}
+.table:not(.table-bordered).table-row-gray-500 tr {
+    border-bottom-color: var(--bs-gray-500)
+}
+.table:not(.table-bordered).table-row-gray-600 tr {
+    border-bottom-color: var(--bs-gray-600)
+}
+.table:not(.table-bordered).table-row-gray-700 tr {
+    border-bottom-color: var(--bs-gray-700)
+}
+.table:not(.table-bordered).table-row-gray-800 tr {
+    border-bottom-color: var(--bs-gray-800)
+}
+.table:not(.table-bordered).table-row-gray-900 tr {
+    border-bottom-color: var(--bs-gray-900)
+}
+.table.g-0 td, .table.g-0 th {
+    padding: 0
+}
+.table.g-0 td.dtr-control, .table.g-0 th.dtr-control {
+    padding-left: 0!important
+}
+.table.gy-0 td, .table.gy-0 th {
+    padding-top: 0;
+    padding-bottom: 0
+}
+.table.gx-0 td, .table.gx-0 th {
+    padding-left: 0;
+    padding-right: 0
+}
+.table.gx-0 td.dtr-control, .table.gx-0 th.dtr-control {
+    padding-left: 0!important
+}
+.table.gs-0 td:first-child, .table.gs-0 th:first-child {
+    padding-left: 0
+}
+.table.gs-0 td:last-child, .table.gs-0 th:last-child {
+    padding-right: 0
+}
+.table.gs-0 td.dtr-control:first-child, .table.gs-0 th.dtr-control:first-child {
+    padding-left: 0!important
+}
+.table.g-1 td, .table.g-1 th {
+    padding: .25rem
+}
+.table.g-1 td.dtr-control, .table.g-1 th.dtr-control {
+    padding-left: .25rem!important
+}
+.table.gy-1 td, .table.gy-1 th {
+    padding-top: .25rem;
+    padding-bottom: .25rem
+}
+.table.gx-1 td, .table.gx-1 th {
+    padding-left: .25rem;
+    padding-right: .25rem
+}
+.table.gx-1 td.dtr-control, .table.gx-1 th.dtr-control {
+    padding-left: .25rem!important
+}
+.table.gs-1 td:first-child, .table.gs-1 th:first-child {
+    padding-left: .25rem
+}
+.table.gs-1 td:last-child, .table.gs-1 th:last-child {
+    padding-right: .25rem
+}
+.table.gs-1 td.dtr-control:first-child, .table.gs-1 th.dtr-control:first-child {
+    padding-left: .25rem!important
+}
+.table.g-2 td, .table.g-2 th {
+    padding: .5rem
+}
+.table.g-2 td.dtr-control, .table.g-2 th.dtr-control {
+    padding-left: .5rem!important
+}
+.table.gy-2 td, .table.gy-2 th {
+    padding-top: .5rem;
+    padding-bottom: .5rem
+}
+.table.gx-2 td, .table.gx-2 th {
+    padding-left: .5rem;
+    padding-right: .5rem
+}
+.table.gx-2 td.dtr-control, .table.gx-2 th.dtr-control {
+    padding-left: .5rem!important
+}
+.table.gs-2 td:first-child, .table.gs-2 th:first-child {
+    padding-left: .5rem
+}
+.table.gs-2 td:last-child, .table.gs-2 th:last-child {
+    padding-right: .5rem
+}
+.table.gs-2 td.dtr-control:first-child, .table.gs-2 th.dtr-control:first-child {
+    padding-left: .5rem!important
+}
+.table.g-3 td, .table.g-3 th {
+    padding: .75rem
+}
+.table.g-3 td.dtr-control, .table.g-3 th.dtr-control {
+    padding-left: .75rem!important
+}
+.table.gy-3 td, .table.gy-3 th {
+    padding-top: .75rem;
+    padding-bottom: .75rem
+}
+.table.gx-3 td, .table.gx-3 th {
+    padding-left: .75rem;
+    padding-right: .75rem
+}
+.table.gx-3 td.dtr-control, .table.gx-3 th.dtr-control {
+    padding-left: .75rem!important
+}
+.table.gs-3 td:first-child, .table.gs-3 th:first-child {
+    padding-left: .75rem
+}
+.table.gs-3 td:last-child, .table.gs-3 th:last-child {
+    padding-right: .75rem
+}
+.table.gs-3 td.dtr-control:first-child, .table.gs-3 th.dtr-control:first-child {
+    padding-left: .75rem!important
+}
+.table.g-4 td, .table.g-4 th {
+    padding: 1rem
+}
+.table.g-4 td.dtr-control, .table.g-4 th.dtr-control {
+    padding-left: 1rem!important
+}
+.table.gy-4 td, .table.gy-4 th {
+    padding-top: 1rem;
+    padding-bottom: 1rem
+}
+.table.gx-4 td, .table.gx-4 th {
+    padding-left: 1rem;
+    padding-right: 1rem
+}
+.table.gx-4 td.dtr-control, .table.gx-4 th.dtr-control {
+    padding-left: 1rem!important
+}
+.table.gs-4 td:first-child, .table.gs-4 th:first-child {
+    padding-left: 1rem
+}
+.table.gs-4 td:last-child, .table.gs-4 th:last-child {
+    padding-right: 1rem
+}
+.table.gs-4 td.dtr-control:first-child, .table.gs-4 th.dtr-control:first-child {
+    padding-left: 1rem!important
+}
+.table.g-5 td, .table.g-5 th {
+    padding: 1.25rem
+}
+.table.g-5 td.dtr-control, .table.g-5 th.dtr-control {
+    padding-left: 1.25rem!important
+}
+.table.gy-5 td, .table.gy-5 th {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem
+}
+.table.gx-5 td, .table.gx-5 th {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem
+}
+.table.gx-5 td.dtr-control, .table.gx-5 th.dtr-control {
+    padding-left: 1.25rem!important
+}
+.table.gs-5 td:first-child, .table.gs-5 th:first-child {
+    padding-left: 1.25rem
+}
+.table.gs-5 td:last-child, .table.gs-5 th:last-child {
+    padding-right: 1.25rem
+}
+.table.gs-5 td.dtr-control:first-child, .table.gs-5 th.dtr-control:first-child {
+    padding-left: 1.25rem!important
+}
+.table.g-6 td, .table.g-6 th {
+    padding: 1.5rem
+}
+.table.g-6 td.dtr-control, .table.g-6 th.dtr-control {
+    padding-left: 1.5rem!important
+}
+.table.gy-6 td, .table.gy-6 th {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem
+}
+.table.gx-6 td, .table.gx-6 th {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem
+}
+.table.gx-6 td.dtr-control, .table.gx-6 th.dtr-control {
+    padding-left: 1.5rem!important
+}
+.table.gs-6 td:first-child, .table.gs-6 th:first-child {
+    padding-left: 1.5rem
+}
+.table.gs-6 td:last-child, .table.gs-6 th:last-child {
+    padding-right: 1.5rem
+}
+.table.gs-6 td.dtr-control:first-child, .table.gs-6 th.dtr-control:first-child {
+    padding-left: 1.5rem!important
+}
+.table.g-7 td, .table.g-7 th {
+    padding: 1.75rem
+}
+.table.g-7 td.dtr-control, .table.g-7 th.dtr-control {
+    padding-left: 1.75rem!important
+}
+.table.gy-7 td, .table.gy-7 th {
+    padding-top: 1.75rem;
+    padding-bottom: 1.75rem
+}
+.table.gx-7 td, .table.gx-7 th {
+    padding-left: 1.75rem;
+    padding-right: 1.75rem
+}
+.table.gx-7 td.dtr-control, .table.gx-7 th.dtr-control {
+    padding-left: 1.75rem!important
+}
+.table.gs-7 td:first-child, .table.gs-7 th:first-child {
+    padding-left: 1.75rem
+}
+.table.gs-7 td:last-child, .table.gs-7 th:last-child {
+    padding-right: 1.75rem
+}
+.table.gs-7 td.dtr-control:first-child, .table.gs-7 th.dtr-control:first-child {
+    padding-left: 1.75rem!important
+}
+.table.g-8 td, .table.g-8 th {
+    padding: 2rem
+}
+.table.g-8 td.dtr-control, .table.g-8 th.dtr-control {
+    padding-left: 2rem!important
+}
+.table.gy-8 td, .table.gy-8 th {
+    padding-top: 2rem;
+    padding-bottom: 2rem
+}
+.table.gx-8 td, .table.gx-8 th {
+    padding-left: 2rem;
+    padding-right: 2rem
+}
+.table.gx-8 td.dtr-control, .table.gx-8 th.dtr-control {
+    padding-left: 2rem!important
+}
+.table.gs-8 td:first-child, .table.gs-8 th:first-child {
+    padding-left: 2rem
+}
+.table.gs-8 td:last-child, .table.gs-8 th:last-child {
+    padding-right: 2rem
+}
+.table.gs-8 td.dtr-control:first-child, .table.gs-8 th.dtr-control:first-child {
+    padding-left: 2rem!important
+}
+.table.g-9 td, .table.g-9 th {
+    padding: 2.25rem
+}
+.table.g-9 td.dtr-control, .table.g-9 th.dtr-control {
+    padding-left: 2.25rem!important
+}
+.table.gy-9 td, .table.gy-9 th {
+    padding-top: 2.25rem;
+    padding-bottom: 2.25rem
+}
+.table.gx-9 td, .table.gx-9 th {
+    padding-left: 2.25rem;
+    padding-right: 2.25rem
+}
+.table.gx-9 td.dtr-control, .table.gx-9 th.dtr-control {
+    padding-left: 2.25rem!important
+}
+.table.gs-9 td:first-child, .table.gs-9 th:first-child {
+    padding-left: 2.25rem
+}
+.table.gs-9 td:last-child, .table.gs-9 th:last-child {
+    padding-right: 2.25rem
+}
+.table.gs-9 td.dtr-control:first-child, .table.gs-9 th.dtr-control:first-child {
+    padding-left: 2.25rem!important
+}
+.table.g-10 td, .table.g-10 th {
+    padding: 2.5rem
+}
+.table.g-10 td.dtr-control, .table.g-10 th.dtr-control {
+    padding-left: 2.5rem!important
+}
+.table.gy-10 td, .table.gy-10 th {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem
+}
+.table.gx-10 td, .table.gx-10 th {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem
+}
+.table.gx-10 td.dtr-control, .table.gx-10 th.dtr-control {
+    padding-left: 2.5rem!important
+}
+.table.gs-10 td:first-child, .table.gs-10 th:first-child {
+    padding-left: 2.5rem
+}
+.table.gs-10 td:last-child, .table.gs-10 th:last-child {
+    padding-right: 2.5rem
+}
+.table.gs-10 td.dtr-control:first-child, .table.gs-10 th.dtr-control:first-child {
+    padding-left: 2.5rem!important
+}
+.table.g-sm-0 td, .table.g-sm-0 th {
+    padding: 0
+}
+.table.g-sm-0 td.dtr-control, .table.g-sm-0 th.dtr-control {
+    padding-left: 0!important
+}
+.table.gy-sm-0 td, .table.gy-sm-0 th {
+    padding-top: 0;
+    padding-bottom: 0
+}
+.table.gx-sm-0 td, .table.gx-sm-0 th {
+    padding-left: 0;
+    padding-right: 0
+}
+.table.gx-sm-0 td.dtr-control, .table.gx-sm-0 th.dtr-control {
+    padding-left: 0!important
+}
+.table.gs-sm-0 td:first-child, .table.gs-sm-0 th:first-child {
+    padding-left: 0
+}
+.table.gs-sm-0 td:last-child, .table.gs-sm-0 th:last-child {
+    padding-right: 0
+}
+.table.gs-sm-0 td.dtr-control:first-child, .table.gs-sm-0 th.dtr-control:first-child {
+    padding-left: 0!important
+}
+.table.g-sm-1 td, .table.g-sm-1 th {
+    padding: .25rem
+}
+.table.g-sm-1 td.dtr-control, .table.g-sm-1 th.dtr-control {
+    padding-left: .25rem!important
+}
+.table.gy-sm-1 td, .table.gy-sm-1 th {
+    padding-top: .25rem;
+    padding-bottom: .25rem
+}
+.table.gx-sm-1 td, .table.gx-sm-1 th {
+    padding-left: .25rem;
+    padding-right: .25rem
+}
+.table.gx-sm-1 td.dtr-control, .table.gx-sm-1 th.dtr-control {
+    padding-left: .25rem!important
+}
+.table.gs-sm-1 td:first-child, .table.gs-sm-1 th:first-child {
+    padding-left: .25rem
+}
+.table.gs-sm-1 td:last-child, .table.gs-sm-1 th:last-child {
+    padding-right: .25rem
+}
+.table.gs-sm-1 td.dtr-control:first-child, .table.gs-sm-1 th.dtr-control:first-child {
+    padding-left: .25rem!important
+}
+.table.g-sm-2 td, .table.g-sm-2 th {
+    padding: .5rem
+}
+.table.g-sm-2 td.dtr-control, .table.g-sm-2 th.dtr-control {
+    padding-left: .5rem!important
+}
+.table.gy-sm-2 td, .table.gy-sm-2 th {
+    padding-top: .5rem;
+    padding-bottom: .5rem
+}
+.table.gx-sm-2 td, .table.gx-sm-2 th {
+    padding-left: .5rem;
+    padding-right: .5rem
+}
+.table.gx-sm-2 td.dtr-control, .table.gx-sm-2 th.dtr-control {
+    padding-left: .5rem!important
+}
+.table.gs-sm-2 td:first-child, .table.gs-sm-2 th:first-child {
+    padding-left: .5rem
+}
+.table.gs-sm-2 td:last-child, .table.gs-sm-2 th:last-child {
+    padding-right: .5rem
+}
+.table.gs-sm-2 td.dtr-control:first-child, .table.gs-sm-2 th.dtr-control:first-child {
+    padding-left: .5rem!important
+}
+.table.g-sm-3 td, .table.g-sm-3 th {
+    padding: .75rem
+}
+.table.g-sm-3 td.dtr-control, .table.g-sm-3 th.dtr-control {
+    padding-left: .75rem!important
+}
+.table.gy-sm-3 td, .table.gy-sm-3 th {
+    padding-top: .75rem;
+    padding-bottom: .75rem
+}
+.table.gx-sm-3 td, .table.gx-sm-3 th {
+    padding-left: .75rem;
+    padding-right: .75rem
+}
+.table.gx-sm-3 td.dtr-control, .table.gx-sm-3 th.dtr-control {
+    padding-left: .75rem!important
+}
+.table.gs-sm-3 td:first-child, .table.gs-sm-3 th:first-child {
+    padding-left: .75rem
+}
+.table.gs-sm-3 td:last-child, .table.gs-sm-3 th:last-child {
+    padding-right: .75rem
+}
+.table.gs-sm-3 td.dtr-control:first-child, .table.gs-sm-3 th.dtr-control:first-child {
+    padding-left: .75rem!important
+}
+.table.g-sm-4 td, .table.g-sm-4 th {
+    padding: 1rem
+}
+.table.g-sm-4 td.dtr-control, .table.g-sm-4 th.dtr-control {
+    padding-left: 1rem!important
+}
+.table.gy-sm-4 td, .table.gy-sm-4 th {
+    padding-top: 1rem;
+    padding-bottom: 1rem
+}
+.table.gx-sm-4 td, .table.gx-sm-4 th {
+    padding-left: 1rem;
+    padding-right: 1rem
+}
+.table.gx-sm-4 td.dtr-control, .table.gx-sm-4 th.dtr-control {
+    padding-left: 1rem!important
+}
+.table.gs-sm-4 td:first-child, .table.gs-sm-4 th:first-child {
+    padding-left: 1rem
+}
+.table.gs-sm-4 td:last-child, .table.gs-sm-4 th:last-child {
+    padding-right: 1rem
+}
+.table.gs-sm-4 td.dtr-control:first-child, .table.gs-sm-4 th.dtr-control:first-child {
+    padding-left: 1rem!important
+}
+.table.g-sm-5 td, .table.g-sm-5 th {
+    padding: 1.25rem
+}
+.table.g-sm-5 td.dtr-control, .table.g-sm-5 th.dtr-control {
+    padding-left: 1.25rem!important
+}
+.table.gy-sm-5 td, .table.gy-sm-5 th {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem
+}
+.table.gx-sm-5 td, .table.gx-sm-5 th {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem
+}
+.table.gx-sm-5 td.dtr-control, .table.gx-sm-5 th.dtr-control {
+    padding-left: 1.25rem!important
+}
+.table.gs-sm-5 td:first-child, .table.gs-sm-5 th:first-child {
+    padding-left: 1.25rem
+}
+.table.gs-sm-5 td:last-child, .table.gs-sm-5 th:last-child {
+    padding-right: 1.25rem
+}
+.table.gs-sm-5 td.dtr-control:first-child, .table.gs-sm-5 th.dtr-control:first-child {
+    padding-left: 1.25rem!important
+}
+.table.g-sm-6 td, .table.g-sm-6 th {
+    padding: 1.5rem
+}
+.table.g-sm-6 td.dtr-control, .table.g-sm-6 th.dtr-control {
+    padding-left: 1.5rem!important
+}
+.table.gy-sm-6 td, .table.gy-sm-6 th {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem
+}
+.table.gx-sm-6 td, .table.gx-sm-6 th {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem
+}
+.table.gx-sm-6 td.dtr-control, .table.gx-sm-6 th.dtr-control {
+    padding-left: 1.5rem!important
+}
+.table.gs-sm-6 td:first-child, .table.gs-sm-6 th:first-child {
+    padding-left: 1.5rem
+}
+.table.gs-sm-6 td:last-child, .table.gs-sm-6 th:last-child {
+    padding-right: 1.5rem
+}
+.table.gs-sm-6 td.dtr-control:first-child, .table.gs-sm-6 th.dtr-control:first-child {
+    padding-left: 1.5rem!important
+}
+.table.g-sm-7 td, .table.g-sm-7 th {
+    padding: 1.75rem
+}
+.table.g-sm-7 td.dtr-control, .table.g-sm-7 th.dtr-control {
+    padding-left: 1.75rem!important
+}
+.table.gy-sm-7 td, .table.gy-sm-7 th {
+    padding-top: 1.75rem;
+    padding-bottom: 1.75rem
+}
+.table.gx-sm-7 td, .table.gx-sm-7 th {
+    padding-left: 1.75rem;
+    padding-right: 1.75rem
+}
+.table.gx-sm-7 td.dtr-control, .table.gx-sm-7 th.dtr-control {
+    padding-left: 1.75rem!important
+}
+.table.gs-sm-7 td:first-child, .table.gs-sm-7 th:first-child {
+    padding-left: 1.75rem
+}
+.table.gs-sm-7 td:last-child, .table.gs-sm-7 th:last-child {
+    padding-right: 1.75rem
+}
+.table.gs-sm-7 td.dtr-control:first-child, .table.gs-sm-7 th.dtr-control:first-child {
+    padding-left: 1.75rem!important
+}
+.table.g-sm-8 td, .table.g-sm-8 th {
+    padding: 2rem
+}
+.table.g-sm-8 td.dtr-control, .table.g-sm-8 th.dtr-control {
+    padding-left: 2rem!important
+}
+.table.gy-sm-8 td, .table.gy-sm-8 th {
+    padding-top: 2rem;
+    padding-bottom: 2rem
+}
+.table.gx-sm-8 td, .table.gx-sm-8 th {
+    padding-left: 2rem;
+    padding-right: 2rem
+}
+.table.gx-sm-8 td.dtr-control, .table.gx-sm-8 th.dtr-control {
+    padding-left: 2rem!important
+}
+.table.gs-sm-8 td:first-child, .table.gs-sm-8 th:first-child {
+    padding-left: 2rem
+}
+.table.gs-sm-8 td:last-child, .table.gs-sm-8 th:last-child {
+    padding-right: 2rem
+}
+.table.gs-sm-8 td.dtr-control:first-child, .table.gs-sm-8 th.dtr-control:first-child {
+    padding-left: 2rem!important
+}
+.table.g-sm-9 td, .table.g-sm-9 th {
+    padding: 2.25rem
+}
+.table.g-sm-9 td.dtr-control, .table.g-sm-9 th.dtr-control {
+    padding-left: 2.25rem!important
+}
+.table.gy-sm-9 td, .table.gy-sm-9 th {
+    padding-top: 2.25rem;
+    padding-bottom: 2.25rem
+}
+.table.gx-sm-9 td, .table.gx-sm-9 th {
+    padding-left: 2.25rem;
+    padding-right: 2.25rem
+}
+.table.gx-sm-9 td.dtr-control, .table.gx-sm-9 th.dtr-control {
+    padding-left: 2.25rem!important
+}
+.table.gs-sm-9 td:first-child, .table.gs-sm-9 th:first-child {
+    padding-left: 2.25rem
+}
+.table.gs-sm-9 td:last-child, .table.gs-sm-9 th:last-child {
+    padding-right: 2.25rem
+}
+.table.gs-sm-9 td.dtr-control:first-child, .table.gs-sm-9 th.dtr-control:first-child {
+    padding-left: 2.25rem!important
+}
+.table.g-sm-10 td, .table.g-sm-10 th {
+    padding: 2.5rem
+}
+.table.g-sm-10 td.dtr-control, .table.g-sm-10 th.dtr-control {
+    padding-left: 2.5rem!important
+}
+.table.gy-sm-10 td, .table.gy-sm-10 th {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem
+}
+.table.gx-sm-10 td, .table.gx-sm-10 th {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem
+}
+.table.gx-sm-10 td.dtr-control, .table.gx-sm-10 th.dtr-control {
+    padding-left: 2.5rem!important
+}
+.table.gs-sm-10 td:first-child, .table.gs-sm-10 th:first-child {
+    padding-left: 2.5rem
+}
+.table.gs-sm-10 td:last-child, .table.gs-sm-10 th:last-child {
+    padding-right: 2.5rem
+}
+.table.gs-sm-10 td.dtr-control:first-child, .table.gs-sm-10 th.dtr-control:first-child {
+    padding-left: 2.5rem!important
+}
+.table.g-md-0 td, .table.g-md-0 th {
+    padding: 0
+}
+.table.g-md-0 td.dtr-control, .table.g-md-0 th.dtr-control {
+    padding-left: 0!important
+}
+.table.gy-md-0 td, .table.gy-md-0 th {
+    padding-top: 0;
+    padding-bottom: 0
+}
+.table.gx-md-0 td, .table.gx-md-0 th {
+    padding-left: 0;
+    padding-right: 0
+}
+.table.gx-md-0 td.dtr-control, .table.gx-md-0 th.dtr-control {
+    padding-left: 0!important
+}
+.table.gs-md-0 td:first-child, .table.gs-md-0 th:first-child {
+    padding-left: 0
+}
+.table.gs-md-0 td:last-child, .table.gs-md-0 th:last-child {
+    padding-right: 0
+}
+.table.gs-md-0 td.dtr-control:first-child, .table.gs-md-0 th.dtr-control:first-child {
+    padding-left: 0!important
+}
+.table.g-md-1 td, .table.g-md-1 th {
+    padding: .25rem
+}
+.table.g-md-1 td.dtr-control, .table.g-md-1 th.dtr-control {
+    padding-left: .25rem!important
+}
+.table.gy-md-1 td, .table.gy-md-1 th {
+    padding-top: .25rem;
+    padding-bottom: .25rem
+}
+.table.gx-md-1 td, .table.gx-md-1 th {
+    padding-left: .25rem;
+    padding-right: .25rem
+}
+.table.gx-md-1 td.dtr-control, .table.gx-md-1 th.dtr-control {
+    padding-left: .25rem!important
+}
+.table.gs-md-1 td:first-child, .table.gs-md-1 th:first-child {
+    padding-left: .25rem
+}
+.table.gs-md-1 td:last-child, .table.gs-md-1 th:last-child {
+    padding-right: .25rem
+}
+.table.gs-md-1 td.dtr-control:first-child, .table.gs-md-1 th.dtr-control:first-child {
+    padding-left: .25rem!important
+}
+.table.g-md-2 td, .table.g-md-2 th {
+    padding: .5rem
+}
+.table.g-md-2 td.dtr-control, .table.g-md-2 th.dtr-control {
+    padding-left: .5rem!important
+}
+.table.gy-md-2 td, .table.gy-md-2 th {
+    padding-top: .5rem;
+    padding-bottom: .5rem
+}
+.table.gx-md-2 td, .table.gx-md-2 th {
+    padding-left: .5rem;
+    padding-right: .5rem
+}
+.table.gx-md-2 td.dtr-control, .table.gx-md-2 th.dtr-control {
+    padding-left: .5rem!important
+}
+.table.gs-md-2 td:first-child, .table.gs-md-2 th:first-child {
+    padding-left: .5rem
+}
+.table.gs-md-2 td:last-child, .table.gs-md-2 th:last-child {
+    padding-right: .5rem
+}
+.table.gs-md-2 td.dtr-control:first-child, .table.gs-md-2 th.dtr-control:first-child {
+    padding-left: .5rem!important
+}
+.table.g-md-3 td, .table.g-md-3 th {
+    padding: .75rem
+}
+.table.g-md-3 td.dtr-control, .table.g-md-3 th.dtr-control {
+    padding-left: .75rem!important
+}
+.table.gy-md-3 td, .table.gy-md-3 th {
+    padding-top: .75rem;
+    padding-bottom: .75rem
+}
+.table.gx-md-3 td, .table.gx-md-3 th {
+    padding-left: .75rem;
+    padding-right: .75rem
+}
+.table.gx-md-3 td.dtr-control, .table.gx-md-3 th.dtr-control {
+    padding-left: .75rem!important
+}
+.table.gs-md-3 td:first-child, .table.gs-md-3 th:first-child {
+    padding-left: .75rem
+}
+.table.gs-md-3 td:last-child, .table.gs-md-3 th:last-child {
+    padding-right: .75rem
+}
+.table.gs-md-3 td.dtr-control:first-child, .table.gs-md-3 th.dtr-control:first-child {
+    padding-left: .75rem!important
+}
+.table.g-md-4 td, .table.g-md-4 th {
+    padding: 1rem
+}
+.table.g-md-4 td.dtr-control, .table.g-md-4 th.dtr-control {
+    padding-left: 1rem!important
+}
+.table.gy-md-4 td, .table.gy-md-4 th {
+    padding-top: 1rem;
+    padding-bottom: 1rem
+}
+.table.gx-md-4 td, .table.gx-md-4 th {
+    padding-left: 1rem;
+    padding-right: 1rem
+}
+.table.gx-md-4 td.dtr-control, .table.gx-md-4 th.dtr-control {
+    padding-left: 1rem!important
+}
+.table.gs-md-4 td:first-child, .table.gs-md-4 th:first-child {
+    padding-left: 1rem
+}
+.table.gs-md-4 td:last-child, .table.gs-md-4 th:last-child {
+    padding-right: 1rem
+}
+.table.gs-md-4 td.dtr-control:first-child, .table.gs-md-4 th.dtr-control:first-child {
+    padding-left: 1rem!important
+}
+.table.g-md-5 td, .table.g-md-5 th {
+    padding: 1.25rem
+}
+.table.g-md-5 td.dtr-control, .table.g-md-5 th.dtr-control {
+    padding-left: 1.25rem!important
+}
+.table.gy-md-5 td, .table.gy-md-5 th {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem
+}
+.table.gx-md-5 td, .table.gx-md-5 th {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem
+}
+.table.gx-md-5 td.dtr-control, .table.gx-md-5 th.dtr-control {
+    padding-left: 1.25rem!important
+}
+.table.gs-md-5 td:first-child, .table.gs-md-5 th:first-child {
+    padding-left: 1.25rem
+}
+.table.gs-md-5 td:last-child, .table.gs-md-5 th:last-child {
+    padding-right: 1.25rem
+}
+.table.gs-md-5 td.dtr-control:first-child, .table.gs-md-5 th.dtr-control:first-child {
+    padding-left: 1.25rem!important
+}
+.table.g-md-6 td, .table.g-md-6 th {
+    padding: 1.5rem
+}
+.table.g-md-6 td.dtr-control, .table.g-md-6 th.dtr-control {
+    padding-left: 1.5rem!important
+}
+.table.gy-md-6 td, .table.gy-md-6 th {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem
+}
+.table.gx-md-6 td, .table.gx-md-6 th {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem
+}
+.table.gx-md-6 td.dtr-control, .table.gx-md-6 th.dtr-control {
+    padding-left: 1.5rem!important
+}
+.table.gs-md-6 td:first-child, .table.gs-md-6 th:first-child {
+    padding-left: 1.5rem
+}
+.table.gs-md-6 td:last-child, .table.gs-md-6 th:last-child {
+    padding-right: 1.5rem
+}
+.table.gs-md-6 td.dtr-control:first-child, .table.gs-md-6 th.dtr-control:first-child {
+    padding-left: 1.5rem!important
+}
+.table.g-md-7 td, .table.g-md-7 th {
+    padding: 1.75rem
+}
+.table.g-md-7 td.dtr-control, .table.g-md-7 th.dtr-control {
+    padding-left: 1.75rem!important
+}
+.table.gy-md-7 td, .table.gy-md-7 th {
+    padding-top: 1.75rem;
+    padding-bottom: 1.75rem
+}
+.table.gx-md-7 td, .table.gx-md-7 th {
+    padding-left: 1.75rem;
+    padding-right: 1.75rem
+}
+.table.gx-md-7 td.dtr-control, .table.gx-md-7 th.dtr-control {
+    padding-left: 1.75rem!important
+}
+.table.gs-md-7 td:first-child, .table.gs-md-7 th:first-child {
+    padding-left: 1.75rem
+}
+.table.gs-md-7 td:last-child, .table.gs-md-7 th:last-child {
+    padding-right: 1.75rem
+}
+.table.gs-md-7 td.dtr-control:first-child, .table.gs-md-7 th.dtr-control:first-child {
+    padding-left: 1.75rem!important
+}
+.table.g-md-8 td, .table.g-md-8 th {
+    padding: 2rem
+}
+.table.g-md-8 td.dtr-control, .table.g-md-8 th.dtr-control {
+    padding-left: 2rem!important
+}
+.table.gy-md-8 td, .table.gy-md-8 th {
+    padding-top: 2rem;
+    padding-bottom: 2rem
+}
+.table.gx-md-8 td, .table.gx-md-8 th {
+    padding-left: 2rem;
+    padding-right: 2rem
+}
+.table.gx-md-8 td.dtr-control, .table.gx-md-8 th.dtr-control {
+    padding-left: 2rem!important
+}
+.table.gs-md-8 td:first-child, .table.gs-md-8 th:first-child {
+    padding-left: 2rem
+}
+.table.gs-md-8 td:last-child, .table.gs-md-8 th:last-child {
+    padding-right: 2rem
+}
+.table.gs-md-8 td.dtr-control:first-child, .table.gs-md-8 th.dtr-control:first-child {
+    padding-left: 2rem!important
+}
+.table.g-md-9 td, .table.g-md-9 th {
+    padding: 2.25rem
+}
+.table.g-md-9 td.dtr-control, .table.g-md-9 th.dtr-control {
+    padding-left: 2.25rem!important
+}
+.table.gy-md-9 td, .table.gy-md-9 th {
+    padding-top: 2.25rem;
+    padding-bottom: 2.25rem
+}
+.table.gx-md-9 td, .table.gx-md-9 th {
+    padding-left: 2.25rem;
+    padding-right: 2.25rem
+}
+.table.gx-md-9 td.dtr-control, .table.gx-md-9 th.dtr-control {
+    padding-left: 2.25rem!important
+}
+.table.gs-md-9 td:first-child, .table.gs-md-9 th:first-child {
+    padding-left: 2.25rem
+}
+.table.gs-md-9 td:last-child, .table.gs-md-9 th:last-child {
+    padding-right: 2.25rem
+}
+.table.gs-md-9 td.dtr-control:first-child, .table.gs-md-9 th.dtr-control:first-child {
+    padding-left: 2.25rem!important
+}
+.table.g-md-10 td, .table.g-md-10 th {
+    padding: 2.5rem
+}
+.table.g-md-10 td.dtr-control, .table.g-md-10 th.dtr-control {
+    padding-left: 2.5rem!important
+}
+.table.gy-md-10 td, .table.gy-md-10 th {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem
+}
+.table.gx-md-10 td, .table.gx-md-10 th {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem
+}
+.table.gx-md-10 td.dtr-control, .table.gx-md-10 th.dtr-control {
+    padding-left: 2.5rem!important
+}
+.table.gs-md-10 td:first-child, .table.gs-md-10 th:first-child {
+    padding-left: 2.5rem
+}
+.table.gs-md-10 td:last-child, .table.gs-md-10 th:last-child {
+    padding-right: 2.5rem
+}
+.table.gs-md-10 td.dtr-control:first-child, .table.gs-md-10 th.dtr-control:first-child {
+    padding-left: 2.5rem!important
+}
+.table.g-lg-0 td, .table.g-lg-0 th {
+    padding: 0
+}
+.table.g-lg-0 td.dtr-control, .table.g-lg-0 th.dtr-control {
+    padding-left: 0!important
+}
+.table.gy-lg-0 td, .table.gy-lg-0 th {
+    padding-top: 0;
+    padding-bottom: 0
+}
+.table.gx-lg-0 td, .table.gx-lg-0 th {
+    padding-left: 0;
+    padding-right: 0
+}
+.table.gx-lg-0 td.dtr-control, .table.gx-lg-0 th.dtr-control {
+    padding-left: 0!important
+}
+.table.gs-lg-0 td:first-child, .table.gs-lg-0 th:first-child {
+    padding-left: 0
+}
+.table.gs-lg-0 td:last-child, .table.gs-lg-0 th:last-child {
+    padding-right: 0
+}
+.table.gs-lg-0 td.dtr-control:first-child, .table.gs-lg-0 th.dtr-control:first-child {
+    padding-left: 0!important
+}
+.table.g-lg-1 td, .table.g-lg-1 th {
+    padding: .25rem
+}
+.table.g-lg-1 td.dtr-control, .table.g-lg-1 th.dtr-control {
+    padding-left: .25rem!important
+}
+.table.gy-lg-1 td, .table.gy-lg-1 th {
+    padding-top: .25rem;
+    padding-bottom: .25rem
+}
+.table.gx-lg-1 td, .table.gx-lg-1 th {
+    padding-left: .25rem;
+    padding-right: .25rem
+}
+.table.gx-lg-1 td.dtr-control, .table.gx-lg-1 th.dtr-control {
+    padding-left: .25rem!important
+}
+.table.gs-lg-1 td:first-child, .table.gs-lg-1 th:first-child {
+    padding-left: .25rem
+}
+.table.gs-lg-1 td:last-child, .table.gs-lg-1 th:last-child {
+    padding-right: .25rem
+}
+.table.gs-lg-1 td.dtr-control:first-child, .table.gs-lg-1 th.dtr-control:first-child {
+    padding-left: .25rem!important
+}
+.table.g-lg-2 td, .table.g-lg-2 th {
+    padding: .5rem
+}
+.table.g-lg-2 td.dtr-control, .table.g-lg-2 th.dtr-control {
+    padding-left: .5rem!important
+}
+.table.gy-lg-2 td, .table.gy-lg-2 th {
+    padding-top: .5rem;
+    padding-bottom: .5rem
+}
+.table.gx-lg-2 td, .table.gx-lg-2 th {
+    padding-left: .5rem;
+    padding-right: .5rem
+}
+.table.gx-lg-2 td.dtr-control, .table.gx-lg-2 th.dtr-control {
+    padding-left: .5rem!important
+}
+.table.gs-lg-2 td:first-child, .table.gs-lg-2 th:first-child {
+    padding-left: .5rem
+}
+.table.gs-lg-2 td:last-child, .table.gs-lg-2 th:last-child {
+    padding-right: .5rem
+}
+.table.gs-lg-2 td.dtr-control:first-child, .table.gs-lg-2 th.dtr-control:first-child {
+    padding-left: .5rem!important
+}
+.table.g-lg-3 td, .table.g-lg-3 th {
+    padding: .75rem
+}
+.table.g-lg-3 td.dtr-control, .table.g-lg-3 th.dtr-control {
+    padding-left: .75rem!important
+}
+.table.gy-lg-3 td, .table.gy-lg-3 th {
+    padding-top: .75rem;
+    padding-bottom: .75rem
+}
+.table.gx-lg-3 td, .table.gx-lg-3 th {
+    padding-left: .75rem;
+    padding-right: .75rem
+}
+.table.gx-lg-3 td.dtr-control, .table.gx-lg-3 th.dtr-control {
+    padding-left: .75rem!important
+}
+.table.gs-lg-3 td:first-child, .table.gs-lg-3 th:first-child {
+    padding-left: .75rem
+}
+.table.gs-lg-3 td:last-child, .table.gs-lg-3 th:last-child {
+    padding-right: .75rem
+}
+.table.gs-lg-3 td.dtr-control:first-child, .table.gs-lg-3 th.dtr-control:first-child {
+    padding-left: .75rem!important
+}
+.table.g-lg-4 td, .table.g-lg-4 th {
+    padding: 1rem
+}
+.table.g-lg-4 td.dtr-control, .table.g-lg-4 th.dtr-control {
+    padding-left: 1rem!important
+}
+.table.gy-lg-4 td, .table.gy-lg-4 th {
+    padding-top: 1rem;
+    padding-bottom: 1rem
+}
+.table.gx-lg-4 td, .table.gx-lg-4 th {
+    padding-left: 1rem;
+    padding-right: 1rem
+}
+.table.gx-lg-4 td.dtr-control, .table.gx-lg-4 th.dtr-control {
+    padding-left: 1rem!important
+}
+.table.gs-lg-4 td:first-child, .table.gs-lg-4 th:first-child {
+    padding-left: 1rem
+}
+.table.gs-lg-4 td:last-child, .table.gs-lg-4 th:last-child {
+    padding-right: 1rem
+}
+.table.gs-lg-4 td.dtr-control:first-child, .table.gs-lg-4 th.dtr-control:first-child {
+    padding-left: 1rem!important
+}
+.table.g-lg-5 td, .table.g-lg-5 th {
+    padding: 1.25rem
+}
+.table.g-lg-5 td.dtr-control, .table.g-lg-5 th.dtr-control {
+    padding-left: 1.25rem!important
+}
+.table.gy-lg-5 td, .table.gy-lg-5 th {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem
+}
+.table.gx-lg-5 td, .table.gx-lg-5 th {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem
+}
+.table.gx-lg-5 td.dtr-control, .table.gx-lg-5 th.dtr-control {
+    padding-left: 1.25rem!important
+}
+.table.gs-lg-5 td:first-child, .table.gs-lg-5 th:first-child {
+    padding-left: 1.25rem
+}
+.table.gs-lg-5 td:last-child, .table.gs-lg-5 th:last-child {
+    padding-right: 1.25rem
+}
+.table.gs-lg-5 td.dtr-control:first-child, .table.gs-lg-5 th.dtr-control:first-child {
+    padding-left: 1.25rem!important
+}
+.table.g-lg-6 td, .table.g-lg-6 th {
+    padding: 1.5rem
+}
+.table.g-lg-6 td.dtr-control, .table.g-lg-6 th.dtr-control {
+    padding-left: 1.5rem!important
+}
+.table.gy-lg-6 td, .table.gy-lg-6 th {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem
+}
+.table.gx-lg-6 td, .table.gx-lg-6 th {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem
+}
+.table.gx-lg-6 td.dtr-control, .table.gx-lg-6 th.dtr-control {
+    padding-left: 1.5rem!important
+}
+.table.gs-lg-6 td:first-child, .table.gs-lg-6 th:first-child {
+    padding-left: 1.5rem
+}
+.table.gs-lg-6 td:last-child, .table.gs-lg-6 th:last-child {
+    padding-right: 1.5rem
+}
+.table.gs-lg-6 td.dtr-control:first-child, .table.gs-lg-6 th.dtr-control:first-child {
+    padding-left: 1.5rem!important
+}
+.table.g-lg-7 td, .table.g-lg-7 th {
+    padding: 1.75rem
+}
+.table.g-lg-7 td.dtr-control, .table.g-lg-7 th.dtr-control {
+    padding-left: 1.75rem!important
+}
+.table.gy-lg-7 td, .table.gy-lg-7 th {
+    padding-top: 1.75rem;
+    padding-bottom: 1.75rem
+}
+.table.gx-lg-7 td, .table.gx-lg-7 th {
+    padding-left: 1.75rem;
+    padding-right: 1.75rem
+}
+.table.gx-lg-7 td.dtr-control, .table.gx-lg-7 th.dtr-control {
+    padding-left: 1.75rem!important
+}
+.table.gs-lg-7 td:first-child, .table.gs-lg-7 th:first-child {
+    padding-left: 1.75rem
+}
+.table.gs-lg-7 td:last-child, .table.gs-lg-7 th:last-child {
+    padding-right: 1.75rem
+}
+.table.gs-lg-7 td.dtr-control:first-child, .table.gs-lg-7 th.dtr-control:first-child {
+    padding-left: 1.75rem!important
+}
+.table.g-lg-8 td, .table.g-lg-8 th {
+    padding: 2rem
+}
+.table.g-lg-8 td.dtr-control, .table.g-lg-8 th.dtr-control {
+    padding-left: 2rem!important
+}
+.table.gy-lg-8 td, .table.gy-lg-8 th {
+    padding-top: 2rem;
+    padding-bottom: 2rem
+}
+.table.gx-lg-8 td, .table.gx-lg-8 th {
+    padding-left: 2rem;
+    padding-right: 2rem
+}
+.table.gx-lg-8 td.dtr-control, .table.gx-lg-8 th.dtr-control {
+    padding-left: 2rem!important
+}
+.table.gs-lg-8 td:first-child, .table.gs-lg-8 th:first-child {
+    padding-left: 2rem
+}
+.table.gs-lg-8 td:last-child, .table.gs-lg-8 th:last-child {
+    padding-right: 2rem
+}
+.table.gs-lg-8 td.dtr-control:first-child, .table.gs-lg-8 th.dtr-control:first-child {
+    padding-left: 2rem!important
+}
+.table.g-lg-9 td, .table.g-lg-9 th {
+    padding: 2.25rem
+}
+.table.g-lg-9 td.dtr-control, .table.g-lg-9 th.dtr-control {
+    padding-left: 2.25rem!important
+}
+.table.gy-lg-9 td, .table.gy-lg-9 th {
+    padding-top: 2.25rem;
+    padding-bottom: 2.25rem
+}
+.table.gx-lg-9 td, .table.gx-lg-9 th {
+    padding-left: 2.25rem;
+    padding-right: 2.25rem
+}
+.table.gx-lg-9 td.dtr-control, .table.gx-lg-9 th.dtr-control {
+    padding-left: 2.25rem!important
+}
+.table.gs-lg-9 td:first-child, .table.gs-lg-9 th:first-child {
+    padding-left: 2.25rem
+}
+.table.gs-lg-9 td:last-child, .table.gs-lg-9 th:last-child {
+    padding-right: 2.25rem
+}
+.table.gs-lg-9 td.dtr-control:first-child, .table.gs-lg-9 th.dtr-control:first-child {
+    padding-left: 2.25rem!important
+}
+.table.g-lg-10 td, .table.g-lg-10 th {
+    padding: 2.5rem
+}
+.table.g-lg-10 td.dtr-control, .table.g-lg-10 th.dtr-control {
+    padding-left: 2.5rem!important
+}
+.table.gy-lg-10 td, .table.gy-lg-10 th {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem
+}
+.table.gx-lg-10 td, .table.gx-lg-10 th {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem
+}
+.table.gx-lg-10 td.dtr-control, .table.gx-lg-10 th.dtr-control {
+    padding-left: 2.5rem!important
+}
+.table.gs-lg-10 td:first-child, .table.gs-lg-10 th:first-child {
+    padding-left: 2.5rem
+}
+.table.gs-lg-10 td:last-child, .table.gs-lg-10 th:last-child {
+    padding-right: 2.5rem
+}
+.table.gs-lg-10 td.dtr-control:first-child, .table.gs-lg-10 th.dtr-control:first-child {
+    padding-left: 2.5rem!important
+}
+.table.g-xl-0 td, .table.g-xl-0 th {
+    padding: 0
+}
+.table.g-xl-0 td.dtr-control, .table.g-xl-0 th.dtr-control {
+    padding-left: 0!important
+}
+.table.gy-xl-0 td, .table.gy-xl-0 th {
+    padding-top: 0;
+    padding-bottom: 0
+}
+.table.gx-xl-0 td, .table.gx-xl-0 th {
+    padding-left: 0;
+    padding-right: 0
+}
+.table.gx-xl-0 td.dtr-control, .table.gx-xl-0 th.dtr-control {
+    padding-left: 0!important
+}
+.table.gs-xl-0 td:first-child, .table.gs-xl-0 th:first-child {
+    padding-left: 0
+}
+.table.gs-xl-0 td:last-child, .table.gs-xl-0 th:last-child {
+    padding-right: 0
+}
+.table.gs-xl-0 td.dtr-control:first-child, .table.gs-xl-0 th.dtr-control:first-child {
+    padding-left: 0!important
+}
+.table.g-xl-1 td, .table.g-xl-1 th {
+    padding: .25rem
+}
+.table.g-xl-1 td.dtr-control, .table.g-xl-1 th.dtr-control {
+    padding-left: .25rem!important
+}
+.table.gy-xl-1 td, .table.gy-xl-1 th {
+    padding-top: .25rem;
+    padding-bottom: .25rem
+}
+.table.gx-xl-1 td, .table.gx-xl-1 th {
+    padding-left: .25rem;
+    padding-right: .25rem
+}
+.table.gx-xl-1 td.dtr-control, .table.gx-xl-1 th.dtr-control {
+    padding-left: .25rem!important
+}
+.table.gs-xl-1 td:first-child, .table.gs-xl-1 th:first-child {
+    padding-left: .25rem
+}
+.table.gs-xl-1 td:last-child, .table.gs-xl-1 th:last-child {
+    padding-right: .25rem
+}
+.table.gs-xl-1 td.dtr-control:first-child, .table.gs-xl-1 th.dtr-control:first-child {
+    padding-left: .25rem!important
+}
+.table.g-xl-2 td, .table.g-xl-2 th {
+    padding: .5rem
+}
+.table.g-xl-2 td.dtr-control, .table.g-xl-2 th.dtr-control {
+    padding-left: .5rem!important
+}
+.table.gy-xl-2 td, .table.gy-xl-2 th {
+    padding-top: .5rem;
+    padding-bottom: .5rem
+}
+.table.gx-xl-2 td, .table.gx-xl-2 th {
+    padding-left: .5rem;
+    padding-right: .5rem
+}
+.table.gx-xl-2 td.dtr-control, .table.gx-xl-2 th.dtr-control {
+    padding-left: .5rem!important
+}
+.table.gs-xl-2 td:first-child, .table.gs-xl-2 th:first-child {
+    padding-left: .5rem
+}
+.table.gs-xl-2 td:last-child, .table.gs-xl-2 th:last-child {
+    padding-right: .5rem
+}
+.table.gs-xl-2 td.dtr-control:first-child, .table.gs-xl-2 th.dtr-control:first-child {
+    padding-left: .5rem!important
+}
+.table.g-xl-3 td, .table.g-xl-3 th {
+    padding: .75rem
+}
+.table.g-xl-3 td.dtr-control, .table.g-xl-3 th.dtr-control {
+    padding-left: .75rem!important
+}
+.table.gy-xl-3 td, .table.gy-xl-3 th {
+    padding-top: .75rem;
+    padding-bottom: .75rem
+}
+.table.gx-xl-3 td, .table.gx-xl-3 th {
+    padding-left: .75rem;
+    padding-right: .75rem
+}
+.table.gx-xl-3 td.dtr-control, .table.gx-xl-3 th.dtr-control {
+    padding-left: .75rem!important
+}
+.table.gs-xl-3 td:first-child, .table.gs-xl-3 th:first-child {
+    padding-left: .75rem
+}
+.table.gs-xl-3 td:last-child, .table.gs-xl-3 th:last-child {
+    padding-right: .75rem
+}
+.table.gs-xl-3 td.dtr-control:first-child, .table.gs-xl-3 th.dtr-control:first-child {
+    padding-left: .75rem!important
+}
+.table.g-xl-4 td, .table.g-xl-4 th {
+    padding: 1rem
+}
+.table.g-xl-4 td.dtr-control, .table.g-xl-4 th.dtr-control {
+    padding-left: 1rem!important
+}
+.table.gy-xl-4 td, .table.gy-xl-4 th {
+    padding-top: 1rem;
+    padding-bottom: 1rem
+}
+.table.gx-xl-4 td, .table.gx-xl-4 th {
+    padding-left: 1rem;
+    padding-right: 1rem
+}
+.table.gx-xl-4 td.dtr-control, .table.gx-xl-4 th.dtr-control {
+    padding-left: 1rem!important
+}
+.table.gs-xl-4 td:first-child, .table.gs-xl-4 th:first-child {
+    padding-left: 1rem
+}
+.table.gs-xl-4 td:last-child, .table.gs-xl-4 th:last-child {
+    padding-right: 1rem
+}
+.table.gs-xl-4 td.dtr-control:first-child, .table.gs-xl-4 th.dtr-control:first-child {
+    padding-left: 1rem!important
+}
+.table.g-xl-5 td, .table.g-xl-5 th {
+    padding: 1.25rem
+}
+.table.g-xl-5 td.dtr-control, .table.g-xl-5 th.dtr-control {
+    padding-left: 1.25rem!important
+}
+.table.gy-xl-5 td, .table.gy-xl-5 th {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem
+}
+.table.gx-xl-5 td, .table.gx-xl-5 th {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem
+}
+.table.gx-xl-5 td.dtr-control, .table.gx-xl-5 th.dtr-control {
+    padding-left: 1.25rem!important
+}
+.table.gs-xl-5 td:first-child, .table.gs-xl-5 th:first-child {
+    padding-left: 1.25rem
+}
+.table.gs-xl-5 td:last-child, .table.gs-xl-5 th:last-child {
+    padding-right: 1.25rem
+}
+.table.gs-xl-5 td.dtr-control:first-child, .table.gs-xl-5 th.dtr-control:first-child {
+    padding-left: 1.25rem!important
+}
+.table.g-xl-6 td, .table.g-xl-6 th {
+    padding: 1.5rem
+}
+.table.g-xl-6 td.dtr-control, .table.g-xl-6 th.dtr-control {
+    padding-left: 1.5rem!important
+}
+.table.gy-xl-6 td, .table.gy-xl-6 th {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem
+}
+.table.gx-xl-6 td, .table.gx-xl-6 th {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem
+}
+.table.gx-xl-6 td.dtr-control, .table.gx-xl-6 th.dtr-control {
+    padding-left: 1.5rem!important
+}
+.table.gs-xl-6 td:first-child, .table.gs-xl-6 th:first-child {
+    padding-left: 1.5rem
+}
+.table.gs-xl-6 td:last-child, .table.gs-xl-6 th:last-child {
+    padding-right: 1.5rem
+}
+.table.gs-xl-6 td.dtr-control:first-child, .table.gs-xl-6 th.dtr-control:first-child {
+    padding-left: 1.5rem!important
+}
+.table.g-xl-7 td, .table.g-xl-7 th {
+    padding: 1.75rem
+}
+.table.g-xl-7 td.dtr-control, .table.g-xl-7 th.dtr-control {
+    padding-left: 1.75rem!important
+}
+.table.gy-xl-7 td, .table.gy-xl-7 th {
+    padding-top: 1.75rem;
+    padding-bottom: 1.75rem
+}
+.table.gx-xl-7 td, .table.gx-xl-7 th {
+    padding-left: 1.75rem;
+    padding-right: 1.75rem
+}
+.table.gx-xl-7 td.dtr-control, .table.gx-xl-7 th.dtr-control {
+    padding-left: 1.75rem!important
+}
+.table.gs-xl-7 td:first-child, .table.gs-xl-7 th:first-child {
+    padding-left: 1.75rem
+}
+.table.gs-xl-7 td:last-child, .table.gs-xl-7 th:last-child {
+    padding-right: 1.75rem
+}
+.table.gs-xl-7 td.dtr-control:first-child, .table.gs-xl-7 th.dtr-control:first-child {
+    padding-left: 1.75rem!important
+}
+.table.g-xl-8 td, .table.g-xl-8 th {
+    padding: 2rem
+}
+.table.g-xl-8 td.dtr-control, .table.g-xl-8 th.dtr-control {
+    padding-left: 2rem!important
+}
+.table.gy-xl-8 td, .table.gy-xl-8 th {
+    padding-top: 2rem;
+    padding-bottom: 2rem
+}
+.table.gx-xl-8 td, .table.gx-xl-8 th {
+    padding-left: 2rem;
+    padding-right: 2rem
+}
+.table.gx-xl-8 td.dtr-control, .table.gx-xl-8 th.dtr-control {
+    padding-left: 2rem!important
+}
+.table.gs-xl-8 td:first-child, .table.gs-xl-8 th:first-child {
+    padding-left: 2rem
+}
+.table.gs-xl-8 td:last-child, .table.gs-xl-8 th:last-child {
+    padding-right: 2rem
+}
+.table.gs-xl-8 td.dtr-control:first-child, .table.gs-xl-8 th.dtr-control:first-child {
+    padding-left: 2rem!important
+}
+.table.g-xl-9 td, .table.g-xl-9 th {
+    padding: 2.25rem
+}
+.table.g-xl-9 td.dtr-control, .table.g-xl-9 th.dtr-control {
+    padding-left: 2.25rem!important
+}
+.table.gy-xl-9 td, .table.gy-xl-9 th {
+    padding-top: 2.25rem;
+    padding-bottom: 2.25rem
+}
+.table.gx-xl-9 td, .table.gx-xl-9 th {
+    padding-left: 2.25rem;
+    padding-right: 2.25rem
+}
+.table.gx-xl-9 td.dtr-control, .table.gx-xl-9 th.dtr-control {
+    padding-left: 2.25rem!important
+}
+.table.gs-xl-9 td:first-child, .table.gs-xl-9 th:first-child {
+    padding-left: 2.25rem
+}
+.table.gs-xl-9 td:last-child, .table.gs-xl-9 th:last-child {
+    padding-right: 2.25rem
+}
+.table.gs-xl-9 td.dtr-control:first-child, .table.gs-xl-9 th.dtr-control:first-child {
+    padding-left: 2.25rem!important
+}
+.table.g-xl-10 td, .table.g-xl-10 th {
+    padding: 2.5rem
+}
+.table.g-xl-10 td.dtr-control, .table.g-xl-10 th.dtr-control {
+    padding-left: 2.5rem!important
+}
+.table.gy-xl-10 td, .table.gy-xl-10 th {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem
+}
+.table.gx-xl-10 td, .table.gx-xl-10 th {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem
+}
+.table.gx-xl-10 td.dtr-control, .table.gx-xl-10 th.dtr-control {
+    padding-left: 2.5rem!important
+}
+.table.gs-xl-10 td:first-child, .table.gs-xl-10 th:first-child {
+    padding-left: 2.5rem
+}
+.table.gs-xl-10 td:last-child, .table.gs-xl-10 th:last-child {
+    padding-right: 2.5rem
+}
+.table.gs-xl-10 td.dtr-control:first-child, .table.gs-xl-10 th.dtr-control:first-child {
+    padding-left: 2.5rem!important
+}
+.table.g-xxl-0 td, .table.g-xxl-0 th {
+    padding: 0
+}
+.table.g-xxl-0 td.dtr-control, .table.g-xxl-0 th.dtr-control {
+    padding-left: 0!important
+}
+.table.gy-xxl-0 td, .table.gy-xxl-0 th {
+    padding-top: 0;
+    padding-bottom: 0
+}
+.table.gx-xxl-0 td, .table.gx-xxl-0 th {
+    padding-left: 0;
+    padding-right: 0
+}
+.table.gx-xxl-0 td.dtr-control, .table.gx-xxl-0 th.dtr-control {
+    padding-left: 0!important
+}
+.table.gs-xxl-0 td:first-child, .table.gs-xxl-0 th:first-child {
+    padding-left: 0
+}
+.table.gs-xxl-0 td:last-child, .table.gs-xxl-0 th:last-child {
+    padding-right: 0
+}
+.table.gs-xxl-0 td.dtr-control:first-child, .table.gs-xxl-0 th.dtr-control:first-child {
+    padding-left: 0!important
+}
+.table.g-xxl-1 td, .table.g-xxl-1 th {
+    padding: .25rem
+}
+.table.g-xxl-1 td.dtr-control, .table.g-xxl-1 th.dtr-control {
+    padding-left: .25rem!important
+}
+.table.gy-xxl-1 td, .table.gy-xxl-1 th {
+    padding-top: .25rem;
+    padding-bottom: .25rem
+}
+.table.gx-xxl-1 td, .table.gx-xxl-1 th {
+    padding-left: .25rem;
+    padding-right: .25rem
+}
+.table.gx-xxl-1 td.dtr-control, .table.gx-xxl-1 th.dtr-control {
+    padding-left: .25rem!important
+}
+.table.gs-xxl-1 td:first-child, .table.gs-xxl-1 th:first-child {
+    padding-left: .25rem
+}
+.table.gs-xxl-1 td:last-child, .table.gs-xxl-1 th:last-child {
+    padding-right: .25rem
+}
+.table.gs-xxl-1 td.dtr-control:first-child, .table.gs-xxl-1 th.dtr-control:first-child {
+    padding-left: .25rem!important
+}
+.table.g-xxl-2 td, .table.g-xxl-2 th {
+    padding: .5rem
+}
+.table.g-xxl-2 td.dtr-control, .table.g-xxl-2 th.dtr-control {
+    padding-left: .5rem!important
+}
+.table.gy-xxl-2 td, .table.gy-xxl-2 th {
+    padding-top: .5rem;
+    padding-bottom: .5rem
+}
+.table.gx-xxl-2 td, .table.gx-xxl-2 th {
+    padding-left: .5rem;
+    padding-right: .5rem
+}
+.table.gx-xxl-2 td.dtr-control, .table.gx-xxl-2 th.dtr-control {
+    padding-left: .5rem!important
+}
+.table.gs-xxl-2 td:first-child, .table.gs-xxl-2 th:first-child {
+    padding-left: .5rem
+}
+.table.gs-xxl-2 td:last-child, .table.gs-xxl-2 th:last-child {
+    padding-right: .5rem
+}
+.table.gs-xxl-2 td.dtr-control:first-child, .table.gs-xxl-2 th.dtr-control:first-child {
+    padding-left: .5rem!important
+}
+.table.g-xxl-3 td, .table.g-xxl-3 th {
+    padding: .75rem
+}
+.table.g-xxl-3 td.dtr-control, .table.g-xxl-3 th.dtr-control {
+    padding-left: .75rem!important
+}
+.table.gy-xxl-3 td, .table.gy-xxl-3 th {
+    padding-top: .75rem;
+    padding-bottom: .75rem
+}
+.table.gx-xxl-3 td, .table.gx-xxl-3 th {
+    padding-left: .75rem;
+    padding-right: .75rem
+}
+.table.gx-xxl-3 td.dtr-control, .table.gx-xxl-3 th.dtr-control {
+    padding-left: .75rem!important
+}
+.table.gs-xxl-3 td:first-child, .table.gs-xxl-3 th:first-child {
+    padding-left: .75rem
+}
+.table.gs-xxl-3 td:last-child, .table.gs-xxl-3 th:last-child {
+    padding-right: .75rem
+}
+.table.gs-xxl-3 td.dtr-control:first-child, .table.gs-xxl-3 th.dtr-control:first-child {
+    padding-left: .75rem!important
+}
+.table.g-xxl-4 td, .table.g-xxl-4 th {
+    padding: 1rem
+}
+.table.g-xxl-4 td.dtr-control, .table.g-xxl-4 th.dtr-control {
+    padding-left: 1rem!important
+}
+.table.gy-xxl-4 td, .table.gy-xxl-4 th {
+    padding-top: 1rem;
+    padding-bottom: 1rem
+}
+.table.gx-xxl-4 td, .table.gx-xxl-4 th {
+    padding-left: 1rem;
+    padding-right: 1rem
+}
+.table.gx-xxl-4 td.dtr-control, .table.gx-xxl-4 th.dtr-control {
+    padding-left: 1rem!important
+}
+.table.gs-xxl-4 td:first-child, .table.gs-xxl-4 th:first-child {
+    padding-left: 1rem
+}
+.table.gs-xxl-4 td:last-child, .table.gs-xxl-4 th:last-child {
+    padding-right: 1rem
+}
+.table.gs-xxl-4 td.dtr-control:first-child, .table.gs-xxl-4 th.dtr-control:first-child {
+    padding-left: 1rem!important
+}
+.table.g-xxl-5 td, .table.g-xxl-5 th {
+    padding: 1.25rem
+}
+.table.g-xxl-5 td.dtr-control, .table.g-xxl-5 th.dtr-control {
+    padding-left: 1.25rem!important
+}
+.table.gy-xxl-5 td, .table.gy-xxl-5 th {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem
+}
+.table.gx-xxl-5 td, .table.gx-xxl-5 th {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem
+}
+.table.gx-xxl-5 td.dtr-control, .table.gx-xxl-5 th.dtr-control {
+    padding-left: 1.25rem!important
+}
+.table.gs-xxl-5 td:first-child, .table.gs-xxl-5 th:first-child {
+    padding-left: 1.25rem
+}
+.table.gs-xxl-5 td:last-child, .table.gs-xxl-5 th:last-child {
+    padding-right: 1.25rem
+}
+.table.gs-xxl-5 td.dtr-control:first-child, .table.gs-xxl-5 th.dtr-control:first-child {
+    padding-left: 1.25rem!important
+}
+.table.g-xxl-6 td, .table.g-xxl-6 th {
+    padding: 1.5rem
+}
+.table.g-xxl-6 td.dtr-control, .table.g-xxl-6 th.dtr-control {
+    padding-left: 1.5rem!important
+}
+.table.gy-xxl-6 td, .table.gy-xxl-6 th {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem
+}
+.table.gx-xxl-6 td, .table.gx-xxl-6 th {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem
+}
+.table.gx-xxl-6 td.dtr-control, .table.gx-xxl-6 th.dtr-control {
+    padding-left: 1.5rem!important
+}
+.table.gs-xxl-6 td:first-child, .table.gs-xxl-6 th:first-child {
+    padding-left: 1.5rem
+}
+.table.gs-xxl-6 td:last-child, .table.gs-xxl-6 th:last-child {
+    padding-right: 1.5rem
+}
+.table.gs-xxl-6 td.dtr-control:first-child, .table.gs-xxl-6 th.dtr-control:first-child {
+    padding-left: 1.5rem!important
+}
+.table.g-xxl-7 td, .table.g-xxl-7 th {
+    padding: 1.75rem
+}
+.table.g-xxl-7 td.dtr-control, .table.g-xxl-7 th.dtr-control {
+    padding-left: 1.75rem!important
+}
+.table.gy-xxl-7 td, .table.gy-xxl-7 th {
+    padding-top: 1.75rem;
+    padding-bottom: 1.75rem
+}
+.table.gx-xxl-7 td, .table.gx-xxl-7 th {
+    padding-left: 1.75rem;
+    padding-right: 1.75rem
+}
+.table.gx-xxl-7 td.dtr-control, .table.gx-xxl-7 th.dtr-control {
+    padding-left: 1.75rem!important
+}
+.table.gs-xxl-7 td:first-child, .table.gs-xxl-7 th:first-child {
+    padding-left: 1.75rem
+}
+.table.gs-xxl-7 td:last-child, .table.gs-xxl-7 th:last-child {
+    padding-right: 1.75rem
+}
+.table.gs-xxl-7 td.dtr-control:first-child, .table.gs-xxl-7 th.dtr-control:first-child {
+    padding-left: 1.75rem!important
+}
+.table.g-xxl-8 td, .table.g-xxl-8 th {
+    padding: 2rem
+}
+.table.g-xxl-8 td.dtr-control, .table.g-xxl-8 th.dtr-control {
+    padding-left: 2rem!important
+}
+.table.gy-xxl-8 td, .table.gy-xxl-8 th {
+    padding-top: 2rem;
+    padding-bottom: 2rem
+}
+.table.gx-xxl-8 td, .table.gx-xxl-8 th {
+    padding-left: 2rem;
+    padding-right: 2rem
+}
+.table.gx-xxl-8 td.dtr-control, .table.gx-xxl-8 th.dtr-control {
+    padding-left: 2rem!important
+}
+.table.gs-xxl-8 td:first-child, .table.gs-xxl-8 th:first-child {
+    padding-left: 2rem
+}
+.table.gs-xxl-8 td:last-child, .table.gs-xxl-8 th:last-child {
+    padding-right: 2rem
+}
+.table.gs-xxl-8 td.dtr-control:first-child, .table.gs-xxl-8 th.dtr-control:first-child {
+    padding-left: 2rem!important
+}
+.table.g-xxl-9 td, .table.g-xxl-9 th {
+    padding: 2.25rem
+}
+.table.g-xxl-9 td.dtr-control, .table.g-xxl-9 th.dtr-control {
+    padding-left: 2.25rem!important
+}
+.table.gy-xxl-9 td, .table.gy-xxl-9 th {
+    padding-top: 2.25rem;
+    padding-bottom: 2.25rem
+}
+.table.gx-xxl-9 td, .table.gx-xxl-9 th {
+    padding-left: 2.25rem;
+    padding-right: 2.25rem
+}
+.table.gx-xxl-9 td.dtr-control, .table.gx-xxl-9 th.dtr-control {
+    padding-left: 2.25rem!important
+}
+.table.gs-xxl-9 td:first-child, .table.gs-xxl-9 th:first-child {
+    padding-left: 2.25rem
+}
+.table.gs-xxl-9 td:last-child, .table.gs-xxl-9 th:last-child {
+    padding-right: 2.25rem
+}
+.table.gs-xxl-9 td.dtr-control:first-child, .table.gs-xxl-9 th.dtr-control:first-child {
+    padding-left: 2.25rem!important
+}
+.table.g-xxl-10 td, .table.g-xxl-10 th {
+    padding: 2.5rem
+}
+.table.g-xxl-10 td.dtr-control, .table.g-xxl-10 th.dtr-control {
+    padding-left: 2.5rem!important
+}
+.table.gy-xxl-10 td, .table.gy-xxl-10 th {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem
+}
+.table.gx-xxl-10 td, .table.gx-xxl-10 th {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem
+}
+.table.gx-xxl-10 td.dtr-control, .table.gx-xxl-10 th.dtr-control {
+    padding-left: 2.5rem!important
+}
+.table.gs-xxl-10 td:first-child, .table.gs-xxl-10 th:first-child {
+    padding-left: 2.5rem
+}
+.table.gs-xxl-10 td:last-child, .table.gs-xxl-10 th:last-child {
+    padding-right: 2.5rem
+}
+.table.gs-xxl-10 td.dtr-control:first-child, .table.gs-xxl-10 th.dtr-control:first-child {
+    padding-left: 2.5rem!important
+}
+.flex-row-fluid {
+    flex: 1 auto;
+    min-width: 0
+}
+.text-muted {
+    color: var(--bs-text-muted)!important
+}
+.text-gray-600 {
+    color: var(--bs-text-gray-600)!important
+}
+.text-gray-600 {
+    color: var(--kt-muted)!important;
+}
+.text-muted {
+    color: #a1a5b7!important;
+}
+.text-end {
+    text-align: right!important;
+}
+.fw-semibold {
+    font-weight: 600!important;
+}
+.fw-bold {
+    font-weight: 700!important;
+}
+.fs-6 {
+    font-size: 1rem!important;
+}
+.fs-7 {
+    font-size: .925rem!important;
+}
+.fs-3 {
+    font-size: 1.45rem!important;
+}
+.mb-0 {
+    margin-bottom: 0!important;
+}
+.mb-4 {
+    margin-bottom: 1.5rem!important;
+}
+.mt-4 {
+    margin-top: 1.5rem!important;
+}
+.py-4 {
+    padding-top: 1.5rem!important;
+    padding-bottom: 1.5rem!important;
+}
+.pt-0 {
+    padding-top: 0!important;
+}
+.p-4 {
+    padding: 1.5rem!important;
+}
+.container-xxl {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+/* ---- Header tabs area ---- */
+
+.nav.nav-custom {
+    background: var(--kt-head-bg);
+    border-radius: 0 0 var(--kt-radius) var(--kt-radius);
+    padding: .75rem 1rem;
+}
+.nav.nav-custom .nav-link {
+    color: rgba(255, 255, 255, .8);
+    border: 0;
+    position: relative;
+}
+.nav.nav-custom .nav-link.active, .nav.nav-custom .nav-link:hover {
+    color: #fff;
+}
+.nav-line-tabs .nav-link.active {
+    border-bottom: 2px solid #fff;
+    background: #201b45;
+}
+.nav-line-tabs.nav-line-tabs-2x .nav-link.active {
+    border-bottom-width: 3px;
+}
+.border-0 {
+    border: 0!important;
+}
+.fs-4 {
+    font-size: 1.15rem!important;
+}
+/* ---- Buttons (lite) ---- */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    padding: .45rem .85rem;
+    font-weight: 600;
+    line-height: 1.3;
+    cursor: pointer;
+    text-decoration: none;
+}
+.btn-sm {
+    padding: .35rem .65rem;
+    font-size: .875rem;
+    border-radius: .65rem;
+}
+.btn-light {
+    background: #f5f8fa;
+    border-color: #f5f8fa;
+    color: #5e6278;
+}
+.btn-light:hover {
+    background: #eef1f5;
+    border-color: #eef1f5;
+    color: #181c32;
+}
+.btn-primary {
+    background: #3e97ff;
+    border-color: #3e97ff;
+    color: #fff;
+}
+.btn-success {
+    background: #50cd89;
+    border-color: #50cd89;
+    color: #fff;
+}
+.btn-home {
+    margin-right: 10px;
+}
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    height: calc(1.5em + 1.55rem + 2px);
+    width: calc(1.5em + 1.55rem + 2px);
+    line-height: 1;
+}
+.btn-actions {
+    background: #f5f8fa;
+    border: 1px solid var(--kt-gray-300);
+}
+.btn-group-sm>.btn.btn-icon, .btn.btn-icon.btn-sm {
+    height: calc(1.5em + 1.1rem + 2px);
+    width: calc(1.5em + 1.1rem + 2px);
+}
+/* ---- Cards ---- */
+
+.card {
+    background: var(--kt-card-bg);
+    border: 1px solid var(--kt-gray-200);
+    border-radius: var(--kt-radius);
+    box-shadow: var(--kt-shadow);
+}
+.card-flush {
+    border-color: var(--kt-gray-200);
+}
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px dashed var(--kt-gray-300);
+}
+.card-title h2 {
+    font-size: 1.1rem;
+    margin: 0;
+}
+.card-body {
+    padding: 1.25rem 1.5rem;
+}
+/* ---- Tables ---- */
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-color: var(--kt-gray-200);
+}
+.table> :not(caption)>*>* {
+    padding: .95rem .75rem;
+    background-color: transparent;
+    border-bottom: 1px solid var(--kt-gray-200);
+}
+.table thead tr {
+    color: #99a1b7;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: .75rem;
+    letter-spacing: .04em;
+}
+.table.align-middle td, .table.align-middle th {
+    vertical-align: middle;
+}
+.table-row-bordered tbody>tr {
+    border-top: 1px solid var(--kt-gray-200);
+}
+.table-row-dashed tbody>tr {
+    border-top: 1px dashed var(--kt-gray-300);
+}
+.min-w-300px {
+    min-width: 300px;
+}
+.gy-5>*+* {
+    margin-top: 1rem;
+}
+/* ---- Symbols / thumbnails ---- */
+
+.symbol {
+    display: inline-block;
+    position: relative;
+}
+.symbol.symbol-50px {
+    width: 50px;
+    height: 50px;
+    border-radius: .65rem;
+    overflow: hidden;
+    background: #f5f8fa;
+    border: 1px solid var(--kt-gray-200);
+}
+.symbol .symbol-label {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: .65rem;
+}
+/* ---- Badges ---- */
+
+.badge {
+    display: inline-block;
+    padding: .35rem .6rem;
+    border-radius: .475rem;
+    font-weight: 600;
+    line-height: 1;
+}
+.badge-light-success {
+    color: #1c3238;
+    background: #e8fff3;
+    border: 1px solid #d1f7e4;
+}
+.badge-light-primary {
+    color: #2e5aac;
+    background: #eef6ff;
+    border: 1px solid #d6e4ff;
+}
+.badge-light-warning {
+    color: #a76d00;
+    background: #fff8dd;
+    border: 1px solid #ffe8a1;
+}
+.badge-light-danger {
+    color: #7a271a;
+    background: #fff5f5;
+    border: 1px solid #fecaca;
+}
+/* ---- Utilities ---- */
+
+.d-flex {
+    display: flex!important;
+}
+.flex-column {
+    flex-direction: column!important;
+}
+.flex-row-fluid {
+    flex: 1 1 auto;
+}
+.flex-wrap {
+    flex-wrap: wrap!important;
+}
+.flex-stack {
+    align-items: center;
+    justify-content: space-between;
+}
+.gap-5 {
+    gap: 1rem;
+}
+.gap-7 {
+    gap: 1.25rem;
+}
+.gap-lg-10 {
+    gap: 2rem;
+}
+.me-auto {
+    margin-right: auto!important;
+}
+.ms-auto {
+    margin-left: auto!important;
+}
+.me-lg-n7 {
+    margin-right: -1.5rem!important;
+}
+.rounded-3 {
+    border-radius: .85rem;
+}
+/* ---- Address blocks (illustration placeholders) ---- */
+
+.order-address-card {
+    position: relative;
+}
+.order-address-card::after {
+    content: "";
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    width: 84px;
+    height: 60px;
+    opacity: .15;
+    background: radial-gradient(ellipse at center, #3e97ff 0%, transparent 70%);
+    border-radius: 12px;
+}
+/* ---- Top spacing around content ---- */
+
+#kt_content .container-xxl {
+    padding-top: 1.25rem;
+}
+/* ---- Links ---- */
+
+a {
+    text-decoration: none;
+}
+a.text-hover-primary:hover {
+    color: #3e97ff;
+}
+/* ---- Responsive ---- */
+
+@media (max-width: 992px) {
+    .nav.nav-custom {
+        border-radius: 0;
+    }
+    .me-lg-n7 {
+        margin-right: 0!important;
+    }
+    .card-header {
+        padding: 1rem 1.25rem;
+    }
+    .card-body {
+        padding: 1rem 1.25rem;
+    }
+}
+@media (min-width: 992px) {
+    .gap-lg-10 {
+        gap: 2.5rem !important;
+    }
+}
+.gap-5 {
+    gap: 1.25rem !important;
+}
+.flex-wrap {
+    flex-wrap: wrap !important;
+}
+.d-flex {
+    display: flex !important;
+}
+@media (min-width: 992px) {
+    div, main, ol, pre, span, ul {
+        scrollbar-width: thin;
+        scrollbar-color: var(--bs-scrollbar-color) transparent;
+    }
+}

@@ -1,0 +1,164 @@
+<!-- Order Details Page -->
+<div class="content d-flex flex-column flex-column-fluid" id="kt_content">
+  <div class="container-xxl" id="kt_content_container">
+    <div class="d-flex flex-column gap-7 gap-lg-10">
+
+      <!-- Tabs -->
+      <div class="d-flex flex-wrap flex-stack gap-5 gap-lg-10" style="background: #201b45;">
+        <ul class="nav nav-custom nav-tabs nav-line-tabs nav-line-tabs-2x border-0 fs-4 fw-semibold mb-lg-n2 me-auto">
+          <li class="nav-item">
+            <a class="nav-link text-active-primary pb-4 active" data-bs-toggle="tab" href="#order_summary">Order Summary</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#order_history">Order History</a>
+          </li>
+        </ul>
+        <a href="{{ back_url }}" class="btn btn-light btn-active-secondary btn-sm ms-auto">
+          Order List
+        </a>
+        <a href="{{ home }}" class="btn btn-primary btn-sm btn-home">Add New Order</a>
+      </div>
+
+      <!-- Summary -->
+      <div class="d-flex flex-column flex-xl-row gap-7 gap-lg-10">
+        <div class="card card-flush py-4 flex-row-fluid">
+          <div class="card-header">
+            <div class="card-title">
+              <h2>Order Details (#{{ order_id }})</h2>
+            </div>
+          </div>
+          <div class="card-body pt-0">
+            <div class="table-responsive">
+              <table class="table align-middle table-row-bordered mb-0 fs-6 gy-5 min-w-300px">
+                <tbody class="fw-semibold text-gray-600">
+                  <tr>
+                    <td class="text-muted">Date Added</td>
+                    <td class="fw-bold text-end">{{ date_added }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-muted">Payment Method</td>
+                    <td class="fw-bold text-end">{{ payment_method }}</td>
+                  </tr>
+                  {# <tr>
+                    <td class="text-muted">Shipping Method</td>
+                    <td class="fw-bold text-end">{{ shipping_method }}</td>
+                  </tr> #}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- Order Summary Tab -->
+        <div class="tab-pane fade show active" id="order_summary">
+          <div class="card card-flush py-4 flex-row-fluid overflow-hidden">
+            <div class="card-header">
+              <div class="card-title">
+                <h2>Order #{{ order_id }}</h2>
+              </div>
+            </div>
+            <div class="card-body pt-0">
+              <div class="table-responsive">
+                <table class="table align-middle table-row-dashed fs-6 gy-5 mb-0">
+                  <thead>
+                    <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+                      <th>Product</th>
+                      <th class="text-end">Model</th>
+                      <th class="text-end">Qty</th>
+                      <th class="text-end">Unit Price</th>
+                      <th class="text-end">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody class="fw-semibold text-gray-600">
+                    {% for product in products %}
+                      <tr>
+                        <td>
+                          <div class="d-flex align-items-center">
+                            {% if product.thumb %}
+                              <span class="symbol symbol-50px" style="background-image:url('{{ product.thumb }}');"></span>
+                            {% endif %}
+                            <div class="ms-5">
+                              {{ product.name }}
+                              {% if product.option %}
+                                <div class="fs-7 text-muted">
+                                  {% for option in product.option %}
+                                    {{ option.name }}: {{ option.value }}<br>
+                                  {% endfor %}
+                                </div>
+                              {% endif %}
+                            </div>
+                          </div>
+                        </td>
+                        <td class="text-end">{{ product.model }}</td>
+                        <td class="text-end">{{ product.quantity }}</td>
+                        <td class="text-end">{{ product.price }}</td>
+                        <td class="text-end">{{ product.total }}</td>
+                      </tr>
+                    {% endfor %}
+                    {% for total in totals %}
+                      <tr>
+                        <td colspan="4" class="text-end">{{ total.title }}</td>
+                        <td class="text-end">{{ total.text }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order History Tab -->
+        <div class="tab-pane fade" id="order_history">
+          <div class="card card-flush py-4 flex-row-fluid">
+            <div class="card-header">
+              <div class="card-title"><h2>Order History</h2></div>
+            </div>
+            <div class="card-body pt-0">
+              <table class="table align-middle table-row-dashed fs-6 gy-5 mb-0">
+                <thead>
+                  <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+                    <th>Date Added</th>
+                    <th>Comment</th>
+                    <th>Status</th>
+                    <th>Customer Notified</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for history in histories %}
+                    <tr>
+                      <td>{{ history.date_added }}</td>
+                      <td>{{ history.comment }}</td>
+                      <td>{{ history.status }}</td>
+                      <td>{{ history.notify ? 'Yes' : 'No' }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card card-flush py-4 flex-row-fluid">
+            <div class="card-header">
+              <div class="card-title"><h2>Order Data</h2></div>
+            </div>
+            <div class="card-body pt-0">
+              <table class="table align-middle table-row-bordered mb-0 fs-6 gy-5">
+                <tbody class="fw-semibold text-gray-600">
+                  <tr><td class="text-muted">IP Address</td><td class="fw-bold text-end">{{ ip }}</td></tr>
+                  <tr><td class="text-muted">Forwarded IP</td><td class="fw-bold text-end">{{ forwarded_ip }}</td></tr>
+                  <tr><td class="text-muted">User Agent</td><td class="fw-bold text-end">{{ user_agent }}</td></tr>
+                  <tr><td class="text-muted">Accept Language</td><td class="fw-bold text-end">{{ accept_language }}</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
