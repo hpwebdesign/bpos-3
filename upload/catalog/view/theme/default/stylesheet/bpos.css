@@ -206,7 +206,79 @@ body {
     font-size: 12px;
     margin-top: 2px;
 }
+
 /* Products grid */
+.flex-item {
+    flex: 0 0 calc(25% - 12px);
+    max-width: 235px; /* Default for desktop/tablet */
+}
+
+/* Responsiveness */
+/* Tablet medium and below */
+@media (max-width: 992px) {
+    .flex-item {
+        flex: 0 0 calc(33.333% - 12px);
+        max-width: 235px;
+    }
+    .nav.nav-custom {
+        border-radius: 0;
+    }
+    .me-lg-n7 {
+        margin-right: 0!important;
+    }
+    .card-header {
+        padding: 1rem 1.25rem;
+    }
+    .card-body {
+        padding: 1rem 1.25rem;
+    }
+    .panel {
+        position: static;
+    }
+    #checkout-summary {
+        position: static;
+        width: 100%;
+        max-width: 100%;
+        margin-top: 20px;
+        order: 1;
+        /* Ensure it appears below content on mobile */
+    }
+    .gap-lg-10 {
+        gap: 2.5rem !important;
+    }
+}
+
+/* Smartphone and below */
+@media (max-width: 768px) {
+    .flex-item {
+        flex: 0 0 calc(50% - 10px);
+        max-width: calc(50% - 10px);
+    }
+
+    #main-content {
+        margin-bottom: 70px;
+    }
+
+    .search {
+        display: none;
+    }
+    .sidebar {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        width: 100%;
+        border-radius: 16px;
+        position: sticky;
+        bottom: 12px;
+        background: #fff;
+    }
+    .bubble {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 0;
+    }
+}
 
 .food {
     width: 100%;
@@ -220,7 +292,7 @@ body {
     margin-bottom: 12px;
 }
 .food .plate {
-    /*    width: 80%;*/
+    width: 80%;
     aspect-ratio: 1;
     border-radius: 50%;
     background: #eee;
@@ -324,34 +396,7 @@ body {
     padding: 14px 16px;
     font-weight: 700;
 }
-/* Responsive adjustments */
 
-@media (max-width: 992px) {
-    .panel {
-        position: static;
-    }
-}
-@media (max-width: 768px) {
-    .search {
-        display: none;
-    }
-    .sidebar {
-        flex-direction: row;
-        justify-content: space-between;
-        gap: 10px;
-        padding: 10px 12px;
-        width: 100%;
-        border-radius: 16px;
-        position: sticky;
-        bottom: 12px;
-        background: #fff;
-    }
-    .bubble {
-        width: 48px;
-        height: 48px;
-        margin-bottom: 0;
-    }
-}
 .card {
     background: var(--card);
     border: 1px solid var(--line);
@@ -360,35 +405,9 @@ body {
     box-shadow: var(--shadow);
     cursor: pointer;
 }
-/* Add this to your style section */
 
-.flex-item {
-    flex: 0 0 calc(25% - 12px);
-    /* 4 items per row with gap */
-    max-width: 235px;
-}
-@media (max-width: 992px) {
-    .flex-item {
-        flex: 0 0 calc(33.333% - 12px);
-        /* 3 items per row on medium screens */
-    }
-}
-@media (max-width: 768px) {
-    .flex-item {
-        flex: 0 0 calc(50% - 12px);
-        /* 2 items per row on small screens */
-    }
-}
-@media (max-width: 576px) {
-    .flex-item {
-        flex: 0 0 100%;
-        /* 1 item per row on extra small screens */
-        max-width: 235px;
-        margin: 0 auto;
-    }
-}
+
 /* Desktop Layout */
-
 @media (min-width: 992px) {
     #checkout-summary {
         position: absolute;
@@ -396,51 +415,14 @@ body {
         top: 120px;
     }
 }
-/* Mobile Layout */
 
-@media (max-width: 991.98px) {
-    #checkout-summary {
-        position: static;
-        width: 100%;
-        max-width: 100%;
-        margin-top: 20px;
-        order: 1;
-        /* Ensure it appears below content on mobile */
-    }
-}
 #products-list {
     /* Base grid for all screens */
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
 }
-.flex-item {
-    /* Default for mobile (2 columns) */
-    flex: 0 0 calc(50% - 6px);
-    /* 50% width minus half the gap */
-    max-width: 235px;
-}
-/* Tablet (3 columns) */
 
-@media (min-width: 768px) {
-    .flex-item {
-        flex: 0 0 calc(33.333% - 8px);
-    }
-}
-/* Desktop (4 columns) */
-
-@media (min-width: 992px) {
-    .flex-item {
-        flex: 0 0 calc(25% - 9px);
-    }
-}
-/* Large desktop (5 columns) */
-
-@media (min-width: 1200px) {
-    .flex-item {
-        flex: 0 0 calc(20% - 9.6px);
-    }
-}
 .active {
     background: #eee;
 }
@@ -3176,27 +3158,7 @@ a {
 a.text-hover-primary:hover {
     color: #3e97ff;
 }
-/* ---- Responsive ---- */
 
-@media (max-width: 992px) {
-    .nav.nav-custom {
-        border-radius: 0;
-    }
-    .me-lg-n7 {
-        margin-right: 0!important;
-    }
-    .card-header {
-        padding: 1rem 1.25rem;
-    }
-    .card-body {
-        padding: 1rem 1.25rem;
-    }
-}
-@media (min-width: 992px) {
-    .gap-lg-10 {
-        gap: 2.5rem !important;
-    }
-}
 .gap-5 {
     gap: 1.25rem !important;
 }
@@ -3214,4 +3176,10 @@ a.text-hover-primary:hover {
 }
 .sidebar .bi {
     font-size: 15px;
+}
+
+#mobile-menu {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
 }
