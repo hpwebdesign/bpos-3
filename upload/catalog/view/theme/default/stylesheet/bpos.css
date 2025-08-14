@@ -81,6 +81,7 @@ body {
     font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     background: #fff;
     color: var(--ink);
+    font-size: 14px;
 }
 .wrap {
     background: linear-gradient(180deg, var(--bg) 0 88px, #fff 88px);
@@ -1053,7 +1054,7 @@ body {
     border-style: inherit;
     text-transform: inherit;
     font-weight: inherit;
-    font-size: inherit;
+    font-size: 14px;
     color: inherit;
     height: inherit;
     min-height: inherit
