@@ -3182,4 +3182,6 @@ a.text-hover-primary:hover {
   position: fixed;
   bottom: 0;
   width: 100%;
+  box-shadow: var(--shadow);
 }
+
