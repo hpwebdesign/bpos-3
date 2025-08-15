@@ -1,0 +1,15 @@
+{
+    "name": "hpwebdesign/framework",
+    "description": "Extension development framework",
+    "type": "template",
+    "authors": [
+        {
+            "name": "HP Web Design",
+            "email": "support@hpwebdesign.io"
+        }
+    ],
+    "require": {
+        "consolidation/robo": "^1.4",
+        "vlucas/phpdotenv": "^3.5"        
+    }
+}

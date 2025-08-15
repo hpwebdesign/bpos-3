@@ -20,7 +20,7 @@ class ControllerBposLogin extends Controller {
                     $this->request->post['username'], 
                     html_entity_decode($this->request->post['password'], ENT_QUOTES, 'UTF-8')
                 )) {
-                $data['error_warning'] = $this->language->get('error_login');
+                $data['error_warning'] = 'No match for Username and/or Password.';
             } else {
                 $this->response->redirect($this->url->link('bpos/home', '', true));
             }

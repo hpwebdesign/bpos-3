@@ -206,15 +206,17 @@ body {
     font-size: 12px;
     margin-top: 2px;
 }
-
 /* Products grid */
+
 .flex-item {
     flex: 0 0 calc(25% - 12px);
-    max-width: 235px; /* Default for desktop/tablet */
+    max-width: 235px;
+    /* Default for desktop/tablet */
 }
-
 /* Responsiveness */
+
 /* Tablet medium and below */
+
 @media (max-width: 992px) {
     .flex-item {
         flex: 0 0 calc(33.333% - 12px);
@@ -247,18 +249,16 @@ body {
         gap: 2.5rem !important;
     }
 }
-
 /* Smartphone and below */
+
 @media (max-width: 768px) {
     .flex-item {
         flex: 0 0 calc(50% - 10px);
         max-width: calc(50% - 10px);
     }
-
     #main-content {
         margin-bottom: 70px;
     }
-
     .search {
         display: none;
     }
@@ -279,7 +279,6 @@ body {
         margin-bottom: 0;
     }
 }
-
 .food {
     width: 100%;
     aspect-ratio: 1;
@@ -396,7 +395,6 @@ body {
     padding: 14px 16px;
     font-weight: 700;
 }
-
 .card {
     background: var(--card);
     border: 1px solid var(--line);
@@ -405,9 +403,8 @@ body {
     box-shadow: var(--shadow);
     cursor: pointer;
 }
-
-
 /* Desktop Layout */
+
 @media (min-width: 992px) {
     #checkout-summary {
         position: absolute;
@@ -415,14 +412,12 @@ body {
         top: 120px;
     }
 }
-
 #products-list {
     /* Base grid for all screens */
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
 }
-
 .active {
     background: #eee;
 }
@@ -3158,7 +3153,6 @@ a {
 a.text-hover-primary:hover {
     color: #3e97ff;
 }
-
 .gap-5 {
     gap: 1.25rem !important;
 }
@@ -3177,28 +3171,25 @@ a.text-hover-primary:hover {
 .sidebar .bi {
     font-size: 15px;
 }
-
 #mobile-menu {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  box-shadow: var(--shadow);
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    box-shadow: var(--shadow);
 }
-
 #mobile-menu .cart {
     position: relative;
 }
-
-#mobile-menu .counter {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: red;
-  color: #fff;
-  border-radius: 50%;
-  width: 25px;
-  height: 25px;
-  text-align: center;
-  padding: 3px;
-  font-size: 13px;
+#mobile-menu .counter, #left-menu .counter {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: red;
+    color: #fff;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    padding: 3px;
+    font-size: 13px;
 }

@@ -95,6 +95,7 @@ class ControllerBposOrder extends Controller {
         // Sesuai format POS layout
         $data['title'] = 'Orders - POS System';
         $data['logout'] = $this->url->link('bpos/login/logout', '', true);
+        $data['total_cart'] = $this->cart->hasProducts();
         $data['content'] = $this->load->view('bpos/order', $view_data);
 
         if (isset($this->request->get['format']) && $this->request->get['format'] == 'json') {
@@ -211,6 +212,7 @@ class ControllerBposOrder extends Controller {
         // Render content
         // ---------------------------
         $data['logout'] = $this->url->link('bpos/login/logout', '', true);
+        $data['total_cart'] = $this->cart->hasProducts();
         $data['content'] = $this->load->view('bpos/order_view', $data);
 
         if (isset($this->request->get['format']) && $this->request->get['format'] == 'json') {

@@ -1,0 +1,11 @@
+obfuscated/
+distribution/
+*.zip
+.idea/
+.DS_Store
+build/
+vendor/
+RoboFile.php
+php_errors.log
+composer.lock
+.env

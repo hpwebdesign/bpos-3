@@ -20,6 +20,7 @@ class ControllerBposHome extends Controller {
         $this->load->model('catalog/product');
         $this->load->model('tool/image');
         $data['logout'] = $this->url->link('bpos/login/logout', '', true);
+        $data['total_cart'] = $this->cart->hasProducts();
         $data['categories'] = [];
         $data['products'] = [];
 

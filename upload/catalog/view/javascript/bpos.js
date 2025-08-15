@@ -8,7 +8,17 @@ $(document).ready(function() {
         if ($(this).hasClass('invoices')) route = 'bpos/invoice';
         if ($(this).hasClass('orders')) route = 'bpos/order';
         if ($(this).hasClass('statistics')) route = 'bpos/statistic';
+        if ($(this).hasClass('cart')) {
+            var target = $('#checkout-summary');
+            var scrollBottom = target.offset().top + target.outerHeight() - $(window).height();
 
+            $('html, body').animate({
+                scrollTop: scrollBottom
+            }, 500);
+
+            // Opsional: beri fokus
+            target.attr('tabindex', -1).focus();
+        }
         if (route) loadContent(route);
     });
 
@@ -210,12 +220,24 @@ $(document).ready(function() {
                 } else {
                     // Langsung add to cart
                     $.ajax({
-                        url: 'index.php?route=checkout/cart/add',
+                        url: 'index.php?route=bpos/cart/add',
                         type: 'post',
                         data: { product_id: product_id, quantity: 1 },
                         dataType: 'json',
                         success: function(json) {
+                            toastr.success(json['success']);
+                            $('.cart .counter').html(json['total_cart']);
                             updateCheckoutPanel();
+                            var target = $('#checkout-summary');
+                            var scrollBottom = target.offset().top + target.outerHeight() - $(window).height();
+
+                            $('html, body').animate({
+                                scrollTop: scrollBottom
+                            }, 500);
+
+                            // Opsional: beri fokus
+                            target.attr('tabindex', -1).focus();
+
                         }
                     });
                 }
@@ -225,13 +247,24 @@ $(document).ready(function() {
     $(document).on('click', '#btn-add-with-options', function() {
         let form_data = $('#form-product-options').serialize();
         $.ajax({
-            url: 'index.php?route=checkout/cart/add',
+            url: 'index.php?route=bpos/cart/add',
             type: 'post',
             data: form_data + '&quantity=1',
             dataType: 'json',
             success: function(json) {
                 $('#productOptionModal').modal('hide');
+                 toastr.success(json['success']);
+                 $('.cart .counter').html(json['total_cart']);
                 updateCheckoutPanel();
+                var target = $('#checkout-summary');
+                var scrollBottom = target.offset().top + target.outerHeight() - $(window).height();
+
+                $('html, body').animate({
+                    scrollTop: scrollBottom
+                }, 500);
+
+                // Opsional: beri fokus
+                target.attr('tabindex', -1).focus();
             }
         });
     });
@@ -241,21 +274,23 @@ $(document).ready(function() {
         // Fungsi Add to Cart
         function posAddToCart(product_id, quantity = 1) {
             $.ajax({
-                url: 'index.php?route=checkout/cart/add',
+                url: 'index.php?route=bpos/cart/add',
                 type: 'post',
                 data: { product_id: product_id, quantity: quantity },
                 dataType: 'json',
                 success: function(json) {
                     if (json['error']) {
-                        alert(json['error']['warning'] || 'Error adding product to cart');
+                        toastr.error(json['error']['warning'] || 'Error adding product to cart');
                     }
                     if (json['success']) {
+                        toastr.success(json['success']);
                         //alert(json['success']); // Bisa ganti pakai notifikasi lebih bagus
                         updateCheckoutPanel();
                     }
                 },
                 error: function() {
-                    alert('Error: Could not add to cart');
+                    toastr.error('Error: Could not add to cart');
+                    //alert('Error: Could not add to cart');
                 }
             });
         }
