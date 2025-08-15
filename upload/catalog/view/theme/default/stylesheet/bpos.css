@@ -83,6 +83,9 @@ body {
     color: var(--ink);
     font-size: 14px;
 }
+form, form input, form select, form textarea, .dropdown-menu {
+    font-size: 14px !important;
+}
 .wrap {
     background: linear-gradient(180deg, var(--bg) 0 88px, #fff 88px);
     min-height: 100vh;
@@ -3192,4 +3195,115 @@ a.text-hover-primary:hover {
     text-align: center;
     padding: 3px;
     font-size: 13px;
+}
+.invoice-wrap {
+    max-width: 1180px;
+    margin: 40px auto
+}
+.brand-lockup {
+    gap: .5rem
+}
+.brand-lockup .logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #6aa8ff, #2a6cf6);
+    color: #fff;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.invoice-meta small {
+    color: var(--muted)
+}
+.pay-now {
+    white-space: nowrap
+}
+.tiny-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    display: inline-block;
+    margin-right: .5rem;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px var(--line) inset
+}
+.dot-red {
+    background: #ff5d5d
+}
+.dot-green {
+    background: #12bf55
+}
+.dot-blue {
+    background: #2f6fec
+}
+.table-invoice thead th {
+    color: #8c94a8;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 600;
+    border-bottom: 1px solid var(--line)
+}
+.table-invoice tbody td {
+    vertical-align: middle;
+    border-bottom: 1px solid var(--line)
+}
+.amount {
+    text-align: right;
+    font-weight: 700
+}
+.money {
+    font-variant-numeric: tabular-nums
+}
+.list-plain {
+    list-style: none;
+    padding: 0;
+    margin: 0
+}
+.list-plain li+li {
+    margin-top: .25rem
+}
+.side-note small {
+    color: #7b8296
+}
+.badge-soft-pill {
+    border-radius: 999px;
+    padding: .35rem .6rem;
+    font-weight: 600
+}
+.badge-approved {
+    background: var(--soft-green-bg);
+    color: var(--soft-green)
+}
+.badge-pending {
+    background: var(--soft-yellow-bg);
+    color: var(--soft-yellow)
+}
+.card.side {
+    border-color: var(--line)
+}
+.kv dt {
+    color: #7b8296;
+    font-weight: 500
+}
+.kv dd {
+    margin: 0
+}
+.total-box {
+    border-top: 1px dashed var(--line)
+}
+@media (max-width: 992px) {
+    .invoice-head {
+        gap: 1rem
+    }
+    .pay-now {
+        margin-top: .5rem
+    }
+}
+.table.table-invoice thead th {
+    color: #b3b9c9;
+}
+.order-total dl dt {
+    color: #b3b9c9;
 }

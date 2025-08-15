@@ -64,7 +64,7 @@ $(document).ready(function() {
                 if (json.success) {
                     console.log(json['order_id']);
                     //loadContent('bpos/invoice&order_id='+ json['order_id']);
-                    window.location.href = 'index.php?route=bpos/order/info&order_id=' + json['order_id'];
+                    window.location.href = 'index.php?route=bpos/order_confirm&order_id=' + json['order_id'];
                 }
             },
             error: function() {
@@ -228,15 +228,6 @@ $(document).ready(function() {
                             toastr.success(json['success']);
                             $('.cart .counter').html(json['total_cart']);
                             updateCheckoutPanel();
-                            var target = $('#checkout-summary');
-                            var scrollBottom = target.offset().top + target.outerHeight() - $(window).height();
-
-                            $('html, body').animate({
-                                scrollTop: scrollBottom
-                            }, 500);
-
-                            // Opsional: beri fokus
-                            target.attr('tabindex', -1).focus();
 
                         }
                     });
@@ -256,15 +247,7 @@ $(document).ready(function() {
                  toastr.success(json['success']);
                  $('.cart .counter').html(json['total_cart']);
                 updateCheckoutPanel();
-                var target = $('#checkout-summary');
-                var scrollBottom = target.offset().top + target.outerHeight() - $(window).height();
-
-                $('html, body').animate({
-                    scrollTop: scrollBottom
-                }, 500);
-
-                // Opsional: beri fokus
-                target.attr('tabindex', -1).focus();
+                
             }
         });
     });
@@ -286,6 +269,16 @@ $(document).ready(function() {
                         toastr.success(json['success']);
                         //alert(json['success']); // Bisa ganti pakai notifikasi lebih bagus
                         updateCheckoutPanel();
+                        var target = $('#checkout-summary');
+                        var scrollBottom = target.offset().top + target.outerHeight() - $(window).height();
+
+                        $('html, body').animate({
+                            scrollTop: scrollBottom
+                        }, 500);
+
+                        // Opsional: beri fokus
+                        target.attr('tabindex', -1).focus();
+
                     }
                 },
                 error: function() {
