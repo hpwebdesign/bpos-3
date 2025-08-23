@@ -286,7 +286,7 @@ form, form input, form select, form textarea, .dropdown-menu {
     width: 100%;
     aspect-ratio: 1;
     border-radius: 16px;
-    background: #f9fbff;
+    background: #fff;
     border: 1px dashed #e6eaf2;
     display: flex;
     align-items: center;
@@ -296,8 +296,8 @@ form, form input, form select, form textarea, .dropdown-menu {
 .food .plate {
     width: 80%;
     aspect-ratio: 1;
-    border-radius: 50%;
-    background: #eee;
+    border-radius: 10%;
+/*    background: #eee;*/
 }
 .card .name {
     font-weight: 600;
