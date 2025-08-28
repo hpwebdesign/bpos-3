@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BPOS — Point of Sales for Modern Retail</title>
+    <meta name="description" content="All‑in‑one Point of Sales built for speed, accuracy, and beautiful retail experiences. Checkout, inventory, reporting, and integrations in one place." />
+    <style>
+      :root {
+        --bg-gradient-start: #5b2be0; /* purple close to screenshot */
+        --bg-gradient-end: #2f66f2;   /* bluish tone for cohesion */
+        --primary: #2f80ed;           /* button blue like the screenshot */
+        --primary-600: #2a73d4;
+        --ink: #0b1220;               /* dark text */
+        --muted: #6b7280;             /* gray text */
+        --card: #ffffff;
+        --soft: #f5f7fb;
+        --accent: #ffd6cc;            /* tiny warm accent for logo dot */
+        --radius-lg: 16px;
+        --radius-md: 12px;
+        --shadow-1: 0 10px 30px rgba(17, 38, 146, .12);
+        --shadow-2: 0 16px 40px rgba(17, 38, 146, .18);
+        --maxw: 1120px;
+      }
+
+      /* Global reset */
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        color: var(--ink); background: linear-gradient(120deg, var(--bg-gradient-start), var(--bg-gradient-end)) fixed;
+        background-size: 200% 200%; animation: gradientShift 12s ease infinite;
+      }
+      @keyframes gradientShift { 0% { background-position: 0% 50% } 50% { background-position: 100% 50% } 100% { background-position: 0% 50% } }
+
+      a { color: inherit; text-decoration: none; }
+      img { max-width: 100%; display: block; }
+
+      /* Layout shell */
+      .shell { display: grid; grid-template-columns: 1fr; gap: 0; smin-height: 100dvh; }
+
+      /* Top navigation */
+      .nav {
+        position: sticky; top: 0; z-index: 100; backdrop-filter: saturate(160%) blur(8px);
+        background: rgba(255,255,255,.6); border-bottom: 1px solid rgba(255,255,255,.35);
+      }
+      .nav-inner { max-width: var(--maxw); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; }
+      .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; letter-spacing: .3px; }
+      .brand-badge { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 10px; background: linear-gradient(135deg, #ff8a65, #ff5e62); box-shadow: var(--shadow-1); }
+      .brand-badge:before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+
+      .nav-links { display: none; gap: 18px; font-weight: 500; color: #1f2937; }
+      .nav-links a { padding: 8px 10px; border-radius: 10px; opacity: .85; }
+      .nav-links a.active, .nav-links a:hover { background: rgba(47,128,237,.08); opacity: 1; }
+
+      .nav-cta { display: none; }
+      .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 18px; border-radius: 12px; border: 0; cursor: pointer; font-weight: 600; box-shadow: var(--shadow-1); transition: transform .12s ease, box-shadow .2s ease, background .2s ease; }
+      .btn-primary { background: var(--primary); color: #fff; }
+      .btn-primary:hover { background: var(--primary-600); box-shadow: var(--shadow-2); transform: translateY(-1px); }
+      .btn-soft { background: #fff; color: var(--primary); border: 1px solid rgba(47,128,237,.15); }
+      .btn-soft:hover { background: #f6faff; }
+
+      .hamburger { border: 0; background: #fff; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; box-shadow: var(--shadow-1); }
+      .hamburger span { width: 18px; height: 2px; background: #1f2937; position: relative; display: block; }
+      .hamburger span:before, .hamburger span:after { content: ""; position: absolute; left: 0; width: 18px; height: 2px; background: #1f2937; }
+      .hamburger span:before { top: -6px; } .hamburger span:after { top: 6px; }
+
+      /* Hero */
+      .hero {
+        background: radial-gradient(1200px 60% at 0% 90%, rgba(255,255,255,.15), transparent 70%),
+          radial-gradient(900px 40% at 100% 0%, rgba(255,255,255,.12), transparent 70%);
+        padding: 48px 0 24px;
+      }
+      .hero-inner { max-width: var(--maxw); margin: 0 auto; display: grid; grid-template-columns: 1.25fr .75fr; align-items: center; gap: 36px; padding: 0 20px; }
+
+      .hero h1 { font-size: clamp(32px, 5vw, 56px); line-height: 1.05; margin: 0 0 16px; color: #fff; }
+      .hero p.sub { color: rgba(255,255,255,.9); font-size: clamp(16px, 1.6vw, 18px); margin: 0 0 28px; }
+
+      .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+
+      .mock { background: var(--card); border-radius: var(--radius-lg); padding: 18px; box-shadow: var(--shadow-2); border: 1px solid rgba(17,38,146,.08); }
+      .mock-top { height: 10px; border-radius: 8px; background: linear-gradient(90deg, #f0f3ff, #e9ecff); margin-bottom: 12px; }
+      .mock-card { background: #f7f9ff; border: 1px solid #edf1ff; border-radius: 14px; padding: 14px; display: grid; gap: 10px; }
+      .mock-row { height: 12px; background: #e6ecff; border-radius: 8px; }
+      .mock-actions { display: flex; gap: 10px; }
+      .mock-actions .btn { padding: 10px 12px; font-size: 14px; }
+
+      /* Section shell */
+      .section { background: var(--soft); border-top-left-radius: 36px; border-top-right-radius: 36px; margin-top: 36px; box-shadow: 0 -1px 0 rgba(255,255,255,.4) inset; }
+      .slice { max-width: var(--maxw); margin: 0 auto; padding: 64px 20px; }
+      .section h2 { font-size: clamp(24px, 3.4vw, 36px); margin: 0 0 12px; }
+      .section p.lead { color: var(--muted); margin: 0 0 24px; }
+
+      /* Feature grid */
+      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+      .card { background: var(--card); border-radius: var(--radius-lg); padding: 22px; box-shadow: var(--shadow-1); border: 1px solid rgba(17,38,146,.08); }
+      .card h3 { margin: 0 0 6px; font-size: 18px; }
+      .kicker { display: inline-flex; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: #6d7a99; background: #eef2ff; padding: 6px 10px; border-radius: 999px; margin-bottom: 10px; }
+
+      /* Two-column sections */
+      .two { display: grid; grid-template-columns: 1.1fr .9fr; gap: 24px; align-items: center; }
+
+      /* Pricing */
+      .pricing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+      .price { background: #fff; border-radius: var(--radius-lg); box-shadow: var(--shadow-1); border: 1px solid rgba(17,38,146,.08); padding: 24px; display: grid; gap: 14px; }
+      .price h3 { margin: 0; }
+      .price .amt { font-weight: 800; font-size: 34px; }
+      .price ul { padding-left: 18px; margin: 0; color: var(--muted); display: grid; gap: 8px; }
+
+      /* Testimonials */
+      .quotes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+      .quote { background: #fff; border-radius: var(--radius-lg); padding: 20px; border: 1px solid rgba(17,38,146,.08); box-shadow: var(--shadow-1); color: #111827; }
+      .quote b { display: block; margin-top: 10px; }
+
+      /* FAQ */
+      .faq { display: grid; grid-template-columns: 1fr; gap: 12px; }
+      .faq .q { background: #fff; border: 1px solid rgba(17,38,146,.08); border-radius: var(--radius-md); padding: 16px 18px; box-shadow: var(--shadow-1); }
+      .faq summary { cursor: pointer; font-weight: 600; }
+
+      /* Footer */
+      .footer { color: rgba(255,255,255,.9); padding: 40px 20px 60px; text-align: center; }
+      .footer small { color: rgba(255,255,255,.8); }
+
+      /* Responsive */
+      @media (max-width: 1024px){ .hero-inner { grid-template-columns: 1fr; } .two { grid-template-columns: 1fr; } .grid, .pricing, .quotes { grid-template-columns: 1fr 1fr; } }
+      @media (max-width: 720px){ .nav-links, .nav-cta { display: none; } .nav-menu { display: block; } .grid, .pricing, .quotes { grid-template-columns: 1fr; } .nav-links.mobile { display: grid; grid-template-columns: 1fr; padding: 8px 20px 16px; gap: 6px; background: rgba(255,255,255,.9); border-bottom: 1px solid rgba(17,38,146,.08); } }
+      @media (min-width: 721px){ .nav-links { display: flex; } .nav-cta { display: flex; gap: 10px; } .nav-menu { display: none; } }
+
+      /* Desktop: sembunyikan nav mobile, tampilkan nav desktop saja */
+      @media (min-width: 721px){
+        .nav-links:not(.mobile) { display: flex; }
+        .nav-links.mobile { display: none !important; }
+      }
+
+      /* Mobile: default hidden; munculkan saat .open */
+      @media (max-width: 720px){
+        .nav-links.mobile { display: none; }
+        .nav-links.mobile.open {
+          display: grid;
+          grid-template-columns: 1fr;
+          padding: 8px 20px 16px;
+          gap: 6px;
+          background: rgba(255,255,255,.9);
+          border-bottom: 1px solid rgba(17,38,146,.08);
+        }
+      }
+
+
+      /* Mobile nav UI overrides */
+      .nav{ z-index:300; }
+      @media (max-width: 720px){
+        /* Panel-style mobile menu under the bar */
+        .nav { position: sticky; }
+        .nav-links.mobile{
+          display:none; /* default hidden; jQuery will slideToggle */
+          position:absolute; left:12px; right:12px; top:64px;
+          background:#fff; border:1px solid rgba(17,38,146,.08);
+          border-radius:16px; box-shadow: 0 16px 40px rgba(17,38,146,.18);
+          padding:10px; gap:0; /* reset */
+        }
+        .nav-links.mobile a{
+          display:block; padding:12px 14px; margin:4px 0; border-radius:10px;
+          font-weight:600; color:#1f2937; letter-spacing:.1px;
+        }
+        .nav-links.mobile a:hover,
+        .nav-links.mobile a.active{
+          background: rgba(47,128,237,.10);
+        }
+      }
+
+      /* ADD: Typewriter styles for the hero <p class="sub"> */
+      .sub.typewriter { white-space: pre-wrap; position: relative; }
+      .sub.typewriter::after {
+        content: "▍";
+        margin-left: 2px;
+        animation: caretBlink 1s step-end infinite;
+        color: currentColor;
+      }
+      @keyframes caretBlink { 50% { opacity: 0; } }
+
+
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <!-- NAV -->
+      <nav class="nav" id="top">
+        <div class="nav-inner">
+          <div class="brand"><div class="brand-badge"></div> BPOS</div>
+          <div class="nav-links" id="navLinks">
+            <a href="#features">Features</a>
+            <a href="#pos">POS Counter</a>
+            <a href="#inventory">Inventory</a>
+            <a href="#integrations">Integrations</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#faq">FAQ</a>
+          </div>
+          <div class="nav-cta">
+            <a class="btn btn-soft" href="#demo">Live Demo</a>
+            <a class="btn btn-primary" href="#contact">Get Started</a>
+          </div>
+          <button class="hamburger nav-menu" aria-label="Toggle menu"
+                  aria-controls="mobileNav" aria-expanded="false" id="menuBtn"><span></span></button>
+
+        </div>
+        <div class="nav-links mobile" id="mobileNav" aria-hidden="true">
+          <a href="#features">Features</a>
+          <a href="#pos">POS Counter</a>
+          <a href="#inventory">Inventory</a>
+          <a href="#integrations">Integrations</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#faq">FAQ</a>
+          <a href="#contact">Get Started</a>
+        </div>
+      </nav>
+
+      <!-- HERO -->
+      <header class="hero" id="hero">
+        <div class="hero-inner">
+          <div>
+            <span class="kicker">Point of Sales, reimagined</span>
+            <h1>Lightning‑fast checkout and crystal‑clear control.</h1>
+            <p class="sub">BPOS unifies in‑store checkout, inventory, customers, and analytics with a clean, modern interface. Designed for speed at the counter, loved by managers after hours.</p>
+            <div class="hero-cta">
+              <a class="btn btn-primary" href="#demo">Try the Demo</a>
+              <a class="btn btn-soft" href="#pricing">See Pricing</a>
+            </div>
+          </div>
+          <div>
+            <!-- Simple visual mock to match the login style of the screenshot -->
+            <div class="mock" aria-label="interface mockup">
+              <div class="mock-top"></div>
+              <div class="mock-card">
+                <div class="mock-row" style="width: 60%"></div>
+                <div class="mock-row" style="width: 90%"></div>
+                <div class="mock-row" style="width: 80%"></div>
+                <div class="mock-actions">
+                  <button class="btn btn-primary">Sign In</button>
+                  <button class="btn btn-soft">Create Account</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- FEATURES -->
+      <section class="section" id="features">
+        <div class="slice">
+          <h2>Everything you need to run retail</h2>
+          <p class="lead">Smart, reliable features that stay out of your way at peak hours and go deep when you need the details.</p>
+          <div class="grid">
+            <div class="card">
+              <h3>Fast Checkout</h3>
+              <p>Barcode scanning, smart search, and quick keys for popular items. Accept cash, card, E‑wallets, and split payments.</p>
+            </div>
+            <div class="card">
+              <h3>Inventory & Stock</h3>
+              <p>Real‑time stock control, multi‑warehouse, low‑stock alerts, purchase orders, and batch/expiry tracking.</p>
+            </div>
+            <div class="card">
+              <h3>Customers & Loyalty</h3>
+              <p>Customer profiles, points, member pricing, and coupons. Build loyalty without extra tools.</p>
+            </div>
+            <div class="card">
+              <h3>Reports that Matter</h3>
+              <p>Daily Z reports, sales trends, product performance, cashier shifts, tax summary, and export to CSV.</p>
+            </div>
+            <div class="card">
+              <h3>Roles & Permissions</h3>
+              <p>Fine‑grained access for cashiers, supervisors, and owners. Audit logs for full traceability.</p>
+            </div>
+            <div class="card">
+              <h3>Offline‑First</h3>
+              <p>Keep selling during internet hiccups. Data syncs automatically when you’re back online.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- POS COUNTER (promo-ready copy templates) -->
+      <section class="section" id="pos">
+        <div class="slice two">
+          <div>
+            <span class="kicker">POS Counter</span>
+            <h2>Built for speed at the front line</h2>
+            <p class="lead">Every click and pixel is tuned to help your cashiers move faster and avoid mistakes.</p>
+            <ul>
+              <li>Scan, search, add notes and discounts without leaving the cart.</li>
+              <li>Hold/recall transactions, park tabs, and quick customer selection.</li>
+              <li>Keyboard shortcuts and large touch targets for tablets.</li>
+            </ul>
+            <!-- ✅ Promo template: replace text freely -->
+            <div class="card" style="margin-top:14px">
+              <b>Promo Template — Speed</b>
+              <p><em>Headline:</em> "Checkout in seconds, even on your busiest day."</p>
+              <p><em>Sub‑copy:</em> "With barcode scanning and one‑tap tenders, BPOS shortens each transaction by up to 40%."</p>
+              <p><em>CTA:</em> "Watch the 60‑second demo"</p>
+            </div>
+          </div>
+          <div>
+            <div class="mock" aria-label="pos mock">
+              <div class="mock-top"></div>
+              <div class="mock-card">
+                <div class="mock-row" style="width: 70%"></div>
+                <div class="mock-row" style="width: 100%"></div>
+                <div class="mock-row" style="width: 85%"></div>
+                <div class="mock-actions">
+                  <button class="btn btn-primary">Charge</button>
+                  <button class="btn btn-soft">Hold</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- INVENTORY -->
+      <section class="section" id="inventory">
+        <div class="slice two">
+          <div>
+            <div class="mock">
+              <div class="mock-top"></div>
+              <div class="mock-card">
+                <div class="mock-row" style="width: 65%"></div>
+                <div class="mock-row" style="width: 95%"></div>
+                <div class="mock-row" style="width: 75%"></div>
+                <div class="mock-row" style="width: 88%"></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <span class="kicker">Inventory</span>
+            <h2>Know what’s on the shelf, always</h2>
+            <p class="lead">From receiving to cycle counts, BPOS keeps your stock accurate across locations.</p>
+            <ul>
+              <li>Variants, bundles/kits, and serial/batch tracking.</li>
+              <li>Transfers across stores and warehouses.</li>
+              <li>Supplier pricing, purchase orders, and landed cost.</li>
+            </ul>
+            <!-- ✅ Promo template: replace text freely -->
+            <div class="card" style="margin-top:14px">
+              <b>Promo Template — Accuracy</b>
+              <p><em>Headline:</em> "Stop stockouts and over‑ordering."</p>
+              <p><em>Sub‑copy:</em> "Live stock, reorder points, and low‑stock alerts keep shelves full and capital free."</p>
+              <p><em>CTA:</em> "See sample inventory report"</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- INTEGRATIONS / MODULES -->
+      <section class="section" id="integrations">
+        <div class="slice">
+          <h2>Plug into your retail stack</h2>
+          <p class="lead">Connect BPOS with payment providers, receipt printers, scanners, ecommerce, and accounting.</p>
+          <div class="grid">
+            <div class="card"><h3>Payments</h3><p>Card terminals, E‑wallets, QRIS, split tenders, refunds, and tips.</p></div>
+            <div class="card"><h3>Hardware</h3><p>USB/Bluetooth scanners, cash drawers, and thermal printers (80mm/58mm).</p></div>
+            <div class="card"><h3>E‑commerce</h3><p>Sync products, customers, and orders with your online store (OpenCart ready).</p></div>
+            <div class="card"><h3>Accounting</h3><p>Daily journal summary and product sales export to your accounting tool.</p></div>
+            <div class="card"><h3>Messaging</h3><p>WhatsApp receipts, order updates, and OTP via Infobip/Twilio.</p></div>
+            <div class="card"><h3>APIs</h3><p>REST API and webhooks for custom workflows and integrations.</p></div>
+          </div>
+          <!-- ✅ Promo template: replace text freely -->
+          <div class="card" style="margin-top:20px">
+            <b>Promo Template — Integration</b>
+            <p><em>Headline:</em> "Works with your existing tools."</p>
+            <p><em>Sub‑copy:</em> "No rip‑and‑replace needed. Connect payments, printers, ecommerce, and accounting in minutes."</p>
+            <p><em>CTA:</em> "Browse integrations"</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== POS Role Highlights Section ===== -->
+<section class="bpos-roles">
+  <div class="bpos-roles__inner">
+    <h2 class="bpos-roles__title">Cut Down the Workload for the Sales Representative</h2>
+
+    <!-- Icon menu -->
+    <nav class="bpos-roles__menu" aria-label="POS areas">
+      <button class="bpos-roles__item is-active" data-tab="agent">
+        <span class="bpos-ico">
+          <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M4 10h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10zm2-6h12l2 4H4l2-4zm5 9h2v5h-2z"/></svg>
+        </span>
+        <span>Agent</span>
+      </button>
+      <button class="bpos-roles__item" data-tab="order">
+        <span class="bpos-ico">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm8 1v4h4"/></svg>
+        </span>
+        <span>Order</span>
+      </button>
+      <button class="bpos-roles__item" data-tab="settings">
+        <span class="bpos-ico">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm9 4l-2 .3a7.8 7.8 0 0 0-.7 1.6l1.2 1.6-1.4 1.4-1.6-1.2c-.5.3-1 .5-1.6.7L14 21h-2l-.3-2a7.8 7.8 0 0 1-1.6-.7l-1.6 1.2-1.4-1.4 1.2-1.6c-.3-.5-.5-1-.7-1.6L3 12v-2l2-.3c.2-.6.4-1.1.7-1.6L4.5 6.5 5.9 5l1.6 1.2c.5-.3 1-.5 1.6-.7L12 3h2l.3 2c.6.2 1.1.4 1.6.7L17.5 5 19 6.5 17.8 8c.3.5.5 1 .7 1.6L21 10v2z"/></svg>
+        </span>
+        <span>Settings</span>
+      </button>
+      <button class="bpos-roles__item" data-tab="search">
+        <span class="bpos-ico">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M10 18a8 8 0 1 1 5.3-14.1l4.9 4.9-1.4 1.4-4.2-4.2A6 6 0 1 0 10 16a6 6 0 0 0 3.6-1.2l1.5 1.5A8 8 0 0 1 10 18z"/></svg>
+        </span>
+        <span>Search</span>
+      </button>
+      <button class="bpos-roles__item" data-tab="products">
+        <span class="bpos-ico">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M3 7l9-4 9 4-9 4-9-4zm0 5l9 4 9-4v5l-9 4-9-4v-5z"/></svg>
+        </span>
+        <span>Products</span>
+      </button>
+      <button class="bpos-roles__item" data-tab="customers">
+        <span class="bpos-ico">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z"/></svg>
+        </span>
+        <span>Customers</span>
+      </button>
+      <button class="bpos-roles__item" data-tab="discount">
+        <span class="bpos-ico">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M7 17a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm10-6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM6 18L18 6l1.4 1.4L7.4 19.4 6 18z"/></svg>
+        </span>
+        <span>Discount</span>
+      </button>
+      <button class="bpos-roles__item" data-tab="checkout">
+        <span class="bpos-ico">
+          <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM6.2 6l.7 2H20l-1.5 7H8.3l-.6-2H5.1l1.1 3.2A2 2 0 0 0 8 18h10a2 2 0 0 0 2-1.6L22 8a2 2 0 0 0-2-2H6.2z"/></svg>
+        </span>
+        <span>Checkout</span>
+      </button>
+    </nav>
+
+    <div class="bpos-roles__content">
+      <figure class="bpos-roles__mock">
+        <!-- Replace with your own screenshot -->
+        <img src="https://via.placeholder.com/820x420.png?text=POS+Cart+Mock" alt="POS mock" />
+      </figure>
+
+      <div class="bpos-roles__copy">
+        <h3>User</h3>
+        <ul>
+          <li>Can easily log in using username and password.</li>
+          <li>Can view the categories, products, and checkout panel.</li>
+          <li>Can view account information and order details.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+/* ========== Section styles (namespaced) ========== */
+.bpos-roles{
+  --bpos-blue: #2ea7e0;
+  --bpos-purple: #3b2fd9;
+  --bpos-primary: #2f80ed;
+  --bpos-ink: #0b1220;
+  --bpos-muted: #5f6b82;
+  background: linear-gradient(90deg, var(--bpos-blue), var(--bpos-purple));
+  color:#fff;
+  padding: 56px 20px;
+}
+.bpos-roles__inner{ max-width:1120px; margin:0 auto; }
+.bpos-roles__title{
+  text-align:center; margin:0 0 18px;
+  font-size: clamp(22px, 3.2vw, 30px); font-weight:700;
+}
+
+/* icon menu */
+.bpos-roles__menu{
+  display:flex; gap:14px; flex-wrap:wrap; justify-content:center;
+  margin: 10px auto 24px; padding:0 6px;
+}
+.bpos-roles__item{
+  display:flex; align-items:center; gap:10px;
+  padding:10px 14px; border-radius:12px; border:0; cursor:pointer;
+  background: transparent; color:#fff; font-weight:600;
+  transition: background .2s ease, box-shadow .2s ease, transform .12s ease;
+}
+.bpos-roles__item .bpos-ico{ line-height:0; opacity:.95; }
+.bpos-roles__item:hover{ transform: translateY(-1px); background: rgba(255,255,255,.08); }
+.bpos-roles__item.is-active{ background: rgba(255,255,255,.18); box-shadow: 0 8px 22px rgba(13, 33, 80, .18); }
+
+/* content */
+.bpos-roles__content{
+  display:grid; grid-template-columns: 1.1fr .9fr; gap:28px; align-items:start;
+}
+.bpos-roles__mock{
+  margin:0; background:#fff; border-radius:18px; overflow:hidden;
+  box-shadow: 0 16px 40px rgba(12, 23, 84, .28);
+  border:1px solid rgba(255,255,255,.35);
+}
+.bpos-roles__mock img{ display:block; width:100%; height:auto; }
+
+.bpos-roles__copy{
+  background: rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.3);
+  border-radius:18px; padding:18px 20px; color:#f3f7ff;
+}
+.bpos-roles__copy h3{ margin:0 0 8px; color:#fff; font-size:20px; }
+.bpos-roles__copy ul{ margin:0; padding-left:20px; }
+.bpos-roles__copy li{ margin:8px 0; color:#e8edff; }
+
+/* responsive */
+@media (max-width: 960px){
+  .bpos-roles__content{ grid-template-columns: 1fr; }
+}
+</style>
+
+<script>
+/* Optional: toggle active pill on click (no content switching needed) */
+document.querySelectorAll('.bpos-roles__item').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.bpos-roles__item').forEach(b=>b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+  });
+});
+</script>
+<!-- ===== /POS Role Highlights Section ===== -->
+
+
+
+      <!-- PRICING -->
+      <section class="section" id="pricing">
+        <div class="slice">
+          <h2>Simple pricing that scales with you</h2>
+          <p class="lead">Start small, grow to multiple stores, and only pay for what you use.</p>
+          <div class="pricing">
+            <div class="price">
+              <h3>Starter</h3>
+              <div class="amt">$19<span style="font-size:14px; font-weight:600">/mo</span></div>
+              <ul>
+                <li>1 register, 1 location</li>
+                <li>Core POS + basic inventory</li>
+                <li>Email receipts</li>
+              </ul>
+              <a class="btn btn-primary" href="#contact">Choose Starter</a>
+            </div>
+            <div class="price" style="border:2px solid rgba(47,128,237,.35)">
+              <h3>Growth</h3>
+              <div class="amt">$49<span style="font-size:14px; font-weight:600">/mo</span></div>
+              <ul>
+                <li>Up to 3 registers, multi‑location</li>
+                <li>Advanced inventory + transfers</li>
+                <li>WhatsApp receipts & loyalty</li>
+              </ul>
+              <a class="btn btn-primary" href="#contact">Choose Growth</a>
+            </div>
+            <div class="price">
+              <h3>Multi‑Store</h3>
+              <div class="amt">Custom</div>
+              <ul>
+                <li>Unlimited registers & locations</li>
+                <li>API, webhooks, and SSO</li>
+                <li>Priority support & SLA</li>
+              </ul>
+              <a class="btn btn-primary" href="#contact">Talk to Sales</a>
+            </div>
+          </div>
+          <!-- ✅ Promo template: replace text freely -->
+          <div class="card" style="margin-top:20px">
+            <b>Promo Template — Offer</b>
+            <p><em>Headline:</em> "Launch your first store for $0 setup."</p>
+            <p><em>Sub‑copy:</em> "Free onboarding session and printable POS kit for early adopters."</p>
+            <p><em>CTA:</em> "Claim the launch offer"</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- DEMO / CTA -->
+      <section class="section" id="demo">
+        <div class="slice two">
+          <div>
+            <h2>See BPOS in action</h2>
+            <p class="lead">Open the interactive demo to try the POS counter, scan items, and complete a test sale.</p>
+            <div class="hero-cta">
+              <a class="btn btn-primary" href="#contact">Request Access</a>
+              <a class="btn btn-soft" href="#features">Explore Features</a>
+            </div>
+          </div>
+          <div>
+            <div class="mock" aria-label="demo card">
+              <div class="mock-top"></div>
+              <div class="mock-card">
+                <div class="mock-row" style="width: 60%"></div>
+                <div class="mock-row" style="width: 92%"></div>
+                <div class="mock-row" style="width: 75%"></div>
+                <div class="mock-actions">
+                  <button class="btn btn-primary">Start Demo</button>
+                  <button class="btn btn-soft">Docs</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TESTIMONIALS -->
+      <section class="section" id="testimonials">
+        <div class="slice">
+          <h2>Trusted by fast‑moving retailers</h2>
+          <p class="lead">From convenience stores to specialty shops, teams choose BPOS for reliability and ease of use.</p>
+          <div class="quotes">
+            <div class="quote">"Our checkout time dropped by a third on the first week. Cashiers love the layout." <b>— Store Manager, FreshMart</b></div>
+            <div class="quote">"Stock accuracy is finally under control. Transfers and counts are a breeze." <b>— Ops Lead, Urban Outfit</b></div>
+            <div class="quote">"The WhatsApp receipts and loyalty points boosted repeat purchases instantly." <b>— Owner, Bean & Bake</b></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section class="section" id="faq">
+        <div class="slice">
+          <h2>Frequently asked questions</h2>
+          <div class="faq">
+            <details class="q"><summary>Does BPOS work offline?</summary><p>Yes. You can continue selling during outages, and data syncs automatically when the connection returns.</p></details>
+            <details class="q"><summary>Which printers and scanners are supported?</summary><p>Most popular USB/Bluetooth barcode scanners and 58mm/80mm thermal printers work out of the box.</p></details>
+            <details class="q"><summary>Can I connect to my online store?</summary><p>Yes. BPOS integrates with OpenCart and other platforms to sync products, customers, and orders.</p></details>
+            <details class="q"><summary>How do I migrate from my current POS?</summary><p>We provide import templates for products, stock, and customers, plus a guided onboarding call.</p></details>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section class="section" id="contact">
+        <div class="slice two">
+          <div>
+            <h2>Get started today</h2>
+            <p class="lead">Tell us about your stores and we’ll set up a tailored demo with the right modules enabled.</p>
+            <!-- ✅ Promo template: replace text freely -->
+            <div class="card" style="margin-top:10px">
+              <b>Promo Template — Contact</b>
+              <p><em>Headline:</em> "Need a custom workflow?"</p>
+              <p><em>Sub‑copy:</em> "Our team can tailor BPOS for franchises, service desks, and specialty retail."</p>
+              <p><em>CTA:</em> "Schedule a discovery call"</p>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <form onsubmit="event.preventDefault(); alert('Thanks! We will reach out shortly.');">
+                <div style="display:grid; gap:12px;">
+                  <div style="display:grid; gap:6px;">
+                    <label for="name">Name</label>
+                    <input id="name" required placeholder="Your full name" style="padding:12px 14px; border-radius:12px; border:1px solid #e5e7eb; outline:none;">
+                  </div>
+                  <div style="display:grid; gap:6px;">
+                    <label for="email">Email</label>
+                    <input id="email" type="email" required placeholder="you@company.com" style="padding:12px 14px; border-radius:12px; border:1px solid #e5e7eb; outline:none;">
+                  </div>
+                  <div style="display:grid; gap:6px;">
+                    <label for="stores">Number of locations</label>
+                    <select id="stores" style="padding:12px 14px; border-radius:12px; border:1px solid #e5e7eb; outline:none;">
+                      <option>1</option>
+                      <option>2–3</option>
+                      <option>4–9</option>
+                      <option>10+</option>
+                    </select>
+                  </div>
+                  <div style="display:grid; gap:6px;">
+                    <label for="msg">Notes</label>
+                    <textarea id="msg" rows="4" placeholder="Tell us about your setup…" style="padding:12px 14px; border-radius:12px; border:1px solid #e5e7eb; outline:none;"></textarea>
+                  </div>
+                  <button class="btn btn-primary" type="submit">Request a demo</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+<!--
+      <footer class="footer">
+        <div class="brand" style="justify-content:center; color:#fff"><div class="brand-badge"></div> BPOS</div>
+        <p style="max-width:720px; margin:12px auto 0; color: rgba(255,255,255,.9)">BPOS is a modern Point of Sales that blends a clean interface with serious retail horsepower. Designed for speed, accuracy, and effortless control.</p>
+        <p style="margin-top:12px"><small>© <span id="year"></span> BPOS. All rights reserved.</small></p>
+      </footer>
+-->
+
+
+      <!-- ===== CTA Clouds + Footer ===== -->
+<section class="bpos-cta-clouds">
+  <div class="bpos-cta-wrap">
+    <h2>Start today and see why retailers choose BPOS</h2>
+    <a class="btn-primary" href="#contact">Start BPOS for FREE</a>
+
+    <!-- Rocket (SVG, blue theme). Replace if you have your own asset -->
+    <div class="rocket-wrap" aria-hidden="true">
+      <svg class="rocket" viewBox="0 0 64 64">
+        <defs>
+          <linearGradient id="gBlue" x1="0" x2="1">
+            <stop offset="0" stop-color="#2ea7e0"/>
+            <stop offset="1" stop-color="#3b2fd9"/>
+          </linearGradient>
+        </defs>
+        <g fill="url(#gBlue)">
+          <path d="M32 6c7 7 12 19 12 26 0 7-5 12-12 12s-12-5-12-12C20 25 25 13 32 6z"/>
+          <circle cx="32" cy="26" r="6" fill="#fff"/>
+          <circle cx="32" cy="26" r="3" fill="#2f80ed"/>
+          <rect x="24" y="42" width="16" height="6" rx="2"/>
+          <path d="M28 50l-3 6 7-3 7 3-3-6z" />
+        </g>
+      </svg>
+    </div>
+
+    <!-- clouds -->
+<!--    <div class="clouds" aria-hidden="true"></div>-->
+
+    <!-- REPLACE this: <div class="clouds" aria-hidden="true"></div> -->
+<div class="clouds" aria-hidden="true">
+  <!-- Inline blur filter (once per page is fine) -->
+  <svg class="cloud-filter" width="0" height="0" focusable="false" aria-hidden="true">
+    <filter id="cloudBlur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8"></feGaussianBlur>
+    </filter>
+  </svg>
+
+  <div class="cloud-layer back"></div>
+  <div class="cloud-layer front"></div>
+</div>
+
+
+  </div>
+</section>
+
+<footer class="bpos-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="brand">
+        <span class="badge"></span>
+        <strong>BPOS</strong>
+      </div>
+      <p>We’ve been building retail software for years. Thousands of merchants run faster checkouts and cleaner inventory with BPOS.</p>
+      <div class="social">
+        <a href="#" aria-label="Facebook">f</a>
+        <a href="#" aria-label="X">x</a>
+        <a href="#" aria-label="LinkedIn">in</a>
+      </div>
+    </div>
+
+    <div class="footer-cols">
+      <div class="col">
+        <h4>Features</h4>
+        <a href="#features">Business Planning</a>
+        <a href="#features">Cash Flow Forecasting</a>
+        <a href="#features">Scenario Planning</a>
+        <a href="#features">Reporting</a>
+      </div>
+      <div class="col">
+        <h4>Get started</h4>
+        <a href="#demo">Take a FREE Trial</a>
+        <a href="#demo">Try a Demo</a>
+        <a href="#contact">Log In</a>
+      </div>
+      <div class="col">
+        <h4>Pricing</h4>
+        <a href="#pricing">Pricing</a>
+      </div>
+      <div class="col">
+        <h4>Helpful Links</h4>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Corporate Notice</a>
+        <a href="#">Terms & Conditions</a>
+        <a href="#">Sitemap</a>
+      </div>
+      <div class="col">
+        <h4>Resources</h4>
+        <a href="#">Blog</a>
+        <a href="#">Video Tutorials</a>
+        <a href="#">Integrations</a>
+        <a href="#">Downloads</a>
+        <a href="#">Help Centre</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-meta">Securely encrypted with SSL · Copyright © <span id="yr"></span> — BPOS</div>
+</footer>
+
+<style>
+  :root{
+    --blueA:#2ea7e0;   /* light blue (replaces orange) */
+    --blueB:#3b2fd9;   /* purple endpoint */
+    --primary:#2f80ed; /* button blue from your theme */
+    --ink:#0b1220;
+    --muted:#6b7280;
+  }
+
+  /* ===== Realistic multi‑layer clouds ===== */
+.clouds{
+  position:absolute; left:0; right:0; bottom:-40px; height:200px;
+  pointer-events:none; overflow:hidden;
+}
+
+.cloud-layer{
+  position:absolute; left:-5vw; right:-5vw; bottom:0; height:180px;
+  filter: url(#cloudBlur);
+  will-change: transform, opacity, filter;
+}
+
+/* BACK layer: softer, wider puffs */
+.cloud-layer.back{
+  opacity:.75;
+  animation: cloudDrift 28s linear infinite;
+  background:
+    radial-gradient(120px 60px at 8% 78%,  #fff 65%, rgba(255,255,255,0) 66%),
+    radial-gradient(160px 80px at 20% 72%, #f9fbff 65%, rgba(255,255,255,0) 66%),
+    radial-gradient(200px 92px at 38% 76%, #ffffff 65%, rgba(255,255,255,0) 66%),
+    radial-gradient(180px 84px at 58% 74%, #f5f8ff 65%, rgba(255,255,255,0) 66%),
+    radial-gradient(220px 96px at 74% 76%, #ffffff 65%, rgba(255,255,255,0) 66%),
+    radial-gradient(160px 82px at 90% 78%, #f6f9ff 65%, rgba(255,255,255,0) 66%);
+  filter: url(#cloudBlur) drop-shadow(0 -6px 10px rgba(31,41,55,.06));
+}
+
+/* FRONT layer: denser puffs + subtle shading */
+.cloud-layer.front{
+  height:160px; bottom:0;
+  opacity:.95;
+  animation: cloudDrift 22s linear infinite reverse, cloudFloat 6s ease-in-out infinite;
+  background:
+    /* highlights */
+    radial-gradient(120px 56px at 16% 84%, #fff 62%, rgba(255,255,255,0) 63%),
+    radial-gradient(170px 76px at 35% 86%, #fff 62%, rgba(255,255,255,0) 63%),
+    radial-gradient(150px 70px at 55% 84%, #fff 62%, rgba(255,255,255,0) 63%),
+    radial-gradient(190px 86px at 74% 86%, #fff 62%, rgba(255,255,255,0) 63%),
+    radial-gradient(130px 58px at 90% 84%, #fff 62%, rgba(255,255,255,0) 63%),
+    /* gentle underside shadow */
+    radial-gradient(120px 40px at 16% 100%, rgba(190,200,220,.22) 30%, rgba(190,200,220,0) 60%),
+    radial-gradient(170px 48px at 38% 100%, rgba(190,200,220,.20) 28%, rgba(190,200,220,0) 60%),
+    radial-gradient(150px 44px at 58% 100%, rgba(190,200,220,.20) 28%, rgba(190,200,220,0) 60%),
+    radial-gradient(190px 52px at 76% 100%, rgba(190,200,220,.20) 28%, rgba(190,200,220,0) 60%);
+  filter: url(#cloudBlur) drop-shadow(0 -8px 20px rgba(12, 23, 84, .08));
+}
+
+/* Motion */
+@keyframes cloudDrift {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-4vw); }
+}
+@keyframes cloudFloat {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-6px); }
+}
+
+
+  .btn-primary{
+    display:inline-flex; align-items:center; justify-content:center;
+    padding:12px 18px; border-radius:12px; color:#fff; text-decoration:none;
+    background: var(--primary); box-shadow:0 12px 30px rgba(47,128,237,.25);
+    font-weight:700; transition: transform .12s ease, box-shadow .2s ease, background .2s;
+  }
+  .btn-primary:hover{ transform: translateY(-1px); box-shadow:0 18px 40px rgba(47,128,237,.35); }
+
+  /* CTA area with clouds */
+  .bpos-cta-clouds{
+    position:relative; overflow:hidden; background:#f5f7fb;
+    padding:64px 20px 120px; text-align:center;
+  }
+  .bpos-cta-wrap{ max-width:920px; margin:0 auto; position:relative; }
+  .bpos-cta-wrap h2{
+    color:#1f2937; font-size:clamp(20px,3vw,24px); margin:0 0 18px; font-weight:700;
+  }
+  .rocket-wrap{ margin-top:28px; height:120px; position:relative; }
+  .rocket{ width:56px; height:56px; margin:auto; animation: floatUp 3.2s ease-in-out infinite; }
+  @keyframes floatUp { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-10px) } }
+
+  .clouds{
+    position:absolute; left:0; right:0; bottom:-40px; height:180px; pointer-events:none;
+    background:
+      radial-gradient(120px 60px at 20% 60%, #fff 60%, rgba(255,255,255,0) 61%) ,
+      radial-gradient(160px 70px at 40% 70%, #fff 60%, rgba(255,255,255,0) 61%) ,
+      radial-gradient(140px 60px at 60% 70%, #fff 60%, rgba(255,255,255,0) 61%) ,
+      radial-gradient(180px 80px at 80% 70%, #fff 60%, rgba(255,255,255,0) 61%);
+    filter: drop-shadow(0 -6px 14px rgba(31,41,55,.08));
+  }
+
+  /* Footer */
+  .bpos-footer{ background:#fff; color:#111827; border-top:1px solid #eef1f6; }
+  .footer-inner{ max-width:1120px; margin:0 auto; padding:40px 20px 28px; display:grid; grid-template-columns: 1.1fr 2fr; gap:36px; }
+  .footer-brand p{ color:var(--muted); margin:10px 0 14px; max-width:420px; }
+  .brand{ display:flex; align-items:center; gap:10px; font-size:18px; }
+  .badge{ width:28px; height:28px; border-radius:10px; background:linear-gradient(135deg, var(--blueA), var(--blueB)); display:inline-block; }
+
+  .social a{ display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:10px;
+    border:1px solid #e6ebf5; margin-right:8px; color:#5b6b8a; font-weight:700; text-transform:uppercase; }
+  .social a:hover{ border-color:#d9e2f2; color:#2f80ed; }
+
+  .footer-cols{ display:grid; grid-template-columns: repeat(5, 1fr); gap:22px; }
+  .footer-cols .col h4{ margin:0 0 10px; font-size:14px; color:#1f2937; }
+  .footer-cols .col a{ display:block; color:#475569; text-decoration:none; padding:6px 0; font-size:14px; }
+  .footer-cols .col a:hover{ color:#2f80ed; }
+
+  .footer-meta{ text-align:center; color:#6b7280; padding:10px 12px 28px; border-top:1px solid #f2f4fb; }
+
+  /* Responsive */
+  @media (max-width: 980px){
+    .footer-inner{ grid-template-columns: 1fr; }
+    .footer-cols{ grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 640px){
+    .footer-cols{ grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+<script>
+  document.getElementById('yr') && (document.getElementById('yr').textContent = new Date().getFullYear());
+</script>
+<!-- ===== /CTA Clouds + Footer ===== -->
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      // Mobile menu toggle with jQuery
+      $(document).ready(function(){
+        $('#menuBtn').on('click', function(){
+          $('#mobileNav').slideToggle(200);
+        });
+
+        // Smooth scroll & active link highlight
+        const sections = $('section[id], header[id]');
+        const navLinks = $('.nav-links a');
+
+        $('.nav a[href^="#"], .nav-links.mobile a').on('click', function(e){
+          const id = $(this).attr('href');
+          const el = $(id);
+          if(el.length){
+            e.preventDefault();
+            $('html, body').animate({ scrollTop: el.offset().top - 70 }, 400);
+            $('#mobileNav').slideUp(200);
+          }
+        });
+
+        const setActive = () => {
+          const pos = $(window).scrollTop() + 80;
+          let current = '#top';
+          sections.each(function(){
+            if(pos >= $(this).offset().top){ current = '#' + $(this).attr('id'); }
+          });
+          navLinks.each(function(){
+            $(this).toggleClass('active', $(this).attr('href') === current);
+          });
+        };
+
+        $(window).on('scroll', setActive);
+        setActive();
+
+        // Year in footer
+        $('#year').text(new Date().getFullYear());
+      });
+
+      $(function(){
+        // Close mobile menu when clicking outside
+        $(document).on('click', function(e){
+          const $nav = $('#mobileNav');
+          const $btn = $('#menuBtn');
+          if(!$nav.is(e.target) && $nav.has(e.target).length===0 &&
+             !$btn.is(e.target) && $btn.has(e.target).length===0){
+            if($nav.is(':visible')) $nav.slideUp(150);
+          }
+        });
+      });
+
+      /* ADD (jQuery): place after your existing jQuery scripts */
+      $(function () {
+        const $el = $('.hero .sub').first();
+        if (!$el.length) return;
+
+        const full = $.trim($el.text());
+        const speed = 18; // ms per char
+
+        $el.empty().addClass('typewriter');
+
+        let i = 0;
+        (function type() {
+          if (i <= full.length) {
+            $el.text(full.slice(0, i++));
+            setTimeout(type, speed);
+          }
+        })();
+      });
+
+    </script>
+
+  </body>
+</html>
