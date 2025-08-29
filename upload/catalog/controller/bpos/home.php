@@ -69,10 +69,10 @@ class ControllerBposHome extends Controller {
     }
 
     public function loadProducts() {
-        $this->load->model('catalog/product');
+        $this->load->model('bpos/product');
         $this->load->model('tool/image');
 
-        $results = $this->model_catalog_product->getProducts(['start' => 0, 'limit' => 50]);
+        $results = $this->model_bpos_product->getProductsLite(['start' => 0, 'limit' => 12]);
         $data['products'] = [];
 
         foreach ($results as $result) {
@@ -89,17 +89,17 @@ class ControllerBposHome extends Controller {
     }
 
     private function getProductsList($category_id) {
-        $this->load->model('catalog/product');
+        $this->load->model('bpos/product');
         $this->load->model('tool/image');
 
         $filter_data = [
             'filter_category_id' => $category_id,
             'filter_sub_category' => true,
             'start' => 0,
-            'limit' => 50
+            'limit' => 12
         ];
 
-        $results = $this->model_catalog_product->getProducts($filter_data);
+        $results = $this->model_bpos_product->getProductsLite($filter_data);
 
         $products = [];
         foreach ($results as $result) {
