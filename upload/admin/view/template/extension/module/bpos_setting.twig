@@ -77,11 +77,10 @@
 </style>
 
 {{ column_left }}
+
 <div id="content">
 	<div class="page-header">
 		<div class="container-fluid">
-
-
 			<h1>{{ heading_title }}</h1>
 			<ul class="breadcrumb">
 				{% for breadcrumb in breadcrumbs %}
@@ -109,6 +108,7 @@
 			<button type="button" class="close" data-dismiss="alert">&times;</button>
 		</div>
 		{% endif %}
+
 
 		<form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-basel" class="form-horizontal">
 
@@ -246,30 +246,6 @@ $(document).ready(function(){
 			$('.btn-group .btn').addClass('btn-sm');
 		}
 
-		$('.date').datetimepicker({language: '{{ datepicker }}', pickTime: false});
-		$('.date-range').daterangepicker();
-
-		var color = '{{ color }}';
-
-		if (color) {
-			$('#color-button i').css('background-color', color);
-		}
-
-		jQuery("#color-button").ColorPicker({
-			color: jQuery('#color').val(),
-			onShow: function (colpkr) {
-				jQuery(colpkr).fadeIn(500);
-				return false;
-			},
-			onHide: function (colpkr) {
-				jQuery(colpkr).fadeOut(500);
-				return false;
-			},
-			onChange: function (hsb, hex, rgb) {
-				jQuery('.input-group-addon i').css('background-color', '#' + hex);
-				jQuery('#color').val('#' + hex);
-			}
-		});
 	});
 
 </script>

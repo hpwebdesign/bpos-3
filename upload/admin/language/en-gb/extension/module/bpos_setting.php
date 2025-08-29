@@ -1,12 +1,12 @@
 <?php
 // Heading
-$_['heading_title']  = '<span style="border-radius:2px;color:#fff;background:#8fbb6c;padding:2px 5px;">HP</span> Smart Floating Menu';
-$_['heading_title2'] = 'HP Smart Floating Menu';
+$_['heading_title']  = '<span style="border-radius:2px;color:#fff;background:#8fbb6c;padding:2px 5px;">B</span> POS';
+$_['heading_title2'] = 'BPOS';
 
 // Text
 $_['text_validation']           = 'Store Validation';
 $_['text_validate_store']          = 'In order to use this extension, please validate your store!. Kindly Contact Us to perform store validation for each domain.';
-$_['text_install_table']           = 'Install Smart Floating Menu Table';
+$_['text_install_table']           = 'Install BPOS Table';
 $_['text_documentation']           = "Documentation";
 $_['text_raise_ticket']            = "Raise Ticket";
 $_['text_validation']              = 'Store Validation';
@@ -49,11 +49,11 @@ $_['entry_status']             = 'Status';
 $_['entry_whatsapp_number']    = 'WhatsApp Number';
 
 // Text
-$_['text_success']             = 'Success: You have modified HP Smart Floating Menu module!';
-$_['text_success_installed']   = 'Success: Smart Floating Menu Extension related database installed successfully!';
-$_['text_success_uninstalled'] = 'Success: Smart Floating Menu Extension related database uninstalled successfully!';
-$_['text_install_message']     = 'Missing Database Tables for <b>Smart Floating Menu</b>, Please install it Now!';
-$_['text_uninstall_message']   = 'You have installed <b>Smart Floating Menu</b>. Click Here to uninstall it Now';
+$_['text_success']             = 'Success: You have modified BPOS module!';
+$_['text_success_installed']   = 'Success: BPOS Extension related database installed successfully!';
+$_['text_success_uninstalled'] = 'Success: BPOS Extension related database uninstalled successfully!';
+$_['text_install_message']     = 'Missing Database Tables for <b>BPOS</b>, Please install it Now!';
+$_['text_uninstall_message']   = 'You have installed <b>BPOS</b>. Click Here to uninstall it Now';
 $_['text_upgrade']             = 'Install Database';
 $_['text_downgrade']           = 'Uninstall Database';
 $_['text_upgrade_version']     = 'New version of this extension is available. Download it <strong><a href="https://my.hpwebdesign.io" target="_blank">HERE</a></strong>';
@@ -65,4 +65,4 @@ $_['button_upgrade_database'] = 'Upgrade Database';
 $_['button_date_range_add']   = 'Add Date Range';
 
 $_['error_database']   = 'Database Not Found!';
-$_['error_permission'] = 'Warning: You do not have permission to modify HP Smart Floating Menu module!';
+$_['error_permission'] = 'Warning: You do not have permission to modify BPOS module!';

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <modification>
-    <name>BPOS</name>
+    <name>Barik Point Of Sales</name>
     <code>HPBPOS</code>
     <version>1.0.0.0</version>
     <author>HP Web Design</author>
@@ -12,9 +12,14 @@
             <search><![CDATA[<ul class="nav navbar-nav navbar-right">]]></search>
             <add position="after"><![CDATA[
                 <li class="dropdown">
-                    <a href="{{ link_pos }}" class="" data-toggle="">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <span style="width: 30px;height: 30px;border-radius: 4px;background: linear-gradient(135deg,#6aa8ff,#2a6cf6);color: #fff;font-weight: 800;line-height: 30px;display: inline-block;padding: 0 10px;">B</span>
-                        <span>POS</span>
+                        <span>POS</span> <i class="fa fa-caret-down fa-fw"></i>
+
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li><a href="{{ pos_frontend }}" target="_blank"><i class="fa fa-shopping-cart fa-fw"></i> Frontend</a></li>
+                        <li><a href="{{ pos_setting }}" target="_self"><i class="fa fa-gears fa-fw"></i> Setting</a></li>
+                      </ul>
                     </a>
                 </li>
             ]]></add>
@@ -22,19 +27,20 @@
     </file>
     <file path="admin/controller/common/header.php">
         <operation>
-          <search><![CDATA[$data['home'] = $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true);]]></search>
-          <add position="after"><![CDATA[
+            <search><![CDATA[$data['home'] = $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true);]]></search>
+            <add position="after"><![CDATA[
         // === POS link (prefer SEO URL if exists) ===
         $catalog_base = HTTPS_CATALOG;
         $keyword = '';
 
         // Try SEO URL for current store & language
-        $seo_sql = "SELECT keyword FROM " . DB_PREFIX . "seo_url 
-                    WHERE query = 'bpos/home' 
-                      AND store_id = '" . (int)$this->config->get('config_store_id') . "' 
+        $seo_sql = "SELECT keyword FROM " . DB_PREFIX . "seo_url
+                    WHERE query = 'bpos/home'
+                      AND store_id = '" . (int)$this->config->get('config_store_id') . "'
                       AND language_id = '" . (int)$this->config->get('config_language_id') . "'
                     LIMIT 1";
         $seo_q = $this->db->query($seo_sql);
+
         if ($seo_q->num_rows) {
           $keyword = $seo_q->row['keyword'];
         }
@@ -47,12 +53,13 @@
         }
 
         if ($keyword) {
-          $data['link_pos'] = rtrim($catalog_base, '/') . '/' . ltrim($keyword, '/');
+          $data['pos_frontend'] = rtrim($catalog_base, '/') . '/' . ltrim($keyword, '/');
         } else {
-          $data['link_pos'] = rtrim($catalog_base, '/') . '/index.php?route=bpos/home';
+          $data['pos_frontend'] = rtrim($catalog_base, '/') . '/index.php?route=bpos/home';
         }
 
+        $data['pos_setting'] = $this->url->link('extension/module/bpos_setting', 'user_token=' . $this->session->data['user_token'], true);
           ]]></add>
         </operation>
-  </file>
+    </file>
 </modification>

@@ -1,6 +1,6 @@
 <?php
 
-class ControllerExtensionModulebposSetting extends Controller {
+class ControllerExtensionModuleBposSetting extends Controller {
 	private $error 			= [];
 	private $v_d 			= '';
 	private $version 		= '1.0.0.0';
@@ -85,10 +85,6 @@ class ControllerExtensionModulebposSetting extends Controller {
 		$data['heading_title'] 	= $this->language->get('heading_title2');
 
 		$this->document->addScript('view/javascript/bootstrap/js/bootstrap-checkbox.min.js');
-		$this->document->addScript('view/javascript/selectpicker/js/bootstrap-select.min.js');
-		$this->document->addStyle('view/javascript/selectpicker/css/bootstrap-select.min.css');
-		$this->document->addScript('view/javascript/bs-colorpicker/js/colorpicker.js');
-		$this->document->addStyle('view/javascript/bs-colorpicker/css/colorpicker.css');
 		$this->document->addStyle('view/javascript/desktop_theme.css');
 
 		$data['breadcrumbs'] = [];
