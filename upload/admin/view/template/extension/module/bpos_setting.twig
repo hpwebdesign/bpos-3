@@ -177,6 +177,106 @@
 										<input type="hidden" name="country_code" value="{{ country_code }}">
 									</div>
 								</div>
+
+								<div class="form-group">
+					                  <label class="col-sm-2 control-label" for="input-shipping-methods">{{ entry_shipping_methods }}</label>
+					                  <div class="col-sm-10">
+					                    <div class="well well-sm" style="height: 150px; overflow: auto;"> {% for shipping_method in delivery_methods %}
+					                      <div class="checkbox">
+					                        <label> {% if shipping_method.code in shipping_methods %}
+					                          <input type="checkbox" name="shipping_methods[]" value="{{ shipping_method.code }}" checked="checked" />
+					                          {{ shipping_method.title }}
+					                          {% else %}
+					                          <input type="checkbox" name="shipping_methods[]" value="{{ shipping_method.code }}" />
+					                           {{ shipping_method.title }}
+					                          {% endif %} </label>
+					                      </div>
+					                      {% endfor %} </div>
+					                     </div>
+					                </div>
+
+					            <div class="form-group">
+					                  <label class="col-sm-2 control-label" for="input-payment-methods">{{ entry_payment_methods }}</label>
+						                  <div class="col-sm-10">
+						                    <div class="well well-sm" style="height: 150px; overflow: auto;"> {% for payment_method in pay_methods %}
+						                      <div class="checkbox">
+						                        <label> {% if payment_method.code in payment_methods %}
+						                          <input type="checkbox" name="payment_methods[]" value="{{ payment_method.code }}" checked="checked" />
+						                          {{ payment_method.title }}
+						                          {% else %}
+						                          <input type="checkbox" name="payment_methods[]" value="{{ payment_method.code }}" />
+						                           {{ payment_method.title }}
+						                          {% endif %} </label>
+						                      </div>
+						                      {% endfor %} </div>
+						                     </div>
+					             </div>
+
+					             <div class="form-group">
+					                  <label class="col-sm-2 control-label" for="input-default-shipping-method">{{ entry_default_shipping_method }}</label>
+					                  <div class="col-sm-10">
+					                    <select name="default_shipping_method" id="input-default-shipping-method" class="form-control">
+					                      
+					                      {% for shipping_method in delivery_methods %}
+					                      {% if shipping_method.code == default_shipping_method %}
+					                      
+					                      <option value="{{ shipping_method.code }}" selected="selected">{{ shipping_method.title }}</option>
+					                      
+					                      {% else %}
+					                      
+					                       <option value="{{ shipping_method.code }}">{{ shipping_method.title }}</option>
+					                      
+					                      {% endif %}
+					                      {% endfor %}
+					                    
+					                    </select>
+					                  </div>
+					                </div>
+
+					                 <div class="form-group">
+					                  <label class="col-sm-2 control-label" for="input-default-payment-method">{{ entry_default_payment_method }}</label>
+					                  <div class="col-sm-10">
+					                    <select name="default_payment_method" id="input-default-payment-method" class="form-control">
+					                      
+					                      {% for payment_method in pay_methods %}
+					                      {% if payment_method.code == default_payment_method %}
+					                      
+					                      <option value="{{ payment_method.code }}" selected="selected">{{ payment_method.title }}</option>
+					                      
+					                      {% else %}
+					                      
+					                       <option value="{{ payment_method.code }}">{{ payment_method.title }}</option>
+					                      
+					                      {% endif %}
+					                      {% endfor %}
+					                    
+					                    </select>
+					                  </div>
+					                </div>
+
+
+					                <div class="form-group">
+					                  <label class="col-sm-2 control-label" for="input-complete-order-status">{{ entry_complete_order_status }}</label>
+					                  <div class="col-sm-10">
+					                    <select name="complete_order_status" id="input-complete-order-status" class="form-control">
+					                      
+					                      {% for order_status in order_statuses %}
+					                      {% if order_status.order_status_id == complete_order_status %}
+					                      
+					                      <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+					                      
+					                      {% else %}
+					                      
+					                      <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+					                      
+					                      {% endif %}
+					                      {% endfor %}
+					                    
+					                    </select>
+					                  </div>
+					                </div>
+
+
 							</div>
 
 							<div class="tab-pane" id="tab-help">

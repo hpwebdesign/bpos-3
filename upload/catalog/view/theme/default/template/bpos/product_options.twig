@@ -10,54 +10,94 @@
                 <label>{{ option.name }}</label>
 
                 {% if option.type == 'select' %}
-                    <select name="option[{{ option.product_option_id }}]" class="form-control" {% if option.required %}required{% endif %}>
-                        <option value=""> --- Please Select --- </option>
-                        {% for value in option.product_option_value %}
-                            <option value="{{ value.product_option_value_id }}">
-                                {{ value.name }}{% if value.price %} ({{ value.price }}){% endif %}
-                            </option>
-                        {% endfor %}
-                    </select>
-
-                {% elseif option.type == 'radio' %}
+                <select id="input-option{{ option.product_option_id }}" 
+                        name="option[{{ option.product_option_id }}]" 
+                        class="form-control" 
+                        {% if option.required %}required{% endif %}>
+                    <option value=""> --- Please Select --- </option>
                     {% for value in option.product_option_value %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="option[{{ option.product_option_id }}]" value="{{ value.product_option_value_id }}" id="option-{{ value.product_option_value_id }}" {% if option.required %}required{% endif %}>
-                            <label class="form-check-label" for="option-{{ value.product_option_value_id }}">
-                                {{ value.name }}{% if value.price %} ({{ value.price }}){% endif %}
-                            </label>
-                        </div>
+                        <option value="{{ value.product_option_value_id }}">
+                            {{ value.name }}{% if value.price %} ({{ value.price }}){% endif %}
+                        </option>
                     {% endfor %}
+                </select>
 
-                {% elseif option.type == 'checkbox' %}
-                    {% for value in option.product_option_value %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="option[{{ option.product_option_id }}][]" value="{{ value.product_option_value_id }}" id="option-{{ value.product_option_value_id }}">
-                            <label class="form-check-label" for="option-{{ value.product_option_value_id }}">
-                                {{ value.name }}{% if value.price %} ({{ value.price }}){% endif %}
-                            </label>
-                        </div>
-                    {% endfor %}
+            {% elseif option.type == 'radio' %}
+                {% for value in option.product_option_value %}
+                    <div class="form-check">
+                        <input class="form-check-input" 
+                               type="radio" 
+                               name="option[{{ option.product_option_id }}]" 
+                               value="{{ value.product_option_value_id }}" 
+                               id="input-option{{ option.product_option_id }}-{{ value.product_option_value_id }}" 
+                               {% if option.required %}required{% endif %}>
+                        <label class="form-check-label" for="input-option{{ option.product_option_id }}-{{ value.product_option_value_id }}">
+                            {{ value.name }}{% if value.price %} ({{ value.price }}){% endif %}
+                        </label>
+                    </div>
+                {% endfor %}
 
-                {% elseif option.type == 'text' %}
-                    <input type="text" name="option[{{ option.product_option_id }}]" class="form-control" value="" {% if option.required %}required{% endif %}>
+            {% elseif option.type == 'checkbox' %}
+                {% for value in option.product_option_value %}
+                    <div class="form-check">
+                        <input class="form-check-input" 
+                               type="checkbox" 
+                               name="option[{{ option.product_option_id }}][]" 
+                               value="{{ value.product_option_value_id }}" 
+                               id="input-option{{ option.product_option_id }}-{{ value.product_option_value_id }}">
+                        <label class="form-check-label" for="input-option{{ option.product_option_id }}-{{ value.product_option_value_id }}">
+                            {{ value.name }}{% if value.price %} ({{ value.price }}){% endif %}
+                        </label>
+                    </div>
+                {% endfor %}
 
-                {% elseif option.type == 'textarea' %}
-                    <textarea name="option[{{ option.product_option_id }}]" class="form-control" rows="3" {% if option.required %}required{% endif %}></textarea>
+            {% elseif option.type == 'text' %}
+                <input type="text" 
+                       id="input-option{{ option.product_option_id }}" 
+                       name="option[{{ option.product_option_id }}]" 
+                       class="form-control" 
+                       value="" 
+                       {% if option.required %}required{% endif %}>
 
-                {% elseif option.type == 'file' %}
-                    <input type="file" name="option[{{ option.product_option_id }}]" class="form-control" {% if option.required %}required{% endif %}>
+            {% elseif option.type == 'textarea' %}
+                <textarea id="input-option{{ option.product_option_id }}" 
+                          name="option[{{ option.product_option_id }}]" 
+                          class="form-control" 
+                          rows="3" 
+                          {% if option.required %}required{% endif %}></textarea>
 
-                {% elseif option.type == 'date' %}
-                    <input type="date" name="option[{{ option.product_option_id }}]" class="form-control" value="" {% if option.required %}required{% endif %}>
+            {% elseif option.type == 'file' %}
+                <input type="file" 
+                       id="input-option{{ option.product_option_id }}" 
+                       name="option[{{ option.product_option_id }}]" 
+                       class="form-control" 
+                       {% if option.required %}required{% endif %}>
 
-                {% elseif option.type == 'datetime' %}
-                    <input type="datetime-local" name="option[{{ option.product_option_id }}]" class="form-control" value="" {% if option.required %}required{% endif %}>
+            {% elseif option.type == 'date' %}
+                <input type="date" 
+                       id="input-option{{ option.product_option_id }}" 
+                       name="option[{{ option.product_option_id }}]" 
+                       class="form-control" 
+                       value="" 
+                       {% if option.required %}required{% endif %}>
 
-                {% elseif option.type == 'time' %}
-                    <input type="time" name="option[{{ option.product_option_id }}]" class="form-control" value="" {% if option.required %}required{% endif %}>
+            {% elseif option.type == 'datetime' %}
+                <input type="datetime-local" 
+                       id="input-option{{ option.product_option_id }}" 
+                       name="option[{{ option.product_option_id }}]" 
+                       class="form-control" 
+                       value="" 
+                       {% if option.required %}required{% endif %}>
 
-                {% endif %}
+            {% elseif option.type == 'time' %}
+                <input type="time" 
+                       id="input-option{{ option.product_option_id }}" 
+                       name="option[{{ option.product_option_id }}]" 
+                       class="form-control" 
+                       value="" 
+                       {% if option.required %}required{% endif %}>
+            {% endif %}
+
             </div>
         {% endfor %}
     </form>

@@ -311,8 +311,17 @@ class ControllerBposOrder extends Controller {
             $order_data['shipping_country_id']= $this->config->get('config_country_id');
             $order_data['shipping_zone']      = '';
             $order_data['shipping_zone_id']   = $this->config->get('config_zone_id');
-            $order_data['shipping_method']    = '';
-            $order_data['shipping_code']      = '';
+            if (isset($this->session->data['shipping_method']['title'])) {
+                $order_data['shipping_methods'] = $this->session->data['shipping_method']['title'];
+            } else {
+                $order_data['shipping_method'] = '';
+            }
+
+            if (isset($this->session->data['shipping_method']['code'])) {
+                $order_data['shipping_method'] = $this->session->data['shipping_method']['code'];
+            } else {
+                $order_data['shipping_method'] = '';
+            }
 
             // Products
             $order_data['products'] = $this->cart->getProducts();

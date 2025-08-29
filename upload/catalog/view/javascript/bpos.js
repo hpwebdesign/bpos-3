@@ -40,6 +40,16 @@ $(document).ready(function() {
             return;
         }
 
+        let activeShipping = $('.shippingbtn.active').data('code');
+
+
+        $('.shipping-error').remove();
+
+        if (!activePayment) {
+            $('.shipping-error-container').html('<div class="shipping-error text-danger mt-2">Please select a shipping method</div>');
+            return;
+        }
+
 
         $("body").busyLoad("show", {
             spinner: "cube-grid",
@@ -87,7 +97,24 @@ $(document).ready(function() {
             data: { code: code },
             dataType: 'json',
             success: function(json) {
-                console.log(json.success);
+                 toastr.success(json['success']);
+            }
+        });
+    });
+
+    $(document).on('click', '.shippingbtn', function() {
+        let code = $(this).data('code');
+        console.log(code);
+        $('.shippingbtn').removeClass('active');
+        $(this).addClass('active');
+
+        $.ajax({
+            url: 'index.php?route=bpos/checkout/setShipping',
+            type: 'post',
+            data: { code: code },
+            dataType: 'json',
+            success: function(json) {
+                 toastr.success(json['success']);
             }
         });
     });
@@ -225,9 +252,11 @@ $(document).ready(function() {
                         data: { product_id: product_id, quantity: 1 },
                         dataType: 'json',
                         success: function(json) {
-                            toastr.success(json['success']);
-                            $('.cart .counter').html(json['total_cart']);
-                            updateCheckoutPanel();
+                            if (json['success']) {
+                                toastr.success(json['success']);
+                                $('.cart .counter').html(json['total_cart']);
+                                updateCheckoutPanel();
+                            }
 
                         }
                     });
@@ -243,11 +272,36 @@ $(document).ready(function() {
             data: form_data + '&quantity=1',
             dataType: 'json',
             success: function(json) {
-                $('#productOptionModal').modal('hide');
-                 toastr.success(json['success']);
-                 $('.cart .counter').html(json['total_cart']);
-                updateCheckoutPanel();
-                
+                // clear error lama
+            $('.text-danger').remove();
+            $('.form-group').removeClass('has-error');
+
+                if (json['error']) {
+                    if (json['error']['option']) {
+                        for (let i in json['error']['option']) {
+                            let element = $('#input-option' + i.replace('_', '-'));
+
+                            if (element.parent().hasClass('input-group')) {
+                                element.parent().after('<div class="text-danger">' + json['error']['option'][i] + '</div>');
+                            } else {
+                                element.after('<div class="text-danger">' + json['error']['option'][i] + '</div>');
+                            }
+                        }
+                    }
+
+                    if (json['error']['recurring']) {
+                        $('select[name="recurring_id"]').after('<div class="text-danger">' + json['error']['recurring'] + '</div>');
+                    }
+
+                    // scroll ke modal body biar user lihat error
+                    $('#productOptionModal .modal-body').animate({ scrollTop: 0 }, 'slow');
+                }
+                if (json['success']) {
+                    $('#productOptionModal').modal('hide');
+                     toastr.success(json['success']);
+                     $('.cart .counter').html(json['total_cart']);
+                    updateCheckoutPanel();
+                }
             }
         });
     });

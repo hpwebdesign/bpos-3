@@ -29,6 +29,13 @@ class ControllerBposLogin extends Controller {
         if ($this->user->isLogged()) {
             $this->response->redirect($this->url->link('bpos/home', '', true));
         }
+        $this->load->model('tool/image');
+
+        if ($this->config->get('config_logo') && is_file(DIR_IMAGE . $this->config->get('config_logo'))) {
+            $data['logo'] = $this->model_tool_image->resize($this->config->get('config_logo'), 120, 120);
+        } else {
+            $data['logo'] = '';
+        }
 
         $data['action'] = $this->url->link('bpos/login', '', true);
         $this->response->setOutput($this->load->view('bpos/login', $data));

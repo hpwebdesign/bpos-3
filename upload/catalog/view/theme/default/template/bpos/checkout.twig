@@ -48,6 +48,25 @@
     </div>
 
     <div class="pay mt-3">
+    {% if shipping_methods and shipping_required %}
+      <h4>Shipping Method</h4>
+      <div class="row row-cols-3 g-2 mb-3">
+        {% for shipping_method in shipping_methods %}
+          {% if not shipping_method.error %}
+          {% for quote in shipping_method.quote %}
+        <div class="col">
+          <button class="shippingbtn w-100 {% if quote.code == default_shipping %}active{% endif %}" data-code="{{ quote.code }}">
+            <i class="bi bi-truck"></i><span>{{ quote.title }} - {{ quote.text }}</span>
+          </button>
+        </div>
+      {% endfor %}
+          {% else %}
+            <div class="alert alert-danger alert-dismissible">{{ shipping_method.error }}</div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <div class="shipping-error-container"></div>
+      {% endif %}
       {% if payment_methods %}
       <h4>Payment Method</h4>
       <div class="row row-cols-3 g-2 mb-3">
@@ -59,8 +78,9 @@
         </div>
         {% endfor %}
       </div>
-      {% endif %}
       <div class="payment-error-container"></div>
+      {% endif %}
+      
       <button class="print">Print Bills</button>
     </div>
   </div>

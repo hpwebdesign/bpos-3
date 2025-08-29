@@ -123,13 +123,27 @@ class ControllerExtensionModuleBposSetting extends Controller {
 				"name" => "payment_methods",
 				"default" => array(),
 			],
-			s[
+
+			[
+				"name" => "whatsapp_number",
+				"default" => '',
+			],
+			[
+				"name" => "country_code",
+				"default" => 62,
+			],
+			[
 				"name" => "default_shipping_method",
-				"default" => array(),
+				"default" => 0,
 			],
 			[
 				"name" => "default_payment_method",
-				"default" => array(),
+				"default" => 0,
+			],
+			[
+				"name" => "complete_order_status",
+				"default" => 0,
+
 			],
 		];
 
@@ -200,11 +214,60 @@ class ControllerExtensionModuleBposSetting extends Controller {
 				$data['placeholder_' . $input['name']] = $this->model_tool_image->resize($input['default'], 350, 100);
 			}
 		}
+		$this->load->model('setting/extension');
+		$this->load->model('tool/image');
+		$delivery_methods = $this->model_setting_extension->getInstalled('shipping');
+
+        $payment_methods = $this->model_setting_extension->getInstalled('payment');
+
+		 $data['delivery_methods'] = array();
+        foreach ($delivery_methods as $delivery_method_code) {
+            if ($this->config->get('shipping_' . $delivery_method_code . '_status')) {
+
+                $code = explode("_", $delivery_method_code);
+                $code_shipping = $code[0];
+                if (is_file(DIR_IMAGE . 'catalog/shipping/' . $code_shipping . '.png')) {
+                    $thumb = $this->model_tool_image->resize('catalog/shipping/' . $code_shipping . '.png', 59, 27);
+                    $image_value = 'catalog/shipping/' . $code_shipping . '.png';
+                } else {
+                    $thumb = $this->model_tool_image->resize('no_image.png', 59, 27);
+                    $image_value = $this->config->get('config_logo');
+                }
+
+
+                $data['delivery_methods'][] = array(
+                    'title' => ucwords(str_replace('_', ' ', $delivery_method_code)),
+                    'code' => $delivery_method_code,
+                    'thumb' => $thumb,
+                    'image_value' => $image_value
+                );
+            }
+        }
+
+        $data['pay_methods'] = array();
+        
+        foreach ($payment_methods as $payment_method_code) {
+            if ($this->config->get('payment_' . $payment_method_code . '_status')) {
+                $extension = basename($payment_method_code, '.php');
+                $this->load->language('extension/payment/' . $payment_method_code);
+                $this->load->language('extension/payment/' . $extension, 'extension');
+
+               
+     
+
+                $data['pay_methods'][] = array(
+                    'title' => strip_tags($this->language->get('heading_title')),
+                    'code' => $payment_method_code
+                );
+            }
+        }
 
 		$data['uninstall'] = $this->url->link('extension/module/bpos_setting/uninstallPage', 'user_token=' . $this->session->data['user_token'], true);
 
 		$data['user_token'] = $this->session->data['user_token'];
+		$this->load->model('localisation/order_status');
 
+		$data['order_statuses'] = $this->model_localisation_order_status->getOrderStatuses();
 		$data['currency_symbol_left'] 	= $currency_info['symbol_left'];
 		$data['currency_symbol_right'] 	= $currency_info['symbol_right'];
 		$data['header'] 				= $this->load->controller('common/header');

@@ -268,6 +268,11 @@
     <div class="col-lg-7">
       <div class="auth-wrapper">
         <div class="auth-card w-100">
+              {% if logo %}
+            <div class="text-center mb-3">
+              <img src="{{ logo }}" alt="Logo" class="img-fluid mb-2" style="max-height:80px;">
+            </div>
+          {% endif %}
           <h4 class="auth-title text-center mb-1">Sign In</h4>
           <p class="text-center muted mb-4">Enter your username and password</p>
 
