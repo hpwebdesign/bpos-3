@@ -374,20 +374,42 @@ form, form input, form select, form textarea, .dropdown-menu {
     font-weight: 800;
     color: #fff;
 }
-.paybtn {
-    border: 1px solid var(--line);
-    background: #f7f9fd;
-    border-radius: 14px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    padding: 14px;
+
+.pay .paybtn {
+  border: 1px solid var(--line);
+  background: #f7f9fd;
+  border-radius: 14px;
+  padding: 14px;
+  display: block;
 }
+
 .paybtn.active {
     outline: 2px solid #d4f1e1;
     background: #f2fff7;
 }
+
+.paybtn i {
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.paybtn span {
+  vertical-align: middle;
+}
+
+.pay .paybtn i {
+  line-height:1;
+  display:inline-block;
+  font-size:1.1rem;
+}
+
+.pay .paybtn span{
+  display:inline-block;
+  white-space:nowrap;
+}
+
+
 .print {
     margin-top: 14px;
     width: 100%;
@@ -3293,6 +3315,7 @@ a.text-hover-primary:hover {
 .total-box {
     border-top: 1px dashed var(--line)
 }
+
 @media (max-width: 992px) {
     .invoice-head {
         gap: 1rem
@@ -3301,9 +3324,19 @@ a.text-hover-primary:hover {
         margin-top: .5rem
     }
 }
+
 .table.table-invoice thead th {
     color: #b3b9c9;
 }
+
 .order-total dl dt {
     color: #b3b9c9;
+}
+
+.pay .col {
+  width: auto !important;
+}
+/* hide payment icon */
+.paybtn > i {
+  display: none !important;
 }
