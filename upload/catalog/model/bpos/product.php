@@ -9,9 +9,10 @@ class ModelBposProduct extends Model {
         }
 
         $start = isset($data['start']) ? (int)$data['start'] : 0;
-        $limit = isset($data['limit']) ? (int)$data['limit'] : 50;
+        $limit = isset($data['limit']) ? (int)$data['limit'] : 12;
+
         if ($start < 0) $start = 0;
-        if ($limit < 1) $limit = 20;
+        if ($limit < 1) $limit = 12;
 
         $language_id = (int)$this->config->get('config_language_id');
         $store_id = (int)$this->config->get('config_store_id');
