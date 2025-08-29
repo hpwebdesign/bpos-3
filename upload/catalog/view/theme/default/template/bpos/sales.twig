@@ -1,0 +1,228 @@
+<div class="container-xxl py-4 orders-board">
+  <div class="panel p-3 p-md-4">
+  <div class="col-6 col-md-12 col-lg-3 ms-lg-auto text-lg-end">
+        <a href="{{ add_order }}" class="btn btn-primary rounded-3">
+          <i class="bi bi-plus-lg me-1"></i> Add Order
+        </a>
+        <button type="button" id="delete-selected" class="btn btn-danger rounded-3">
+         <i class="bi bi-trash"></i> Delete
+      </button>
+      </div>
+    <!-- Toolbar -->
+    <div class="toolbar row g-2 align-items-center mb-3">
+      <!-- Search -->
+      <div class="col-12 col-md-5 col-lg-4">
+          <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input type="text" class="form-control" placeholder="Search Customer" id="search-order" value="{{ filter_search ?? '' }}">
+          </div>
+      </div>
+
+      <!-- Date Range Placeholder -->
+      <div class="col-12 col-md-4 col-lg-3">
+          <div class="d-flex align-items-center gap-2 chip-input">
+              <i class="bi bi-calendar2"></i>
+              <span class="chip">
+                  <input 
+                      type="text" 
+                      id="filter-daterange" 
+                      class="form-control border-0 p-0" 
+                      placeholder="Date Range" 
+                      readonly
+                      value="{% if filter_date_start and filter_date_end %}{{ filter_date_start }} - {{ filter_date_end }}{% endif %}">
+                  <button class="btn-clear" type="button" data-clear="daterange" title="Clear">
+                      <i class="bi bi-x"></i>
+                  </button>
+              </span>
+          </div>
+      </div>
+
+      <!-- Filter Status -->
+      <div class="col-6 col-md-3 col-lg-2">
+          <select class="form-select" id="filter-status">
+              <option value="">Status</option>
+              {% for status in order_statuses %}
+                  <option value="{{ status.order_status_id }}" {% if filter_status_id == status.order_status_id %}selected{% endif %}>
+                      {{ status.name }}
+                  </option>
+              {% endfor %}
+          </select>
+      </div>
+
+      <!-- Filter Button -->
+      <div class="col-6 col-md-2 col-lg-1">
+          <button id="btn-filter" class="btn btn-primary w-100">
+              <i class="bi bi-funnel"></i> Filter
+          </button>
+      </div>
+
+
+      <!-- Add Order -->
+      
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table align-middle table-hover">
+        <thead>
+          <tr>
+            <th style="width:40px;">
+              <input class="form-check-input" type="checkbox" id="checkAll">
+            </th>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Status</th>
+            <th>Total</th>
+            <th>Date Added</th>
+            <th>Date Modified</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if orders %}
+            {% for order in orders %}
+              <tr>
+                <td><input class="form-check-input row-check" type="checkbox" value="{{ order.order_id }}"></td>
+                <td>{{ order.order_id }}</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="avatar">{{ order.firstname|first }}</span>
+                    <div class="fw-semibold">{{ order.firstname }} {{ order.lastname }}</div>
+                  </div>
+                </td>
+                <td>
+                  {% set badge_class = 'badge-soft badge-pending' %}
+                  {% if order.status == 'Completed' %}{% set badge_class = 'badge-soft badge-completed' %}{% endif %}
+                  {% if order.status == 'Pending' %}{% set badge_class = 'badge-soft badge-pending' %}{% endif %}
+                  {% if order.status == 'Processing' %}{% set badge_class = 'badge-soft badge-delivering' %}{% endif %}
+                  {% if order.status == 'Cancelled' %}{% set badge_class = 'badge-soft badge-cancelled' %}{% endif %}
+                  {% if order.status == 'Failed' %}{% set badge_class = 'badge-soft badge-failed' %}{% endif %}
+                  {% if order.status == 'Expired' %}{% set badge_class = 'badge-soft badge-expired' %}{% endif %}
+                  <span class="{{ badge_class }}">{{ order.status }}</span>
+                </td>
+                <td>{{ order.total }}</td>
+                <td>{{ order.date_added }}</td>
+                <td>{{ order.date_modified }}</td>
+                <td class="text-end">
+                  <div class="dropdown">
+                    <button class="btn btn-actions dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Actions</button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                      <li><a class="dropdown-item" href="{{ order.invoice }}">Invoice</a></li>
+                      <li><a class="dropdown-item" href="{{ order.view }}">View</a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li>
+                        <a class="dropdown-item text-danger" href="{{ order.delete }}" onclick="return confirm('Delete this order?')">
+                          Delete
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="8" class="text-center text-muted">No orders found</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="table-footer d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3">
+      <div>{{ pagination }}</div>
+      <div class="text-muted">{{ results }}</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+$(function(){
+    // Init Date Range Picker
+    $('#filter-daterange').daterangepicker({
+        autoUpdateInput: false,
+        locale: {
+            format: 'YYYY-MM-DD',
+            cancelLabel: 'Clear'
+        }
+    });
+
+    $('#filter-daterange').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+    });
+
+    $('#filter-daterange').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+    });
+
+    // Set default value kalau ada dari PHP
+    {% if filter_date_start and filter_date_end %}
+    let start = moment('{{ filter_date_start }}', 'YYYY-MM-DD');
+    let end   = moment('{{ filter_date_end }}', 'YYYY-MM-DD');
+    $('#filter-daterange').data('daterangepicker').setStartDate(start);
+    $('#filter-daterange').data('daterangepicker').setEndDate(end);
+    $('#filter-daterange').val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+    {% endif %}
+
+    // Filter button click
+    $('#btn-filter').on('click', function(){
+        let url = 'index.php?route=bpos/order';
+
+        let search = $('#search-order').val();
+        let daterange = $('#filter-daterange').val();
+        let status = $('#filter-status').val();
+
+        if(search) url += '&filter_search=' + encodeURIComponent(search);
+        if(daterange){
+            let dr = daterange.split(' - ');
+            url += '&filter_date_start=' + dr[0] + '&filter_date_end=' + dr[1];
+        }
+        if(status) url += '&filter_status_id=' + status;
+
+        window.location = url;
+    });
+
+
+  // Check All
+  $('#checkAll').on('change', function() {
+    $('.row-check').prop('checked', this.checked);
+  });
+
+});
+$(document).ready(function () {
+
+    // Delete selected
+    $('#delete-selected').on('click', function () {
+        let ids = $('.row-check:checked').map(function () {
+            return $(this).val();
+        }).get();
+
+        if (ids.length === 0) {
+            alert('Please select at least one order.');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to delete selected orders?')) {
+            return;
+        }
+
+        $.ajax({
+            url: 'index.php?route=bpos/order/deleteSelected',
+            type: 'POST',
+            data: { order_ids: ids },
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    location.reload();
+                } else if (response.error) {
+                    alert(response.error);
+                }
+            }
+        });
+    });
+});
+
+</script>
+

@@ -73,14 +73,14 @@
         {% for payment_method in payment_methods %}
         <div class="col">
           <button class="paybtn w-100 {% if payment_method.code == default_payment %}active{% endif %}" data-code="{{ payment_method.code }}">
-            <i class="bi bi-cash"></i><span>{{ payment_method.title }}</span>
+            <i class="bi bi-credit-card"></i><span>{{ payment_method.title }}</span>
           </button>
         </div>
         {% endfor %}
       </div>
       <div class="payment-error-container"></div>
       {% endif %}
-      
+
       <button class="print">Print Bills</button>
     </div>
   </div>

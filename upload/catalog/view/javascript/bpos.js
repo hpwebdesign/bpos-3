@@ -8,6 +8,7 @@ $(document).ready(function() {
         if ($(this).hasClass('invoices')) route = 'bpos/invoice';
         if ($(this).hasClass('orders')) route = 'bpos/order';
         if ($(this).hasClass('statistics')) route = 'bpos/statistic';
+        if ($(this).hasClass('reports')) route = 'bpos/report';
         if ($(this).hasClass('cart')) {
             var target = $('#checkout-summary');
             var scrollBottom = target.offset().top + target.outerHeight() - $(window).height();
@@ -64,7 +65,7 @@ $(document).ready(function() {
             type: 'post',
             dataType: 'json',
             success: function(json) {
-                $("body").busyLoad("hide"); 
+                $("body").busyLoad("hide");
 
                 if (json.error) {
                     $('.payment-error-container').html('<div class="payment-error text-danger mt-2">' + json.error + '</div>');
@@ -370,5 +371,5 @@ $(document).ready(function() {
         });
     }
 
-    
+
 });

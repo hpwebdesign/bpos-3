@@ -213,7 +213,7 @@ form, form input, form select, form textarea, .dropdown-menu {
 
 .flex-item {
     flex: 0 0 calc(25% - 12px);
-    max-width: 235px;
+    max-width: 200px;
     /* Default for desktop/tablet */
 }
 /* Responsiveness */
@@ -223,7 +223,7 @@ form, form input, form select, form textarea, .dropdown-menu {
 @media (max-width: 992px) {
     .flex-item {
         flex: 0 0 calc(33.333% - 12px);
-        max-width: 235px;
+        max-width: 200px;
     }
     .nav.nav-custom {
         border-radius: 0;
@@ -374,25 +374,27 @@ form, form input, form select, form textarea, .dropdown-menu {
     font-weight: 800;
     color: #fff;
 }
+
 .paybtn, .shippingbtn {
-    border: 1px solid var(--line);
-    background: #f7f9fd;
-    border-radius: 14px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    padding: 14px;
+  border: 1px solid var(--line);
+  background: #f7f9fd;
+  border-radius: 14px;
+  display: inline-block;
+  padding: 14px;
 }
+
 .paybtn.active, .shippingbtn.active {
     outline: 2px solid #d4f1e1;
     background: #f2fff7;
 }
-.paybtn i {
-    display: inline-block;
-    margin-right: 6px;
-    vertical-align: middle;
+
+#checkout-summary .paybtn i, #checkout-summary .shippingbtn i {
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: middle;
+  font-size: 15px;
 }
+
 .paybtn span {
     vertical-align: middle;
 }
@@ -3328,7 +3330,3 @@ a.text-hover-primary:hover {
     width: auto !important;
 }
 /* hide payment icon */
-
-.paybtn>i {
-    display: none !important;
-}

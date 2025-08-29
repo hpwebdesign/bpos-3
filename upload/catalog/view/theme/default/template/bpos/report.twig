@@ -1,0 +1,166 @@
+<div class="container-xxl py-4 orders-board">
+  <div class="panel p-3 p-md-4">
+    <!-- Toolbar -->
+    <div class="toolbar row g-2 align-items-center mb-3">
+
+      <!-- Date Range Placeholder -->
+      <div class="col-12 col-md-4 col-lg-3">
+          <div class="d-flex align-items-center gap-2 chip-input">
+              <i class="bi bi-calendar2"></i>
+              <span class="chip">
+                  <input
+                      type="text"
+                      id="filter-daterange"
+                      class="form-control border-0 p-0"
+                      placeholder="Date Range"
+                      readonly
+                      value="{% if filter_date_start and filter_date_end %}{{ filter_date_start }} - {{ filter_date_end }}{% endif %}">
+                  <button class="btn-clear" type="button" data-clear="daterange" title="Clear">
+                      <i class="bi bi-x"></i>
+                  </button>
+              </span>
+          </div>
+      </div>
+
+
+      <!-- Filter Button -->
+      <div class="col-6 col-md-2 col-lg-1">
+          <button id="btn-filter" class="btn btn-primary w-100">
+              <i class="bi bi-funnel"></i> Filter
+          </button>
+      </div>
+
+
+      <!-- Add Order -->
+
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table align-middle table-hover">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>No. Orders</th>
+            <th>Product Sold</th>
+            <th>Tax</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if sales %}
+            {% for sale in sales %}
+              <tr>
+                <td>{{ sale.date }}</td>
+                <td>{{ sale.no_orders }}</td>
+                <td>{{ sale.product_sold }}</td>
+                <td>{{ sale.tax }}</td>
+                <td>{{ sale.total }}</td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="8" class="text-center text-muted">{{ text_no_sales }}</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="table-footer d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3">
+      <div>{{ pagination }}</div>
+      <div class="text-muted">{{ results }}</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+$(function(){
+    // Init Date Range Picker
+    $('#filter-daterange').daterangepicker({
+        autoUpdateInput: false,
+        locale: {
+            format: 'YYYY-MM-DD',
+            cancelLabel: 'Clear'
+        }
+    });
+
+    $('#filter-daterange').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+    });
+
+    $('#filter-daterange').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+    });
+
+    // Set default value kalau ada dari PHP
+    {% if filter_date_start and filter_date_end %}
+    let start = moment('{{ filter_date_start }}', 'YYYY-MM-DD');
+    let end   = moment('{{ filter_date_end }}', 'YYYY-MM-DD');
+    $('#filter-daterange').data('daterangepicker').setStartDate(start);
+    $('#filter-daterange').data('daterangepicker').setEndDate(end);
+    $('#filter-daterange').val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+    {% endif %}
+
+    // Filter button click
+    $('#btn-filter').on('click', function(){
+        let url = 'index.php?route=bpos/order';
+
+        let search = $('#search-order').val();
+        let daterange = $('#filter-daterange').val();
+        let status = $('#filter-status').val();
+
+        if(search) url += '&filter_search=' + encodeURIComponent(search);
+        if(daterange){
+            let dr = daterange.split(' - ');
+            url += '&filter_date_start=' + dr[0] + '&filter_date_end=' + dr[1];
+        }
+        if(status) url += '&filter_status_id=' + status;
+
+        window.location = url;
+    });
+
+
+  // Check All
+  $('#checkAll').on('change', function() {
+    $('.row-check').prop('checked', this.checked);
+  });
+
+});
+$(document).ready(function () {
+
+    // Delete selected
+    $('#delete-selected').on('click', function () {
+        let ids = $('.row-check:checked').map(function () {
+            return $(this).val();
+        }).get();
+
+        if (ids.length === 0) {
+            alert('Please select at least one order.');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to delete selected orders?')) {
+            return;
+        }
+
+        $.ajax({
+            url: 'index.php?route=bpos/order/deleteSelected',
+            type: 'POST',
+            data: { order_ids: ids },
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    location.reload();
+                } else if (response.error) {
+                    alert(response.error);
+                }
+            }
+        });
+    });
+});
+
+</script>
+

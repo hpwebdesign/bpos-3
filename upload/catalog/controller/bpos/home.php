@@ -102,11 +102,12 @@ class ControllerBposHome extends Controller {
         $results = $this->model_bpos_product->getProductsLite($filter_data);
 
         $products = [];
+
         foreach ($results as $result) {
             if ($result['image']) {
-                $image = $this->model_tool_image->resize($result['image'], 150, 150);
+                $image = $this->model_tool_image->resize($result['image'], 200, 200);
             } else {
-                $image = $this->model_tool_image->resize('placeholder.png', 150, 150);
+                $image = $this->model_tool_image->resize('placeholder.png', 200, 200);
             }
 
             $products[] = [
