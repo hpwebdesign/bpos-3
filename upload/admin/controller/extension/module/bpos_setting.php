@@ -108,11 +108,27 @@ class ControllerExtensionModuleBposSetting extends Controller {
 				"default" => 0,
 			],
 			[
+				"name" => "whatsapp_number",
+				"default" => "",
+			],
+			[
+				"name" => "country_code",
+				"default" => "",
+			],
+			[
 				"name" => "shipping_methods",
 				"default" => array(),
 			],
 			[
 				"name" => "payment_methods",
+				"default" => array(),
+			],
+			s[
+				"name" => "default_shipping_method",
+				"default" => array(),
+			],
+			[
+				"name" => "default_payment_method",
 				"default" => array(),
 			],
 		];
