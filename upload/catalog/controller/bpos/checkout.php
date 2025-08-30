@@ -40,54 +40,6 @@ class ControllerBposCheckout extends Controller {
             ];
         }
 
-        // Totals
-            $totals = array();
-            $taxes = $this->cart->getTaxes();
-            $total = 0;
-
-            // Because __call can not keep var references so we put them into an array.
-            $total_data = array(
-                'totals' => &$totals,
-                'taxes'  => &$taxes,
-                'total'  => &$total
-            );
-
-            $this->load->model('setting/extension');
-
-            $sort_order = array();
-
-            $results = $this->model_setting_extension->getExtensions('total');
-
-            foreach ($results as $key => $value) {
-                $sort_order[$key] = $this->config->get('total_' . $value['code'] . '_sort_order');
-            }
-
-            array_multisort($sort_order, SORT_ASC, $results);
-
-            foreach ($results as $result) {
-                if ($this->config->get('total_' . $result['code'] . '_status')) {
-                    $this->load->model('extension/total/' . $result['code']);
-
-                    // We have to put the totals in an array so that they pass by reference.
-                    $this->{'model_extension_total_' . $result['code']}->getTotal($total_data);
-                }
-            }
-
-            $sort_order = array();
-
-            foreach ($totals as $key => $value) {
-                $sort_order[$key] = $value['sort_order'];
-            }
-
-            array_multisort($sort_order, SORT_ASC, $totals);
-
-        // Format totals
-        foreach ($totals as &$t) {
-            $t['value'] = $this->currency->format($t['value'], $this->session->data['currency']);
-        }
-
-        $data['totals'] = $totals;
-
         // Payment Methods
         $data['payment_methods'] = [];
         $payment_address = [];
@@ -180,6 +132,53 @@ class ControllerBposCheckout extends Controller {
         }
         $data['default_shipping'] = !empty($this->session->data['shipping_method']['code']) ? $this->session->data['shipping_method']['code'] : $this->config->get('module_bpos_setting_default_shipping_method');
         $data['shipping_required'] = $this->cart->hasShipping();
+        // Totals
+            $totals = array();
+            $taxes = $this->cart->getTaxes();
+            $total = 0;
+
+            // Because __call can not keep var references so we put them into an array.
+            $total_data = array(
+                'totals' => &$totals,
+                'taxes'  => &$taxes,
+                'total'  => &$total
+            );
+
+            $this->load->model('setting/extension');
+
+            $sort_order = array();
+
+            $results = $this->model_setting_extension->getExtensions('total');
+
+            foreach ($results as $key => $value) {
+                $sort_order[$key] = $this->config->get('total_' . $value['code'] . '_sort_order');
+            }
+
+            array_multisort($sort_order, SORT_ASC, $results);
+
+            foreach ($results as $result) {
+                if ($this->config->get('total_' . $result['code'] . '_status')) {
+                    $this->load->model('extension/total/' . $result['code']);
+
+                    // We have to put the totals in an array so that they pass by reference.
+                    $this->{'model_extension_total_' . $result['code']}->getTotal($total_data);
+                }
+            }
+
+            $sort_order = array();
+
+            foreach ($totals as $key => $value) {
+                $sort_order[$key] = $value['sort_order'];
+            }
+
+            array_multisort($sort_order, SORT_ASC, $totals);
+
+        // Format totals
+        foreach ($totals as &$t) {
+            $t['value'] = $this->currency->format($t['value'], $this->session->data['currency']);
+        }
+
+        $data['totals'] = $totals;
         $html = isset($this->request->get['html']) ? 1 : 0;
         if ($html) {
             $this->response->setOutput($this->load->view('bpos/checkout', $data));

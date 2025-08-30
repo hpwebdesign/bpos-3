@@ -18,8 +18,8 @@ class ControllerBposOrder extends Controller {
 
         // Filter dari GET
         $filter_search = $this->request->get['filter_search'] ?? '';
-        $filter_date_start = $this->request->get['filter_date_start'] ?? '';
-        $filter_date_end = $this->request->get['filter_date_end'] ?? '';
+        $filter_date_start = $this->request->get['filter_date_start'] ?? date('Y-m').'-01';
+        $filter_date_end = $this->request->get['filter_date_end'] ?? date('Y-m-d');
         $filter_status_id = $this->request->get['filter_status_id'] ?? '';
         $page = isset($this->request->get['page']) ? (int)$this->request->get['page'] : 1;
 

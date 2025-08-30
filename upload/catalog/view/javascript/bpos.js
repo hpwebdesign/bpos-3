@@ -98,7 +98,8 @@ $(document).ready(function() {
             data: { code: code },
             dataType: 'json',
             success: function(json) {
-                 toastr.success(json['success']);
+                 toastr.success(json['success'], '', { timeOut: 1000 });
+                 updateCheckoutPanel();
             }
         });
     });
@@ -115,7 +116,8 @@ $(document).ready(function() {
             data: { code: code },
             dataType: 'json',
             success: function(json) {
-                 toastr.success(json['success']);
+                 toastr.success(json['success'], '', { timeOut: 1000 });
+                 updateCheckoutPanel();
             }
         });
     });

@@ -146,10 +146,26 @@
 $(function(){
     // Init Date Range Picker
     $('#filter-daterange').daterangepicker({
-        autoUpdateInput: false,
-        locale: {
-            format: 'YYYY-MM-DD',
-            cancelLabel: 'Clear'
+      ranges: {
+        'Today': [moment(), moment()],
+        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+        'This Year': [moment().startOf('year'), moment().endOf('year')],
+    'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
+    },
+    "alwaysShowCalendars": true,
+    "startDate": moment('{{ filter_date_start }}'),
+    "endDate":  moment('{{ filter_date_end }}'),
+  "showCustomRangeLabel": false,
+    "opens": "center",
+  "autoApply": true,
+  "autoUpdateInput": false,
+        "locale": {
+            "format": 'YYYY-MM-DD',
+            "cancelLabel": 'Clear'
         }
     });
 
@@ -172,7 +188,7 @@ $(function(){
 
     // Filter button click
     $('#btn-filter').on('click', function(){
-        let url = 'index.php?route=bpos/order';
+        let url = 'bpos/order';
 
         let search = $('#search-order').val();
         let daterange = $('#filter-daterange').val();
@@ -185,7 +201,7 @@ $(function(){
         }
         if(status) url += '&filter_status_id=' + status;
 
-        window.location = url;
+        loadFilter(url);
     });
 
 
@@ -195,6 +211,20 @@ $(function(){
   });
 
 });
+function loadFilter(route) {
+        $('#main-content').html('<p>Loading...</p>');
+        $.ajax({
+            url: 'index.php?route=' + route + '&format=json',
+            type: 'get',
+            dataType: 'json',
+            success: function(json) {
+                if (json['output']) $('#main-content').html(json['output']);
+            },
+            error: function() {
+                $('#main-content').html('<p>Error loading content</p>');
+            }
+        });
+    }  
 $(document).ready(function () {
 
     // Delete selected

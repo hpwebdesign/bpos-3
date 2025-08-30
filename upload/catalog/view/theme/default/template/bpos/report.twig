@@ -1,98 +1,192 @@
-<div id="report" class="content-wrapper">
-  <div class="container-xxl py-4 orders-board">
-    <div class="panel p-3 p-md-4">
-      <!-- Toolbar -->
-      <div class="toolbar row g-2 align-items-center mb-3">
+<div class="container-xxl py-4 orders-board">
+  <div class="panel p-3 p-md-6">
+    <!-- Toolbar -->
+    <div class="toolbar row g-2 align-items-center mb-3">
 
-        <!-- Date Range Placeholder -->
-        <div class="col-12 col-md-4 col-lg-3">
-          <div class="d-flex align-items-center gap-2 chip-input">
-            <i class="bi bi-calendar2"></i>
-            <span class="chip">
-              <input
-                     type="text"
-                     id="filter-daterange"
-                     class="form-control border-0 p-0"
-                     placeholder="Date Range"
-                     readonly
-                     value="{% if filter_date_start and filter_date_end %}{{ filter_date_start }} - {{ filter_date_end }}{% endif %}">
-              <button class="btn-clear" type="button" data-clear="daterange" title="Clear">
-                <i class="bi bi-x"></i>
-              </button>
-            </span>
-          </div>
+      <!-- Date Range Placeholder -->
+      <div class="col-12 col-md-4 col-lg-3">
+        <div class="d-flex align-items-center gap-2 chip-input">
+          <i class="bi bi-calendar2"></i>
+          <span class="chip">
+            <input
+                   type="text"
+                   id="filter-daterange"
+                   class="form-control border-0 p-0"
+                   placeholder="Date Range"
+                   readonly
+                   value="{% if filter_date_start and filter_date_end %}{{ filter_date_start }} - {{ filter_date_end }}{% endif %}">
+            <button class="btn-clear" type="button" data-clear="daterange" title="Clear">
+              <i class="bi bi-x"></i>
+            </button>
+          </span>
         </div>
+      </div>
 
 
-        <!-- Filter Button -->
-        <div class="col-6 col-md-2 col-lg-1">
-          <button id="btn-filter" class="btn btn-primary w-100">
-            <i class="bi bi-funnel"></i> {{ button_filter }}
-          </button>
+      <!-- Filter Button -->
+      <div class="col-6 col-md-2 col-lg-1">
+        <button id="btn-filter" class="btn btn-primary w-100">
+          <i class="bi bi-funnel"></i> {{ button_filter }}
+        </button>
+      </div>
+       {% if sales %}
+      <div class="col-6 col-md-7 col-lg-8 text-end">
+      <!-- Add Order -->
+      <button class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Export Report</button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li><a class="dropdown-item menu-item px-3" data-kt-ecommerce-export="excel" href="#">Export as Excel</a></li>
+        <li><a class="dropdown-item menu-item px-3" data-kt-ecommerce-export="csv" href="#">Export as Csv</a></li>
+        <li><a class="dropdown-item menu-item px-3" data-kt-ecommerce-export="pdf" href="#">Export as PDF</a></li>
+      </ul>
+      </div>
+    {% endif %}
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table id="reports-table" class="table align-middle table-hover">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>No. Orders</th>
+            <th>Product Sold</th>
+            <th>Tax</th>
+            <th>Total</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if sales %}
+          {% for sale in sales %}
+          <tr>
+            <td>{{ sale.date|date("d-m-Y") }}</td>
+            <td>{{ sale.no_orders }}</td>
+            <td>{{ sale.product_sold }}</td>
+            <td>{{ sale.tax }}</td>
+            <td>{{ sale.total }}</td>
+            <td>
+             <button type="button" 
+              class="btn btn-light-primary me-3 btn-view" 
+              data-bs-toggle="modal" 
+              data-bs-target="#kt_customers_export_modal"
+              data-date="{{ sale.date }}">
+        <i class="ki-duotone ki-exit-up fs-2"><span class="path1"></span><span class="path2"></span></i>
+        {{ text_view }}
+      </button>
+            </td>
+          </tr>
+          {% endfor %}
+          {% else %}
+          <tr>
+            <td colspan="6" class="text-center text-muted">{{ text_no_sales }}</td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+
+
+  </div>
+</div>
+{# Modal #}
+<div class="modal fade" id="kt_customers_export_modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered mw-650px">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ text_view }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <strong>Total:</strong> <span id="modal-total"></span>
         </div>
-
-
-        <!-- Add Order -->
-
+        <div class="mb-3">
+          <strong>Payments:</strong>
+          <ul id="modal-payments" class="mb-0"></ul>
+        </div>
+        <div class="mb-3">
+          <strong>Order ID:</strong> 
+          <span id="modal-orders"></span>
+        </div>
       </div>
-
-      <!-- Table -->
-      <div class="table-responsive">
-        <table class="table align-middle table-hover">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>No. Orders</th>
-              <th>Product Sold</th>
-              <th>Tax</th>
-              <th>Total</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% if sales %}
-            {% for sale in sales %}
-            <tr>
-              <td>{{ sale.date }}</td>
-              <td>{{ sale.no_orders }}</td>
-              <td>{{ sale.product_sold }}</td>
-              <td>{{ sale.tax }}</td>
-              <td>{{ sale.total }}</td>
-              <td>
-                <button type="button" class="btn btn-light-primary me-3" data-bs-toggle="modal" data-bs-target="#kt_customers_export_modal">
-                  <i class="ki-duotone ki-exit-up fs-2"><span class="path1"></span><span class="path2"></span></i>        {{ text_view }}
-                </button>
-              </td>
-            </tr>
-            {% endfor %}
-            {% else %}
-            <tr>
-              <td colspan="8" class="text-center text-muted">{{ text_no_sales }}</td>
-            </tr>
-            {% endif %}
-          </tbody>
-        </table>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ button_close }}</button>
       </div>
-
-      <!-- Pagination -->
-      <div class="table-footer d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3">
-        <div>{{ pagination }}</div>
-        <div class="text-muted">{{ results }}</div>
-      </div>
-
     </div>
   </div>
 </div>
 
 <script>
   $(function(){
+    {% if sales %}
+    var table = $('#reports-table').DataTable({
+    pageLength: 10,
+    // lengthChange: false, 
+    dom: 
+        "<'row'<'col-sm-12 d-flex justify-content-end'B>>" + 
+        "<'row'<'col-sm-12'tr>>" + 
+        "<'row'<'col-sm-12 col-md-5 d-flex align-items-center justify-content-center justify-content-md-start'i>" + 
+        "<'col-sm-12 col-md-7 d-flex align-items-center justify-content-center justify-content-md-end'p>>",
+    buttons: [
+        { extend: 'copy', title: 'Export Data', className: 'd-none' },
+        { extend: 'excel', title: 'Export Data', className: 'd-none' },
+        { extend: 'csv', title: 'Export Data', className: 'd-none' },
+        { extend: 'pdf', title: 'Export Data', className: 'd-none' }
+    ],
+    pagingType: "simple_numbers",
+    language: {
+        paginate: {
+            previous: '<i class="previous"></i>',
+            next: '<i class="next"></i>'
+        },
+        search: "",
+        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+        infoEmpty: "Tidak ada data",
+        zeroRecords: "Data tidak ditemukan"
+    }
+});
+
+
+    $('[data-kt-ecommerce-export]').on('click', function (e) {
+    e.preventDefault();
+    var type = $(this).data('kt-ecommerce-export');
+
+    if (type === 'copy') {
+        table.button('.buttons-copy').trigger();
+    } else if (type === 'excel') {
+        table.button('.buttons-excel').trigger();
+    } else if (type === 'csv') {
+        table.button('.buttons-csv').trigger();
+    } else if (type === 'pdf') {
+        table.button('.buttons-pdf').trigger();
+    }
+});
+    {% endif %}
     // Init Date Range Picker
-    $('#filter-daterange').daterangepicker({
-      autoUpdateInput: false,
-      locale: {
-        format: 'YYYY-MM-DD',
-        cancelLabel: 'Clear'
-      }
+   $('#filter-daterange').daterangepicker({
+      ranges: {
+        'Today': [moment(), moment()],
+        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+        'This Year': [moment().startOf('year'), moment().endOf('year')],
+    'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
+    },
+    "alwaysShowCalendars": true,
+    "startDate": moment('{{ filter_date_start }}'),
+    "endDate":  moment('{{ filter_date_end }}'),
+  "showCustomRangeLabel": false,
+    "opens": "center",
+  "autoApply": true,
+  "autoUpdateInput": false,
+        "locale": {
+            "format": 'YYYY-MM-DD',
+            "cancelLabel": 'Clear'
+        }
     });
 
     $('#filter-daterange').on('apply.daterangepicker', function(ev, picker) {
@@ -114,61 +208,83 @@
 
      // Filter button click
      $('#btn-filter').on('click', function(){
-       let url = 'index.php?route=bpos/order';
+       let url = 'bpos/report';
 
-       let search = $('#search-order').val();
        let daterange = $('#filter-daterange').val();
-       let status = $('#filter-status').val();
 
-       if(search) url += '&filter_search=' + encodeURIComponent(search);
+
        if(daterange){
          let dr = daterange.split(' - ');
          url += '&filter_date_start=' + dr[0] + '&filter_date_end=' + dr[1];
        }
-       if(status) url += '&filter_status_id=' + status;
 
-       window.location = url;
+
+       loadFilter(url);
      });
 
 
-      // Check All
-      $('#checkAll').on('change', function() {
-        $('.row-check').prop('checked', this.checked);
-      });
-
      });
-     $(document).ready(function () {
+function loadFilter(route) {
+        $('#main-content').html('<p>Loading...</p>');
+        $.ajax({
+            url: 'index.php?route=' + route + '&format=json',
+            type: 'get',
+            dataType: 'json',
+            success: function(json) {
+                if (json['output']) $('#main-content').html(json['output']);
+            },
+            error: function() {
+                $('#main-content').html('<p>Error loading content</p>');
+            }
+        });
+    }  
+$(document).on('click', '.btn-view', function () {
+  var date = $(this).data('date');
 
-       // Delete selected
-       $('#delete-selected').on('click', function () {
-         let ids = $('.row-check:checked').map(function () {
-           return $(this).val();
-         }).get();
+  // Set judul/modal sementara (optional)
+  $('#kt_customers_export_modal .modal-title').text('Details - ' + date);
 
-         if (ids.length === 0) {
-           alert('Please select at least one order.');
-           return;
-         }
+  // State awal (loading)
+  $('#modal-total').text('Loading...');
+  $('#modal-payments').empty().append($('<li>').addClass('text-muted').text('Loading...'));
+  $('#modal-orders').text('Loading...');
 
-         if (!confirm('Are you sure you want to delete selected orders?')) {
-           return;
-         }
+  $.ajax({
+    url: 'index.php?route=bpos/report/detail&date=' + encodeURIComponent(date),
+    dataType: 'json',
+    success: function (json) {
+      if (json && json.success) {
+        // Total
+        $('#modal-total').text(json.total);
 
-         $.ajax({
-           url: 'index.php?route=bpos/order/deleteSelected',
-           type: 'POST',
-           data: { order_ids: ids },
-           dataType: 'json',
-           success: function (response) {
-             if (response.success) {
-               location.reload();
-             } else if (response.error) {
-               alert(response.error);
-             }
-           }
-         });
-       });
-     });
+        // Payments
+        var $ul = $('#modal-payments').empty();
+        if (json.payments && json.payments.length) {
+          $.each(json.payments, function(i, p){
+            $('<li>').text(p.name + ': ' + p.total).appendTo($ul);
+          });
+        } else {
+          $('<li>').addClass('text-muted').text('-').appendTo($ul);
+        }
 
+        // Orders
+        if (json.orders && json.orders.length) {
+          $('#modal-orders').text(json.orders.join(', '));
+        } else {
+          $('#modal-orders').text('-');
+        }
+      } else {
+        $('#modal-total').text('-');
+        $('#modal-payments').html('<li class="text-danger">' + (json && json.error ? json.error : 'Failed to load') + '</li>');
+        $('#modal-orders').text('-');
+      }
+    },
+    error: function () {
+      $('#modal-total').text('-');
+      $('#modal-payments').html('<li class="text-danger">Request failed</li>');
+      $('#modal-orders').text('-');
+    }
+  });
+});
 </script>
 
