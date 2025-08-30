@@ -395,6 +395,17 @@ class ControllerBposOrder extends Controller {
         $order_data['store_name']      = $this->config->get('config_name');
         $order_data['store_url']       = defined('HTTPS_SERVER') ? HTTPS_SERVER : HTTP_SERVER;
 
+
+        // Final sanitation check
+        $order_data += [
+            'customer_group_id'       => (int)$this->config->get('config_customer_group_id'),
+            'payment_company'         => '',
+            'shipping_company'        => '',
+            'payment_address_format'  => '',
+            'shipping_address_format' => '',
+            'shipping_code'           => isset($order_data['shipping_code']) ? $order_data['shipping_code'] : ''
+        ];
+
         $order_id = $this->model_checkout_order->addOrder($order_data);
         $this->model_checkout_order->addOrderHistory($order_id, (int)$this->config->get('config_order_status_id'));
 
