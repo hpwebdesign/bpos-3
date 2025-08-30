@@ -278,6 +278,7 @@ class ControllerBposOrder extends Controller {
                 $this->response->setOutput(json_encode($json));
                 return;
             }
+
             $order_data['payment_firstname'] = $order_data['firstname'];
             $order_data['payment_lastname']  = $order_data['lastname'];
             $order_data['payment_address_1'] = $this->config->get('config_address');
@@ -371,17 +372,25 @@ class ControllerBposOrder extends Controller {
             $order_data['totals'] = $totals;
 
             // Currency & misc
-            $order_data['comment'] = '';
-            $order_data['total'] = $total;
-            $order_data['affiliate_id'] = 0;
-            $order_data['commission'] = 0;
-            $order_data['marketing_id'] = 0;
-            $order_data['tracking'] = '';
-            $order_data['language_id'] = $this->config->get('config_language_id');
-            $order_data['currency_id'] = $this->currency->getId($this->session->data['currency']);
-            $order_data['currency_code'] = $this->session->data['currency'];
-            $order_data['currency_value'] = $this->currency->getValue($this->session->data['currency']);
-            $order_data['ip'] = $this->request->server['REMOTE_ADDR'];
+            $order_data['customer_group_id']       = $this->config->get('config_customer_group_id');
+            $order_data['payment_company']         = '';
+            $order_data['shipping_company']        = '';
+            $order_data['payment_address_format']  = '';
+            $order_data['shipping_address_format'] = '';
+            $order_data['shipping_code']           = $this->session->data['shipping_method']['code'];
+
+            $order_data['comment']          = '';
+            $order_data['total']            = $total;
+            $order_data['affiliate_id']     = 0;
+            $order_data['commission']       = 0;
+            $order_data['marketing_id']     = 0;
+            $order_data['tracking']         = '';
+            $order_data['language_id']      = $this->config->get('config_language_id');
+            $order_data['currency_id']      = $this->currency->getId($this->session->data['currency']);
+            $order_data['currency_code']    = $this->session->data['currency'];
+            $order_data['currency_value']   = $this->currency->getValue($this->session->data['currency']);
+            $order_data['ip']               = $this->request->server['REMOTE_ADDR'];
+
             if (!empty($this->request->server['HTTP_X_FORWARDED_FOR'])) {
                 $order_data['forwarded_ip'] = $this->request->server['HTTP_X_FORWARDED_FOR'];
             } elseif (!empty($this->request->server['HTTP_CLIENT_IP'])) {
@@ -401,10 +410,10 @@ class ControllerBposOrder extends Controller {
             } else {
                 $order_data['accept_language'] = '';
             }
-            $order_data['invoice_prefix'] = $this->config->get('config_invoice_prefix');
-            $order_data['store_id'] = $this->config->get('config_store_id');
-            $order_data['store_name'] = $this->config->get('config_name');
-            $order_data['store_url'] = HTTPS_SERVER;
+            $order_data['invoice_prefix']   = $this->config->get('config_invoice_prefix');
+            $order_data['store_id']         = $this->config->get('config_store_id');
+            $order_data['store_name']       = $this->config->get('config_name');
+            $order_data['store_url']        = HTTPS_SERVER;
 
             $order_id = $this->model_checkout_order->addOrder($order_data);
 
