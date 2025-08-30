@@ -77,12 +77,20 @@
     --kt-shadow: 0 8px 24px rgba(15, 21, 53, .06), 0 2px 6px rgba(15, 21, 53, .08);
     --kt-radius: 16px;
 }
+
+html, body {
+  -webkit-font-smoothing: antialiased;   /* untuk WebKit (Chrome, Safari, Opera) */
+  -moz-osx-font-smoothing: grayscale;   /* untuk Firefox di macOS */
+  text-rendering: optimizeLegibility;   /* perbaikan kerning & ligature */
+}
+
 body {
     font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     background: #fff;
     color: var(--ink);
     font-size: 14px;
 }
+
 form, form input, form select, form textarea, .dropdown-menu {
     font-size: 14px !important;
 }
@@ -216,7 +224,7 @@ form, form input, form select, form textarea, .dropdown-menu {
     max-width: 200px;
     /* Default for desktop/tablet */
 }
-.food {
+.product-image {
     width: 100%;
     aspect-ratio: 1;
     border-radius: 16px;
@@ -227,7 +235,7 @@ form, form input, form select, form textarea, .dropdown-menu {
     justify-content: center;
     margin-bottom: 12px;
 }
-.food .plate {
+.product-image .plate {
     width: 80%;
     aspect-ratio: 1;
     border-radius: 10%;
@@ -319,12 +327,22 @@ form, form input, form select, form textarea, .dropdown-menu {
     outline: 2px solid #d4f1e1;
     background: #f2fff7;
 }
+
+/* Checkout Summary */
 #checkout-summary .paybtn i, #checkout-summary .shippingbtn i {
     display: inline-block;
     margin-right: 6px;
     vertical-align: middle;
     font-size: 15px;
 }
+
+#checkout-summary h3 {
+  font-size: 1.5rem;
+}
+#checkout-summary h4 {
+  font-size: 1.2rem;
+}
+
 .paybtn span {
     vertical-align: middle;
 }
@@ -1457,7 +1475,7 @@ a.text-hover-primary:hover {
 }
 .sub-heading {
     background: #0f1535;
-    height: 100px;
+    height: 80px;
 }
 
 .sub-heading .page-title {
@@ -1470,8 +1488,10 @@ a.text-hover-primary:hover {
 #main-content {
     padding: 0;
 }
-#main-content>.content-wrapper {
+
+#main-content > .content-wrapper {
     padding: 1rem 1rem 1rem 6rem;
+    margin-top: -50px;
 }
 /* TABLE */
 

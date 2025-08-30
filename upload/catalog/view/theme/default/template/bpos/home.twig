@@ -1,4 +1,4 @@
-<div class="sub-heading py-3 px-3">
+<div class="sub-heading">
 	  <div class="page-title">Products</div>
 	</div>
 
@@ -25,8 +25,8 @@
 			<div class="d-flex flex-wrap gap-3" id="products-list">
 				{% for product in products %}
 				<div class="flex-item">
-					<div class="card h-100 p-3 product-item" data-id="{{ product.product_id }}">
-						<div class="food">
+					<div class="card h-100 p-2 product-item" data-id="{{ product.product_id }}">
+						<div class="product-image">
 							<img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" class="plate img-responsive">
 						</div>
 						<div class="name">{{ product.name }}</div>

@@ -4,32 +4,45 @@ class ControllerBposCheckout extends Controller {
         $this->load->language('checkout/cart');
         $this->load->model('tool/image');
 
+        // Totals
+        $totals = array();
+        $taxes = $this->cart->getTaxes();
+        $total = 0;
+
+        // Because __call can not keep var references so we put them into an array.
+        $total_data = array(
+            'totals' => &$totals,
+            'taxes'  => &$taxes,
+            'total'  => &$total
+        );
+
         // Produk di cart
         $data['products'] = [];
+
         foreach ($this->cart->getProducts() as $product) {
-            $thumb = $product['image'] 
-                ? $this->model_tool_image->resize($product['image'], 50, 50) 
+            $thumb = $product['image']
+                ? $this->model_tool_image->resize($product['image'], 50, 50)
                 : $this->model_tool_image->resize('placeholder.png', 50, 50);
-                $option_data = array();
+            $option_data = array();
 
-                foreach ($product['option'] as $option) {
-                    if ($option['type'] != 'file') {
-                        $value = $option['value'];
+            foreach ($product['option'] as $option) {
+                if ($option['type'] != 'file') {
+                    $value = $option['value'];
+                } else {
+                    $upload_info = $this->model_tool_upload->getUploadByCode($option['value']);
+
+                    if ($upload_info) {
+                        $value = $upload_info['name'];
                     } else {
-                        $upload_info = $this->model_tool_upload->getUploadByCode($option['value']);
-
-                        if ($upload_info) {
-                            $value = $upload_info['name'];
-                        } else {
-                            $value = '';
-                        }
+                        $value = '';
                     }
-
-                    $option_data[] = array(
-                        'name'  => $option['name'],
-                        'value' => (utf8_strlen($value) > 20 ? utf8_substr($value, 0, 20) . '..' : $value)
-                    );
                 }
+
+                $option_data[] = array(
+                    'name'  => $option['name'],
+                    'value' => (utf8_strlen($value) > 20 ? utf8_substr($value, 0, 20) . '..' : $value)
+                );
+            }
             $data['products'][] = [
                 'cart_id'    => $product['cart_id'],
                 'thumb'    => $thumb,
@@ -42,6 +55,7 @@ class ControllerBposCheckout extends Controller {
 
         // Payment Methods
         $data['payment_methods'] = [];
+
         $payment_address = [];
 
         if (!empty($this->session->data['payment_address'])) {
@@ -60,27 +74,35 @@ class ControllerBposCheckout extends Controller {
         }
 
         $method_data = [];
+
         $results = $this->config->get('bpos_payment_methods');
-       
+
         foreach ($results as $code) {
-            
+
             if ($this->config->get('payment_' . $code . '_status')) {
+
                 $this->load->model('extension/payment/' . $code);
+
                 $method = $this->{'model_extension_payment_' . $code}->getMethod($payment_address, $total);
+
                 if ($method) {
-                    
                     $method_data[$code] = $method;
                 }
             }
         }
+
         $this->session->data['payment_methods'] = $method_data;
+
         $data['payment_methods'] = $method_data;
+
         if (!empty($data['payment_methods']) && !isset($this->session->data['payment_method'])) {
             $this->session->data['payment_method'] = $data['payment_methods'][$this->config->get('bpos_default_payment_method')];
         }
+
         $data['default_payment'] = !empty($this->session->data['payment_method']['code']) ? $this->session->data['payment_method']['code'] : $this->config->get('module_bpos_setting_default_payment_method');
 
         $data['shipping_methods'] = [];
+
         $shipping_address = [];
 
         if (!empty($this->session->data['shipping_address'])) {
@@ -101,77 +123,72 @@ class ControllerBposCheckout extends Controller {
         $shipping_data = [];
         $results = $this->config->get('bpos_shipping_methods');
         $code = '';
+
         foreach ($results as $code) {
-                if ($this->config->get('shipping_' . $code . '_status')) {
-                    $this->load->model('extension/shipping/' . $code);
+            if ($this->config->get('shipping_' . $code . '_status')) {
+                $this->load->model('extension/shipping/' . $code);
 
-                    $quote = $this->{'model_extension_shipping_' . $code}->getQuote($shipping_address);
+                $quote = $this->{'model_extension_shipping_' . $code}->getQuote($shipping_address);
 
-                    if ($quote) {
-                        $shipping_data[$code] = array(
-                            'title'      => $quote['title'],
-                            'quote'      => $quote['quote'],
-                            'sort_order' => $quote['sort_order'],
-                            'error'      => $quote['error']
-                        );
-                    }
+                if ($quote) {
+                    $shipping_data[$code] = array(
+                        'title'      => $quote['title'],
+                        'quote'      => $quote['quote'],
+                        'sort_order' => $quote['sort_order'],
+                        'error'      => $quote['error']
+                    );
                 }
             }
+        }
+
         $sort_order = array();
 
-            foreach ($shipping_data as $key => $value) {
-                $sort_order[$key] = $value['sort_order'];
-            }
+        foreach ($shipping_data as $key => $value) {
+            $sort_order[$key] = $value['sort_order'];
+        }
 
-            array_multisort($sort_order, SORT_ASC, $shipping_data);
+        array_multisort($sort_order, SORT_ASC, $shipping_data);
 
         $this->session->data['shipping_methods'] = $shipping_data;
+
         $data['shipping_methods'] = $shipping_data;
+
         if (!empty($data['shipping_methods']) && !isset($this->session->data['shipping_method'])) {
             $this->session->data['shipping_method'] = $data['shipping_methods'][$this->config->get('bpos_default_shipping_method')]['quote'][$this->config->get('bpos_default_shipping_method')];
         }
+
         $data['default_shipping'] = !empty($this->session->data['shipping_method']['code']) ? $this->session->data['shipping_method']['code'] : $this->config->get('module_bpos_setting_default_shipping_method');
         $data['shipping_required'] = $this->cart->hasShipping();
-        // Totals
-            $totals = array();
-            $taxes = $this->cart->getTaxes();
-            $total = 0;
 
-            // Because __call can not keep var references so we put them into an array.
-            $total_data = array(
-                'totals' => &$totals,
-                'taxes'  => &$taxes,
-                'total'  => &$total
-            );
 
-            $this->load->model('setting/extension');
+        $this->load->model('setting/extension');
 
-            $sort_order = array();
+        $sort_order = array();
 
-            $results = $this->model_setting_extension->getExtensions('total');
+        $results = $this->model_setting_extension->getExtensions('total');
 
-            foreach ($results as $key => $value) {
-                $sort_order[$key] = $this->config->get('total_' . $value['code'] . '_sort_order');
+        foreach ($results as $key => $value) {
+            $sort_order[$key] = $this->config->get('total_' . $value['code'] . '_sort_order');
+        }
+
+        array_multisort($sort_order, SORT_ASC, $results);
+
+        foreach ($results as $result) {
+            if ($this->config->get('total_' . $result['code'] . '_status')) {
+                $this->load->model('extension/total/' . $result['code']);
+
+                // We have to put the totals in an array so that they pass by reference.
+                $this->{'model_extension_total_' . $result['code']}->getTotal($total_data);
             }
+        }
 
-            array_multisort($sort_order, SORT_ASC, $results);
+        $sort_order = array();
 
-            foreach ($results as $result) {
-                if ($this->config->get('total_' . $result['code'] . '_status')) {
-                    $this->load->model('extension/total/' . $result['code']);
+        foreach ($totals as $key => $value) {
+            $sort_order[$key] = $value['sort_order'];
+        }
 
-                    // We have to put the totals in an array so that they pass by reference.
-                    $this->{'model_extension_total_' . $result['code']}->getTotal($total_data);
-                }
-            }
-
-            $sort_order = array();
-
-            foreach ($totals as $key => $value) {
-                $sort_order[$key] = $value['sort_order'];
-            }
-
-            array_multisort($sort_order, SORT_ASC, $totals);
+        array_multisort($sort_order, SORT_ASC, $totals);
 
         // Format totals
         foreach ($totals as &$t) {
@@ -179,13 +196,15 @@ class ControllerBposCheckout extends Controller {
         }
 
         $data['totals'] = $totals;
+
         $html = isset($this->request->get['html']) ? 1 : 0;
+
         if ($html) {
             $this->response->setOutput($this->load->view('bpos/checkout', $data));
         } else {
-             return $this->load->view('bpos/checkout', $data);
+            return $this->load->view('bpos/checkout', $data);
         }
-       
+
     }
 
     public function setPayment() {
@@ -195,7 +214,7 @@ class ControllerBposCheckout extends Controller {
             $this->session->data['payment_method'] = $this->session->data['payment_methods'][$this->request->post['code']];
             $json['success'] = 'Payment Method Updated';
         }
-        
+
         $this->response->addHeader('Content-Type: application/json');
         $this->response->setOutput(json_encode($json));
     }
@@ -208,7 +227,7 @@ class ControllerBposCheckout extends Controller {
             $this->session->data['shipping_method'] = $this->session->data['shipping_methods'][$shipping[0]]['quote'][$shipping[1]];
             $json['success'] = 'Shipping Method Updated';
         }
-        
+
         $this->response->addHeader('Content-Type: application/json');
         $this->response->setOutput(json_encode($json));
     }

@@ -98,8 +98,8 @@ $(document).ready(function() {
             data: { code: code },
             dataType: 'json',
             success: function(json) {
-                 toastr.success(json['success'], '', { timeOut: 1000 });
-                 updateCheckoutPanel();
+                toastr.success(json['success'], '', { timeOut: 1000 });
+                updateCheckoutPanel();
             }
         });
     });
@@ -116,8 +116,8 @@ $(document).ready(function() {
             data: { code: code },
             dataType: 'json',
             success: function(json) {
-                 toastr.success(json['success'], '', { timeOut: 1000 });
-                 updateCheckoutPanel();
+                toastr.success(json['success'], '', { timeOut: 1000 });
+                updateCheckoutPanel();
             }
         });
     });
@@ -147,42 +147,29 @@ $(document).ready(function() {
 
 
     // Category
-    $(document).on('click', '.categories .cat', function() {
-        $('.categories .cat').removeClass('active');
-        $(this).addClass('active');
+    $(document).on('click', '.categories .cat', function (e) {
+      e.preventDefault();
+      $('.categories .cat').removeClass('active');
+      $(this).addClass('active');
 
-        let category_id = $(this).data('id');
-        $('#products-list').html('<div class="text-center py-5">Loading...</div>');
+      const category_id = $(this).data('id');
+      $('#products-list').html('<div class="text-center py-5">Loading...</div>');
 
-        $.ajax({
-            url: 'index.php?route=bpos/home/products&category_id=' + category_id,
-            type: 'get',
-            dataType: 'json',
-            success: function(json) {
-                if (json['products']) {
-                    let html = '';
-                    json['products'].forEach(function(product) {
-                        html += `
-                        <div class="flex-item">
-                            <div class="card h-100 p-3 product-item" data-id="${product.product_id}">
-                                <div class="food">
-                                    <img src="${product.thumb}" alt="${product.name}" title="${product.name}" class="plate img-responsive">
-                                </div>
-                                <div class="name">${product.name}</div>
-                                <div class="price">${product.price}</div>
-                            </div>
-                        </div>`;
-                    });
-                    $('#products-list').html(html);
-                } else {
-                    $('#products-list').html('<div class="text-center py-5">No products found</div>');
-                }
-            },
-            error: function() {
-                $('#products-list').html('<div class="text-center py-5">Error loading products</div>');
-            }
-        });
+      $.ajax({
+        url: 'index.php?route=bpos/home/products&category_id=' + encodeURIComponent(category_id),
+        type: 'get',
+        dataType: 'html',
+        success: function (html) {
+          $('#products-list').html(html);
+        },
+        error: function () {
+          $('#products-list').html('<div class="text-center py-5">Error loading products</div>');
+        }
+      });
     });
+
+
+
     $(document).on('click', '.qty-plus', function() {
         let key = $(this).data('key');
         let qty = $(this).data('qty');
@@ -191,7 +178,7 @@ $(document).ready(function() {
 
     $(document).on('click', '.qty-minus', function() {
         let key = $(this).data('key');
-         let qty = $(this).data('qty');
+        let qty = $(this).data('qty');
         updateCartQty(key, qty);
     });
 
@@ -276,8 +263,8 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(json) {
                 // clear error lama
-            $('.text-danger').remove();
-            $('.form-group').removeClass('has-error');
+                $('.text-danger').remove();
+                $('.form-group').removeClass('has-error');
 
                 if (json['error']) {
                     if (json['error']['option']) {
@@ -301,8 +288,8 @@ $(document).ready(function() {
                 }
                 if (json['success']) {
                     $('#productOptionModal').modal('hide');
-                     toastr.success(json['success']);
-                     $('.cart .counter').html(json['total_cart']);
+                    toastr.success(json['success']);
+                    $('.cart .counter').html(json['total_cart']);
                     updateCheckoutPanel();
                 }
             }
@@ -311,51 +298,51 @@ $(document).ready(function() {
 
 
 
-        // Fungsi Add to Cart
-        function posAddToCart(product_id, quantity = 1) {
-            $.ajax({
-                url: 'index.php?route=bpos/cart/add',
-                type: 'post',
-                data: { product_id: product_id, quantity: quantity },
-                dataType: 'json',
-                success: function(json) {
-                    if (json['error']) {
-                        toastr.error(json['error']['warning'] || 'Error adding product to cart');
-                    }
-                    if (json['success']) {
-                        toastr.success(json['success']);
-                        //alert(json['success']); // Bisa ganti pakai notifikasi lebih bagus
-                        updateCheckoutPanel();
-                        var target = $('#checkout-summary');
-                        var scrollBottom = target.offset().top + target.outerHeight() - $(window).height();
-
-                        $('html, body').animate({
-                            scrollTop: scrollBottom
-                        }, 500);
-
-                        // Opsional: beri fokus
-                        target.attr('tabindex', -1).focus();
-
-                    }
-                },
-                error: function() {
-                    toastr.error('Error: Could not add to cart');
-                    //alert('Error: Could not add to cart');
+    // Fungsi Add to Cart
+    function posAddToCart(product_id, quantity = 1) {
+        $.ajax({
+            url: 'index.php?route=bpos/cart/add',
+            type: 'post',
+            data: { product_id: product_id, quantity: quantity },
+            dataType: 'json',
+            success: function(json) {
+                if (json['error']) {
+                    toastr.error(json['error']['warning'] || 'Error adding product to cart');
                 }
-            });
-        }
+                if (json['success']) {
+                    toastr.success(json['success']);
+                    //alert(json['success']); // Bisa ganti pakai notifikasi lebih bagus
+                    updateCheckoutPanel();
+                    var target = $('#checkout-summary');
+                    var scrollBottom = target.offset().top + target.outerHeight() - $(window).height();
 
-        // Update checkout panel (kalau mau menampilkan isi keranjang di POS)
-        function updateCheckoutPanel() {
-            $.ajax({
-                url: 'index.php?route=bpos/checkout&html=1',
-                type: 'get',
-                dataType: 'html',
-                success: function(html) {
-                    $('#checkout-summary').replaceWith(html);
+                    $('html, body').animate({
+                        scrollTop: scrollBottom
+                    }, 500);
+
+                    // Opsional: beri fokus
+                    target.attr('tabindex', -1).focus();
+
                 }
-            });
-        }
+            },
+            error: function() {
+                toastr.error('Error: Could not add to cart');
+                //alert('Error: Could not add to cart');
+            }
+        });
+    }
+
+    // Update checkout panel (kalau mau menampilkan isi keranjang di POS)
+    function updateCheckoutPanel() {
+        $.ajax({
+            url: 'index.php?route=bpos/checkout&html=1',
+            type: 'get',
+            dataType: 'html',
+            success: function(html) {
+                $('#checkout-summary').replaceWith(html);
+            }
+        });
+    }
 
 
     function loadContent(route) {

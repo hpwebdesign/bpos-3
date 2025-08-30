@@ -60,13 +60,19 @@ class ControllerBposHome extends Controller {
     }
 
     public function products() {
+        $this->load->model('catalog/product');
+        $this->load->model('tool/image');
+
         $category_id = isset($this->request->get['category_id']) ? (int)$this->request->get['category_id'] : 0;
 
         $products = $this->getProductsList($category_id);
 
-        $this->response->addHeader('Content-Type: application/json');
-        $this->response->setOutput(json_encode(['products' => $products]));
+        $data['products'] = $products;
+
+        // hapus header JSON
+        $this->response->setOutput($this->load->view('bpos/product_list', $data));
     }
+
 
     public function loadProducts() {
         $this->load->model('bpos/product');
@@ -80,7 +86,6 @@ class ControllerBposHome extends Controller {
                 'product_id' => $result['product_id'],
                 'thumb'      => $result['image'] ? $this->model_tool_image->resize($result['image'], 200, 200) : $this->model_tool_image->resize('placeholder.png', 200, 200),
                 'name'       => $result['name'],
-                'model'      => $result['model'],
                 'price'      => $this->currency->format($result['price'], $this->session->data['currency'])
             ];
         }
@@ -114,7 +119,6 @@ class ControllerBposHome extends Controller {
                 'product_id' => $result['product_id'],
                 'thumb'      => $image,
                 'name'       => $result['name'],
-                'model'       => $result['model'],
                 'price'      => $this->currency->format($result['price'], $this->session->data['currency'])
             ];
         }
