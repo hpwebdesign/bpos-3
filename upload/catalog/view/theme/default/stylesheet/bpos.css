@@ -1477,7 +1477,7 @@ a.text-hover-primary:hover {
 }
 
 #main-content > .content-wrapper {
-  padding-left: 80px;
+  padding: 1rem 1rem 1rem 6rem;
 }
 
 /* TABLE */
@@ -1575,7 +1575,7 @@ a.text-hover-primary:hover {
         margin-bottom: 0;
     }
 
-    .main-content .content-wrapper {
+    #main-content > .content-wrapper {
         padding: 1rem;
     }
 }
