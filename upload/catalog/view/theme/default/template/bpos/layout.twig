@@ -24,28 +24,31 @@
     </head>
     <body>
         <div class="wrap">
-           <header class="header container-fluid d-flex align-items-center px-3">
-            <div class="logo me-2">B</div>
-            <div class="title me-auto">POS System</div>
+            <header class="header container-fluid d-flex align-items-center px-3">
+                <div class="logo me-2">B</div>
+                <div class="title me-auto">POS System</div>
 
-            <div class="search position-relative me-3 d-none d-md-block">
-                <i class="bi bi-search position-absolute"></i>
-                <input id="pos-search" type="text" class="form-control ps-5" placeholder="Find Products">
-            </div>
+                <div class="search position-relative me-3 d-none d-md-block">
+                    <i class="bi bi-search position-absolute"></i>
+                    <input id="pos-search" type="text" class="form-control ps-5" placeholder="Find Products">
+                </div>
 
-            <div class="head-actions d-flex align-items-center gap-2">
-                <button class="icon-btn" title="Notifications">
-                    <i class="bi bi-bell"></i>
-                </button>
-                <button class="icon-btn" title="Settings">
-                    <i class="bi bi-gear"></i>
-                </button>
-                <button id="btn-logout" class="icon-btn text-danger" title="Logout">
-                    <i class="bi bi-box-arrow-right"></i>
-                </button>
-            </div>
-        </header>
+                <div class="head-actions d-flex align-items-center gap-2">
+                    <button class="icon-btn" title="Notifications">
+                        <i class="bi bi-bell"></i>
+                    </button>
+                    <button class="icon-btn" title="Settings">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <button id="btn-logout" class="icon-btn text-danger" title="Logout">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </button>
+                </div>
+            </header>
 
+                <div class="sub-heading py-3 px-3">
+                    <div class="page-title"></div>
+                </div>
 
             <div class="d-flex">
                 <div class="col-auto d-none d-md-block" id="left-menu">
@@ -57,7 +60,7 @@
                         <div class="setting bubble"><i class="bi bi-gear"></i></div>
                     </div>
                 </div>
-                <div id="main-content" class="container-fluid py-3">{{ content|raw }}</div>
+                <div id="main-content" class="container-fluid py-0">{{ content|raw }}</div>
 
                 <!-- Mobile sidebar -->
                 <div class="d-md-none mt-3" id="mobile-menu">
@@ -66,7 +69,7 @@
                         {# <div class="invoices bubble"><i class="bi bi-receipt"></i></div> #}
                         <div class="orders bubble"><i class="bi bi-box"></i></div>
                         <div class="reports bubble"><i class="bi bi-graph-up"></i></div>
-<!--                        <div class="bubble"><i class="bi bi-gear"></i></div>-->
+                        <!--                        <div class="bubble"><i class="bi bi-gear"></i></div>-->
                         <div class="cart bubble"><i class="bi bi-cart"></i> <span class="counter">{{ total_cart }}</span></div>
                     </div>
                 </div>
@@ -80,22 +83,22 @@
             </div>
         </div>
         <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="logoutModalLabel">Konfirmasi Logout</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin keluar dari POS System?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <a href="{{ logout }}" class="btn btn-danger">Logout</a>
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="logoutModalLabel">Konfirmasi Logout</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+                    <div class="modal-body">
+                        Apakah Anda yakin ingin keluar dari POS System?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <a href="{{ logout }}" class="btn btn-danger">Logout</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
         <script src="https://cdn.jsdelivr.net/npm/busy-load/dist/app.min.js"></script>
         <!-- Moment.js -->

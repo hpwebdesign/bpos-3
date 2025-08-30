@@ -1,84 +1,86 @@
-<div class="container-xxl py-4 orders-board">
-  <div class="panel p-3 p-md-4">
-    <!-- Toolbar -->
-    <div class="toolbar row g-2 align-items-center mb-3">
+<div id="report" class="content-wrapper">
+  <div class="container-xxl py-4 orders-board">
+    <div class="panel p-3 p-md-4">
+      <!-- Toolbar -->
+      <div class="toolbar row g-2 align-items-center mb-3">
 
-      <!-- Date Range Placeholder -->
-      <div class="col-12 col-md-4 col-lg-3">
-        <div class="d-flex align-items-center gap-2 chip-input">
-          <i class="bi bi-calendar2"></i>
-          <span class="chip">
-            <input
-                   type="text"
-                   id="filter-daterange"
-                   class="form-control border-0 p-0"
-                   placeholder="Date Range"
-                   readonly
-                   value="{% if filter_date_start and filter_date_end %}{{ filter_date_start }} - {{ filter_date_end }}{% endif %}">
-            <button class="btn-clear" type="button" data-clear="daterange" title="Clear">
-              <i class="bi bi-x"></i>
-            </button>
-          </span>
-        </div>
-      </div>
-
-
-      <!-- Filter Button -->
-      <div class="col-6 col-md-2 col-lg-1">
-        <button id="btn-filter" class="btn btn-primary w-100">
-          <i class="bi bi-funnel"></i> {{ button_filter }}
-        </button>
-      </div>
-
-
-      <!-- Add Order -->
-
-    </div>
-
-    <!-- Table -->
-    <div class="table-responsive">
-      <table class="table align-middle table-hover">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>No. Orders</th>
-            <th>Product Sold</th>
-            <th>Tax</th>
-            <th>Total</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% if sales %}
-          {% for sale in sales %}
-          <tr>
-            <td>{{ sale.date }}</td>
-            <td>{{ sale.no_orders }}</td>
-            <td>{{ sale.product_sold }}</td>
-            <td>{{ sale.tax }}</td>
-            <td>{{ sale.total }}</td>
-            <td>
-              <button type="button" class="btn btn-light-primary me-3" data-bs-toggle="modal" data-bs-target="#kt_customers_export_modal">
-                <i class="ki-duotone ki-exit-up fs-2"><span class="path1"></span><span class="path2"></span></i>        {{ text_view }}
+        <!-- Date Range Placeholder -->
+        <div class="col-12 col-md-4 col-lg-3">
+          <div class="d-flex align-items-center gap-2 chip-input">
+            <i class="bi bi-calendar2"></i>
+            <span class="chip">
+              <input
+                     type="text"
+                     id="filter-daterange"
+                     class="form-control border-0 p-0"
+                     placeholder="Date Range"
+                     readonly
+                     value="{% if filter_date_start and filter_date_end %}{{ filter_date_start }} - {{ filter_date_end }}{% endif %}">
+              <button class="btn-clear" type="button" data-clear="daterange" title="Clear">
+                <i class="bi bi-x"></i>
               </button>
-            </td>
-          </tr>
-          {% endfor %}
-          {% else %}
-          <tr>
-            <td colspan="8" class="text-center text-muted">{{ text_no_sales }}</td>
-          </tr>
-          {% endif %}
-        </tbody>
-      </table>
-    </div>
+            </span>
+          </div>
+        </div>
 
-    <!-- Pagination -->
-    <div class="table-footer d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3">
-      <div>{{ pagination }}</div>
-      <div class="text-muted">{{ results }}</div>
-    </div>
 
+        <!-- Filter Button -->
+        <div class="col-6 col-md-2 col-lg-1">
+          <button id="btn-filter" class="btn btn-primary w-100">
+            <i class="bi bi-funnel"></i> {{ button_filter }}
+          </button>
+        </div>
+
+
+        <!-- Add Order -->
+
+      </div>
+
+      <!-- Table -->
+      <div class="table-responsive">
+        <table class="table align-middle table-hover">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>No. Orders</th>
+              <th>Product Sold</th>
+              <th>Tax</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if sales %}
+            {% for sale in sales %}
+            <tr>
+              <td>{{ sale.date }}</td>
+              <td>{{ sale.no_orders }}</td>
+              <td>{{ sale.product_sold }}</td>
+              <td>{{ sale.tax }}</td>
+              <td>{{ sale.total }}</td>
+              <td>
+                <button type="button" class="btn btn-light-primary me-3" data-bs-toggle="modal" data-bs-target="#kt_customers_export_modal">
+                  <i class="ki-duotone ki-exit-up fs-2"><span class="path1"></span><span class="path2"></span></i>        {{ text_view }}
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+              <td colspan="8" class="text-center text-muted">{{ text_no_sales }}</td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="table-footer d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3">
+        <div>{{ pagination }}</div>
+        <div class="text-muted">{{ results }}</div>
+      </div>
+
+    </div>
   </div>
 </div>
 
