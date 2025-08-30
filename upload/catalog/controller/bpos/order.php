@@ -253,181 +253,159 @@ class ControllerBposOrder extends Controller {
     public function addOrder() {
         $this->load->model('checkout/order');
 
-        if ($this->cart->hasProducts()) {
-            // Data order sederhana (POS tidak lewat checkout form)
-            $order_data = [];
-            // Customer default
-            if ($this->customer->isLogged()) {
-                $order_data['customer_id'] = $this->customer->getId();
-                $order_data['firstname'] = $this->customer->getFirstName();
-                $order_data['lastname'] = $this->customer->getLastName();
-                $order_data['email'] = $this->customer->getEmail();
-                $order_data['telephone'] = $this->customer->getTelephone();
-            } else {
-                $order_data['customer_id'] = 0;
-                $order_data['firstname'] = 'POS';
-                $order_data['lastname'] = 'Customer';
-                $order_data['email'] = 'support@hpwebdesign.io';
-                $order_data['telephone'] = '';
-            }
+        $json = [];
 
-            // Payment & Shipping
-            if (empty($this->session->data['payment_method'])) {
-                $json['error'] = 'Please select a payment method';
-                $this->response->addHeader('Content-Type: application/json');
-                $this->response->setOutput(json_encode($json));
-                return;
-            }
-
-            $order_data['payment_firstname'] = $order_data['firstname'];
-            $order_data['payment_lastname']  = $order_data['lastname'];
-            $order_data['payment_address_1'] = $this->config->get('config_address');
-            $order_data['payment_address_2'] = '';
-            $order_data['payment_city']      = '';
-            $order_data['payment_postcode']  = '';
-            $order_data['payment_country']   = '';
-            $order_data['payment_country_id']= $this->config->get('config_country_id');
-            $order_data['payment_zone']      = '';
-            $order_data['payment_zone_id']   = $this->config->get('config_zone_id');
-
-            if (isset($this->session->data['payment_method']['title'])) {
-                $order_data['payment_method'] = $this->session->data['payment_method']['title'];
-            } else {
-                $order_data['payment_method'] = '';
-            }
-
-            if (isset($this->session->data['payment_method']['code'])) {
-                $order_data['payment_code'] = $this->session->data['payment_method']['code'];
-            } else {
-                $order_data['payment_code'] = '';
-            }
-
-            $order_data['shipping_firstname'] = $order_data['firstname'];
-            $order_data['shipping_lastname']  = $order_data['lastname'];
-            $order_data['shipping_address_1'] = $this->config->get('config_address');
-            $order_data['shipping_address_2'] = '';
-            $order_data['shipping_city']      = '';
-            $order_data['shipping_postcode']  = '';
-            $order_data['shipping_country']   = '';
-            $order_data['shipping_country_id']= $this->config->get('config_country_id');
-            $order_data['shipping_zone']      = '';
-            $order_data['shipping_zone_id']   = $this->config->get('config_zone_id');
-
-            if (isset($this->session->data['shipping_method']['title'])) {
-                $order_data['shipping_methods'] = $this->session->data['shipping_method']['title'];
-            } else {
-                $order_data['shipping_method'] = '';
-            }
-
-            if (isset($this->session->data['shipping_method']['code'])) {
-                $order_data['shipping_method'] = $this->session->data['shipping_method']['code'];
-            } else {
-                $order_data['shipping_method'] = '';
-            }
-
-            // Products
-            $order_data['products'] = $this->cart->getProducts();
-
-            // Totals
-            $totals = array();
-            $taxes = $this->cart->getTaxes();
-            $total = 0;
-
-            // Because __call can not keep var references so we put them into an array.
-            $total_data = array(
-                'totals' => &$totals,
-                'taxes'  => &$taxes,
-                'total'  => &$total
-            );
-
-            $this->load->model('setting/extension');
-
-            $sort_order = array();
-
-            $results = $this->model_setting_extension->getExtensions('total');
-
-            foreach ($results as $key => $value) {
-                $sort_order[$key] = $this->config->get('total_' . $value['code'] . '_sort_order');
-            }
-
-            array_multisort($sort_order, SORT_ASC, $results);
-
-            foreach ($results as $result) {
-                if ($this->config->get('total_' . $result['code'] . '_status')) {
-                    $this->load->model('extension/total/' . $result['code']);
-
-                    // We have to put the totals in an array so that they pass by reference.
-                    $this->{'model_extension_total_' . $result['code']}->getTotal($total_data);
-                }
-            }
-
-            $sort_order = array();
-
-            foreach ($totals as $key => $value) {
-                $sort_order[$key] = $value['sort_order'];
-            }
-
-            array_multisort($sort_order, SORT_ASC, $totals);
-
-            $order_data['totals'] = $totals;
-
-            // Currency & misc
-            $order_data['customer_group_id']       = $this->config->get('config_customer_group_id');
-            $order_data['payment_company']         = '';
-            $order_data['shipping_company']        = '';
-            $order_data['payment_address_format']  = '';
-            $order_data['shipping_address_format'] = '';
-            $order_data['shipping_code']           = $this->session->data['shipping_method']['code'];
-
-            $order_data['comment']          = '';
-            $order_data['total']            = $total;
-            $order_data['affiliate_id']     = 0;
-            $order_data['commission']       = 0;
-            $order_data['marketing_id']     = 0;
-            $order_data['tracking']         = '';
-            $order_data['language_id']      = $this->config->get('config_language_id');
-            $order_data['currency_id']      = $this->currency->getId($this->session->data['currency']);
-            $order_data['currency_code']    = $this->session->data['currency'];
-            $order_data['currency_value']   = $this->currency->getValue($this->session->data['currency']);
-            $order_data['ip']               = $this->request->server['REMOTE_ADDR'];
-
-            if (!empty($this->request->server['HTTP_X_FORWARDED_FOR'])) {
-                $order_data['forwarded_ip'] = $this->request->server['HTTP_X_FORWARDED_FOR'];
-            } elseif (!empty($this->request->server['HTTP_CLIENT_IP'])) {
-                $order_data['forwarded_ip'] = $this->request->server['HTTP_CLIENT_IP'];
-            } else {
-                $order_data['forwarded_ip'] = '';
-            }
-
-            if (isset($this->request->server['HTTP_USER_AGENT'])) {
-                $order_data['user_agent'] = $this->request->server['HTTP_USER_AGENT'];
-            } else {
-                $order_data['user_agent'] = '';
-            }
-
-            if (isset($this->request->server['HTTP_ACCEPT_LANGUAGE'])) {
-                $order_data['accept_language'] = $this->request->server['HTTP_ACCEPT_LANGUAGE'];
-            } else {
-                $order_data['accept_language'] = '';
-            }
-            $order_data['invoice_prefix']   = $this->config->get('config_invoice_prefix');
-            $order_data['store_id']         = $this->config->get('config_store_id');
-            $order_data['store_name']       = $this->config->get('config_name');
-            $order_data['store_url']        = HTTPS_SERVER;
-
-            $order_id = $this->model_checkout_order->addOrder($order_data);
-
-            $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('config_order_status_id'));
-
-            $this->cart->clear();
-
-            $json['order_id'] = $order_id;
-            $json['success'] = true;
-        } else {
+        if (!$this->cart->hasProducts()) {
             $json['error'] = 'Cart is empty';
+            $this->response->addHeader('Content-Type: application/json');
+            $this->response->setOutput(json_encode($json));
+            return;
         }
+
+        $currency        = isset($this->session->data['currency']) ? $this->session->data['currency'] : $this->config->get('config_currency');
+        $payment_method  = isset($this->session->data['payment_method']) ? $this->session->data['payment_method'] : [];
+        $shipping_method = isset($this->session->data['shipping_method']) ? $this->session->data['shipping_method'] : [];
+
+        if (empty($payment_method)) {
+            $json['error'] = 'Please select a payment method';
+            $this->response->addHeader('Content-Type: application/json');
+            $this->response->setOutput(json_encode($json));
+            return;
+        }
+
+        if ($this->customer->isLogged()) {
+            $firstname   = $this->customer->getFirstName();
+            $lastname    = $this->customer->getLastName();
+            $email       = $this->customer->getEmail();
+            $telephone   = $this->customer->getTelephone();
+            $customer_id = $this->customer->getId();
+        } else {
+            $firstname   = 'POS';
+            $lastname    = 'Customer';
+            $email       = 'support@hpwebdesign.io';
+            $telephone   = '';
+            $customer_id = 0;
+        }
+
+        $order_data = [];
+
+        $order_data['customer_id']             = $customer_id;
+        $order_data['customer_group_id']       = (int)$this->config->get('config_customer_group_id');
+        $order_data['firstname']               = $firstname;
+        $order_data['lastname']                = $lastname;
+        $order_data['email']                   = $email;
+        $order_data['telephone']               = $telephone;
+
+        $order_data['payment_firstname']       = $firstname;
+        $order_data['payment_lastname']        = $lastname;
+        $order_data['payment_company']         = '';
+        $order_data['payment_address_1']       = (string)$this->config->get('config_address');
+        $order_data['payment_address_2']       = '';
+        $order_data['payment_city']            = '';
+        $order_data['payment_postcode']        = '';
+        $order_data['payment_zone']            = '';
+        $order_data['payment_zone_id']         = (int)$this->config->get('config_zone_id');
+        $order_data['payment_country']         = '';
+        $order_data['payment_country_id']      = (int)$this->config->get('config_country_id');
+        $order_data['payment_address_format']  = '';
+        $order_data['payment_method']          = isset($payment_method['title']) ? $payment_method['title'] : '';
+        $order_data['payment_code']            = isset($payment_method['code']) ? $payment_method['code'] : '';
+
+        $order_data['shipping_firstname']      = $firstname;
+        $order_data['shipping_lastname']       = $lastname;
+        $order_data['shipping_company']        = '';
+        $order_data['shipping_address_1']      = (string)$this->config->get('config_address');
+        $order_data['shipping_address_2']      = '';
+        $order_data['shipping_city']           = '';
+        $order_data['shipping_postcode']       = '';
+        $order_data['shipping_zone']           = '';
+        $order_data['shipping_zone_id']        = (int)$this->config->get('config_zone_id');
+        $order_data['shipping_country']        = '';
+        $order_data['shipping_country_id']     = (int)$this->config->get('config_country_id');
+        $order_data['shipping_address_format'] = '';
+        $order_data['shipping_method']         = isset($shipping_method['title']) ? $shipping_method['title'] : '';
+        $order_data['shipping_code']           = isset($shipping_method['code']) ? $shipping_method['code'] : '';
+
+        $this->tax->setStoreAddress($this->config->get('config_country_id'), $this->config->get('config_zone_id'));
+        $this->tax->setPaymentAddress($order_data['payment_country_id'], $order_data['payment_zone_id']);
+        $this->tax->setShippingAddress($order_data['shipping_country_id'], $order_data['shipping_zone_id']);
+
+        $products = $this->cart->getProducts();
+        foreach ($products as &$p) {
+            if (!isset($p['tax'])) {
+                $p['tax'] = 0;
+            }
+        }
+        $order_data['products'] = $products;
+
+        $totals = [];
+        $taxes  = $this->cart->getTaxes();
+        $total  = 0;
+
+        $total_data = [
+            'totals' => &$totals,
+            'taxes'  => &$taxes,
+            'total'  => &$total
+        ];
+
+        $this->load->model('setting/extension');
+
+        $results    = $this->model_setting_extension->getExtensions('total');
+        $sort_order = [];
+        foreach ($results as $key => $value) {
+            $sort_order[$key] = $this->config->get('total_' . $value['code'] . '_sort_order');
+        }
+        array_multisort($sort_order, SORT_ASC, $results);
+
+        foreach ($results as $result) {
+            if ($this->config->get('total_' . $result['code'] . '_status')) {
+                $this->load->model('extension/total/' . $result['code']);
+                $this->{'model_extension_total_' . $result['code']}->getTotal($total_data);
+            }
+        }
+
+        $sort_order = [];
+
+        foreach ($totals as $key => $value) {
+            $sort_order[$key] = $value['sort_order'];
+        }
+
+        array_multisort($sort_order, SORT_ASC, $totals);
+
+        $order_data['totals']          = $totals;
+        $order_data['comment']         = '';
+        $order_data['total']           = $total;
+        $order_data['affiliate_id']    = 0;
+        $order_data['commission']      = 0;
+        $order_data['marketing_id']    = 0;
+        $order_data['tracking']        = '';
+
+        $order_data['language_id']     = (int)$this->config->get('config_language_id');
+        $order_data['currency_id']     = $this->currency->getId($currency);
+        $order_data['currency_code']   = $currency;
+        $order_data['currency_value']  = $this->currency->getValue($currency);
+
+        $order_data['ip']              = isset($this->request->server['REMOTE_ADDR']) ? $this->request->server['REMOTE_ADDR'] : '';
+        $order_data['forwarded_ip']    = !empty($this->request->server['HTTP_X_FORWARDED_FOR']) ? $this->request->server['HTTP_X_FORWARDED_FOR'] : (!empty($this->request->server['HTTP_CLIENT_IP']) ? $this->request->server['HTTP_CLIENT_IP'] : '');
+        $order_data['user_agent']      = isset($this->request->server['HTTP_USER_AGENT']) ? $this->request->server['HTTP_USER_AGENT'] : '';
+        $order_data['accept_language'] = isset($this->request->server['HTTP_ACCEPT_LANGUAGE']) ? $this->request->server['HTTP_ACCEPT_LANGUAGE'] : '';
+
+        $order_data['invoice_prefix']  = $this->config->get('config_invoice_prefix');
+        $order_data['store_id']        = (int)$this->config->get('config_store_id');
+        $order_data['store_name']      = $this->config->get('config_name');
+        $order_data['store_url']       = defined('HTTPS_SERVER') ? HTTPS_SERVER : HTTP_SERVER;
+
+        $order_id = $this->model_checkout_order->addOrder($order_data);
+        $this->model_checkout_order->addOrderHistory($order_id, (int)$this->config->get('config_order_status_id'));
+
+        $this->cart->clear();
+
+        $json['order_id'] = $order_id;
+        $json['success']  = true;
 
         $this->response->addHeader('Content-Type: application/json');
         $this->response->setOutput(json_encode($json));
     }
+
+
 }
