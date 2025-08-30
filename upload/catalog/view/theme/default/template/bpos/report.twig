@@ -1,3 +1,7 @@
+<div class="sub-heading py-3 px-3">
+      <div class="page-title">Sales</div>
+    </div>
+
 <div class="container-xxl py-4 orders-board">
   <div class="panel p-3 p-md-6">
     <!-- Toolbar -->
@@ -65,9 +69,9 @@
             <td>{{ sale.tax }}</td>
             <td>{{ sale.total }}</td>
             <td>
-             <button type="button" 
-              class="btn btn-light-primary me-3 btn-view" 
-              data-bs-toggle="modal" 
+             <button type="button"
+              class="btn btn-light-primary me-3 btn-view"
+              data-bs-toggle="modal"
               data-bs-target="#kt_customers_export_modal"
               data-date="{{ sale.date }}">
         <i class="ki-duotone ki-exit-up fs-2"><span class="path1"></span><span class="path2"></span></i>
@@ -107,7 +111,7 @@
           <ul id="modal-payments" class="mb-0"></ul>
         </div>
         <div class="mb-3">
-          <strong>Order ID:</strong> 
+          <strong>Order ID:</strong>
           <span id="modal-orders"></span>
         </div>
       </div>
@@ -123,11 +127,11 @@
     {% if sales %}
     var table = $('#reports-table').DataTable({
     pageLength: 10,
-    // lengthChange: false, 
-    dom: 
-        "<'row'<'col-sm-12 d-flex justify-content-end'B>>" + 
-        "<'row'<'col-sm-12'tr>>" + 
-        "<'row'<'col-sm-12 col-md-5 d-flex align-items-center justify-content-center justify-content-md-start'i>" + 
+    // lengthChange: false,
+    dom:
+        "<'row'<'col-sm-12 d-flex justify-content-end'B>>" +
+        "<'row'<'col-sm-12'tr>>" +
+        "<'row'<'col-sm-12 col-md-5 d-flex align-items-center justify-content-center justify-content-md-start'i>" +
         "<'col-sm-12 col-md-7 d-flex align-items-center justify-content-center justify-content-md-end'p>>",
     buttons: [
         { extend: 'copy', title: 'Export Data', className: 'd-none' },
@@ -237,7 +241,7 @@ function loadFilter(route) {
                 $('#main-content').html('<p>Error loading content</p>');
             }
         });
-    }  
+    }
 $(document).on('click', '.btn-view', function () {
   var date = $(this).data('date');
 
