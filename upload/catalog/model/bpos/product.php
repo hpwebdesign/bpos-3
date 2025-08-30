@@ -22,6 +22,7 @@ class ModelBposProduct extends Model {
                     pd.name,
                     p.image,
                     p.price,
+                    p.model,
                     (
                         SELECT pd2.price FROM " . DB_PREFIX . "product_discount pd2
                         WHERE pd2.product_id = p.product_id
