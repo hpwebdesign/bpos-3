@@ -3,10 +3,8 @@ class ControllerBposOrder extends Controller {
     public function __construct($registry) {
         parent::__construct($registry);
 
-        // Load library user dari admin
         $this->user = new Cart\User($this->registry);
 
-        // Cek login
         if (!$this->user->isLogged()) {
             $this->response->redirect($this->url->link('bpos/login', '', true));
         }
@@ -16,18 +14,18 @@ class ControllerBposOrder extends Controller {
         $this->load->language('account/order');
         $this->load->model('bpos/order');
 
-        // Filter dari GET
-        $filter_search = $this->request->get['filter_search'] ?? '';
-        $filter_date_start = $this->request->get['filter_date_start'] ?? date('Y-m').'-01';
-        $filter_date_end = $this->request->get['filter_date_end'] ?? date('Y-m-d');
-        $filter_status_id = $this->request->get['filter_status_id'] ?? '';
-        $page = isset($this->request->get['page']) ? (int)$this->request->get['page'] : 1;
+        $filter_search          = $this->request->get['filter_search'] ?? '';
+        $filter_date_start      = $this->request->get['filter_date_start'] ?? date('Y-m').'-01';
+        $filter_date_end        = $this->request->get['filter_date_end'] ?? date('Y-m-d');
+        $filter_order_status_id = $this->request->get['filter_status_id'] ?? '';
+
+        $page               = isset($this->request->get['page']) ? (int)$this->request->get['page'] : 1;
 
         $limit = 10;
 
         $filter_data = [
             'filter_order_status_id' => $filter_order_status_id,
-            'filter_customer'          => $filter_search,
+            'filter_customer'        => $filter_search,
             'filter_date_start'      => $filter_date_start,
             'filter_date_end'        => $filter_date_end,
             'start'                  => ($page - 1) * $limit,
@@ -64,6 +62,7 @@ class ControllerBposOrder extends Controller {
         $pagination->limit = $limit;
 
         $url_params = '';
+
         if ($filter_order_status_id) $url_params .= '&filter_order_status_id=' . $filter_order_status_id;
         if ($filter_search) $url_params .= '&filter_search=' . urlencode($filter_search);
         if ($filter_date_start) $url_params .= '&filter_date_start=' . $filter_date_start;
@@ -72,6 +71,7 @@ class ControllerBposOrder extends Controller {
         $pagination->url = $this->url->link('bpos/order', $url_params . '&page={page}');
 
         $pagination_html = $pagination->render();
+
         $results_text = sprintf(
             $this->language->get('text_pagination'),
             ($order_total) ? (($page - 1) * $limit) + 1 : 0,
@@ -92,11 +92,10 @@ class ControllerBposOrder extends Controller {
             'add_order'        => $this->url->link('bpos/home')
         ];
 
-        // Sesuai format POS layout
-        $data['title'] = 'Orders - POS System';
-        $data['logout'] = $this->url->link('bpos/login/logout', '', true);
+        $data['title']      = 'Orders - POS System';
+        $data['logout']     = $this->url->link('bpos/login/logout', '', true);
         $data['total_cart'] = $this->cart->hasProducts();
-        $data['content'] = $this->load->view('bpos/order', $view_data);
+        $data['content']    = $this->load->view('bpos/order', $view_data);
 
         if (isset($this->request->get['format']) && $this->request->get['format'] == 'json') {
             $this->response->addHeader('Content-Type: application/json');
@@ -107,7 +106,7 @@ class ControllerBposOrder extends Controller {
     }
 
     public function view() {
-       
+
         if (!isset($this->request->get['order_id'])) {
             $this->response->redirect($this->url->link('bpos/order', '', true));
         }
@@ -289,6 +288,7 @@ class ControllerBposOrder extends Controller {
             $order_data['payment_country_id']= $this->config->get('config_country_id');
             $order_data['payment_zone']      = '';
             $order_data['payment_zone_id']   = $this->config->get('config_zone_id');
+
             if (isset($this->session->data['payment_method']['title'])) {
                 $order_data['payment_method'] = $this->session->data['payment_method']['title'];
             } else {
@@ -311,6 +311,7 @@ class ControllerBposOrder extends Controller {
             $order_data['shipping_country_id']= $this->config->get('config_country_id');
             $order_data['shipping_zone']      = '';
             $order_data['shipping_zone_id']   = $this->config->get('config_zone_id');
+
             if (isset($this->session->data['shipping_method']['title'])) {
                 $order_data['shipping_methods'] = $this->session->data['shipping_method']['title'];
             } else {
@@ -405,13 +406,10 @@ class ControllerBposOrder extends Controller {
             $order_data['store_name'] = $this->config->get('config_name');
             $order_data['store_url'] = HTTPS_SERVER;
 
-            // Tambah order
             $order_id = $this->model_checkout_order->addOrder($order_data);
 
-            // Konfirmasi otomatis
             $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('config_order_status_id'));
 
-            // Kosongkan cart
             $this->cart->clear();
 
             $json['order_id'] = $order_id;
