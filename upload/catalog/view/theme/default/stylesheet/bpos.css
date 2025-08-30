@@ -3330,3 +3330,8 @@ a.text-hover-primary:hover {
     width: auto !important;
 }
 /* hide payment icon */
+
+
+#main-content .container-xxl {
+    margin-top: -50px;
+}
