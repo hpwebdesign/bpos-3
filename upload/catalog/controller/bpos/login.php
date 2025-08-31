@@ -14,10 +14,10 @@ class ControllerBposLogin extends Controller {
         $data['error_warning'] = '';
 
         if ($this->request->server['REQUEST_METHOD'] == 'POST') {
-            if (!isset($this->request->post['username']) || 
-                !isset($this->request->post['password']) || 
+            if (!isset($this->request->post['username']) ||
+                !isset($this->request->post['password']) ||
                 !$this->user->login(
-                    $this->request->post['username'], 
+                    $this->request->post['username'],
                     html_entity_decode($this->request->post['password'], ENT_QUOTES, 'UTF-8')
                 )) {
                 $data['error_warning'] = 'No match for Username and/or Password.';
@@ -32,7 +32,7 @@ class ControllerBposLogin extends Controller {
         $this->load->model('tool/image');
 
         if ($this->config->get('config_logo') && is_file(DIR_IMAGE . $this->config->get('config_logo'))) {
-            $data['logo'] = $this->model_tool_image->resize($this->config->get('config_logo'), 120, 120);
+            $data['logo'] = $this->model_tool_image->resize($this->config->get('config_logo'), 200, 100);
         } else {
             $data['logo'] = '';
         }
