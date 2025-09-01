@@ -4,8 +4,12 @@ class ControllerBposLogin extends Controller {
     public function __construct($registry) {
         parent::__construct($registry);
 
+        if (!$this->config->get('bpos_status')) {
+            $this->response->redirect($this->url->link('common/home', '', true));
+        }
         // Load library user dari admin
         $this->user = new Cart\User($this->registry);
+
 
     }
     public function index() {

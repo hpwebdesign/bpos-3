@@ -1,5 +1,16 @@
 <?php
 class ControllerBposReport extends Controller {
+    public function __construct($registry) {
+        parent::__construct($registry);
+        if (!$this->config->get('bpos_status')) {
+            $this->response->redirect($this->url->link('common/home', '', true));
+        }
+        $this->user = new Cart\User($this->registry);
+
+        if (!$this->user->isLogged()) {
+            $this->response->redirect($this->url->link('bpos/login', '', true));
+        }
+    }
     public function index() {
         $this->load->language('bpos/report');
 

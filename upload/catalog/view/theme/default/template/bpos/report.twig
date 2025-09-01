@@ -39,7 +39,6 @@
       <button class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Export Report</button>
       <ul class="dropdown-menu dropdown-menu-end">
         <li><a class="dropdown-item menu-item px-3" data-kt-ecommerce-export="excel" href="#">Export as Excel</a></li>
-        <li><a class="dropdown-item menu-item px-3" data-kt-ecommerce-export="csv" href="#">Export as Csv</a></li>
         <li><a class="dropdown-item menu-item px-3" data-kt-ecommerce-export="pdf" href="#">Export as PDF</a></li>
       </ul>
       </div>
@@ -134,10 +133,30 @@
         "<'row'<'col-sm-12 col-md-5 d-flex align-items-center justify-content-center justify-content-md-start'i>" +
         "<'col-sm-12 col-md-7 d-flex align-items-center justify-content-center justify-content-md-end'p>>",
     buttons: [
-        { extend: 'copy', title: 'Export Data', className: 'd-none' },
-        { extend: 'excel', title: 'Export Data', className: 'd-none' },
-        { extend: 'csv', title: 'Export Data', className: 'd-none' },
-        { extend: 'pdf', title: 'Export Data', className: 'd-none' }
+        { 
+            extend: 'copy', 
+            title: 'Export Data', 
+            className: 'd-none',
+            exportOptions: { columns: ':not(:last-child)' }
+        },
+        { 
+            extend: 'excel', 
+            title: 'Export Data', 
+            className: 'd-none',
+            exportOptions: { columns: ':not(:last-child)' }
+        },
+        { 
+            extend: 'csv', 
+            title: 'Export Data', 
+            className: 'd-none',
+            exportOptions: { columns: ':not(:last-child)' }
+        },
+        { 
+            extend: 'pdf', 
+            title: 'Export Data', 
+            className: 'd-none',
+            exportOptions: { columns: ':not(:last-child)' }
+        }
     ],
     pagingType: "simple_numbers",
     language: {

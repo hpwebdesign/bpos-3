@@ -77,20 +77,20 @@
     --kt-shadow: 0 8px 24px rgba(15, 21, 53, .06), 0 2px 6px rgba(15, 21, 53, .08);
     --kt-radius: 16px;
 }
-
 html, body {
-  -webkit-font-smoothing: antialiased;   /* untuk WebKit (Chrome, Safari, Opera) */
-  -moz-osx-font-smoothing: grayscale;   /* untuk Firefox di macOS */
-  text-rendering: optimizeLegibility;   /* perbaikan kerning & ligature */
+    -webkit-font-smoothing: antialiased;
+    /* untuk WebKit (Chrome, Safari, Opera) */
+    -moz-osx-font-smoothing: grayscale;
+    /* untuk Firefox di macOS */
+    text-rendering: optimizeLegibility;
+    /* perbaikan kerning & ligature */
 }
-
 body {
     font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     background: #fff;
     color: var(--ink);
     font-size: 14px;
 }
-
 form, form input, form select, form textarea, .dropdown-menu {
     font-size: 14px !important;
 }
@@ -327,22 +327,20 @@ form, form input, form select, form textarea, .dropdown-menu {
     outline: 2px solid #d4f1e1;
     background: #f2fff7;
 }
-
 /* Checkout Summary */
+
 #checkout-summary .paybtn i, #checkout-summary .shippingbtn i {
     display: inline-block;
     margin-right: 6px;
     vertical-align: middle;
     font-size: 15px;
 }
-
 #checkout-summary h3 {
-  font-size: 1.5rem;
+    font-size: 1.5rem;
 }
 #checkout-summary h4 {
-  font-size: 1.2rem;
+    font-size: 1.2rem;
 }
-
 .paybtn span {
     vertical-align: middle;
 }
@@ -1041,7 +1039,7 @@ form, form input, form select, form textarea, .dropdown-menu {
     padding: 1.5rem!important;
 }
 .container-xxl {
-    max-width: 1320px;
+    max-width: 1450px;
     margin: 0 auto;
     padding-left: 1rem;
     padding-right: 1rem;
@@ -1486,8 +1484,7 @@ a.text-hover-primary:hover {
 #main-content {
     padding: 0;
 }
-
-#main-content > .content-wrapper {
+#main-content>.content-wrapper {
     padding: 1rem 1rem 1rem 6rem;
     margin-top: -50px;
 }

@@ -2,7 +2,9 @@
 class ControllerBposOrder extends Controller {
     public function __construct($registry) {
         parent::__construct($registry);
-
+        if (!$this->config->get('bpos_status')) {
+            $this->response->redirect($this->url->link('common/home', '', true));
+        }
         $this->user = new Cart\User($this->registry);
 
         if (!$this->user->isLogged()) {
@@ -14,81 +16,20 @@ class ControllerBposOrder extends Controller {
         $this->load->language('account/order');
         $this->load->model('bpos/order');
 
-        $filter_search          = $this->request->get['filter_search'] ?? '';
-        $filter_date_start      = $this->request->get['filter_date_start'] ?? date('Y-m').'-01';
-        $filter_date_end        = $this->request->get['filter_date_end'] ?? date('Y-m-d');
-        $filter_order_status_id = $this->request->get['filter_status_id'] ?? '';
+        $filter_search          = '';
+        $filter_date_start      = date('Y-m').'-01';
+        $filter_date_end        = date('Y-m-d');
+        $filter_order_status_id = '';
 
-        $page               = isset($this->request->get['page']) ? (int)$this->request->get['page'] : 1;
-
-        $limit = 10;
-
-        $filter_data = [
-            'filter_order_status_id' => $filter_order_status_id,
-            'filter_customer'        => $filter_search,
-            'filter_date_start'      => $filter_date_start,
-            'filter_date_end'        => $filter_date_end,
-            'start'                  => ($page - 1) * $limit,
-            'limit'                  => $limit
-        ];
-
-        $order_total = $this->model_bpos_order->getTotalOrders($filter_data);
-        $results = $this->model_bpos_order->getOrders($filter_data);
-
-        $orders = [];
-        foreach ($results as $result) {
-            $orders[] = [
-                'order_id'      => $result['order_id'],
-                'firstname'     => $result['firstname'],
-                'lastname'      => $result['lastname'],
-                'status'        => $result['order_status'],
-                'total'         => $this->currency->format($result['total'], $result['currency_code'], $result['currency_value']),
-                'date_added'    => date($this->language->get('date_format_short'), strtotime($result['date_added'])),
-                'date_modified' => $result['date_modified'] > 0 ? date($this->language->get('date_format_short'), strtotime($result['date_modified'])) : '-',
-                'invoice'       => $this->url->link('bpos/invoice', 'order_id=' . $result['order_id']),
-                'view'          => $this->url->link('bpos/order/view', 'order_id=' . $result['order_id']),
-                'delete'        => $this->url->link('bpos/order/delete', 'order_id=' . $result['order_id'])
-            ];
-        }
-
-        // Order Status List
         $this->load->model('localisation/order_status');
         $order_statuses = $this->model_localisation_order_status->getOrderStatuses();
 
-        // Pagination
-        $pagination = new Pagination();
-        $pagination->total = $order_total;
-        $pagination->page = $page;
-        $pagination->limit = $limit;
-
-        $url_params = '';
-
-        if ($filter_order_status_id) $url_params .= '&filter_order_status_id=' . $filter_order_status_id;
-        if ($filter_search) $url_params .= '&filter_search=' . urlencode($filter_search);
-        if ($filter_date_start) $url_params .= '&filter_date_start=' . $filter_date_start;
-        if ($filter_date_end) $url_params .= '&filter_date_end=' . $filter_date_end;
-
-        $pagination->url = $this->url->link('bpos/order', $url_params . '&page={page}');
-
-        $pagination_html = $pagination->render();
-
-        $results_text = sprintf(
-            $this->language->get('text_pagination'),
-            ($order_total) ? (($page - 1) * $limit) + 1 : 0,
-            ((($page - 1) * $limit) > ($order_total - $limit)) ? $order_total : ((($page - 1) * $limit) + $limit),
-            $order_total,
-            ceil($order_total / $limit)
-        );
-
         $view_data = [
-            'orders'           => $orders,
             'order_statuses'   => $order_statuses,
             'filter_status_id' => $filter_order_status_id,
             'filter_search'    => $filter_search,
             'filter_date_start'=> $filter_date_start,
             'filter_date_end'  => $filter_date_end,
-            'pagination'       => $pagination_html,
-            'results'          => $results_text,
             'add_order'        => $this->url->link('bpos/home')
         ];
 
@@ -103,6 +44,73 @@ class ControllerBposOrder extends Controller {
         } else {
             $this->response->setOutput($this->load->view('bpos/layout', $data));
         }
+    }
+
+    public function datatable() {
+        $this->load->language('account/order');
+        $this->load->model('bpos/order');
+
+        $draw   = (int)$this->request->get['draw'] ?? 1;
+        $start  = (int)$this->request->get['start'] ?? 0;
+        $length = (int)$this->request->get['length'] ?? 10;
+
+        $search_value = $this->request->get['search']['value'] ?? '';
+        $order_column_index = $this->request->get['order'][0]['column'] ?? 0;
+        $order_dir = $this->request->get['order'][0]['dir'] ?? 'asc';
+
+        $columns = ['o.order_id','c.firstname','o.order_status_id','o.total','o.date_added','o.date_modified'];
+        $order_column = $columns[$order_column_index] ?? 'o.order_id';
+
+        $filter_data = [
+            'filter_customer'        => $search_value,
+            'filter_order_status_id' => $this->request->get['filter_status_id'] ?? '',
+            'filter_date_start'      => $this->request->get['filter_date_start'] ?? '',
+            'filter_date_end'        => $this->request->get['filter_date_end'] ?? '',
+            'start'                  => $start,
+            'limit'                  => $length,
+            'sort'                   => $order_column,
+            'order'                  => strtoupper($order_dir)
+        ];
+
+        $order_total   = $this->model_bpos_order->getTotalOrders($filter_data);
+        $order_results = $this->model_bpos_order->getOrders($filter_data);
+
+        $data = [];
+        foreach ($order_results as $result) {
+            $status_class = 'badge-soft badge-pending';
+
+            if ($result['order_status'] == 'Completed') $status_class = 'badge-soft badge-completed';
+            if ($result['order_status'] == 'Pending')   $status_class = 'badge-soft badge-pending';
+            if ($result['order_status'] == 'Processing')$status_class = 'badge-soft badge-delivering';
+            if ($result['order_status'] == 'Cancelled') $status_class = 'badge-soft badge-cancelled';
+
+            $data[] = [
+                '<input class="form-check-input row-check" type="checkbox" value="'.$result['order_id'].'">',
+                $result['order_id'],
+                '<div class="d-flex align-items-center gap-2"><span class="avatar">'.substr($result['firstname'],0,1).'</span> <div class="fw-semibold">'.$result['firstname'].' '.$result['lastname'].'</div></div>',
+                '<span class="'.$status_class.'">'.$result['order_status'].'</span>',
+                $this->currency->format($result['total'], $result['currency_code'], $result['currency_value']),
+                date($this->language->get('date_format_short'), strtotime($result['date_added'])),
+                ($result['date_modified'] > 0 ? date($this->language->get('date_format_short'), strtotime($result['date_modified'])) : '-'),
+                '<div class="dropdown text-end">
+                    <button class="btn btn-actions dropdown-toggle" data-bs-toggle="dropdown">Actions</button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                      <li><a class="dropdown-item" href="'.$this->url->link('bpos/invoice','order_id='.$result['order_id']).'">Invoice</a></li>
+                      <li><a class="dropdown-item" href="'.$this->url->link('bpos/order/view','order_id='.$result['order_id']).'">View</a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item text-danger" href="'.$this->url->link('bpos/order/delete','order_id='.$result['order_id']).'" onclick="return confirm(\'Delete this order?\')">Delete</a></li>
+                    </ul>
+                  </div>'
+            ];
+        }
+
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode([
+            'draw'            => $draw,
+            'recordsTotal'    => $order_total,
+            'recordsFiltered' => $order_total,
+            'data'            => $data
+        ]));
     }
 
     public function view() {
