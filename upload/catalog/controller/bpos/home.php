@@ -18,9 +18,11 @@ class ControllerBposHome extends Controller {
         if (!$this->user->isLogged()) {
             $this->response->redirect($this->url->link('bpos/login', '', true));
         }
+
         $this->load->model('catalog/category');
         $this->load->model('catalog/product');
         $this->load->model('tool/image');
+
         $data['logout'] = $this->url->link('bpos/login/logout', '', true);
         $data['total_cart'] = $this->cart->hasProducts();
         $data['categories'] = [];
@@ -57,6 +59,9 @@ class ControllerBposHome extends Controller {
         } else {
             $data['title'] = 'Home - POS System';
             $data['content'] = $this->load->view('bpos/home', $data);
+
+            $data['server'] = HTTPS_SERVER;
+
             $this->response->setOutput($this->load->view('bpos/layout', $data));
         }
     }
