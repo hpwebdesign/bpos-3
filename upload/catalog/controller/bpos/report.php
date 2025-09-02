@@ -40,7 +40,8 @@ class ControllerBposReport extends Controller {
                 ];
             }
         }
-
+        $data['language'] = $this->load->controller('bpos/language');
+        $data['currency'] = $this->load->controller('bpos/currency');
         $data['text_no_sales'] = $this->language->get('text_no_sales');
         $data['text_view']     = $this->language->get('text_view');
         $data['button_filter'] = $this->language->get('button_filter');

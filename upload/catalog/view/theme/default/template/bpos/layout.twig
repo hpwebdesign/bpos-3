@@ -41,6 +41,9 @@
                 </div>
 
                 <div class="head-actions d-flex align-items-center gap-2">
+                    {{ language }}
+                    {{ currency }}
+                    {{ store }}
                     <button class="icon-btn" title="Notifications">
                         <i class="bi bi-bell"></i>
                     </button>
@@ -63,6 +66,12 @@
                         <div class="setting bubble"><i class="bi bi-gear"></i></div>
                     </div>
                 </div>
+                <div id="loading-spinner" class="loading-spinner" style="display:none;">
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+                </div>
+
                 <div id="main-content" class="container-fluid py-0">{{ content|raw }}</div>
 
                 <!-- Mobile sidebar -->

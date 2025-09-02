@@ -126,6 +126,7 @@
     {% if sales %}
     var table = $('#reports-table').DataTable({
     pageLength: 10,
+    processing: true,
     // lengthChange: false,
     dom:
         "<'row'<'col-sm-12 d-flex justify-content-end'B>>" +
@@ -247,20 +248,24 @@
 
 
      });
-function loadFilter(route) {
-        $('#main-content').html('<p>Loading...</p>');
-        $.ajax({
-            url: 'index.php?route=' + route + '&format=json',
-            type: 'get',
-            dataType: 'json',
-            success: function(json) {
-                if (json['output']) $('#main-content').html(json['output']);
-            },
-            error: function() {
-                $('#main-content').html('<p>Error loading content</p>');
-            }
-        });
-    }
+  function loadFilter(route) {
+      $('#loading-spinner').show();
+      $.ajax({
+          url: 'index.php?route=' + route + '&format=json',
+          type: 'get',
+          dataType: 'json',
+          success: function(json) {
+              if (json['output']) $('#main-content').html(json['output']);
+              else $('#main-content').html('<p>No content</p>');
+              setTimeout(function() { 
+               $('#loading-spinner').hide();
+              }, 1000);
+          },
+          error: function() {
+              $('#main-content').html('<p>Error loading content</p>');
+          }
+      });
+  }
 $(document).on('click', '.btn-view', function () {
   var date = $(this).data('date');
 

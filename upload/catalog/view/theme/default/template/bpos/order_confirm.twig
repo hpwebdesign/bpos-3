@@ -3,8 +3,8 @@
         <div class="col-lg-8 d-flex align-items-center justify-content-between">
           
           <div class="d-flex justify-content-end gap-2">
-            <a href="#" class="btn btn-success btn-sm pay-now">Send WhatsApp</a>
-            <a href="#" class="btn btn-primary btn-sm pay-now">Print Receipt</a>
+            <a href="{{ link_wa }}" target="_blank" class="btn btn-success btn-sm pay-now">Send WhatsApp</a>
+            <a onclick="window.print();return false;" class="btn btn-primary btn-sm pay-now">Print Receipt</a>
           </div>
 
         </div>
@@ -127,7 +127,31 @@
       </div>
 
       <div class="row g-4 col-lg-5 align-items-center justify-content-center d-flex" style="margin: 0 auto;">
-        <a href="#" class="btn btn-primary btn-sm pay-now">Back to Cart</a>
+        <a onclick="home();" class="btn btn-primary btn-sm pay-now">Back to Cart</a>
       </div>
 
     </main>
+
+    <script>
+      function home() {
+        link_url('bpos/home');
+      }
+      function link_url(route) {
+        $('#loading-spinner').show();
+        $.ajax({
+            url: 'index.php?route=' + route + '&format=json',
+            type: 'get',
+            dataType: 'json',
+            success: function(json) {
+                if (json['output']) $('#main-content').html(json['output']);
+                else $('#main-content').html('<p>No content</p>');
+                setTimeout(function() { 
+                 $('#loading-spinner').hide();
+                }, 1000);
+            },
+            error: function() {
+                $('#main-content').html('<p>Error loading content</p>');
+            }
+        });
+    }
+    </script>

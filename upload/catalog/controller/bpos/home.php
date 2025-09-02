@@ -50,7 +50,9 @@ class ControllerBposHome extends Controller {
 
         $data['total_product'] = $total_product_all;
         $data['products'] = $this->getProductsList(0); // Semua produk
-
+        $data['language'] = $this->load->controller('bpos/language');
+        $data['currency'] = $this->load->controller('bpos/currency');
+        $data['store'] = $this->load->controller('bpos/store');
         $data['checkout'] = $this->load->controller('bpos/checkout');
 
         if (isset($this->request->get['format']) && $this->request->get['format'] == 'json') {

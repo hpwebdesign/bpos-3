@@ -53,10 +53,10 @@ $(document).ready(function() {
 
 
         $("body").busyLoad("show", {
-            spinner: "cube-grid",
+            spinner: "accordion",
             text: "Processing Order...",
             textPosition: "bottom",
-            background: "rgba(255,255,255,0.7)",
+            background: "rgba(144,238,144,0.7)", 
             animation: "fade"
         });
 
@@ -74,8 +74,8 @@ $(document).ready(function() {
 
                 if (json.success) {
                     console.log(json['order_id']);
-                    //loadContent('bpos/invoice&order_id='+ json['order_id']);
-                    window.location.href = 'index.php?route=bpos/order_confirm&order_id=' + json['order_id'];
+                    loadContent('bpos/order_confirm&order_id='+ json['order_id']);
+                    //window.location.href = 'index.php?route=bpos/order_confirm&order_id=' + json['order_id'];
                 }
             },
             error: function() {
@@ -346,13 +346,17 @@ $(document).ready(function() {
 
 
     function loadContent(route) {
-        $('#main-content').html('<p>Loading...</p>');
+        $('#loading-spinner').show();
         $.ajax({
             url: 'index.php?route=' + route + '&format=json',
             type: 'get',
             dataType: 'json',
             success: function(json) {
                 if (json['output']) $('#main-content').html(json['output']);
+                else $('#main-content').html('<p>No content</p>');
+                setTimeout(function() { 
+                 $('#loading-spinner').hide();
+                }, 1000);
             },
             error: function() {
                 $('#main-content').html('<p>Error loading content</p>');

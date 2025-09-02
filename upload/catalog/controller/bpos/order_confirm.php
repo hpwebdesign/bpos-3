@@ -31,10 +31,12 @@ class ControllerBposOrderConfirm extends Controller {
             'status'         => $order_info['order_status'],
             'payment_method' => $order_info['payment_method']
         );
-
+        $data['link_wa'] = "https://wa.me/".$this->config->get('bpos_country_code').$this->config->get('bpos_whatsapp_number');
         $data['products'] = $products;
         $data['totals']   = array();
-
+        $data['language'] = $this->load->controller('bpos/language');
+        $data['currency'] = $this->load->controller('bpos/currency');
+        $data['store'] = $this->load->controller('bpos/store');
         foreach ($totals as $total) {
             $data['totals'][] = array(
                 'tile' => $total['title'],

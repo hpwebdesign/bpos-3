@@ -34,6 +34,9 @@ class ControllerBposOrder extends Controller {
         ];
 
         $data['title']      = 'Orders - POS System';
+        $data['language'] = $this->load->controller('bpos/language');
+        $data['currency'] = $this->load->controller('bpos/currency');
+        $data['store'] = $this->load->controller('bpos/store');
         $data['logout']     = $this->url->link('bpos/login/logout', '', true);
         $data['total_cart'] = $this->cart->hasProducts();
         $data['content']    = $this->load->view('bpos/order', $view_data);

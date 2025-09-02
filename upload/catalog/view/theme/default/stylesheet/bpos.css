@@ -1787,3 +1787,41 @@ a.text-hover-primary:hover {
         display: none !important;
     }
 }
+.loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    position: fixed;
+    /* biar selalu di tengah viewport */
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    /* pastikan di atas elemen lain */
+}
+.loading-spinner .dot {
+    width: 12px;
+    height: 12px;
+    margin: 0 5px;
+    background: #007bff;
+    /* biru */
+    border-radius: 50%;
+    animation: bounce 0.6s infinite alternate;
+}
+.loading-spinner .dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+.loading-spinner .dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+@keyframes bounce {
+    from {
+        transform: translateY(0);
+        opacity: 0.6;
+    }
+    to {
+        transform: translateY(-10px);
+        opacity: 1;
+    }
+}

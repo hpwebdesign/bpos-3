@@ -11,7 +11,9 @@ class ControllerBposInvoice extends Controller {
         $order_id = (int)$this->request->get['order_id'];
         $this->load->model('checkout/order');
         $this->load->model('tool/image');
-
+        $data['language'] = $this->load->controller('bpos/language');
+        $data['currency'] = $this->load->controller('bpos/currency');
+        $data['store'] = $this->load->controller('bpos/store');
         $order_info = $this->model_checkout_order->getOrder($order_id);
 
         if ($order_info) {
