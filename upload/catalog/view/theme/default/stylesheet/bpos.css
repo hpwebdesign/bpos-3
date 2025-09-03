@@ -105,15 +105,15 @@ form, form input, form select, form textarea, .dropdown-menu {
     background-color: var(--bg);
 }
 .logo {
-    width: 30px;
-    height: 30px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #6aa8ff, #2a6cf6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-weight: 800;
+  height: 30px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #6aa8ff, #2a6cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 800;
+  padding: 0 10px;
 }
 .title {
     color: #fff;
@@ -1824,4 +1824,9 @@ a.text-hover-primary:hover {
         transform: translateY(-10px);
         opacity: 1;
     }
+}
+
+
+.order-line .flex-grow-1 {
+  max-width: calc(100% - 125px);
 }
