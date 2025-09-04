@@ -125,6 +125,7 @@ class ControllerBposCheckout extends Controller {
         $code = '';
 
         foreach ($results as $code) {
+            
             if ($this->config->get('shipping_' . $code . '_status')) {
                 $this->load->model('extension/shipping/' . $code);
 
@@ -153,8 +154,20 @@ class ControllerBposCheckout extends Controller {
 
         $data['shipping_methods'] = $shipping_data;
 
+        $default_shipping = $this->config->get('bpos_default_shipping_method'); 
+
         if (!empty($data['shipping_methods']) && !isset($this->session->data['shipping_method'])) {
-            $this->session->data['shipping_method'] = $data['shipping_methods'][$this->config->get('bpos_default_shipping_method')]['quote'][$this->config->get('bpos_default_shipping_method')];
+
+            if (isset($data['shipping_methods'][$default_shipping]['quote'][$default_shipping])) {
+                $this->session->data['shipping_method'] =
+                    $data['shipping_methods'][$default_shipping]['quote'][$default_shipping];
+            } else {
+                $first = reset($data['shipping_methods']);
+
+                if (!empty($first['quote'])) {
+                    $this->session->data['shipping_method'] = reset($first['quote']);
+                }
+            }
         }
 
         $data['default_shipping'] = !empty($this->session->data['shipping_method']['code']) ? $this->session->data['shipping_method']['code'] : $this->config->get('module_bpos_setting_default_shipping_method');
