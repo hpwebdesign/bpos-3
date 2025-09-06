@@ -56,7 +56,7 @@ $(document).ready(function() {
             spinner: "accordion",
             text: "Processing Order...",
             textPosition: "bottom",
-            background: "rgba(144,238,144,0.7)", 
+            background: "rgba(144,238,144,0.7)",
             animation: "fade"
         });
 
@@ -148,24 +148,24 @@ $(document).ready(function() {
 
     // Category
     $(document).on('click', '.categories .cat', function (e) {
-      e.preventDefault();
-      $('.categories .cat').removeClass('active');
-      $(this).addClass('active');
+        e.preventDefault();
+        $('.categories .cat').removeClass('active');
+        $(this).addClass('active');
 
-      const category_id = $(this).data('id');
-      $('#products-list').html('<div class="text-center py-5">Loading...</div>');
+        const category_id = $(this).data('id');
+        $('#products-list').html('<div class="text-center py-5">Loading...</div>');
 
-      $.ajax({
-        url: 'index.php?route=bpos/home/products&category_id=' + encodeURIComponent(category_id),
-        type: 'get',
-        dataType: 'html',
-        success: function (html) {
-          $('#products-list').html(html);
-        },
-        error: function () {
-          $('#products-list').html('<div class="text-center py-5">Error loading products</div>');
-        }
-      });
+        $.ajax({
+            url: 'index.php?route=bpos/home/products&category_id=' + encodeURIComponent(category_id),
+            type: 'get',
+            dataType: 'html',
+            success: function (html) {
+                $('#products-list').html(html);
+            },
+            error: function () {
+                $('#products-list').html('<div class="text-center py-5">Error loading products</div>');
+            }
+        });
     });
 
 
@@ -346,30 +346,42 @@ $(document).ready(function() {
 
 
     function loadContent(route) {
-         $("body").busyLoad("show", {
-            spinner: "accordion",
-            text: "",
-            textPosition: "bottom",
-            background: "rgba(144,238,144,0.7)", 
-            animation: "fade"
-        });
+        let busyTimer;
+
         $.ajax({
             url: 'index.php?route=' + route + '&format=json',
             type: 'get',
             dataType: 'json',
+            beforeSend: function() {
+                // set timer, if > 2 second show busyLoad
+                busyTimer = setTimeout(function() {
+                    $("body").busyLoad("show", {
+                        spinner: "circle-line",
+                        text: "",
+                        textPosition: "bottom",
+                        background: "rgba(0,0,0,0.3)",
+                        animation: "fade"
+                    });
+                }, 2000);
+            },
             success: function(json) {
-                if (json['output']) $('#main-content').html(json['output']);
-                else $('#main-content').html('<p>No content</p>');
-                setTimeout(function() { 
-                  $("body").busyLoad("hide");
-                }, 1000);
+                if (json['output']) {
+                    $('#main-content').html(json['output']);
+                } else {
+                    $('#main-content').html('<p>No content</p>');
+                }
             },
             error: function() {
-                 $("body").busyLoad("hide");
                 $('#main-content').html('<p>Error loading content</p>');
+            },
+            complete: function() {
+                // clear timer wathefer the result
+                clearTimeout(busyTimer);
+                $("body").busyLoad("hide");
             }
         });
     }
+
 
 
 });
