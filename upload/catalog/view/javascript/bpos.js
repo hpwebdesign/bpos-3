@@ -346,7 +346,13 @@ $(document).ready(function() {
 
 
     function loadContent(route) {
-        $('#loading-spinner').show();
+         $("body").busyLoad("show", {
+            spinner: "accordion",
+            text: "",
+            textPosition: "bottom",
+            background: "rgba(144,238,144,0.7)", 
+            animation: "fade"
+        });
         $.ajax({
             url: 'index.php?route=' + route + '&format=json',
             type: 'get',
@@ -355,10 +361,11 @@ $(document).ready(function() {
                 if (json['output']) $('#main-content').html(json['output']);
                 else $('#main-content').html('<p>No content</p>');
                 setTimeout(function() { 
-                 $('#loading-spinner').hide();
+                  $("body").busyLoad("hide");
                 }, 1000);
             },
             error: function() {
+                 $("body").busyLoad("hide");
                 $('#main-content').html('<p>Error loading content</p>');
             }
         });
