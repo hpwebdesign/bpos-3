@@ -6,14 +6,14 @@
 	<div class="row">
 		<div class="col-md-8 col-lg-9 order-0" id="product-categories">
 			<div class="categories d-flex gap-3 mb-4">
-				<div class="cat active" data-id="0">
+				<div class="cat {% if category_id == 0 %}active{% endif %}" data-id="0">
 					<div><i class="bi bi-egg-fried"></i></div>
 					<span class="name">All Categories</span>
 					<span class="meta">{{ total_product }} products</span>
 				</div>
 				{% if categories %}
 				{% for category in categories %}
-				<div class="cat" data-id="{{ category.id }}">
+				<div class="cat" {% if category_id == category.id %}active{% endif %} data-id="{{ category.id }}">
 					<div><i class="bi bi-egg"></i></div>
 					<span class="name">{{ category.name }}</span>
 					<span class="meta">{{ category.total_product }} products</span>
@@ -36,6 +36,11 @@
 				</div>
 				{% endfor %}
 			</div>
+			{% if pagination %}
+			 <div class="home-paginate" id="products_paginate">
+				  {{ pagination|raw }}
+				</div>
+			{% endif %}
 		</div>
 		{{ checkout }}
 

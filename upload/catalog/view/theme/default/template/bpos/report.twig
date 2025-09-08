@@ -249,17 +249,12 @@
 
      });
   function loadFilter(route) {
-     // $('#loading-spinner').show();
       $.ajax({
           url: 'index.php?route=' + route + '&format=json',
           type: 'get',
           dataType: 'json',
           success: function(json) {
               if (json['output']) $('#main-content').html(json['output']);
-              else $('#main-content').html('<p>No content</p>');
-             // setTimeout(function() { 
-             //  $('#loading-spinner').hide();
-             // }, 1000);
           },
           error: function() {
               $('#main-content').html('<p>Error loading content</p>');

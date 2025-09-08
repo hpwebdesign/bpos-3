@@ -67,8 +67,8 @@ class ControllerBposOrder extends Controller {
         $filter_data = [
             'filter_customer'        => $search_value,
             'filter_order_status_id' => $this->request->get['filter_status_id'] ?? '',
-            'filter_date_start'      => $this->request->get['filter_date_start'] ?? '',
-            'filter_date_end'        => $this->request->get['filter_date_end'] ?? '',
+            'filter_date_start'      => $this->request->get['filter_date_start'] ?? date('Y-m').'-01',
+            'filter_date_end'        => $this->request->get['filter_date_end'] ?? date('Y-m-d'),
             'start'                  => $start,
             'limit'                  => $length,
             'sort'                   => $order_column,

@@ -105,15 +105,15 @@ form, form input, form select, form textarea, .dropdown-menu {
     background-color: var(--bg);
 }
 .logo {
-  height: 30px;
-  border-radius: 4px;
-  background: linear-gradient(135deg, #6aa8ff, #2a6cf6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: 800;
-  padding: 0 10px;
+    height: 30px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #6aa8ff, #2a6cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 800;
+    padding: 0 10px;
 }
 .title {
     color: #fff;
@@ -1825,8 +1825,62 @@ a.text-hover-primary:hover {
         opacity: 1;
     }
 }
-
-
 .order-line .flex-grow-1 {
-  max-width: calc(100% - 125px);
+    max-width: calc(100% - 125px);
+}
+.home-paginate {
+    padding: 20px;
+}
+.home-paginate .pagination .active {
+    background: transparent;
+}
+.home-paginate .pagination {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+}
+/* item & link */
+
+.home-paginate .pagination>li>a, .home-paginate .pagination>li>span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    text-decoration: none;
+    line-height: 1;
+    padding: 0;
+    font-size: 14px;
+    color: #1a73e8;
+}
+.home-paginate .pagination>li>a:hover {
+    background: rgba(26, 115, 232, 0.12);
+}
+/* aktif & disabled */
+
+.home-paginate .pagination>li.active>a, .home-paginate .pagination>li.active>span {
+    background: #1a73e8;
+    color: #fff;
+}
+.home-paginate .pagination>li.disabled>a, .home-paginate .pagination>li.disabled>span {
+    color: #c7c7c7;
+    pointer-events: none;
+}
+/* opsional: bikin prev/next tampak icon */
+
+.home-paginate .pagination>li:first-child>a, .home-paginate .pagination>li:last-child>a {
+    font-size: 0;
+    /* sembunyikan teks bawaan (‹ › « ») */
+}
+.home-paginate .pagination>li:first-child>a::before {
+    content: "‹";
+    font-size: 18px;
+}
+.home-paginate .pagination>li:last-child>a::before {
+    content: "›";
+    font-size: 18px;
 }

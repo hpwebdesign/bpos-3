@@ -131,17 +131,12 @@ $(document).ready(function() {
                 dataType: 'html',
                 success: function(html) {
                     $('#products-list').html(html);
+                    $('#products_paginate').hide();
                 }
             });
         } else {
-            $.ajax({
-                url: 'index.php?route=bpos/home/loadProducts',
-                type: 'get',
-                dataType: 'html',
-                success: function(html) {
-                    $('#products-list').html(html);
-                }
-            });
+            loadPage('index.php?route=bpos/home');
+           
         }
     });
 
@@ -153,19 +148,20 @@ $(document).ready(function() {
         $(this).addClass('active');
 
         const category_id = $(this).data('id');
-        $('#products-list').html('<div class="text-center py-5">Loading...</div>');
+        loadPage('index.php?route=bpos/home&category_id='+category_id);
+        // $('#products-list').html('<div class="text-center py-5">Loading...</div>');
 
-        $.ajax({
-            url: 'index.php?route=bpos/home/products&category_id=' + encodeURIComponent(category_id),
-            type: 'get',
-            dataType: 'html',
-            success: function (html) {
-                $('#products-list').html(html);
-            },
-            error: function () {
-                $('#products-list').html('<div class="text-center py-5">Error loading products</div>');
-            }
-        });
+        // $.ajax({
+        //     url: 'index.php?route=bpos/home/products&category_id=' + encodeURIComponent(category_id),
+        //     type: 'get',
+        //     dataType: 'html',
+        //     success: function (html) {
+        //         $('#products-list').html(html);
+        //     },
+        //     error: function () {
+        //         $('#products-list').html('<div class="text-center py-5">Error loading products</div>');
+        //     }
+        // });
     });
 
 
@@ -344,8 +340,9 @@ $(document).ready(function() {
         });
     }
 
+});
 
-    function loadContent(route) {
+function loadContent(route) {
         let busyTimer;
 
         $.ajax({
@@ -380,8 +377,29 @@ $(document).ready(function() {
                 $("body").busyLoad("hide");
             }
         });
-    }
+}
 
-
-
-});
+function loadPage(route) {
+    $.ajax({
+        url: route + '&format=json',
+        type: 'get',
+        dataType: 'json',
+        beforeSend: function() {
+           
+        },
+        success: function(json) {
+            if (json.output) {
+                $('#main-content').html(json.output);
+              
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                $('#main-content').html('<p>No content</p>');
+            }
+        },
+        error: function() {
+            $('#main-content').html('<p>Error loading content</p>');
+        },
+        complete: function() {
+        }
+    });
+}

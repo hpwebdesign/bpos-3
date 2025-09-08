@@ -137,13 +137,6 @@
         link_url('bpos/home');
       }
       function link_url(route) {
-        $("body").busyLoad("show", {
-            spinner: "accordion",
-            text: "",
-            textPosition: "bottom",
-            background: "rgba(144,238,144,0.7)", 
-            animation: "fade"
-        });
         $.ajax({
             url: 'index.php?route=' + route + '&format=json',
             type: 'get',
@@ -151,12 +144,9 @@
             success: function(json) {
                 if (json['output']) $('#main-content').html(json['output']);
                 else $('#main-content').html('<p>No content</p>');
-                setTimeout(function() { 
-                  $("body").busyLoad("hide");
-                }, 1000);
+                
             },
             error: function() {
-                 $("body").busyLoad("hide");
                 $('#main-content').html('<p>Error loading content</p>');
             }
         });
