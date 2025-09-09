@@ -83,13 +83,23 @@
       <!-- Tombol -->
       <div class="action-row">
         <div class="mini-buttons">
-          <button type="button" class="mini-btn" data-action="customer">Customer</button>
-          <button type="button" class="mini-btn" data-action="discount">Discount</button>
-          <button type="button" class="mini-btn" data-action="charge">Charge</button>
-        </div>
+  <button type="button" data-action="customer" class="mini-btn">
+    <i class="bi bi-person" style="margin-right:6px;"></i>Customer
+  </button>
+  <button type="button" data-action="discount" class="mini-btn">
+    <i class="bi bi-tags-fill" style="margin-right:6px;"></i>Discount
+  </button>
+  <button type="button" data-action="charge" class="mini-btn">
+    <i class="bi bi-cash-coin" style="margin-right:6px;"></i>Charge
+  </button>
+  <button type="button" data-action="coupon" class="mini-btn">
+    <i class="bi bi-ticket-perforated" style="margin-right:6px;"></i>Coupon
+  </button>
+</div>
+
          <button class="print">{{ text_print_bill }}</button>
       </div>
-     
+
     </div>
   </div>
 </div>

@@ -354,7 +354,6 @@ form, form input, form select, form textarea, .dropdown-menu {
     white-space: nowrap;
 }
 .print {
-    margin-top: 14px;
     width: 100%;
     border: none;
     background: #1971ff;
@@ -1914,7 +1913,7 @@ a.text-hover-primary:hover {
 }
 .mini-btn:hover {
     background: var(--brand-500, #95a974);
-    color: #fff;
+    color: #2a6cf6;
 }
 /* Print button tetap lebih besar */
 
@@ -1929,4 +1928,54 @@ a.text-hover-primary:hover {
 }
 .print:hover {
     background: var(--brand-500, #95a974);
+}
+
+/* Checkout */
+.mini-buttons{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr); /* 2 kolom sama lebar */
+  gap:8px;
+}
+
+.mini-btn{
+  flex:1 1 0;
+  padding:8px 10px;
+  font-size:13px;
+  line-height:1.2;
+  border-radius:10px;
+  border:1px solid var(--ring, #e5e7eb);
+  color: var(--fg, #1f2937);
+  background-color: var(--mini-bg, var(--card-bg, #fff)) !important; /* override .btn */
+  transition: background-color .2s, box-shadow .2s, transform .08s;
+}
+
+.mini-btn{ width:100%; }
+
+.mini-btn:active{ transform: translateY(1px); }
+
+/* Palette (bisa taruh di :root kalau mau reuse) */
+.mini-btn[data-action="customer"]{ --mini-bg:#e8f4ff; }   /* sky-100 */
+.mini-btn[data-action="discount"]{ --mini-bg:#ecfdf5; }   /* green-50 */
+.mini-btn[data-action="charge"]  { --mini-bg:#fff7e0; }   /* amber-100 */
+.mini-btn[data-action="coupon"]  { --mini-bg:#fde8f3; }   /* pink-100 */
+
+/* Hover states per aksi (sedikit lebih gelap) */
+.mini-btn[data-action="customer"]:hover{ background-color:#dbeafe !important; }
+.mini-btn[data-action="discount"]:hover{ background-color:#d1fae5 !important; }
+.mini-btn[data-action="charge"]:hover  { background-color:#fde68a !important; }
+.mini-btn[data-action="coupon"]:hover  { background-color:#fbcfe8 !important; }
+
+/* Optional: fokus ring */
+.mini-btn:focus{
+  outline:0;
+  box-shadow:0 0 0 3px rgba(124,141,90,.2);
+}
+
+/* popup restyle */
+#swal2-html-container, .swal2-actions * {
+  font-size: 14px !important;
+}
+
+#swal2-title {
+  font-size: 20px !important;
 }
