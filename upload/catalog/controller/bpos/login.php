@@ -15,6 +15,7 @@ class ControllerBposLogin extends Controller {
     public function index() {
 
         $this->load->language('common/login');
+        $this->load->language('bpos/bpos');
         $data['error_warning'] = '';
 
         if ($this->request->server['REQUEST_METHOD'] == 'POST') {

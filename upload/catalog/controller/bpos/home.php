@@ -18,7 +18,7 @@ class ControllerBposHome extends Controller {
         if (!$this->user->isLogged()) {
             $this->response->redirect($this->url->link('bpos/login', '', true));
         }
-
+        $this->load->language('bpos/bpos');
         $this->load->model('catalog/category');
         $this->load->model('catalog/product');
         $this->load->model('tool/image');

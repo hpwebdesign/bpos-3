@@ -15,7 +15,7 @@ class ControllerBposOrder extends Controller {
     public function index() {
         $this->load->language('account/order');
         $this->load->model('bpos/order');
-
+        $this->load->language('bpos/bpos');
         $filter_search          = '';
         $filter_date_start      = date('Y-m').'-01';
         $filter_date_end        = date('Y-m-d');

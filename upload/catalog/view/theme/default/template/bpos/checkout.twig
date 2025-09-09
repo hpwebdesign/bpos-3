@@ -3,7 +3,7 @@
     <h3>Current Order</h3>
     <div class="d-flex justify-content-between text-muted mb-2">
       <span></span>
-      <a href="#" id="clear-cart" class="text-muted text-decoration-none">Clear All</a>
+      <a href="#" id="clear-cart" class="text-muted text-decoration-none">{{ text_clear_all }}</a>
     </div>
 
     {% if products %}
@@ -34,7 +34,7 @@
       </div>
     {% endfor %}
   {% else %}
-    <p class="text-muted">No items in cart</p>
+    <p class="text-muted">{{ text_empty_cart }}</p>
   {% endif %}
 
     <div class="summary">
@@ -80,8 +80,16 @@
       </div>
       <div class="payment-error-container"></div>
       {% endif %}
-
-      <button class="print">Print Bills</button>
+      <!-- Tombol -->
+      <div class="action-row">
+        <div class="mini-buttons">
+          <button type="button" class="mini-btn" data-action="customer">Customer</button>
+          <button type="button" class="mini-btn" data-action="discount">Discount</button>
+          <button type="button" class="mini-btn" data-action="charge">Charge</button>
+        </div>
+         <button class="print">{{ text_print_bill }}</button>
+      </div>
+     
     </div>
   </div>
 </div>

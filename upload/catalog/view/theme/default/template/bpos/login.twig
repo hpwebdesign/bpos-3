@@ -256,9 +256,9 @@
           <span class="brand-mark"></span>
         </div>
         <div class="welcome-copy mt-auto">
-          <h2 class="mb-2">Welcome to BPOS!</h2>
+          <h2 class="mb-2">{{ text_welcome }}</h2>
           <p class="mb-0">
-            Please sign in using your admin account to access the POS system.
+            {{ text_login_desc }}
           </p>
         </div>
       </div>
@@ -273,8 +273,8 @@
               <img src="{{ logo }}" alt="Logo" class="img-fluid mb-2">
             </div>
           {% endif %}
-          <h4 class="auth-title text-center mb-1">Sign In</h4>
-          <p class="text-center muted mb-4">Enter your username and password</p>
+          <h4 class="auth-title text-center mb-1">{{ text_signin }}</h4>
+          <p class="text-center muted mb-4">{{ text_signin_desc }}</p>
 
           {% if error_warning %}
             <div class="alert alert-danger">{{ error_warning }}</div>
@@ -289,7 +289,7 @@
             </div>
 
             <div class="d-flex align-items-center justify-content-between">
-              <button type="submit" class="btn btn-cta text-white">Sign In</button>
+              <button type="submit" class="btn btn-cta text-white">{{ text_signin }}</button>
             </div>
           </form>
 

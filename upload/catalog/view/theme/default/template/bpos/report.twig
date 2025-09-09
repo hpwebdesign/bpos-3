@@ -50,12 +50,12 @@
       <table id="reports-table" class="table align-middle table-hover">
         <thead>
           <tr>
-            <th>Date</th>
-            <th>No. Orders</th>
-            <th>Product Sold</th>
-            <th>Tax</th>
-            <th>Total</th>
-            <th>Action</th>
+            <th>{{ column_date }}</th>
+            <th>{{ column_no_orders }}</th>
+            <th>{{ column_product_sold }}</th>
+            <th>{{ column_tax }}</th>
+            <th>{{ column_total }}</th>
+            <th>{{ column_actions }}</th>
           </tr>
         </thead>
         <tbody>
@@ -166,9 +166,9 @@
             next: '<i class="next"></i>'
         },
         search: "",
-        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-        infoEmpty: "Tidak ada data",
-        zeroRecords: "Data tidak ditemukan"
+        info: "Displays _START_ to _END_ of _TOTAL_ data",
+        infoEmpty: "No Data",
+        zeroRecords: "Data not found"
     }
 });
 

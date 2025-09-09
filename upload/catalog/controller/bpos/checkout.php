@@ -2,6 +2,7 @@
 class ControllerBposCheckout extends Controller {
     public function index() {
         $this->load->language('checkout/cart');
+        $this->load->language('bpos/bpos');
         $this->load->model('tool/image');
 
         // Totals

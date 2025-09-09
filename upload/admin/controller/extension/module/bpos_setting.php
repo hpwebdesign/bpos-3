@@ -16,7 +16,7 @@ class ControllerExtensionModuleBposSetting extends Controller {
 
 		$this->language->load('extension/module/bpos_setting');
 
-		$this->rightman();
+		// $this->rightman();
 
 		if (!$this->validateTable()) {
 
@@ -51,6 +51,7 @@ class ControllerExtensionModuleBposSetting extends Controller {
 				$this->getData();
 			}
 		}
+		$this->getData();
 	}
 
 	public function installEvent() {

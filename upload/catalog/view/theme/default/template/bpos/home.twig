@@ -1,5 +1,5 @@
 <div class="sub-heading">
-	  <div class="page-title">Products</div>
+	  <div class="page-title">{{ text_products }}</div>
 	</div>
 
 <div id="home" class="content-wrapper">
@@ -9,14 +9,14 @@
 				<div class="cat {% if category_id == 0 %}active{% endif %}" data-id="0">
 					<div><i class="bi bi-egg-fried"></i></div>
 					<span class="name">All Categories</span>
-					<span class="meta">{{ total_product }} products</span>
+					<span class="meta">{{ total_product }} {{ text_products }}</span>
 				</div>
 				{% if categories %}
 				{% for category in categories %}
-				<div class="cat" {% if category_id == category.id %}active{% endif %} data-id="{{ category.id }}">
+				<div class="cat  {% if category_id == category.id %}active{% endif %}" data-id="{{ category.id }}">
 					<div><i class="bi bi-egg"></i></div>
 					<span class="name">{{ category.name }}</span>
-					<span class="meta">{{ category.total_product }} products</span>
+					<span class="meta">{{ category.total_product }} {{ text_products }}</span>
 				</div>
 				{% endfor %}
 				{% endif %}

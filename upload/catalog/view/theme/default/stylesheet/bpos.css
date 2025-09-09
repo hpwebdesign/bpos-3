@@ -137,7 +137,7 @@ form, form input, form select, form textarea, .dropdown-menu {
     color: #cdd3e2;
 }
 .icon-btn {
-    width: 34px;
+    width: auto;
     height: 34px;
     border-radius: 10px;
     background: rgba(255, 255, 255, .12);
@@ -1883,4 +1883,50 @@ a.text-hover-primary:hover {
 .home-paginate .pagination>li:last-child>a::before {
     content: "›";
     font-size: 18px;
+}
+/* Container untuk tombol */
+
+.action-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 300px;
+    /* sesuaikan dengan lebar container Anda */
+}
+/* Barisan tombol kecil */
+
+.mini-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+}
+/* Style tombol kecil */
+
+.mini-btn {
+    flex: 1;
+    padding: 6px 10px;
+    font-size: 13px;
+    border: 1px solid var(--ring, #ddd);
+    border-radius: 6px;
+    background: var(--card-bg, #f8f8f8);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.mini-btn:hover {
+    background: var(--brand-500, #95a974);
+    color: #fff;
+}
+/* Print button tetap lebih besar */
+
+.print {
+    padding: 10px 14px;
+    font-size: 15px;
+    border-radius: 8px;
+    background: var(--brand, #7c8d5a);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+.print:hover {
+    background: var(--brand-500, #95a974);
 }

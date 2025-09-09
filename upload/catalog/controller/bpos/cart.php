@@ -2,6 +2,7 @@
 class ControllerBposCart extends Controller {
     public function add() {
         $this->load->language('checkout/cart');
+        $this->load->language('bpos/bpos');
 
         $json = array();
 
@@ -149,5 +150,132 @@ class ControllerBposCart extends Controller {
 
         $this->response->addHeader('Content-Type: application/json');
         $this->response->setOutput(json_encode($json));
+    }
+
+    private function jsonHeader(){
+        $this->response->addHeader('Content-Type: application/json');
+    }
+
+    private function getSubtotal(){
+        // Use OpenCart cart API
+        if(isset($this->cart)&&method_exists($this->cart,'getSubTotal')){
+            return (float)$this->cart->getSubTotal();
+        }
+        // Fallback manual
+        $subtotal=0.0;
+        if(isset($this->cart)&&method_exists($this->cart,'getProducts')){
+            foreach($this->cart->getProducts() as $p){
+                $price=isset($p['price'])?(float)$p['price']:0.0;
+                $qty=isset($p['quantity'])?(int)$p['quantity']:1;
+                $subtotal+=($price*$qty);
+            }
+        }
+        return $subtotal;
+    }
+
+    private function readAdjustments(){
+        $disc=isset($this->session->data['bpos_discount'])?$this->session->data['bpos_discount']:array('percent'=>0,'fixed'=>0,'amount'=>0);
+        $chg=isset($this->session->data['bpos_charge'])?$this->session->data['bpos_charge']:array('percent'=>0,'fixed'=>0,'amount'=>0);
+        return array($disc,$chg);
+    }
+
+    private function calcTotals($subtotal,$disc,$chg){
+        $discount_amount=max(0.0, (float)$disc['amount']);
+        $charge_amount=max(0.0, (float)$chg['amount']);
+        $total=max(0.0, $subtotal - $discount_amount + $charge_amount);
+        return array($discount_amount,$charge_amount,$total);
+    }
+
+    // GET /index.php?route=bpos/cart/summary
+    // Returns: { subtotal, discount, charge, total }
+    public function summary(){
+        $this->jsonHeader();
+        $subtotal=$this->getSubtotal();
+        list($disc,$chg)=$this->readAdjustments();
+        list($discount_amount,$charge_amount,$total)=$this->calcTotals($subtotal,$disc,$chg);
+
+        $out=array(
+            'subtotal'=>round($subtotal),
+            'discount'=>array(
+                'percent'=>isset($disc['percent'])?(float)$disc['percent']:0,
+                'fixed'=>isset($disc['fixed'])?(float)$disc['fixed']:0,
+                'amount'=>round($discount_amount)
+            ),
+            'charge'=>array(
+                'percent'=>isset($chg['percent'])?(float)$chg['percent']:0,
+                'fixed'=>isset($chg['fixed'])?(float)$chg['fixed']:0,
+                'amount'=>round($charge_amount)
+            ),
+            'total'=>round($total)
+        );
+
+        $this->response->setOutput(json_encode($out));
+    }
+
+    // POST /index.php?route=bpos/cart/apply_discount
+    // Body: percent, fixed
+    // Returns: { ok:true, subtotal, applied:{percent,fixed,amount}, total }
+    public function apply_discount(){
+        $this->jsonHeader();
+        $percent=isset($this->request->post['percent'])?(float)$this->request->post['percent']:0.0;
+        $fixed=isset($this->request->post['fixed'])?(float)$this->request->post['fixed']:0.0;
+        if($percent<0||$fixed<0){
+            $this->response->setOutput(json_encode(array('error'=>'Values must be >= 0')));return;
+        }
+
+        $subtotal=$this->getSubtotal();
+        $from_pct=floor($subtotal*($percent/100.0));
+        $amount=$from_pct + $fixed;
+        if($amount>$subtotal){$amount=$subtotal;} // prevent negative totals
+
+        $this->session->data['bpos_discount']=array(
+            'percent'=>$percent,
+            'fixed'=>$fixed,
+            'amount'=>$amount
+        );
+
+        // Keep existing charge if any
+        $chg=isset($this->session->data['bpos_charge'])?$this->session->data['bpos_charge']:array('percent'=>0,'fixed'=>0,'amount'=>0);
+        $total=max(0.0, $subtotal - $amount + (float)$chg['amount']);
+
+        $this->response->setOutput(json_encode(array(
+            'ok'=>true,
+            'subtotal'=>round($subtotal),
+            'applied'=>array('percent'=>$percent,'fixed'=>$fixed,'amount'=>round($amount)),
+            'total'=>round($total)
+        )));
+    }
+
+    // POST /index.php?route=bpos/cart/apply_charge
+    // Body: percent, fixed
+    // Returns: { ok:true, subtotal, applied:{percent,fixed,amount}, total }
+    public function apply_charge(){
+        $this->jsonHeader();
+        $percent=isset($this->request->post['percent'])?(float)$this->request->post['percent']:0.0;
+        $fixed=isset($this->request->post['fixed'])?(float)$this->request->post['fixed']:0.0;
+        if($percent<0||$fixed<0){
+            $this->response->setOutput(json_encode(array('error'=>'Values must be >= 0')));return;
+        }
+
+        $subtotal=$this->getSubtotal();
+        $from_pct=floor($subtotal*($percent/100.0));
+        $amount=$from_pct + $fixed;
+
+        $this->session->data['bpos_charge']=array(
+            'percent'=>$percent,
+            'fixed'=>$fixed,
+            'amount'=>$amount
+        );
+
+        // Keep existing discount if any
+        $disc=isset($this->session->data['bpos_discount'])?$this->session->data['bpos_discount']:array('percent'=>0,'fixed'=>0,'amount'=>0);
+        $total=max(0.0, $subtotal - (float)$disc['amount'] + $amount);
+
+        $this->response->setOutput(json_encode(array(
+            'ok'=>true,
+            'subtotal'=>round($subtotal),
+            'applied'=>array('percent'=>$percent,'fixed'=>$fixed,'amount'=>round($amount)),
+            'total'=>round($total)
+        )));
     }
 }

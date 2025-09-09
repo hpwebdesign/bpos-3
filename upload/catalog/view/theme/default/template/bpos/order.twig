@@ -6,10 +6,10 @@
   <div class="panel p-3 p-md-6">
   <div class="col-6 col-md-12 col-lg-3 ms-lg-auto text-lg-end">
         <a href="{{ add_order }}" class="btn btn-primary rounded-3">
-          <i class="bi bi-plus-lg me-1"></i> Add Order
+          <i class="bi bi-plus-lg me-1"></i> {{ button_add_order }}
         </a>
         <button type="button" id="delete-selected" class="btn btn-danger rounded-3">
-         <i class="bi bi-trash"></i> Delete
+         <i class="bi bi-trash"></i> {{ button_delete }}
       </button>
       </div>
 
@@ -72,13 +72,13 @@
           <thead>
             <tr>
               <th style="width:40px;"><input class="form-check-input" type="checkbox" id="checkAll"></th>
-              <th>Order ID</th>
-              <th>Customer</th>
-              <th>Status</th>
-              <th>Total</th>
-              <th>Date Added</th>
-              <th>Date Modified</th>
-              <th class="text-end">Actions</th>
+              <th>{{ column_order_id }}</th>
+              <th>{{ column_customer }}</th>
+              <th>{{ column_status }}</th>
+              <th>{{ column_total }}</th>
+              <th>{{ column_date_added }}</th>
+              <th>{{ column_date_modified }}</th>
+              <th class="text-end">{{ column_actions }}</th>
             </tr>
           </thead>
         </table>
@@ -196,9 +196,9 @@ $(document).ready(function () {
             next: '<i class="next"></i>'
         },
         search: "",
-        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-        infoEmpty: "Tidak ada data",
-        zeroRecords: "Data tidak ditemukan"
+        info: "Displays _START_ to _END_ of _TOTAL_ data",
+        infoEmpty: "No Data",
+        zeroRecords: "Data not found"
     }
     });
 

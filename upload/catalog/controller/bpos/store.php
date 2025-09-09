@@ -19,7 +19,7 @@ class ControllerBposStore extends Controller {
                 'url'      => $result['url'].'index.php?route=bpos/home'
             );
         }
-
+        $data['store_name'] = $this->config->get('config_name');
         $data['store_id'] = $this->config->get('config_store_id');
 
         return $this->load->view('bpos/store', $data);

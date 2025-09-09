@@ -196,16 +196,38 @@ $(document).ready(function() {
 
     // Clear cart
     $(document).on('click', '#clear-cart', function(e) {
-        e.preventDefault();
-        $.ajax({
-            url: 'index.php?route=bpos/cart/clear',
-            type: 'post',
-            dataType: 'json',
-            success: function(json) {
-                updateCheckoutPanel();
-            }
-        });
+    e.preventDefault();
+
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "Cart will be empty!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'No'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: 'index.php?route=bpos/cart/clear',
+                type: 'post',
+                dataType: 'json',
+                success: function(json) {
+                    updateCheckoutPanel();
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed',
+                        text: 'An error occurred while emptying the cart.'
+                    });
+                }
+            });
+        }
     });
+});
+
     // Add to Cart
 
     // $(document).on('click', '.product-item', function() {
@@ -390,8 +412,8 @@ function loadPage(route) {
         success: function(json) {
             if (json.output) {
                 $('#main-content').html(json.output);
-              
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                 $('html, body').animate({ scrollTop: 0 }, 'smooth');
+                // window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
                 $('#main-content').html('<p>No content</p>');
             }
@@ -403,3 +425,329 @@ function loadPage(route) {
         }
     });
 }
+
+/* =========================
+   CONFIG ENDPOINTS
+   ========================= */
+var API = {
+  customers_list:   'index.php?route=bpos/customer/list',       // GET
+  customers_create: 'index.php?route=bpos/customer/create',     // POST {name}
+  customers_edit:   'index.php?route=bpos/customer/edit',       // POST {id, name}
+  cart_summary:     'index.php?route=bpos/cart/summary',        // GET -> { subtotal: 125000 }
+  apply_discount:   'index.php?route=bpos/cart/apply_discount', // POST {percent, fixed}
+  apply_charge:     'index.php?route=bpos/cart/apply_charge'    // POST {percent, fixed}
+};
+
+/* =========================
+   UTILITIES
+   ========================= */
+var CUSTOMER_LIST = []; // akan diisi dari AJAX
+
+function formatIDR(n){
+  var num = Number(n||0);
+  return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(num);
+}
+function toNumber(v){
+  if (v === '' || v == null) return 0;
+  var n = Number(v);
+  return isNaN(n) ? 0 : n;
+}
+function debounce(fn, wait){
+  var t; return function(){ clearTimeout(t); var args=arguments, ctx=this; t=setTimeout(function(){fn.apply(ctx,args);}, wait||200); };
+}
+
+/* =========================
+   AJAX HELPERS
+   ========================= */
+function ajaxLoadCustomers(){
+  return $.getJSON(API.customers_list).then(function(res){
+    // Expect res.customers = [{id:'C001', name:'Walk-in'}, ...]
+    CUSTOMER_LIST = (res && res.customers) ? res.customers : [];
+    return CUSTOMER_LIST;
+  });
+}
+function ajaxCreateCustomer(payload){
+  return $.post(API.customers_create, payload, null, 'json');
+}
+function ajaxEditCustomer(payload){
+  return $.post(API.customers_edit, payload, null, 'json');
+}
+function fetchCartSummary(){
+  return $.getJSON(API.cart_summary).then(function(res){
+    return (res && typeof res.subtotal !== 'undefined') ? Number(res.subtotal) : 0;
+  });
+}
+function applyDiscount(payload){ // {percent,fixed}
+  return $.post(API.apply_discount, payload, null, 'json');
+}
+function applyCharge(payload){ // {percent,fixed}
+  return $.post(API.apply_charge, payload, null, 'json');
+}
+
+/* =========================
+   HTML BUILDERS
+   ========================= */
+function buildCustomerHTML(){
+  var opts = CUSTOMER_LIST.map(function(c){return '<option value="'+c.id+'">'+c.name+'</option>';}).join('');
+  return ''+
+  '<div class="swal-form">'+
+    '<label style="display:block;margin-bottom:6px;">Select customer</label>'+
+    '<select id="swal_customer_select" class="form-control" style="margin-bottom:10px;">'+opts+'</select>'+
+    '<div class="btn-group" style="width:100%;gap:6px;display:flex;">'+
+      '<button type="button" class="btn btn-default" id="swal_add_customer" style="flex:1;">Add</button>'+
+      '<button type="button" class="btn btn-default" id="swal_edit_customer" style="flex:1;">Edit</button>'+
+    '</div>'+
+  '</div>';
+}
+function buildDiscountHTML(){
+  return ''+
+  '<div class="swal-form">'+
+    '<div class="form-group" style="margin-bottom:10px;">'+
+      '<label>% Discount</label>'+
+      '<input type="number" min="0" step="0.01" id="swal_discount_pct" class="form-control" placeholder="e.g. 10">'+
+    '</div>'+
+    '<div class="form-group">'+
+      '<label>Fixed Discount (Rupiah)</label>'+
+      '<input type="number" min="0" step="1" id="swal_discount_fix" class="form-control" placeholder="e.g. 25000">'+
+    '</div>'+
+    '<div id="swal_discount_preview" style="margin-top:8px;padding:8px;border:1px dashed #e5e7eb;border-radius:8px;font-size:12px;line-height:1.4;">'+
+      '<div><strong>Subtotal:</strong> <span data-subtotal>-</span></div>'+
+      '<div><strong>Dari %:</strong> <span data-from-pct>-</span></div>'+
+      '<div><strong>Dari fixed:</strong> <span data-from-fix>-</span></div>'+
+      '<div><strong>Total diskon:</strong> <span data-total-disc>-</span></div>'+
+      '<div><strong>New total:</strong> <span data-new-total>-</span></div>'+
+    '</div>'+
+    '<p style="font-size:12px;color:#6b7280;margin-top:6px;">Boleh isi salah satu atau keduanya.</p>'+
+  '</div>';
+}
+function buildChargeHTML(){
+  return ''+
+  '<div class="swal-form">'+
+    '<div class="form-group" style="margin-bottom:10px;">'+
+      '<label>% Charge</label>'+
+      '<input type="number" min="0" step="0.01" id="swal_charge_pct" class="form-control" placeholder="e.g. 5">'+
+    '</div>'+
+    '<div class="form-group">'+
+      '<label>Fixed Charge (Rupiah)</label>'+
+      '<input type="number" min="0" step="1" id="swal_charge_fix" class="form-control" placeholder="e.g. 5000">'+
+    '</div>'+
+    '<div id="swal_charge_preview" style="margin-top:8px;padding:8px;border:1px dashed #e5e7eb;border-radius:8px;font-size:12px;line-height:1.4;">'+
+      '<div><strong>Subtotal:</strong> <span data-subtotal>-</span></div>'+
+      '<div><strong>Dari %:</strong> <span data-from-pct>-</span></div>'+
+      '<div><strong>Dari fixed:</strong> <span data-from-fix>-</span></div>'+
+      '<div><strong>Total charge:</strong> <span data-total-charge>-</span></div>'+
+      '<div><strong>New total:</strong> <span data-new-total>-</span></div>'+
+    '</div>'+
+    '<p style="font-size:12px;color:#6b7280;margin-top:6px;">Boleh isi salah satu atau keduanya.</p>'+
+  '</div>';
+}
+
+/* =========================
+   CUSTOMER EDITOR (Add/Edit)
+   ========================= */
+function openCustomerEditor(mode, current){
+  var title = (mode === 'add') ? 'Add Customer' : 'Edit Customer';
+  var nameVal = current && current.name ? current.name : '';
+  var idVal = current && current.id ? current.id : '';
+  return Swal.fire({
+    title: title,
+    html:
+      '<div class="swal-form">'+
+        (mode === 'edit'
+          ? '<div class="form-group"><label>Customer ID</label><input id="swal_cust_id" class="form-control" value="'+(idVal||'')+'" disabled></div>'
+          : '')+
+        '<div class="form-group"><label>Name</label><input id="swal_cust_name" class="form-control" value="'+(nameVal||'')+'" placeholder="Full Name"></div>'+
+      '</div>',
+    showCancelButton: true,
+    confirmButtonText: (mode === 'add') ? 'Create' : 'Save',
+    focusConfirm: false,
+    preConfirm: function(){
+      var name = $('#swal_cust_name').val().trim();
+      if (!name) { Swal.showValidationMessage('Name is required'); return false; }
+      if (mode === 'add') {
+        return ajaxCreateCustomer({name:name}).then(function(res){
+          // harapkan res.customer: {id, name}
+          if (!res || !res.customer) throw new Error('Create failed');
+          return {mode:'add', id:res.customer.id, name:res.customer.name};
+        }).catch(function(err){
+          Swal.showValidationMessage(err.message || 'Create customer failed');
+          return false;
+        });
+      } else {
+        return ajaxEditCustomer({id:idVal, name:name}).then(function(res){
+          // harapkan res.customer: {id, name}
+          if (!res || !res.customer) throw new Error('Edit failed');
+          return {mode:'edit', id:res.customer.id, name:res.customer.name};
+        }).catch(function(err){
+          Swal.showValidationMessage(err.message || 'Edit customer failed');
+          return false;
+        });
+      }
+    }
+  });
+}
+
+/* =========================
+   GENERIC SWAL
+   ========================= */
+function openSwal(type, onSubmit){
+  var cfg;
+  if (type === 'customer') {
+    cfg = {
+      title: 'Customer',
+      html: '<div style="text-align:center;padding:14px 0;">Loading...</div>',
+      willOpen: function(){ Swal.showLoading(); },
+      didOpen: function(){
+        // Load customers via AJAX, rebuild HTML, then re-bind
+        ajaxLoadCustomers().then(function(){
+          Swal.update({ html: buildCustomerHTML(), didOpen: bindCustomerButtons });
+        }).catch(function(){
+          Swal.update({ html: '<p style="color:#ef4444;">Failed to load customers</p>' });
+        });
+      },
+      preConfirm: function(){
+        var id = $('#swal_customer_select').val();
+        if (!id) { Swal.showValidationMessage('Please select a customer'); return false; }
+        var found = CUSTOMER_LIST.find(function(c){return c.id === id;});
+        return {type:'customer', customer: found || {id:id, name:'Unknown'}};
+      }
+    };
+  }
+  if (type === 'discount' || type === 'charge') {
+    var isDiscount = (type === 'discount');
+    cfg = {
+      title: isDiscount ? 'Add Discount' : 'Add Charge',
+      html: isDiscount ? buildDiscountHTML() : buildChargeHTML(),
+      willOpen: function(){ Swal.showLoading(); },
+      didOpen: function(){
+        // Ambil subtotal lalu isi preview
+        fetchCartSummary().then(function(subtotal){
+          var wrap = isDiscount ? '#swal_discount_preview' : '#swal_charge_preview';
+          var $wrap = $(wrap);
+          $wrap.find('[data-subtotal]').text(formatIDR(subtotal));
+          // bind input & calc
+          var recalc = debounce(function(){
+            var pct = toNumber($(isDiscount ? '#swal_discount_pct' : '#swal_charge_pct').val());
+            var fix = toNumber($(isDiscount ? '#swal_discount_fix' : '#swal_charge_fix').val());
+            var fromPct = Math.floor(subtotal * (pct/100));
+            var fromFix = fix;
+            var delta = fromPct + fromFix; // diskon: kurangi; charge: tambahkan
+            var newTotal = isDiscount ? Math.max(0, subtotal - delta) : subtotal + delta;
+            $wrap.find('[data-from-pct]').text(formatIDR(fromPct));
+            $wrap.find('[data-from-fix]').text(formatIDR(fromFix));
+            $wrap.find(isDiscount ? '[data-total-disc]' : '[data-total-charge]').text(formatIDR(delta));
+            $wrap.find('[data-new-total]').text(formatIDR(newTotal));
+          }, 120);
+          $(document).on('input', isDiscount ? '#swal_discount_pct,#swal_discount_fix' : '#swal_charge_pct,#swal_charge_fix', recalc);
+          recalc(); // initial
+          Swal.hideLoading();
+        }).catch(function(){
+          Swal.update({ footer: '<small style="color:#ef4444;">Failed to load subtotal</small>' });
+          Swal.hideLoading();
+        });
+      },
+      preConfirm: function(){
+        var pct = toNumber($(isDiscount ? '#swal_discount_pct' : '#swal_charge_pct').val());
+        var fix = toNumber($(isDiscount ? '#swal_discount_fix' : '#swal_charge_fix').val());
+        if (pct <= 0 && fix <= 0) { Swal.showValidationMessage('Isi minimal salah satu: % atau fixed'); return false; }
+        if (pct < 0 || fix < 0) { Swal.showValidationMessage('Nilai tidak boleh negatif'); return false; }
+        return {type, percent:pct, fixed:fix};
+      }
+    };
+  }
+
+  Swal.fire({
+    title: cfg.title,
+    html: cfg.html,
+    showCancelButton: true,
+    confirmButtonText: 'Apply',
+    focusConfirm: false,
+    willOpen: cfg.willOpen || null,
+    didOpen: cfg.didOpen || null,
+    preConfirm: cfg.preConfirm
+  }).then(function(result){
+    if (result.isConfirmed){
+      // Auto-apply ke server (untuk discount/charge)
+      if (result.value && result.value.type === 'discount'){
+        Swal.showLoading();
+        applyDiscount({percent: result.value.percent, fixed: result.value.fixed})
+          .then(function(res){
+            if (typeof onSubmit === 'function') onSubmit({ok:true, type:'discount', server:res});
+            Swal.fire('Applied','Discount applied','success');
+          })
+          .catch(function(err){
+            Swal.fire('Error', (err && err.message) || 'Failed to apply discount', 'error');
+          });
+      } else if (result.value && result.value.type === 'charge'){
+        Swal.showLoading();
+        applyCharge({percent: result.value.percent, fixed: result.value.fixed})
+          .then(function(res){
+            if (typeof onSubmit === 'function') onSubmit({ok:true, type:'charge', server:res});
+            Swal.fire('Applied','Charge applied','success');
+          })
+          .catch(function(err){
+            Swal.fire('Error', (err && err.message) || 'Failed to apply charge', 'error');
+          });
+      } else {
+        // customer
+        if (typeof onSubmit === 'function') onSubmit(result.value);
+      }
+    }
+  });
+
+  // Helper bind untuk tombol add/edit customer
+  function bindCustomerButtons(){
+    $('#swal_add_customer').on('click', function(){
+      openCustomerEditor('add').then(function(r){
+        if (r.isConfirmed && r.value){
+          // refresh list dari server supaya konsisten
+          ajaxLoadCustomers().then(function(){
+            // rebuild select
+            var html = buildCustomerHTML();
+            Swal.update({html: html, didOpen: bindCustomerButtons});
+            // set value ke customer baru
+            setTimeout(function(){
+              $('#swal_customer_select').val(r.value.id);
+            }, 0);
+          });
+        }
+      });
+    });
+    $('#swal_edit_customer').on('click', function(){
+      var id = $('#swal_customer_select').val();
+      if (!id) return;
+      var cur = CUSTOMER_LIST.find(function(c){return c.id === id;});
+      openCustomerEditor('edit', cur).then(function(r){
+        if (r.isConfirmed && r.value){
+          // refresh list lalu pilih yang diedit
+          ajaxLoadCustomers().then(function(){
+            var html = buildCustomerHTML();
+            Swal.update({html: html, didOpen: bindCustomerButtons});
+            setTimeout(function(){ $('#swal_customer_select').val(r.value.id); }, 0);
+          });
+        }
+      });
+    });
+  }
+}
+
+/* =========================
+   BUTTON BINDINGS
+   ========================= */
+$(document).on('click', '.mini-btn[data-action="customer"]', function(){
+  openSwal('customer', function(payload){
+    // TODO: simpan pilihan customer ke cart state-mu
+    console.log('Selected customer:', payload);
+  });
+});
+$(document).on('click', '.mini-btn[data-action="discount"]', function(){
+  openSwal('discount', function(payload){
+    // response server tersedia di payload.server
+    console.log('Discount applied:', payload);
+  });
+});
+$(document).on('click', '.mini-btn[data-action="charge"]', function(){
+  openSwal('charge', function(payload){
+    console.log('Charge applied:', payload);
+  });
+});
