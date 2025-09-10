@@ -12,6 +12,7 @@
     --line: #e7ebf2;
     /* borders */
     --brand: #2a6cf6;
+    --brand-darker: #0a57f7;
     /* primary */
     --good: #12bf55;
     /* success */
@@ -1883,17 +1884,14 @@ a.text-hover-primary:hover {
     content: "›";
     font-size: 18px;
 }
-/* Container untuk tombol */
 
+/* Container for buttons */
 .action-row {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-width: 300px;
-    /* sesuaikan dengan lebar container Anda */
+  display: flex;
+  gap: 5px;
 }
-/* Barisan tombol kecil */
 
+/* mini buttons */
 .mini-buttons {
     display: flex;
     justify-content: space-between;
@@ -1912,29 +1910,29 @@ a.text-hover-primary:hover {
     transition: background 0.2s;
 }
 .mini-btn:hover {
-    background: var(--brand-500, #95a974);
+    background: var(--brand-darker);
     color: #2a6cf6;
 }
-/* Print button tetap lebih besar */
 
+/* Print */
 .print {
     padding: 10px 14px;
     font-size: 15px;
     border-radius: 8px;
-    background: var(--brand, #7c8d5a);
+    background: var(--brand, --brand-darker);
     color: #fff;
     border: none;
     cursor: pointer;
 }
 .print:hover {
-    background: var(--brand-500, #95a974);
+    background: var(--brand-darker);
 }
 
 /* Checkout */
 .mini-buttons{
   display:grid;
   grid-template-columns:repeat(2, 1fr); /* 2 kolom sama lebar */
-  gap:8px;
+  gap:5px;
 }
 
 .mini-btn{
@@ -1953,19 +1951,16 @@ a.text-hover-primary:hover {
 
 .mini-btn:active{ transform: translateY(1px); }
 
-/* Palette (bisa taruh di :root kalau mau reuse) */
 .mini-btn[data-action="customer"]{ --mini-bg:#e8f4ff; }   /* sky-100 */
 .mini-btn[data-action="discount"]{ --mini-bg:#ecfdf5; }   /* green-50 */
 .mini-btn[data-action="charge"]  { --mini-bg:#fff7e0; }   /* amber-100 */
 .mini-btn[data-action="coupon"]  { --mini-bg:#fde8f3; }   /* pink-100 */
 
-/* Hover states per aksi (sedikit lebih gelap) */
 .mini-btn[data-action="customer"]:hover{ background-color:#dbeafe !important; }
 .mini-btn[data-action="discount"]:hover{ background-color:#d1fae5 !important; }
 .mini-btn[data-action="charge"]:hover  { background-color:#fde68a !important; }
 .mini-btn[data-action="coupon"]:hover  { background-color:#fbcfe8 !important; }
 
-/* Optional: fokus ring */
 .mini-btn:focus{
   outline:0;
   box-shadow:0 0 0 3px rgba(124,141,90,.2);
