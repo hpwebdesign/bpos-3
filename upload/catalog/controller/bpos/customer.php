@@ -50,7 +50,7 @@ class ControllerBposCustomer extends Controller {
         $salt='';
         // OpenCart >= 3.0 uses `salt`? In modern OC password hashed via password_hash in core; we rely on set to empty and update via model if needed.
         $this->db->query("INSERT INTO `".DB_PREFIX."customer`
-            SET customer_group_id='1',
+            SET customer_group_id='".$this->config->get('config_customer_group_id')."',
                 store_id='0',
                 firstname='".$this->db->escape($firstname)."',
                 lastname='".$this->db->escape($lastname)."',
@@ -62,7 +62,6 @@ class ControllerBposCustomer extends Controller {
                 address_id='0',
                 ip='".$this->db->escape($this->request->server['REMOTE_ADDR'])."',
                 status='1',
-                approved='1',
                 safe='0',
                 token='',
                 code='',
@@ -97,5 +96,57 @@ class ControllerBposCustomer extends Controller {
             WHERE customer_id='".(int)$id."'");
 
         $this->response->setOutput(json_encode(array('customer'=>array('id'=>$id,'name'=>$name))));
+    }
+
+    // POST /index.php?route=bpos/customer/login
+    // Body: id
+    // Returns: { ok:true, customer:{id,name} }
+    public function login(){
+        $this->jsonHeader();
+        $id = isset($this->request->post['id']) ? (int)$this->request->post['id'] : 0;
+        if ($id <= 0) { $this->response->setOutput(json_encode(array('error'=>'Invalid id'))); return; }
+
+        $q = $this->db->query("SELECT customer_id, firstname, lastname, email, status FROM `".DB_PREFIX."customer` WHERE customer_id='".(int)$id."' LIMIT 1");
+        if (!$q->num_rows) { $this->response->setOutput(json_encode(array('error'=>'Customer not found'))); return; }
+
+        $row = $q->row;
+        if (!isset($row['status']) || (int)$row['status'] !== 1) {
+            $this->response->setOutput(json_encode(array('error'=>'Customer is not active/approved')));
+            return;
+        }
+        $name = trim($row['firstname'].' '.$row['lastname']);
+        if ($name==='') { $name='(No Name)'; }
+
+        // Login customer with override (no password required)
+        // Ensure clean previous customer session
+        if ($this->customer->isLogged() && (int)$this->customer->getId() !== (int)$id) {
+            $this->customer->logout();
+        }
+
+        $ok = false;
+        if (!empty($row['email'])) {
+            $ok = $this->customer->login($row['email'], '', true);
+        }
+        // Fallback: force session customer_id then re-init library
+        if (!$ok) {
+            $this->session->data['customer_id'] = (int)$row['customer_id'];
+            try {
+                $this->customer = new Cart\Customer($this->registry);
+                $ok = $this->customer->isLogged();
+            } catch (\Exception $e) {
+                $ok = false;
+            }
+        }
+        if (!$ok) { $this->response->setOutput(json_encode(array('error'=>'Failed to login customer'))); return; }
+
+        // Reset cached methods so totals/payment can refresh correctly
+        unset($this->session->data['payment_method']);
+        unset($this->session->data['payment_methods']);
+        unset($this->session->data['shipping_method']);
+        unset($this->session->data['shipping_methods']);
+        unset($this->session->data['payment_address']);
+        unset($this->session->data['shipping_address']);
+
+        $this->response->setOutput(json_encode(array('ok'=>true,'customer'=>array('id'=>$id,'name'=>$name))));
     }
 }

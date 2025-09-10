@@ -158,7 +158,7 @@ class ControllerBposCart extends Controller {
 
     private function getSubtotal(){
         // Use OpenCart cart API
-        if(isset($this->cart)&&method_exists($this->cart,'getSubTotal')){
+        if ($this->cart->getSubTotal()){
             return (float)$this->cart->getSubTotal();
         }
         // Fallback manual
@@ -277,5 +277,64 @@ class ControllerBposCart extends Controller {
             'applied'=>array('percent'=>$percent,'fixed'=>$fixed,'amount'=>round($amount)),
             'total'=>round($total)
         )));
+    }
+
+    // GET /index.php?route=bpos/cart/coupons
+    // Returns: { coupons: [ {code,name,discount,type,date_end,total_min} ] }
+    public function coupons(){
+        $this->jsonHeader();
+        $now = date('Y-m-d');
+        $rows = $this->db->query("SELECT code, name, discount, type, date_end, total FROM `".DB_PREFIX."coupon` WHERE status='1' AND (date_start = '0000-00-00' OR date_start <= '".$this->db->escape($now)."') AND (date_end = '0000-00-00' OR date_end >= '".$this->db->escape($now)."') ORDER BY date_end ASC LIMIT 200");
+        $list = array();
+        foreach ($rows->rows as $r){
+            $list[] = array(
+                'code'      => $r['code'],
+                'name'      => $r['name'],
+                'discount'  => (float)$r['discount'],
+                'type'      => $r['type'], // 'P' or 'F'
+                'date_end'  => $r['date_end'],
+                'total_min' => (float)$r['total']
+            );
+        }
+        $this->response->setOutput(json_encode(array('coupons'=>$list)));
+    }
+
+    // POST /index.php?route=bpos/cart/apply_coupon
+    // Body: code
+    // Behavior: validate via default OC coupon model, then set session
+    public function apply_coupon(){
+        $this->jsonHeader();
+        $code = isset($this->request->post['code']) ? trim($this->request->post['code']) : '';
+        if ($code===''){ $this->response->setOutput(json_encode(array('error'=>'Coupon code is required'))); return; }
+
+        // Try to validate using native model if available
+        $valid = false; $info = null;
+        try {
+            $this->load->model('extension/total/coupon');
+            if (isset($this->model_extension_total_coupon) && method_exists($this->model_extension_total_coupon,'getCoupon')){
+                $info = $this->model_extension_total_coupon->getCoupon($code);
+                if ($info) { $valid = true; }
+            }
+        } catch (\Exception $e) {
+            // ignore
+        }
+
+        if (!$valid){
+            // Fallback validate by basic DB check
+            $now = date('Y-m-d');
+            $q = $this->db->query("SELECT * FROM `".DB_PREFIX."coupon` WHERE code='".$this->db->escape($code)."' AND status='1' AND (date_start='0000-00-00' OR date_start <= '".$this->db->escape($now)."') AND (date_end='0000-00-00' OR date_end >= '".$this->db->escape($now)."') LIMIT 1");
+            if ($q->num_rows){ $valid = true; $info = $q->row; }
+        }
+
+        if (!$valid){ $this->response->setOutput(json_encode(array('error'=>'Invalid or expired coupon'))); return; }
+
+        // Set session coupon and clear cached totals methods
+        $this->session->data['coupon'] = $code;
+        unset($this->session->data['payment_method']);
+        unset($this->session->data['payment_methods']);
+        unset($this->session->data['shipping_method']);
+        unset($this->session->data['shipping_methods']);
+
+        $this->response->setOutput(json_encode(array('ok'=>true,'code'=>$code,'info'=>array('type'=>isset($info['type'])?$info['type']:null,'discount'=>isset($info['discount'])?(float)$info['discount']:null))));
     }
 }

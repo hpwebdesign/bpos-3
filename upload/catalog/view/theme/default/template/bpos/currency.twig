@@ -1,3 +1,14 @@
+{# Always expose current currency code for JS #}
+<span id="bpos-currency"
+  data-code="{{ code }}"
+  {% for currency in currencies %}
+    {% if currency.code == code %}
+      data-symbol-left="{{ currency.symbol_left }}"
+      data-symbol-right="{{ currency.symbol_right }}"
+    {% endif %}
+  {% endfor %}
+  style="display:none"></span>
+
 {% if currencies|length > 1 %}
 <div class="dropdown">
   <button class="icon-btn dropdown-toggle" type="button" id="currencyDropdown" data-bs-toggle="dropdown" aria-expanded="false">

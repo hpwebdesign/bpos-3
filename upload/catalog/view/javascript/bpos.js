@@ -351,7 +351,10 @@ $(document).ready(function() {
     }
 
     // Update checkout panel (kalau mau menampilkan isi keranjang di POS)
-    function updateCheckoutPanel() {
+    
+
+});
+function updateCheckoutPanel() {
         $.ajax({
             url: 'index.php?route=bpos/checkout&html=1',
             type: 'get',
@@ -361,9 +364,6 @@ $(document).ready(function() {
             }
         });
     }
-
-});
-
 function loadContent(route) {
         let busyTimer;
 
@@ -435,7 +435,10 @@ var API = {
   customers_edit:   'index.php?route=bpos/customer/edit',       // POST {id, name}
   cart_summary:     'index.php?route=bpos/cart/summary',        // GET -> { subtotal: 125000 }
   apply_discount:   'index.php?route=bpos/cart/apply_discount', // POST {percent, fixed}
-  apply_charge:     'index.php?route=bpos/cart/apply_charge'    // POST {percent, fixed}
+  apply_charge:     'index.php?route=bpos/cart/apply_charge',   // POST {percent, fixed}
+  customers_login:  'index.php?route=bpos/customer/login',      // POST {id}
+  coupons_list:     'index.php?route=bpos/cart/coupons',        // GET -> { coupons: [...] }
+  apply_coupon:     'index.php?route=bpos/cart/apply_coupon'    // POST {code}
 };
 
 /* =========================
@@ -444,8 +447,17 @@ var API = {
 var CUSTOMER_LIST = []; // akan diisi dari AJAX
 
 function formatIDR(n){
-  var num = Number(n||0);
-  return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(num);
+  var num = Number(n || 0);
+  // Read current currency code from DOM (set by bpos/currency twig)
+  var el = document.getElementById('bpos-currency');
+  var code = (el && el.getAttribute('data-code')) || 'IDR';
+  try {
+    // Let Intl decide fraction digits per currency (IDR=0, USD=2, etc.)
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: code }).format(num);
+  } catch (e) {
+    // Fallback to IDR formatting without decimals
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+  }
 }
 function toNumber(v){
   if (v === '' || v == null) return 0;
@@ -472,6 +484,15 @@ function ajaxCreateCustomer(payload){
 function ajaxEditCustomer(payload){
   return $.post(API.customers_edit, payload, null, 'json');
 }
+function ajaxLoginCustomer(payload){
+  return $.post(API.customers_login, payload, null, 'json');
+}
+function ajaxLoadCoupons(){
+  return $.getJSON(API.coupons_list).then(function(res){ return (res && res.coupons) ? res.coupons : []; });
+}
+function applyCoupon(payload){ // {code}
+  return $.post(API.apply_coupon, payload, null, 'json');
+}
 function fetchCartSummary(){
   return $.getJSON(API.cart_summary).then(function(res){
     return (res && typeof res.subtotal !== 'undefined') ? Number(res.subtotal) : 0;
@@ -488,12 +509,15 @@ function applyCharge(payload){ // {percent,fixed}
    HTML BUILDERS
    ========================= */
 function buildCustomerHTML(){
-  var opts = CUSTOMER_LIST.map(function(c){return '<option value="'+c.id+'">'+c.name+'</option>';}).join('');
   return ''+
   '<div class="swal-form">'+
     '<label style="display:block;margin-bottom:6px;">Select customer</label>'+
-    '<select id="swal_customer_select" class="form-control" style="margin-bottom:10px;">'+opts+'</select>'+
-    '<div class="btn-group" style="width:100%;gap:6px;display:flex;">'+
+    '<input type="text" id="swal_customer_input" class="form-control" placeholder="Type name to search" autocomplete="off" />'+
+    '<input type="hidden" id="swal_customer_id" />'+
+    '<div id="swal_customer_suggest" style="position:relative;">'+
+      '<div class="swal-ac-list" style="position:absolute;top:100%;left:0;right:0;margin-top:4px;z-index:9999;background:#fff;border:1px solid #e5e7eb;border-radius:6px;box-shadow:0 8px 22px rgba(13,33,80,.08);display:none;max-height:220px;overflow:auto"></div>'+
+    '</div>'+
+    '<div class="btn-group" style="width:100%;gap:6px;display:flex;margin-top:10px;">'+
       '<button type="button" class="btn btn-default" id="swal_add_customer" style="flex:1;">Add</button>'+
       '<button type="button" class="btn btn-default" id="swal_edit_customer" style="flex:1;">Edit</button>'+
     '</div>'+
@@ -507,39 +531,59 @@ function buildDiscountHTML(){
       '<input type="number" min="0" step="0.01" id="swal_discount_pct" class="form-control" placeholder="e.g. 10">'+
     '</div>'+
     '<div class="form-group">'+
-      '<label>Fixed Discount (Rupiah)</label>'+
+      '<label>Fixed Discount</label>'+
       '<input type="number" min="0" step="1" id="swal_discount_fix" class="form-control" placeholder="e.g. 25000">'+
     '</div>'+
     '<div id="swal_discount_preview" style="margin-top:8px;padding:8px;border:1px dashed #e5e7eb;border-radius:8px;font-size:12px;line-height:1.4;">'+
       '<div><strong>Subtotal:</strong> <span data-subtotal>-</span></div>'+
-      '<div><strong>Dari %:</strong> <span data-from-pct>-</span></div>'+
-      '<div><strong>Dari fixed:</strong> <span data-from-fix>-</span></div>'+
+      '<div><strong>Discount %:</strong> <span data-from-pct>-</span></div>'+
+      '<div><strong>Fixed Discount:</strong> <span data-from-fix>-</span></div>'+
       '<div><strong>Total diskon:</strong> <span data-total-disc>-</span></div>'+
       '<div><strong>New total:</strong> <span data-new-total>-</span></div>'+
     '</div>'+
-    '<p style="font-size:12px;color:#6b7280;margin-top:6px;">Boleh isi salah satu atau keduanya.</p>'+
+    '<p style="font-size:12px;color:#6b7280;margin-top:6px;">You can fill in one or both.</p>'+
   '</div>';
 }
 function buildChargeHTML(){
   return ''+
   '<div class="swal-form">'+
     '<div class="form-group" style="margin-bottom:10px;">'+
-      '<label>% Charge</label>'+
+      '<label>Charge %</label>'+
       '<input type="number" min="0" step="0.01" id="swal_charge_pct" class="form-control" placeholder="e.g. 5">'+
     '</div>'+
     '<div class="form-group">'+
-      '<label>Fixed Charge (Rupiah)</label>'+
+      '<label>Fixed Charge</label>'+
       '<input type="number" min="0" step="1" id="swal_charge_fix" class="form-control" placeholder="e.g. 5000">'+
     '</div>'+
     '<div id="swal_charge_preview" style="margin-top:8px;padding:8px;border:1px dashed #e5e7eb;border-radius:8px;font-size:12px;line-height:1.4;">'+
       '<div><strong>Subtotal:</strong> <span data-subtotal>-</span></div>'+
-      '<div><strong>Dari %:</strong> <span data-from-pct>-</span></div>'+
-      '<div><strong>Dari fixed:</strong> <span data-from-fix>-</span></div>'+
+      '<div><strong>Charge %:</strong> <span data-from-pct>-</span></div>'+
+      '<div><strong>Fixed Charge:</strong> <span data-from-fix>-</span></div>'+
       '<div><strong>Total charge:</strong> <span data-total-charge>-</span></div>'+
       '<div><strong>New total:</strong> <span data-new-total>-</span></div>'+
     '</div>'+
-    '<p style="font-size:12px;color:#6b7280;margin-top:6px;">Boleh isi salah satu atau keduanya.</p>'+
+    '<p style="font-size:12px;color:#6b7280;margin-top:6px;">You can fill in one or both.</p>'+
   '</div>';
+}
+
+function buildCouponHTML(list){
+  var items = (list||[]).map(function(c){
+    var label = c.type === 'P' ? (c.discount + '%') : formatIDR(c.discount);
+    var end = (c.date_end && c.date_end !== '0000-00-00') ? ('<small style="color:#6b7280">until '+c.date_end+'</small>') : '';
+    return '\n      <div class="swal-coupon-item" data-code="'+c.code+'" style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:6px;cursor:pointer;">\n        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">\n          <div>\n            <div style="font-weight:600">'+c.name+' <span style="color:#374151">('+c.code+')</span></div>\n            <div style="font-size:12px;color:#6b7280">'+label+' off '+end+'</div>\n          </div>\n          <div><span class="badge" style="background:#f3f4f6;color:#111827;">Select</span></div>\n        </div>\n      </div>';
+  }).join('');
+  if (!items) items = '<div class="text-muted" style="padding:8px 0">No active coupons</div>';
+  return ''+
+    '<div class="swal-form">'+
+      '<div class="form-group" style="margin-bottom:10px;">'+
+        '<label>Coupon code</label>'+
+        '<div style="display:flex;gap:6px;">'+
+          '<input type="text" id="swal_coupon_code" class="form-control" placeholder="Enter coupon code" style="flex:1" />'+
+          '<button type="button" id="swal_coupon_paste" class="btn btn-default">Paste</button>'+
+        '</div>'+
+      '</div>'+
+      '<div id="swal_coupon_list" style="max-height:220px;overflow:auto">'+items+'</div>'+
+    '</div>';
 }
 
 /* =========================
@@ -596,20 +640,58 @@ function openSwal(type, onSubmit){
     cfg = {
       title: 'Customer',
       html: '<div style="text-align:center;padding:14px 0;">Loading...</div>',
-      willOpen: function(){ Swal.showLoading(); },
+      // willOpen: function(){  },
       didOpen: function(){
-        // Load customers via AJAX, rebuild HTML, then re-bind
+        // Load customers via AJAX, rebuild HTML, then bind handlers
         ajaxLoadCustomers().then(function(){
-          Swal.update({ html: buildCustomerHTML(), didOpen: bindCustomerButtons });
+          Swal.update({ html: buildCustomerHTML() });
+          // Swal.update doesn't trigger didOpen, so bind manually
+          bindCustomerButtons();
+          bindCustomerAutocomplete();
         }).catch(function(){
           Swal.update({ html: '<p style="color:#ef4444;">Failed to load customers</p>' });
         });
       },
       preConfirm: function(){
-        var id = $('#swal_customer_select').val();
-        if (!id) { Swal.showValidationMessage('Please select a customer'); return false; }
-        var found = CUSTOMER_LIST.find(function(c){return c.id === id;});
-        return {type:'customer', customer: found || {id:id, name:'Unknown'}};
+        var id = $('#swal_customer_id').val();
+        var nameInput = ($('#swal_customer_input').val() || '').trim();
+        var found = null;
+        if (id) {
+          found = CUSTOMER_LIST.find(function(c){ return String(c.id) === String(id); });
+        } else if (nameInput) {
+          var matches = CUSTOMER_LIST.filter(function(c){ return c.name.toLowerCase() === nameInput.toLowerCase(); });
+          if (matches.length === 1) { found = matches[0]; }
+        }
+        if (!found) { Swal.showValidationMessage('Please select a customer'); return false; }
+        return {type:'customer', customer: found};
+      }
+    };
+  }
+  if (type === 'coupon') {
+    cfg = {
+      title: 'Coupon',
+      html: '<div style="text-align:center;padding:14px 0;">Loading...</div>',
+      didOpen: function(){
+        ajaxLoadCoupons().then(function(list){
+          Swal.update({ html: buildCouponHTML(list) });
+          // Bind list select and paste button
+          $(document).off('click.swal_coupon').on('click.swal_coupon', '#swal_coupon_list .swal-coupon-item', function(){
+            var code = $(this).data('code');
+            $('#swal_coupon_code').val(code).focus();
+          });
+          $(document).off('click.swal_coupon_paste').on('click.swal_coupon_paste', '#swal_coupon_paste', function(){
+            if (navigator.clipboard && navigator.clipboard.readText){
+              navigator.clipboard.readText().then(function(t){ $('#swal_coupon_code').val((t||'').trim()).focus(); });
+            }
+          });
+        }).catch(function(){
+          Swal.update({ html: '<p style="color:#ef4444;">Failed to load coupons</p>' });
+        });
+      },
+      preConfirm: function(){
+        var code = ($('#swal_coupon_code').val()||'').trim();
+        if (!code){ Swal.showValidationMessage('Enter coupon code'); return false; }
+        return {type:'coupon', code: code};
       }
     };
   }
@@ -667,13 +749,15 @@ function openSwal(type, onSubmit){
     preConfirm: cfg.preConfirm
   }).then(function(result){
     if (result.isConfirmed){
-      // Auto-apply ke server (untuk discount/charge)
+      // Auto-apply ke server (discount/charge/coupon)
       if (result.value && result.value.type === 'discount'){
         Swal.showLoading();
         applyDiscount({percent: result.value.percent, fixed: result.value.fixed})
           .then(function(res){
             if (typeof onSubmit === 'function') onSubmit({ok:true, type:'discount', server:res});
+             updateCheckoutPanel();
             Swal.fire('Applied','Discount applied','success');
+           
           })
           .catch(function(err){
             Swal.fire('Error', (err && err.message) || 'Failed to apply discount', 'error');
@@ -683,14 +767,45 @@ function openSwal(type, onSubmit){
         applyCharge({percent: result.value.percent, fixed: result.value.fixed})
           .then(function(res){
             if (typeof onSubmit === 'function') onSubmit({ok:true, type:'charge', server:res});
+            updateCheckoutPanel();
             Swal.fire('Applied','Charge applied','success');
           })
           .catch(function(err){
             Swal.fire('Error', (err && err.message) || 'Failed to apply charge', 'error');
           });
+      } else if (result.value && result.value.type === 'coupon'){
+        applyCoupon({code: result.value.code})
+          .then(function(res){
+            if (res && res.ok){
+              if (typeof onSubmit === 'function') onSubmit({ok:true, type:'coupon', code: result.value.code});
+              if (typeof updateCheckoutPanel === 'function') { updateCheckoutPanel(); }
+              Swal.fire('Applied','Coupon applied','success');
+            } else {
+              Swal.fire('Error', (res && res.error) || 'Failed to apply coupon', 'error');
+            }
+          })
+          .catch(function(err){
+            Swal.fire('Error', (err && err.message) || 'Failed to apply coupon', 'error');
+          });
       } else {
-        // customer
-        if (typeof onSubmit === 'function') onSubmit(result.value);
+        // customer: login selected customer to session
+        if (result.value && result.value.type === 'customer' && result.value.customer && result.value.customer.id){
+          ajaxLoginCustomer({id: result.value.customer.id})
+            .then(function(res){
+              if (res && res.ok){
+                if (typeof onSubmit === 'function') onSubmit({ok:true, type:'customer', customer: res.customer});
+                Swal.fire('Applied','Customer selected','success');
+                if (typeof updateCheckoutPanel === 'function') { updateCheckoutPanel(); }
+              } else {
+                Swal.fire('Error', (res && res.error) || 'Failed to login customer', 'error');
+              }
+            })
+            .catch(function(err){
+              Swal.fire('Error', (err && err.message) || 'Failed to login customer', 'error');
+            });
+        } else {
+          if (typeof onSubmit === 'function') onSubmit(result.value);
+        }
       }
     }
   });
@@ -700,33 +815,80 @@ function openSwal(type, onSubmit){
     $('#swal_add_customer').on('click', function(){
       openCustomerEditor('add').then(function(r){
         if (r.isConfirmed && r.value){
-          // refresh list dari server supaya konsisten
           ajaxLoadCustomers().then(function(){
-            // rebuild select
+            // rebuild content
             var html = buildCustomerHTML();
-            Swal.update({html: html, didOpen: bindCustomerButtons});
-            // set value ke customer baru
+            Swal.update({html: html});
+            bindCustomerButtons();
+            bindCustomerAutocomplete();
             setTimeout(function(){
-              $('#swal_customer_select').val(r.value.id);
+              $('#swal_customer_input').val(r.value.name);
+              $('#swal_customer_id').val(r.value.id);
             }, 0);
           });
         }
       });
     });
     $('#swal_edit_customer').on('click', function(){
-      var id = $('#swal_customer_select').val();
-      if (!id) return;
-      var cur = CUSTOMER_LIST.find(function(c){return c.id === id;});
+      var id = $('#swal_customer_id').val();
+      var cur = null;
+      if (id) {
+        cur = CUSTOMER_LIST.find(function(c){ return String(c.id) === String(id); });
+      } else {
+        var name = ($('#swal_customer_input').val()||'').trim();
+        cur = CUSTOMER_LIST.find(function(c){ return c.name.toLowerCase() === name.toLowerCase(); });
+      }
+      if (!cur) return;
       openCustomerEditor('edit', cur).then(function(r){
         if (r.isConfirmed && r.value){
-          // refresh list lalu pilih yang diedit
           ajaxLoadCustomers().then(function(){
             var html = buildCustomerHTML();
-            Swal.update({html: html, didOpen: bindCustomerButtons});
-            setTimeout(function(){ $('#swal_customer_select').val(r.value.id); }, 0);
+            Swal.update({html: html});
+            bindCustomerButtons();
+            bindCustomerAutocomplete();
+            setTimeout(function(){
+              $('#swal_customer_input').val(r.value.name);
+              $('#swal_customer_id').val(r.value.id);
+            }, 0);
           });
         }
       });
+    });
+  }
+
+  // Autocomplete binder for customer input
+  function bindCustomerAutocomplete(){
+    var $inp = $('#swal_customer_input');
+    var $id = $('#swal_customer_id');
+    var $box = $('.swal-ac-list');
+
+    function escapeHtml(str){ return $('<div>').text(str).html(); }
+    function render(items){
+      if (!items || !items.length){ $box.hide().empty(); return; }
+      var html = items.slice(0, 20).map(function(c){
+        return '<div class="swal-ac-item" data-id="'+c.id+'" data-name="'+escapeHtml(c.name)+'" style="padding:8px 10px;cursor:pointer;">'+
+                 escapeHtml(c.name)+' <small style="color:#6b7280">#'+c.id+'</small>'+
+               '</div>';
+      }).join('');
+      $box.html(html).show();
+    }
+
+    var run = debounce(function(){
+      var q = ($inp.val()||'').toLowerCase().trim();
+      $id.val('');
+      if (!q){ $box.hide().empty(); return; }
+      var items = CUSTOMER_LIST.filter(function(c){ return c.name.toLowerCase().indexOf(q) !== -1 || String(c.id).indexOf(q) !== -1; });
+      render(items);
+    }, 120);
+
+    $inp.on('input focus', run);
+    $(document).off('click.swal_ac').on('click.swal_ac', function(e){ if ($(e.target).closest('.swal-ac-list, #swal_customer_input').length === 0){ $box.hide(); } });
+    $box.on('click', '.swal-ac-item', function(){
+      var cid = $(this).data('id');
+      var cname = $(this).data('name');
+      $inp.val(cname);
+      $id.val(cid);
+      $box.hide();
     });
   }
 }
@@ -749,5 +911,10 @@ $(document).on('click', '.mini-btn[data-action="discount"]', function(){
 $(document).on('click', '.mini-btn[data-action="charge"]', function(){
   openSwal('charge', function(payload){
     console.log('Charge applied:', payload);
+  });
+});
+$(document).on('click', '.mini-btn[data-action="coupon"]', function(){
+  openSwal('coupon', function(payload){
+    console.log('Coupon applied:', payload);
   });
 });
