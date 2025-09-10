@@ -2013,3 +2013,44 @@ a.text-hover-primary:hover {
 #swal2-title {
   font-size: 20px !important;
 }
+
+
+/* Product card hover animation */
+.product-item {
+    transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    will-change: transform;
+}
+.product-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 28px rgba(15, 21, 53, .12), 0 2px 10px rgba(15, 21, 53, .10);
+    border-color: #d6def0;
+}
+.product-item .product-image {
+    transition: border-color .22s ease, transform .28s ease;
+}
+.product-item:hover .product-image {
+    border-color: #cfe0ff;
+    transform: scale(1.02);
+}
+.product-item .product-image .plate {
+    transition: transform .28s ease;
+}
+.product-item:hover .product-image .plate {
+    transform: scale(1.06) rotate(1deg);
+}
+.product-item .name, .product-item .price {
+    transition: color .22s ease;
+}
+.product-item:hover .name {
+    color: var(--soft-blue);
+}
+.product-item:hover .price {
+    color: var(--good);
+}
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .product-item, .product-item * {
+        transition: none !important;
+        transform: none !important;
+    }
+}
