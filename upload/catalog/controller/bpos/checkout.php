@@ -54,6 +54,24 @@ class ControllerBposCheckout extends Controller {
             ];
         }
 
+        // Customer info for display
+        if ($this->customer->isLogged()) {
+            $firstname = method_exists($this->customer, 'getFirstName') ? $this->customer->getFirstName() : '';
+            $lastname  = method_exists($this->customer, 'getLastName') ? $this->customer->getLastName() : '';
+            $name = trim($firstname . ' ' . $lastname);
+            if ($name === '') {
+                // Fallback to email if name empty
+                $name = method_exists($this->customer, 'getEmail') ? $this->customer->getEmail() : 'Customer';
+            }
+            $data['customer_name'] = $name;
+            if (method_exists($this->customer, 'getId')) {
+                $data['customer_id'] = $this->customer->getId();
+            }
+        } else {
+            $data['customer_name'] = 'Guest Customer';
+            $data['customer_id'] = 0;
+        }
+
         // Payment Methods
         $data['payment_methods'] = [];
 

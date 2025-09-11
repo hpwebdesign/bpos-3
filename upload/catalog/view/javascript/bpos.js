@@ -372,7 +372,6 @@ function loadContent(route) {
             type: 'get',
             dataType: 'json',
             beforeSend: function() {
-                // set timer, if > 2 second show busyLoad
                 busyTimer = setTimeout(function() {
                     $("body").busyLoad("show", {
                         spinner: "circle-line",
@@ -394,7 +393,6 @@ function loadContent(route) {
                 $('#main-content').html('<p>Error loading content</p>');
             },
             complete: function() {
-                // clear timer wathefer the result
                 clearTimeout(busyTimer);
                 $("body").busyLoad("hide");
             }
@@ -444,15 +442,13 @@ var API = {
 /* =========================
    UTILITIES
    ========================= */
-var CUSTOMER_LIST = []; // akan diisi dari AJAX
+var CUSTOMER_LIST = [];
 
 function formatIDR(n){
   var num = Number(n || 0);
-  // Read current currency code from DOM (set by bpos/currency twig)
   var el = document.getElementById('bpos-currency');
   var code = (el && el.getAttribute('data-code')) || 'IDR';
   try {
-    // Let Intl decide fraction digits per currency (IDR=0, USD=2, etc.)
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: code }).format(num);
   } catch (e) {
     // Fallback to IDR formatting without decimals
@@ -473,24 +469,23 @@ function debounce(fn, wait){
    ========================= */
 function ajaxLoadCustomers(){
   return $.getJSON(API.customers_list).then(function(res){
-    // Expect res.customers = [{id:'C001', name:'Walk-in'}, ...]
     CUSTOMER_LIST = (res && res.customers) ? res.customers : [];
     return CUSTOMER_LIST;
   });
 }
-function ajaxCreateCustomer(payload){
+function ajaxCreateCustomer(payload) {
   return $.post(API.customers_create, payload, null, 'json');
 }
-function ajaxEditCustomer(payload){
+function ajaxEditCustomer(payload) {
   return $.post(API.customers_edit, payload, null, 'json');
 }
-function ajaxLoginCustomer(payload){
+function ajaxLoginCustomer(payload) {
   return $.post(API.customers_login, payload, null, 'json');
 }
 function ajaxLoadCoupons(){
   return $.getJSON(API.coupons_list).then(function(res){ return (res && res.coupons) ? res.coupons : []; });
 }
-function applyCoupon(payload){ // {code}
+function applyCoupon(payload) {
   return $.post(API.apply_coupon, payload, null, 'json');
 }
 function fetchCartSummary(){
@@ -498,10 +493,10 @@ function fetchCartSummary(){
     return (res && typeof res.subtotal !== 'undefined') ? Number(res.subtotal) : 0;
   });
 }
-function applyDiscount(payload){ // {percent,fixed}
+function applyDiscount(payload) {
   return $.post(API.apply_discount, payload, null, 'json');
 }
-function applyCharge(payload){ // {percent,fixed}
+function applyCharge(payload) {
   return $.post(API.apply_charge, payload, null, 'json');
 }
 
@@ -610,7 +605,6 @@ function openCustomerEditor(mode, current){
       if (!name) { Swal.showValidationMessage('Name is required'); return false; }
       if (mode === 'add') {
         return ajaxCreateCustomer({name:name}).then(function(res){
-          // harapkan res.customer: {id, name}
           if (!res || !res.customer) throw new Error('Create failed');
           return {mode:'add', id:res.customer.id, name:res.customer.name};
         }).catch(function(err){
@@ -619,7 +613,6 @@ function openCustomerEditor(mode, current){
         });
       } else {
         return ajaxEditCustomer({id:idVal, name:name}).then(function(res){
-          // harapkan res.customer: {id, name}
           if (!res || !res.customer) throw new Error('Edit failed');
           return {mode:'edit', id:res.customer.id, name:res.customer.name};
         }).catch(function(err){
@@ -642,10 +635,8 @@ function openSwal(type, onSubmit){
       html: '<div style="text-align:center;padding:14px 0;">Loading...</div>',
       // willOpen: function(){  },
       didOpen: function(){
-        // Load customers via AJAX, rebuild HTML, then bind handlers
         ajaxLoadCustomers().then(function(){
           Swal.update({ html: buildCustomerHTML() });
-          // Swal.update doesn't trigger didOpen, so bind manually
           bindCustomerButtons();
           bindCustomerAutocomplete();
         }).catch(function(){
@@ -674,7 +665,6 @@ function openSwal(type, onSubmit){
       didOpen: function(){
         ajaxLoadCoupons().then(function(list){
           Swal.update({ html: buildCouponHTML(list) });
-          // Bind list select and paste button
           $(document).off('click.swal_coupon').on('click.swal_coupon', '#swal_coupon_list .swal-coupon-item', function(){
             var code = $(this).data('code');
             $('#swal_coupon_code').val(code).focus();
@@ -700,28 +690,26 @@ function openSwal(type, onSubmit){
     cfg = {
       title: isDiscount ? 'Add Discount' : 'Add Charge',
       html: isDiscount ? buildDiscountHTML() : buildChargeHTML(),
-      willOpen: function(){ Swal.showLoading(); },
-      didOpen: function(){
-        // Ambil subtotal lalu isi preview
+      willOpen: function() { Swal.showLoading(); },
+      didOpen: function() {
         fetchCartSummary().then(function(subtotal){
           var wrap = isDiscount ? '#swal_discount_preview' : '#swal_charge_preview';
           var $wrap = $(wrap);
           $wrap.find('[data-subtotal]').text(formatIDR(subtotal));
-          // bind input & calc
           var recalc = debounce(function(){
-            var pct = toNumber($(isDiscount ? '#swal_discount_pct' : '#swal_charge_pct').val());
-            var fix = toNumber($(isDiscount ? '#swal_discount_fix' : '#swal_charge_fix').val());
-            var fromPct = Math.floor(subtotal * (pct/100));
-            var fromFix = fix;
-            var delta = fromPct + fromFix; // diskon: kurangi; charge: tambahkan
-            var newTotal = isDiscount ? Math.max(0, subtotal - delta) : subtotal + delta;
-            $wrap.find('[data-from-pct]').text(formatIDR(fromPct));
-            $wrap.find('[data-from-fix]').text(formatIDR(fromFix));
-            $wrap.find(isDiscount ? '[data-total-disc]' : '[data-total-charge]').text(formatIDR(delta));
-            $wrap.find('[data-new-total]').text(formatIDR(newTotal));
+          var pct = toNumber($(isDiscount ? '#swal_discount_pct' : '#swal_charge_pct').val());
+          var fix = toNumber($(isDiscount ? '#swal_discount_fix' : '#swal_charge_fix').val());
+          var fromPct = Math.floor(subtotal * (pct/100));
+          var fromFix = fix;
+          var delta = fromPct + fromFix;
+          var newTotal = isDiscount ? Math.max(0, subtotal - delta) : subtotal + delta;
+          $wrap.find('[data-from-pct]').text(formatIDR(fromPct));
+          $wrap.find('[data-from-fix]').text(formatIDR(fromFix));
+          $wrap.find(isDiscount ? '[data-total-disc]' : '[data-total-charge]').text(formatIDR(delta));
+          $wrap.find('[data-new-total]').text(formatIDR(newTotal));
           }, 120);
           $(document).on('input', isDiscount ? '#swal_discount_pct,#swal_discount_fix' : '#swal_charge_pct,#swal_charge_fix', recalc);
-          recalc(); // initial
+          recalc();
           Swal.hideLoading();
         }).catch(function(){
           Swal.update({ footer: '<small style="color:#ef4444;">Failed to load subtotal</small>' });
@@ -748,8 +736,7 @@ function openSwal(type, onSubmit){
     didOpen: cfg.didOpen || null,
     preConfirm: cfg.preConfirm
   }).then(function(result){
-    if (result.isConfirmed){
-      // Auto-apply ke server (discount/charge/coupon)
+    if (result.isConfirmed) {
       if (result.value && result.value.type === 'discount'){
         Swal.showLoading();
         applyDiscount({percent: result.value.percent, fixed: result.value.fixed})
@@ -788,7 +775,6 @@ function openSwal(type, onSubmit){
             Swal.fire('Error', (err && err.message) || 'Failed to apply coupon', 'error');
           });
       } else {
-        // customer: login selected customer to session
         if (result.value && result.value.type === 'customer' && result.value.customer && result.value.customer.id){
           ajaxLoginCustomer({id: result.value.customer.id})
             .then(function(res){
@@ -810,13 +796,11 @@ function openSwal(type, onSubmit){
     }
   });
 
-  // Helper bind untuk tombol add/edit customer
   function bindCustomerButtons(){
     $('#swal_add_customer').on('click', function(){
       openCustomerEditor('add').then(function(r){
         if (r.isConfirmed && r.value){
           ajaxLoadCustomers().then(function(){
-            // rebuild content
             var html = buildCustomerHTML();
             Swal.update({html: html});
             bindCustomerButtons();
@@ -856,8 +840,7 @@ function openSwal(type, onSubmit){
     });
   }
 
-  // Autocomplete binder for customer input
-  function bindCustomerAutocomplete(){
+  function bindCustomerAutocomplete() {
     var $inp = $('#swal_customer_input');
     var $id = $('#swal_customer_id');
     var $box = $('.swal-ac-list');
@@ -898,13 +881,11 @@ function openSwal(type, onSubmit){
    ========================= */
 $(document).on('click', '.mini-btn[data-action="customer"]', function(){
   openSwal('customer', function(payload){
-    // TODO: simpan pilihan customer ke cart state-mu
     console.log('Selected customer:', payload);
   });
 });
 $(document).on('click', '.mini-btn[data-action="discount"]', function(){
   openSwal('discount', function(payload){
-    // response server tersedia di payload.server
     console.log('Discount applied:', payload);
   });
 });
