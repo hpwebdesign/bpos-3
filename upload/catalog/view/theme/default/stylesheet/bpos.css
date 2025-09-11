@@ -1947,6 +1947,10 @@ a.text-hover-primary:hover {
     background: var(--card-bg, #f8f8f8);
     cursor: pointer;
     transition: background 0.2s;
+    -webkit-transition: background 0.2s;
+    -moz-transition: background 0.2s;
+    -ms-transition: background 0.2s;
+    -o-transition: background 0.2s;
 }
 .mini-btn:hover {
     background: var(--brand-darker);
@@ -2055,6 +2059,7 @@ a.text-hover-primary:hover {
     }
 }
 
+
 #pos-search:focus {
   background-color: rgba(255, 255, 255, 0.2);
   color: #d8e5ff;
@@ -2063,3 +2068,35 @@ a.text-hover-primary:hover {
 #pos-search .search input:focus::placeholder {
   color: #a8a8a8;
 }
+
+.swal-form p {
+  font-size: 12px;
+  padding: 6px 0;
+}
+.swal-form {
+  text-align: left;
+  font-size: 13px;
+}
+#swal_total_preview {
+  text-align: left;
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px dashed #e5e7eb;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.customer-btn {
+    flex: unset !important;
+    border: 1px solid var(--line);
+    background: #f7f9fd;
+    border-radius: 14px;
+    display: inline-block;
+    padding: 14px;
+    width: auto !important;
+}
+.customer-btn.active {
+    outline: 2px solid #d4f1e1 !important;
+    background: #f2fff7 !important;
+}
+

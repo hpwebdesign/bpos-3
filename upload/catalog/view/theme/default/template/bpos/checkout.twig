@@ -82,10 +82,11 @@
       {% endif %}
       <h4>Customer</h4>
       <div class="row row-cols-3 g-2 mb-3">
-        <button type="button" data-action="customer" class="mini-btn">
+        <button type="button" id="pos-current-customer" data-action="customer" class="mini-btn customer-btn w-100 active"
+                data-customer-name="{{ customer_name is defined and customer_name ? customer_name : 'Guest Customer' }}">
           <i class="bi bi-person" style="margin-right:6px;"></i>
           {{ customer_name is defined and customer_name ? customer_name : 'Guest Customer' }}
-          <i class="bi bi-edit"></i>
+          <i class="bi bi-pencil-square"></i>
         </button>
       </div>
       <!-- Tombol -->

@@ -100,13 +100,14 @@ class ControllerBposCustomer extends Controller {
 
     // POST /index.php?route=bpos/customer/login
     // Body: id
+    // Instead of authenticating OpenCart Customer, just store session 'bpos_customer'
     // Returns: { ok:true, customer:{id,name} }
     public function login(){
         $this->jsonHeader();
         $id = isset($this->request->post['id']) ? (int)$this->request->post['id'] : 0;
         if ($id <= 0) { $this->response->setOutput(json_encode(array('error'=>'Invalid id'))); return; }
 
-        $q = $this->db->query("SELECT customer_id, firstname, lastname, email, status FROM `".DB_PREFIX."customer` WHERE customer_id='".(int)$id."' LIMIT 1");
+        $q = $this->db->query("SELECT customer_id, firstname, lastname, status FROM `".DB_PREFIX."customer` WHERE customer_id='".(int)$id."' LIMIT 1");
         if (!$q->num_rows) { $this->response->setOutput(json_encode(array('error'=>'Customer not found'))); return; }
 
         $row = $q->row;
@@ -117,29 +118,7 @@ class ControllerBposCustomer extends Controller {
         $name = trim($row['firstname'].' '.$row['lastname']);
         if ($name==='') { $name='(No Name)'; }
 
-        // Login customer with override (no password required)
-        // Ensure clean previous customer session
-        if ($this->customer->isLogged() && (int)$this->customer->getId() !== (int)$id) {
-            $this->customer->logout();
-        }
-
-        $ok = false;
-        if (!empty($row['email'])) {
-            $ok = $this->customer->login($row['email'], '', true);
-        }
-        // Fallback: force session customer_id then re-init library
-        if (!$ok) {
-            $this->session->data['customer_id'] = (int)$row['customer_id'];
-            try {
-                $this->customer = new Cart\Customer($this->registry);
-                $ok = $this->customer->isLogged();
-            } catch (\Exception $e) {
-                $ok = false;
-            }
-        }
-        if (!$ok) { $this->response->setOutput(json_encode(array('error'=>'Failed to login customer'))); return; }
-
-        // Reset cached methods so totals/payment can refresh correctly
+        $this->session->data['bpos_customer'] = array('id' => (int)$id, 'name' => $name);
         unset($this->session->data['payment_method']);
         unset($this->session->data['payment_methods']);
         unset($this->session->data['shipping_method']);
@@ -148,5 +127,21 @@ class ControllerBposCustomer extends Controller {
         unset($this->session->data['shipping_address']);
 
         $this->response->setOutput(json_encode(array('ok'=>true,'customer'=>array('id'=>$id,'name'=>$name))));
+    }
+
+    // POST /index.php?route=bpos/customer/clear
+    // Unset current customer session (switch to guest)
+    // Returns: { ok:true }
+    public function clear(){
+        $this->jsonHeader();
+        unset($this->session->data['bpos_customer']);
+        unset($this->session->data['payment_method']);
+        unset($this->session->data['payment_methods']);
+        unset($this->session->data['shipping_method']);
+        unset($this->session->data['shipping_methods']);
+        unset($this->session->data['payment_address']);
+        unset($this->session->data['shipping_address']);
+
+        $this->response->setOutput(json_encode(array('ok'=>true)));
     }
 }

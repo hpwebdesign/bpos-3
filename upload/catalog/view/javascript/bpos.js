@@ -435,6 +435,7 @@ var API = {
   apply_discount:   'index.php?route=bpos/cart/apply_discount', // POST {percent, fixed}
   apply_charge:     'index.php?route=bpos/cart/apply_charge',   // POST {percent, fixed}
   customers_login:  'index.php?route=bpos/customer/login',      // POST {id}
+  customers_unset:  'index.php?route=bpos/customer/clear',      // POST
   coupons_list:     'index.php?route=bpos/cart/coupons',        // GET -> { coupons: [...] }
   apply_coupon:     'index.php?route=bpos/cart/apply_coupon'    // POST {code}
 };
@@ -443,6 +444,15 @@ var API = {
    UTILITIES
    ========================= */
 var CUSTOMER_LIST = [];
+
+function getCurrentCustomerName(){
+  var el = document.getElementById('pos-current-customer');
+  if (!el) return 'Guest Customer';
+  var d = el.getAttribute('data-customer-name');
+  var t = (d && d.trim()) || (el.textContent||'').trim();
+  if (!t) t = 'Guest Customer';
+  return t;
+}
 
 function formatIDR(n){
   var num = Number(n || 0);
@@ -499,22 +509,29 @@ function applyDiscount(payload) {
 function applyCharge(payload) {
   return $.post(API.apply_charge, payload, null, 'json');
 }
+function ajaxUnsetCustomer(){
+  return $.post(API.customers_unset, {}, null, 'json');
+}
 
 /* =========================
    HTML BUILDERS
    ========================= */
 function buildCustomerHTML(){
+  var cur = getCurrentCustomerName();
   return ''+
   '<div class="swal-form">'+
-    '<label style="display:block;margin-bottom:6px;">Select customer</label>'+
+    '<div class="form-group" style="margin-bottom:8px;">'+
+      '<div style="font-size:14px;">Current Customer: <strong>'+ $('<div>').text(cur).html() +'</strong></div>'+
+    '</div>'+
+    '<label style="display:block;margin-bottom:6px;">Change Customer</label>'+
     '<input type="text" id="swal_customer_input" class="form-control" placeholder="Type name to search" autocomplete="off" />'+
     '<input type="hidden" id="swal_customer_id" />'+
     '<div id="swal_customer_suggest" style="position:relative;">'+
       '<div class="swal-ac-list" style="position:absolute;top:100%;left:0;right:0;margin-top:4px;z-index:9999;background:#fff;border:1px solid #e5e7eb;border-radius:6px;box-shadow:0 8px 22px rgba(13,33,80,.08);display:none;max-height:220px;overflow:auto"></div>'+
     '</div>'+
     '<div class="btn-group" style="width:100%;gap:6px;display:flex;margin-top:10px;">'+
-      '<button type="button" class="btn btn-default" id="swal_add_customer" style="flex:1;">Add</button>'+
-      '<button type="button" class="btn btn-default" id="swal_edit_customer" style="flex:1;">Edit</button>'+
+      '<button type="button" class="btn btn-success" id="swal_add_customer" style="flex:1;">Add</button>'+
+      '<button type="button" class="btn btn-warning" id="swal_edit_customer" style="flex:1;">Edit</button>'+
     '</div>'+
   '</div>';
 }
@@ -731,12 +748,27 @@ function openSwal(type, onSubmit){
     html: cfg.html,
     showCancelButton: true,
     confirmButtonText: 'Apply',
+    showDenyButton: (type === 'customer'),
+    denyButtonText: (type === 'customer') ? 'Remove' : undefined,
     focusConfirm: false,
     willOpen: cfg.willOpen || null,
     didOpen: cfg.didOpen || null,
     preConfirm: cfg.preConfirm
   }).then(function(result){
-    if (result.isConfirmed) {
+    if (result.isDenied && type === 'customer') {
+      ajaxUnsetCustomer()
+        .then(function(res){
+          if (res && res.ok){
+            if (typeof updateCheckoutPanel === 'function') { updateCheckoutPanel(); }
+            Swal.fire('Removed','Customer unset to guest','success');
+          } else {
+            Swal.fire('Error', (res && res.error) || 'Failed to unset customer', 'error');
+          }
+        })
+        .catch(function(err){
+          Swal.fire('Error', (err && err.message) || 'Failed to unset customer', 'error');
+        });
+    } else if (result.isConfirmed) {
       if (result.value && result.value.type === 'discount'){
         Swal.showLoading();
         applyDiscount({percent: result.value.percent, fixed: result.value.fixed})

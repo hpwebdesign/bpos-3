@@ -284,12 +284,20 @@ class ControllerBposOrder extends Controller {
             return;
         }
 
-        if ($this->customer->isLogged()) {
-            $firstname   = $this->customer->getFirstName();
-            $lastname    = $this->customer->getLastName();
-            $email       = $this->customer->getEmail();
-            $telephone   = $this->customer->getTelephone();
-            $customer_id = $this->customer->getId();
+        // Customer info from POS session (no login required)
+        if (!empty($this->session->data['bpos_customer']['id'])) {
+            $customer_id = (int)$this->session->data['bpos_customer']['id'];
+            $name = isset($this->session->data['bpos_customer']['name']) ? trim($this->session->data['bpos_customer']['name']) : '';
+            $parts = preg_split('/\s+/', $name, 2);
+            $firstname = isset($parts[0]) ? $parts[0] : 'POS';
+            $lastname  = isset($parts[1]) ? $parts[1] : '';
+            // Try to enrich contact from DB
+            $email=''; $telephone='';
+            $q = $this->db->query("SELECT email, telephone FROM `".DB_PREFIX."customer` WHERE customer_id='".(int)$customer_id."' LIMIT 1");
+            if ($q->num_rows) {
+                $email = $q->row['email'];
+                $telephone = $q->row['telephone'];
+            }
         } else {
             $firstname   = 'POS';
             $lastname    = 'Customer';
