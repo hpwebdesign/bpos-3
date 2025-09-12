@@ -13,6 +13,7 @@ $_['text_welcome']         = 'Welcome to BPOS!';
 $_['text_login_desc']         = 'Please sign in using your admin account to access the POS system.';
 $_['text_signin']         = 'Sign In';
 $_['text_signin_desc']         = 'Enter your username and password';
+$_['text_success_cart']         = 'Success: You have added %s to your shopping cart!';
 
 // Button
 $_['button_filter']     = 'Filter';
