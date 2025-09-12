@@ -8,7 +8,7 @@
 
     {% if products %}
     <div class="order-line-wrapper">
-    {% for product in products %}
+      {% for product in products %}
       <div class="order-line">
         <div class="thumb">
           <img src="{{ product.thumb }}" alt="{{ product.name }}" style="width:28px;height:28px;border-radius:50%;">
@@ -18,11 +18,11 @@
 
           {# Tampilkan option kalau ada #}
           {% if product.option %}
-            <div class="text-muted small">
-              {% for option in product.option %}
-                <div>- {{ option.name }}: {{ option.value }}</div>
-              {% endfor %}
-            </div>
+          <div class="text-muted small">
+            {% for option in product.option %}
+            <div>- {{ option.name }}: {{ option.value }}</div>
+            {% endfor %}
+          </div>
           {% endif %}
 
           <div class="qty">
@@ -33,39 +33,39 @@
         </div>
         <div class="price-sm">{{ product.total }}</div>
       </div>
-    {% endfor %}
-</div>
-  {% else %}
+      {% endfor %}
+    </div>
+    {% else %}
     <p class="text-muted">{{ text_empty_cart }}</p>
-  {% endif %}
+    {% endif %}
 
     <div class="summary">
       {% for total in totals %}
-        {% if total.code == 'total' %}
-          <div class="total"><span>{{ total.title }}</span><span>{{ total.value }}</span></div>
-        {% else %}
-          <div class="subtotal"><span>{{ total.title }}</span><span>{{ total.value }}</span></div>
-        {% endif %}
+      {% if total.code == 'total' %}
+      <div class="total"><span>{{ total.title }}</span><span>{{ total.value }}</span></div>
+      {% else %}
+      <div class="subtotal"><span>{{ total.title }}</span><span>{{ total.value }}</span></div>
+      {% endif %}
       {% endfor %}
     </div>
 
     <div class="pay mt-3">
-    {% if shipping_methods and shipping_required %}
+      {% if shipping_methods and shipping_required %}
       <h4>Shipping Method</h4>
       <div class="row row-cols-3 g-2 mb-3">
         {% for shipping_method in shipping_methods %}
-          {% if not shipping_method.error %}
-          {% for quote in shipping_method.quote %}
+        {% if not shipping_method.error %}
+        {% for quote in shipping_method.quote %}
         <div class="col">
           <button data-original-title="{{ quote.short_title }} - {{ quote.text }}" class="shippingbtn w-100 {% if quote.code == default_shipping %}active{% endif %}" data-code="{{ quote.code }}">
             <i class="bi bi-truck"></i>
             <span>{{ quote.title|split(' ')[0] }} - {{ quote.text }}</span>
           </button>
         </div>
-      {% endfor %}
-          {% else %}
-            <div class="alert alert-danger alert-dismissible">{{ shipping_method.error }}</div>
-          {% endif %}
+        {% endfor %}
+        {% else %}
+        <div class="alert alert-danger alert-dismissible">{{ shipping_method.error }}</div>
+        {% endif %}
         {% endfor %}
       </div>
       <div class="shipping-error-container"></div>
@@ -86,31 +86,33 @@
       <h4>Customer</h4>
       {% set current_customer = customer_name|default('Guest Customer') %}
       <div class="row row-cols-3 g-2 mb-3">
-        <button type="button" id="pos-current-customer" data-original-title="{{ customer_name.title }}" data-action="customer" class="mini-btn customer-btn w-100 active"
-                data-customer-name="{{ current_customer }}">
-          <i class="bi bi-person" style="margin-right:6px;"></i>
-          {{ current_customer }}
-          <i class="bi bi-pencil-square"></i>
-        </button>
+        <div class="col">
+          <button type="button" id="pos-current-customer" data-original-title="{{ customer_name.title }}" data-action="customer" class="customer-btn w-100 active"
+                  data-customer-name="{{ current_customer }}">
+            <i class="bi bi-person" style="margin-right:6px;"></i>
+              <span>{{ current_customer }}</span>
+            <i class="bi bi-pencil-square"></i>
+          </button>
+        </div>
       </div>
       <!-- Tombol -->
       <div class="action-row">
         <div class="mini-buttons">
-  <button type="button" data-action="customer" class="mini-btn">
-    <i class="bi bi-person" style="margin-right:6px;"></i>Customer
-  </button>
-  <button type="button" data-action="discount" class="mini-btn">
-    <i class="bi bi-tags-fill" style="margin-right:6px;"></i>Discount
-  </button>
-  <button type="button" data-action="charge" class="mini-btn">
-    <i class="bi bi-cash-coin" style="margin-right:6px;"></i>Charge
-  </button>
-  <button type="button" data-action="coupon" class="mini-btn">
-    <i class="bi bi-ticket-perforated" style="margin-right:6px;"></i>Coupon
-  </button>
-</div>
+          <button type="button" data-action="customer" class="mini-btn">
+            <i class="bi bi-person" style="margin-right:6px;"></i> <span>Customer</span>
+          </button>
+          <button type="button" data-action="discount" class="mini-btn">
+            <i class="bi bi-tags-fill" style="margin-right:6px;"></i> <span>Discount</span>
+          </button>
+          <button type="button" data-action="charge" class="mini-btn">
+            <i class="bi bi-cash-coin" style="margin-right:6px;"></i> <span>Charge</span>
+          </button>
+          <button type="button" data-action="coupon" class="mini-btn">
+            <i class="bi bi-ticket-perforated" style="margin-right:6px;"></i> <span>Coupon</span>
+          </button>
+        </div>
 
-         <button class="print">{{ text_print_bill }}</button>
+        <button class="checkout-btn"><i class="bi bi-cart-check" style="font-size: 20px;"></i> {{ text_checkout }}</button>
       </div>
 
     </div>

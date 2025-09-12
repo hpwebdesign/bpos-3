@@ -322,6 +322,7 @@ form, form input, form select, form textarea, .dropdown-menu {
     margin-top: 8px;
     font-weight: 800;
     color: #fff;
+    font-size: 20px;
 }
 .paybtn, .shippingbtn, .customer-btn {
     border: 1px solid var(--line);
@@ -340,7 +341,6 @@ form, form input, form select, form textarea, .dropdown-menu {
 
 #checkout-summary .paybtn i, #checkout-summary .shippingbtn i {
     display: block;
-    margin-right: 6px;
     vertical-align: middle;
     font-size: 15px;
 }
@@ -364,7 +364,7 @@ form, form input, form select, form textarea, .dropdown-menu {
     white-space: nowrap;
 }
 */
-.print {
+.checkout-btn {
     width: 100%;
     border: none;
     background: #1971ff;
@@ -1972,7 +1972,7 @@ a.text-hover-primary:hover {
 }
 
 /* Print */
-.print {
+.checkout-btn {
     padding: 10px 14px;
     font-size: 15px;
     border-radius: 8px;
@@ -1981,7 +1981,7 @@ a.text-hover-primary:hover {
     border: none;
     cursor: pointer;
 }
-.print:hover {
+.checkout-btn:hover {
     background: var(--brand-darker);
 }
 
@@ -2106,8 +2106,16 @@ a.text-hover-primary:hover {
 
 
 /*Experimental*/
-.paybtn > span, .shippingbtn > span, .customer-btn > span {
-/* display: none;*/
+#checkout-summary button span {
     font-size: 12px;
 }
 
+#checkout-summary button.active span {
+/* display: none;*/
+    color: #009539;
+}
+
+
+#checkout-summary button.active > i {
+  color: #009539;
+}
