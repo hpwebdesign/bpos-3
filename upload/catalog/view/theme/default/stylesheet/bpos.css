@@ -104,6 +104,7 @@ form, form input, form select, form textarea, .dropdown-menu {
 .header {
     height: 88px;
     background-color: var(--bg);
+    padding-right: 410px
 }
 .logo {
     height: 30px;
@@ -139,6 +140,7 @@ form, form input, form select, form textarea, .dropdown-menu {
 }
 .icon-btn {
     width: auto;
+    min-width: 34px;
     height: 34px;
     border-radius: 10px;
     background: rgba(255, 255, 255, .12);
@@ -326,7 +328,8 @@ form, form input, form select, form textarea, .dropdown-menu {
     background: #f7f9fd;
     border-radius: 14px;
     display: inline-block;
-    padding: 14px;
+    padding: 7px;
+    min-width: 60px;
 }
 
 .paybtn.active, .shippingbtn.active, .customer-btn.active {
@@ -336,7 +339,7 @@ form, form input, form select, form textarea, .dropdown-menu {
 /* Checkout Summary */
 
 #checkout-summary .paybtn i, #checkout-summary .shippingbtn i {
-    display: inline-block;
+    display: block;
     margin-right: 6px;
     vertical-align: middle;
     font-size: 15px;
@@ -423,7 +426,11 @@ form, form input, form select, form textarea, .dropdown-menu {
     #checkout-summary {
         position: absolute;
         right: 20px;
-        top: 120px;
+        top: 20px;
+    }
+
+    body header {
+        padding-right: 400px;
     }
 }
 #products-list {
@@ -2099,8 +2106,8 @@ a.text-hover-primary:hover {
 
 
 /*Experimental*/
-/*
 .paybtn > span, .shippingbtn > span, .customer-btn > span {
- display: none;
+/* display: none;*/
+    font-size: 12px;
 }
-*/
+

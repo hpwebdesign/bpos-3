@@ -96,7 +96,6 @@ class ControllerBposCheckoutCheckout extends Controller {
                 $method = $this->{'model_extension_payment_' . $code}->getMethod($payment_address, $total);
 
                 if ($method) {
-                     $method['title']       = preg_split('/\s+/u', trim($method['title']), 2)[0];;
                      $method_data[$code]    = $method;
                 }
             }
@@ -143,9 +142,9 @@ class ControllerBposCheckoutCheckout extends Controller {
                 $quote = $this->{'model_extension_shipping_' . $code}->getQuote($shipping_address);
 
                 if ($quote) {
+
                     $shipping_data[$code] = array(
-//                        'title'      => $quote['title'],
-                        'title'      => explode(' ', trim($quote['title']))[0],
+                        'title'      => $quote['title'],
                         'quote'      => $quote['quote'],
                         'sort_order' => $quote['sort_order'],
                         'error'      => $quote['error']

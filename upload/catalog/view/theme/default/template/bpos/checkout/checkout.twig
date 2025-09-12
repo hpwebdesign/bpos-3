@@ -57,9 +57,9 @@
           {% if not shipping_method.error %}
           {% for quote in shipping_method.quote %}
         <div class="col">
-          <button data-original-title="{{ quote.title }} - {{ quote.text }}" class="shippingbtn w-100 {% if quote.code == default_shipping %}active{% endif %}" data-code="{{ quote.code }}">
+          <button data-original-title="{{ quote.short_title }} - {{ quote.text }}" class="shippingbtn w-100 {% if quote.code == default_shipping %}active{% endif %}" data-code="{{ quote.code }}">
             <i class="bi bi-truck"></i>
-            <span>{{ quote.title }} - {{ quote.text }}</span>
+            <span>{{ quote.title|split(' ')[0] }} - {{ quote.text }}</span>
           </button>
         </div>
       {% endfor %}
@@ -76,7 +76,7 @@
         {% for payment_method in payment_methods %}
         <div class="col">
           <button data-original-title="{{ payment_method.title }}" class="paybtn w-100 {% if payment_method.code == default_payment %}active{% endif %}" data-code="{{ payment_method.code }}">
-            <i class="bi bi-credit-card"></i><span>{{ payment_method.title }}</span>
+            <i class="bi bi-credit-card"></i><span>{{ payment_method.title|split(' ')[0] }}</span>
           </button>
         </div>
         {% endfor %}
