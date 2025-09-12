@@ -60,7 +60,7 @@ class ControllerBposCheckoutCart extends Controller {
             if (!$json) {
                 $this->cart->add($this->request->post['product_id'], $quantity, $option, $recurring_id);
 
-                $json['success'] = sprintf($this->language->get('text_success'), $this->url->link('product/product', 'product_id=' . $this->request->post['product_id']), $product_info['name'], $this->url->link('checkout/cart'));
+                $json['success'] = sprintf($this->language->get('text_success_cart'),  $product_info['name']);
 
                 // Unset all shipping and payment methods
                 unset($this->session->data['shipping_method']);
