@@ -57,8 +57,9 @@
           {% if not shipping_method.error %}
           {% for quote in shipping_method.quote %}
         <div class="col">
-          <button class="shippingbtn w-100 {% if quote.code == default_shipping %}active{% endif %}" data-code="{{ quote.code }}">
-            <i class="bi bi-truck"></i><span>{{ quote.title }} - {{ quote.text }}</span>
+          <button data-original-title="{{ quote.title }} - {{ quote.text }}" class="shippingbtn w-100 {% if quote.code == default_shipping %}active{% endif %}" data-code="{{ quote.code }}">
+            <i class="bi bi-truck"></i>
+            <span>{{ quote.title }} - {{ quote.text }}</span>
           </button>
         </div>
       {% endfor %}
@@ -74,7 +75,7 @@
       <div class="row row-cols-3 g-2 mb-3">
         {% for payment_method in payment_methods %}
         <div class="col">
-          <button class="paybtn w-100 {% if payment_method.code == default_payment %}active{% endif %}" data-code="{{ payment_method.code }}">
+          <button data-original-title="{{ payment_method.title }}" class="paybtn w-100 {% if payment_method.code == default_payment %}active{% endif %}" data-code="{{ payment_method.code }}">
             <i class="bi bi-credit-card"></i><span>{{ payment_method.title }}</span>
           </button>
         </div>
@@ -83,11 +84,12 @@
       <div class="payment-error-container"></div>
       {% endif %}
       <h4>Customer</h4>
+      {% set current_customer = customer_name|default('Guest Customer') %}
       <div class="row row-cols-3 g-2 mb-3">
-        <button type="button" id="pos-current-customer" data-action="customer" class="mini-btn customer-btn w-100 active"
-                data-customer-name="{{ customer_name is defined and customer_name ? customer_name : 'Guest Customer' }}">
+        <button type="button" id="pos-current-customer" data-original-title="{{ customer_name.title }}" data-action="customer" class="mini-btn customer-btn w-100 active"
+                data-customer-name="{{ current_customer }}">
           <i class="bi bi-person" style="margin-right:6px;"></i>
-          {{ customer_name is defined and customer_name ? customer_name : 'Guest Customer' }}
+          {{ current_customer }}
           <i class="bi bi-pencil-square"></i>
         </button>
       </div>

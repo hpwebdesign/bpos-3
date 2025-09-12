@@ -321,14 +321,15 @@ form, form input, form select, form textarea, .dropdown-menu {
     font-weight: 800;
     color: #fff;
 }
-.paybtn, .shippingbtn {
+.paybtn, .shippingbtn, .customer-btn {
     border: 1px solid var(--line);
     background: #f7f9fd;
     border-radius: 14px;
     display: inline-block;
     padding: 14px;
 }
-.paybtn.active, .shippingbtn.active {
+
+.paybtn.active, .shippingbtn.active, .customer-btn.active {
     outline: 2px solid #d4f1e1;
     background: #f2fff7;
 }
@@ -354,10 +355,12 @@ form, form input, form select, form textarea, .dropdown-menu {
     display: inline-block;
     font-size: 1.1rem;
 }
+/*
 .pay .paybtn span {
     display: inline-block;
     white-space: nowrap;
 }
+*/
 .print {
     width: 100%;
     border: none;
@@ -2090,20 +2093,14 @@ a.text-hover-primary:hover {
   font-size: 12px;
   line-height: 1.4;
 }
-.customer-btn {
-    flex: unset !important;
-    border: 1px solid var(--line);
-    background: #f7f9fd;
-    border-radius: 14px;
-    display: inline-block;
-    padding: 14px;
-    width: auto !important;
-}
-.customer-btn.active {
-    outline: 2px solid #d4f1e1 !important;
-    background: #f2fff7 !important;
-}
-
 .swal-form .btn-group {
   margin-bottom: 15px;
 }
+
+
+/*Experimental*/
+/*
+.paybtn > span, .shippingbtn > span, .customer-btn > span {
+ display: none;
+}
+*/
