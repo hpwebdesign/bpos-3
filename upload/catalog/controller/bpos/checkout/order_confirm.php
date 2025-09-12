@@ -1,5 +1,5 @@
 <?php
-class ControllerBposOrderCheckoutConfirm extends Controller {
+class ControllerBposCheckoutOrderConfirm extends Controller {
     public function index() {
         if (!isset($this->request->get['order_id'])) {
             $this->response->redirect($this->url->link('bpos/home', '', true));
