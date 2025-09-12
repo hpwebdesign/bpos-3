@@ -1,5 +1,5 @@
 <?php
-class ControllerBposLanguage extends Controller {
+class ControllerBposCommonLanguage extends Controller {
     public function index() {
         $this->load->language('common/language');
 
@@ -42,7 +42,7 @@ class ControllerBposLanguage extends Controller {
             $data['redirect'] = $this->url->link($route, $url, $this->request->server['HTTPS']);
         }
 
-        return $this->load->view('bpos/language', $data);
+        return $this->load->view('bpos/common/language', $data);
     }
 
     public function language() {

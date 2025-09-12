@@ -72,10 +72,10 @@ class ControllerBposHome extends Controller {
         $pagination->url = "javascript:loadPage('" . $ajax_url . "');";
         $data['pagination'] = $pagination->render();
 
-        $data['language'] = $this->load->controller('bpos/language');
-        $data['currency'] = $this->load->controller('bpos/currency');
-        $data['store']    = $this->load->controller('bpos/store');
-        $data['checkout'] = $this->load->controller('bpos/checkout');
+        $data['language'] = $this->load->controller('bpos/common/language');
+        $data['currency'] = $this->load->controller('bpos/common/currency');
+        $data['store']    = $this->load->controller('bpos/common/store');
+        $data['checkout'] = $this->load->controller('bpos/checkout/checkout');
 
         if (isset($this->request->get['format']) && $this->request->get['format'] == 'json') {
             $this->response->addHeader('Content-Type: application/json');
@@ -86,7 +86,7 @@ class ControllerBposHome extends Controller {
             $data['title'] = 'Home - POS System';
             $data['content'] = $this->load->view('bpos/home', $data);
             $data['server']  = HTTPS_SERVER;
-            $this->response->setOutput($this->load->view('bpos/layout', $data));
+            $this->response->setOutput($this->load->view('bpos/common/layout', $data));
         }
     }
 

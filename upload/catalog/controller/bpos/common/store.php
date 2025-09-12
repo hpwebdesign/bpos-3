@@ -1,5 +1,5 @@
 <?php
-class ControllerBposStore extends Controller {
+class ControllerBposCommonStore extends Controller {
     public function index() {
         $this->load->model('bpos/store');
         $data['stores'] = array();
@@ -22,7 +22,7 @@ class ControllerBposStore extends Controller {
         $data['store_name'] = $this->config->get('config_name');
         $data['store_id'] = $this->config->get('config_store_id');
 
-        return $this->load->view('bpos/store', $data);
+        return $this->load->view('bpos/common/store', $data);
     }
 
 }

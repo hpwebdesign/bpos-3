@@ -1,5 +1,5 @@
 <?php
-class ControllerBposCart extends Controller {
+class ControllerBposCheckoutCart extends Controller {
     public function add() {
         $this->load->language('checkout/cart');
         $this->load->language('bpos/bpos');
@@ -74,8 +74,8 @@ class ControllerBposCart extends Controller {
                 $totals = array();
                 $taxes = $this->cart->getTaxes();
                 $total = 0;
-        
-                // Because __call can not keep var references so we put them into an array.             
+
+                // Because __call can not keep var references so we put them into an array.
                 $total_data = array(
                     'totals' => &$totals,
                     'taxes'  => &$taxes,
@@ -129,9 +129,9 @@ class ControllerBposCart extends Controller {
         if (isset($this->request->post['key'])) {
             $key = $this->request->post['key'];
 
-            
+
             $this->cart->update($key, (int)$this->request->post['quantity']);
-            
+
         }
         // unset($this->session->data['shipping_method']);
         //     unset($this->session->data['shipping_methods']);

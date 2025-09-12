@@ -7,6 +7,7 @@
     </div>
 
     {% if products %}
+    <div class="order-line-wrapper">
     {% for product in products %}
       <div class="order-line">
         <div class="thumb">
@@ -33,6 +34,7 @@
         <div class="price-sm">{{ product.total }}</div>
       </div>
     {% endfor %}
+</div>
   {% else %}
     <p class="text-muted">{{ text_empty_cart }}</p>
   {% endif %}

@@ -1,5 +1,5 @@
 <?php
-class ControllerBposCurrency extends Controller {
+class ControllerBposCommonCurrency extends Controller {
     public function index() {
         $this->load->language('bpos/currency');
 
@@ -44,17 +44,17 @@ class ControllerBposCurrency extends Controller {
             $data['redirect'] = $this->url->link($route, $url, $this->request->server['HTTPS']);
         }
 
-        return $this->load->view('bpos/currency', $data);
+        return $this->load->view('bpos/common/currency', $data);
     }
 
     public function currency() {
         if (isset($this->request->post['code'])) {
             $this->session->data['currency'] = $this->request->post['code'];
-        
+
             unset($this->session->data['shipping_method']);
             unset($this->session->data['shipping_methods']);
         }
-        
+
         if (isset($this->request->post['redirect'])) {
             $this->response->redirect($this->request->post['redirect']);
         } else {

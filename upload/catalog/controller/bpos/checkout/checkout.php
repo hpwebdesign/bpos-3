@@ -1,5 +1,5 @@
 <?php
-class ControllerBposCheckout extends Controller {
+class ControllerBposCheckoutCheckout extends Controller {
     public function index() {
         $this->load->language('checkout/cart');
         $this->load->language('bpos/bpos');
@@ -135,7 +135,7 @@ class ControllerBposCheckout extends Controller {
         $code = '';
 
         foreach ($results as $code) {
-            
+
             if ($this->config->get('shipping_' . $code . '_status')) {
                 $this->load->model('extension/shipping/' . $code);
 
@@ -164,7 +164,7 @@ class ControllerBposCheckout extends Controller {
 
         $data['shipping_methods'] = $shipping_data;
 
-        $default_shipping = $this->config->get('bpos_default_shipping_method'); 
+        $default_shipping = $this->config->get('bpos_default_shipping_method');
 
         if (!empty($data['shipping_methods']) && !isset($this->session->data['shipping_method'])) {
 
@@ -223,9 +223,9 @@ class ControllerBposCheckout extends Controller {
         $html = isset($this->request->get['html']) ? 1 : 0;
 
         if ($html) {
-            $this->response->setOutput($this->load->view('bpos/checkout', $data));
+            $this->response->setOutput($this->load->view('bpos/checkout/checkout', $data));
         } else {
-            return $this->load->view('bpos/checkout', $data);
+            return $this->load->view('bpos/checkout/checkout', $data);
         }
 
     }

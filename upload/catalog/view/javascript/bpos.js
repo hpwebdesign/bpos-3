@@ -1,4 +1,15 @@
 $(document).ready(function() {
+
+//toastr.options = {
+//  timeOut: 1000,
+//  extendedTimeOut: 0,
+//  showDuration: 150,
+//  hideDuration: 150,
+//  progressBar: true,
+//  newestOnTop: true,
+//  closeButton: false
+//};
+
     $('.sidebar .bubble').on('click', function() {
         $('.sidebar .bubble').removeClass('active');
         $(this).addClass('active');
@@ -74,8 +85,8 @@ $(document).ready(function() {
 
                 if (json.success) {
                     console.log(json['order_id']);
-                    loadContent('bpos/order_confirm&order_id='+ json['order_id']);
-                    //window.location.href = 'index.php?route=bpos/order_confirm&order_id=' + json['order_id'];
+                    loadContent('bpos/checkout/order_confirm&order_id='+ json['order_id']);
+                    //window.location.href = 'index.php?route=bpos/checkout/order_confirm&order_id=' + json['order_id'];
                 }
             },
             error: function() {
@@ -93,7 +104,7 @@ $(document).ready(function() {
         $(this).addClass('active');
 
         $.ajax({
-            url: 'index.php?route=bpos/checkout/setPayment',
+            url: 'index.php?route=bpos/checkout/checkout/setPayment',
             type: 'post',
             data: { code: code },
             dataType: 'json',
@@ -111,7 +122,7 @@ $(document).ready(function() {
         $(this).addClass('active');
 
         $.ajax({
-            url: 'index.php?route=bpos/checkout/setShipping',
+            url: 'index.php?route=bpos/checkout/checkout/setShipping',
             type: 'post',
             data: { code: code },
             dataType: 'json',
@@ -136,7 +147,7 @@ $(document).ready(function() {
             });
         } else {
             loadPage('index.php?route=bpos/home');
-           
+
         }
     });
 
@@ -180,7 +191,7 @@ $(document).ready(function() {
 
     function updateCartQty(key, qty) {
         $.ajax({
-            url: 'index.php?route=bpos/cart/edit',
+            url: 'index.php?route=bpos/checkout/cart/edit',
             type: 'post',
             data: {
                 key: key,
@@ -210,7 +221,7 @@ $(document).ready(function() {
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
-                url: 'index.php?route=bpos/cart/clear',
+                url: 'index.php?route=bpos/checkout/cart/clear',
                 type: 'post',
                 dataType: 'json',
                 success: function(json) {
@@ -255,7 +266,7 @@ $(document).ready(function() {
                 } else {
                     // Langsung add to cart
                     $.ajax({
-                        url: 'index.php?route=bpos/cart/add',
+                        url: 'index.php?route=bpos/checkout/cart/add',
                         type: 'post',
                         data: { product_id: product_id, quantity: 1 },
                         dataType: 'json',
@@ -275,7 +286,7 @@ $(document).ready(function() {
     $(document).on('click', '#btn-add-with-options', function() {
         let form_data = $('#form-product-options').serialize();
         $.ajax({
-            url: 'index.php?route=bpos/cart/add',
+            url: 'index.php?route=bpos/checkout/cart/add',
             type: 'post',
             data: form_data + '&quantity=1',
             dataType: 'json',
@@ -319,7 +330,7 @@ $(document).ready(function() {
     // Fungsi Add to Cart
     function posAddToCart(product_id, quantity = 1) {
         $.ajax({
-            url: 'index.php?route=bpos/cart/add',
+            url: 'index.php?route=bpos/checkout/cart/add',
             type: 'post',
             data: { product_id: product_id, quantity: quantity },
             dataType: 'json',
@@ -351,12 +362,12 @@ $(document).ready(function() {
     }
 
     // Update checkout panel (kalau mau menampilkan isi keranjang di POS)
-    
+
 
 });
 function updateCheckoutPanel() {
         $.ajax({
-            url: 'index.php?route=bpos/checkout&html=1',
+            url: 'index.php?route=bpos/checkout/checkout&html=1',
             type: 'get',
             dataType: 'html',
             success: function(html) {
@@ -405,7 +416,7 @@ function loadPage(route) {
         type: 'get',
         dataType: 'json',
         beforeSend: function() {
-           
+
         },
         success: function(json) {
             if (json.output) {
@@ -431,13 +442,13 @@ var API = {
   customers_list:   'index.php?route=bpos/customer/list',       // GET
   customers_create: 'index.php?route=bpos/customer/create',     // POST {name}
   customers_edit:   'index.php?route=bpos/customer/edit',       // POST {id, name}
-  cart_summary:     'index.php?route=bpos/cart/summary',        // GET -> { subtotal: 125000 }
-  apply_discount:   'index.php?route=bpos/cart/apply_discount', // POST {percent, fixed}
-  apply_charge:     'index.php?route=bpos/cart/apply_charge',   // POST {percent, fixed}
+  cart_summary:     'index.php?route=bpos/checkout/cart/summary',        // GET -> { subtotal: 125000 }
+  apply_discount:   'index.php?route=bpos/checkout/cart/apply_discount', // POST {percent, fixed}
+  apply_charge:     'index.php?route=bpos/checkout/cart/apply_charge',   // POST {percent, fixed}
   customers_login:  'index.php?route=bpos/customer/login',      // POST {id}
   customers_unset:  'index.php?route=bpos/customer/clear',      // POST
-  coupons_list:     'index.php?route=bpos/cart/coupons',        // GET -> { coupons: [...] }
-  apply_coupon:     'index.php?route=bpos/cart/apply_coupon'    // POST {code}
+  coupons_list:     'index.php?route=bpos/checkout/cart/coupons',        // GET -> { coupons: [...] }
+  apply_coupon:     'index.php?route=bpos/checkout/cart/apply_coupon'    // POST {code}
 };
 
 /* =========================
@@ -520,6 +531,10 @@ function buildCustomerHTML(){
   var cur = getCurrentCustomerName();
   return ''+
   '<div class="swal-form">'+
+    '<div class="btn-group" style="width:100%;gap:6px;display:flex;margin-top:10px;">'+
+      '<button type="button" class="btn btn-success" id="swal_add_customer" style="flex:1;">Add</button>'+
+      '<button type="button" class="btn btn-warning" id="swal_edit_customer" style="flex:1;">Edit</button>'+
+    '</div>'+
     '<div class="form-group" style="margin-bottom:8px;">'+
       '<div style="font-size:14px;">Current Customer: <strong>'+ $('<div>').text(cur).html() +'</strong></div>'+
     '</div>'+
@@ -528,10 +543,6 @@ function buildCustomerHTML(){
     '<input type="hidden" id="swal_customer_id" />'+
     '<div id="swal_customer_suggest" style="position:relative;">'+
       '<div class="swal-ac-list" style="position:absolute;top:100%;left:0;right:0;margin-top:4px;z-index:9999;background:#fff;border:1px solid #e5e7eb;border-radius:6px;box-shadow:0 8px 22px rgba(13,33,80,.08);display:none;max-height:220px;overflow:auto"></div>'+
-    '</div>'+
-    '<div class="btn-group" style="width:100%;gap:6px;display:flex;margin-top:10px;">'+
-      '<button type="button" class="btn btn-success" id="swal_add_customer" style="flex:1;">Add</button>'+
-      '<button type="button" class="btn btn-warning" id="swal_edit_customer" style="flex:1;">Edit</button>'+
     '</div>'+
   '</div>';
 }
@@ -657,7 +668,7 @@ function openSwal(type, onSubmit){
           bindCustomerButtons();
           bindCustomerAutocomplete();
         }).catch(function(){
-          Swal.update({ html: '<p style="color:#ef4444;">Failed to load customers</p>' });
+          Swal.update({ html: '<p style="color:#ef4444;">Failed to load Sustomers</p>' });
         });
       },
       preConfirm: function(){
@@ -686,11 +697,11 @@ function openSwal(type, onSubmit){
             var code = $(this).data('code');
             $('#swal_coupon_code').val(code).focus();
           });
-          $(document).off('click.swal_coupon_paste').on('click.swal_coupon_paste', '#swal_coupon_paste', function(){
-            if (navigator.clipboard && navigator.clipboard.readText){
-              navigator.clipboard.readText().then(function(t){ $('#swal_coupon_code').val((t||'').trim()).focus(); });
-            }
-          });
+//          $(document).off('click.swal_coupon_paste').on('click.swal_coupon_paste', '#swal_coupon_paste', function(){
+//            if (navigator.clipboard && navigator.clipboard.readText){
+//              navigator.clipboard.readText().then(function(t){ $('#swal_coupon_code').val((t||'').trim()).focus(); });
+//            }
+//          });
         }).catch(function(){
           Swal.update({ html: '<p style="color:#ef4444;">Failed to load coupons</p>' });
         });
@@ -776,7 +787,7 @@ function openSwal(type, onSubmit){
             if (typeof onSubmit === 'function') onSubmit({ok:true, type:'discount', server:res});
              updateCheckoutPanel();
             Swal.fire('Applied','Discount applied','success');
-           
+
           })
           .catch(function(err){
             Swal.fire('Error', (err && err.message) || 'Failed to apply discount', 'error');

@@ -1,5 +1,5 @@
 <?php
-class ControllerBposOrderConfirm extends Controller {
+class ControllerBposOrderCheckoutConfirm extends Controller {
     public function index() {
         if (!isset($this->request->get['order_id'])) {
             $this->response->redirect($this->url->link('bpos/home', '', true));
@@ -51,7 +51,7 @@ class ControllerBposOrderConfirm extends Controller {
             $this->response->addHeader('Content-Type: application/json');
             $this->response->setOutput(json_encode(['output' => $data['content']]));
         } else {
-            $this->response->setOutput($this->load->view('bpos/layout', $data));
+            $this->response->setOutput($this->load->view('bpos/checkout/layout', $data));
         }
     }
 }
