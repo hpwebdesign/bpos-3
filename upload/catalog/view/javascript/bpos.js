@@ -185,16 +185,18 @@ $(document).ready(function() {
     $(document).on('click', '.qty-plus', function() {
         let key = $(this).data('key');
         let qty = $(this).data('qty');
-        updateCartQty(key, qty);
+        let prev = parseInt($(this).closest('.qty').find('span').text(), 10) || 0;
+        updateCartQty(key, qty, prev);
     });
 
     $(document).on('click', '.qty-minus', function() {
         let key = $(this).data('key');
         let qty = $(this).data('qty');
-        updateCartQty(key, qty);
+        let prev = parseInt($(this).closest('.qty').find('span').text(), 10) || 0;
+        updateCartQty(key, qty, prev);
     });
 
-    function updateCartQty(key, qty) {
+    function updateCartQty(key, qty, prevQty) {
         $.ajax({
             url: 'index.php?route=bpos/checkout/cart/edit',
             type: 'post',
@@ -206,6 +208,23 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(json) {
                 updateCheckoutPanel();
+                if (window.notyf) {
+                    var p = typeof prevQty === 'number' ? prevQty : null;
+                    if (p != null) {
+                        if (qty === 0) {
+                            notyf.success('Item removed');
+                        } else {
+                            var msg = 'Qty: ' + p + ' → ' + qty;
+                            // notyf.success(msg);
+                            notyf.success('Quantity updated');
+                        }
+                    } else {
+                        notyf.success('Quantity updated');
+                    }
+                }
+            },
+            error: function(){
+                if (window.notyf) { notyf.error('Failed to update quantity'); }
             }
         });
     }
