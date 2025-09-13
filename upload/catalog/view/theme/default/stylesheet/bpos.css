@@ -341,6 +341,7 @@ form, form input, form select, form textarea, .dropdown-menu {
 
 #checkout-summary .paybtn i, #checkout-summary .shippingbtn i {
     display: block;
+    margin-right: 6px;
     vertical-align: middle;
     font-size: 15px;
 }

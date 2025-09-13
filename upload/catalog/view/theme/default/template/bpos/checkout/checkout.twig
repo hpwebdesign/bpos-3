@@ -87,7 +87,7 @@
       {% set current_customer = customer_name|default('Guest Customer') %}
       <div class="row row-cols-3 g-2 mb-3">
         <div class="col">
-          <button type="button" id="pos-current-customer" data-original-title="{{ customer_name.title }}" data-action="customer" class="mini-btn customer-btn w-100 active"
+          <button type="button" id="pos-current-customer" data-original-title="{{ customer_name.title }}" data-action="customer" class="customer-btn w-100 active"
                   data-customer-name="{{ current_customer }}">
             <i class="bi bi-person" style="margin-right:6px;"></i>
               <span>{{ current_customer }}</span>
