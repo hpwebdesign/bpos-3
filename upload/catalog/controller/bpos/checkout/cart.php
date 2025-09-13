@@ -206,7 +206,8 @@ class ControllerBposCheckoutCart extends Controller {
                 'fixed'=>isset($chg['fixed'])?(float)$chg['fixed']:0,
                 'amount'=>round($charge_amount)
             ),
-            'total'=>round($total)
+            'total'=>round($total),
+            'coupon'=> isset($this->session->data['coupon']) ? $this->session->data['coupon'] : null
         );
 
         $this->response->setOutput(json_encode($out));
@@ -279,6 +280,38 @@ class ControllerBposCheckoutCart extends Controller {
         )));
     }
 
+    // POST /index.php?route=bpos/checkout/cart/remove_discount
+    // Behavior: clear discount session
+    public function remove_discount(){
+        $this->jsonHeader();
+        unset($this->session->data['bpos_discount']);
+        $subtotal = $this->getSubtotal();
+        // Keep existing charge if any
+        $chg = isset($this->session->data['bpos_charge']) ? $this->session->data['bpos_charge'] : array('percent'=>0,'fixed'=>0,'amount'=>0);
+        list($discount_amount,$charge_amount,$total) = $this->calcTotals($subtotal, array('percent'=>0,'fixed'=>0,'amount'=>0), $chg);
+        $this->response->setOutput(json_encode(array(
+            'ok'=>true,
+            'subtotal'=>round($subtotal),
+            'total'=>round($total)
+        )));
+    }
+
+    // POST /index.php?route=bpos/checkout/cart/remove_charge
+    // Behavior: clear charge session
+    public function remove_charge(){
+        $this->jsonHeader();
+        unset($this->session->data['bpos_charge']);
+        $subtotal = $this->getSubtotal();
+        // Keep existing discount if any
+        $disc = isset($this->session->data['bpos_discount']) ? $this->session->data['bpos_discount'] : array('percent'=>0,'fixed'=>0,'amount'=>0);
+        list($discount_amount,$charge_amount,$total) = $this->calcTotals($subtotal, $disc, array('percent'=>0,'fixed'=>0,'amount'=>0));
+        $this->response->setOutput(json_encode(array(
+            'ok'=>true,
+            'subtotal'=>round($subtotal),
+            'total'=>round($total)
+        )));
+    }
+
     // GET /index.php?route=bpos/cart/coupons
     // Returns: { coupons: [ {code,name,discount,type,date_end,total_min} ] }
     public function coupons(){
@@ -336,5 +369,16 @@ class ControllerBposCheckoutCart extends Controller {
         unset($this->session->data['shipping_methods']);
 
         $this->response->setOutput(json_encode(array('ok'=>true,'code'=>$code,'info'=>array('type'=>isset($info['type'])?$info['type']:null,'discount'=>isset($info['discount'])?(float)$info['discount']:null))));
+    }
+
+    // POST /index.php?route=bpos/checkout/cart/remove_coupon
+    public function remove_coupon(){
+        $this->jsonHeader();
+        unset($this->session->data['coupon']);
+        unset($this->session->data['payment_method']);
+        unset($this->session->data['payment_methods']);
+        unset($this->session->data['shipping_method']);
+        unset($this->session->data['shipping_methods']);
+        $this->response->setOutput(json_encode(array('ok'=>true)));
     }
 }

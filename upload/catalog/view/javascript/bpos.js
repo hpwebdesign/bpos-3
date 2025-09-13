@@ -1,3 +1,8 @@
+// Initialize Notyf (top-right) if available
+if (typeof window !== 'undefined' && typeof window.Notyf !== 'undefined') {
+  window.notyf = window.notyf || new Notyf({ duration: 1000, position: { x: 'right', y: 'top' } });
+}
+
 $(document).ready(function() {
 
 //toastr.options = {
@@ -109,7 +114,7 @@ $(document).ready(function() {
             data: { code: code },
             dataType: 'json',
             success: function(json) {
-                toastr.success(json['success'], '', { timeOut: 1000 });
+                if (window.notyf) { notyf.success(json['success']); }
                 updateCheckoutPanel();
             }
         });
@@ -127,7 +132,7 @@ $(document).ready(function() {
             data: { code: code },
             dataType: 'json',
             success: function(json) {
-                toastr.success(json['success'], '', { timeOut: 1000 });
+                if (window.notyf) { notyf.success(json['success']); }
                 updateCheckoutPanel();
             }
         });
@@ -272,7 +277,7 @@ $(document).ready(function() {
                         dataType: 'json',
                         success: function(json) {
                             if (json['success']) {
-                                toastr.success(json['success']);
+                                if (window.notyf) { notyf.success(json['success']); }
                                 $('.cart .counter').html(json['total_cart']);
                                 updateCheckoutPanel();
                             }
@@ -317,7 +322,7 @@ $(document).ready(function() {
                 }
                 if (json['success']) {
                     $('#productOptionModal').modal('hide');
-                    toastr.success(json['success']);
+                    if (window.notyf) { notyf.success(json['success']); }
                     $('.cart .counter').html(json['total_cart']);
                     updateCheckoutPanel();
                 }
@@ -336,10 +341,10 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(json) {
                 if (json['error']) {
-                    toastr.error(json['error']['warning'] || 'Error adding product to cart');
+                    if (window.notyf) { notyf.error(json['error']['warning'] || 'Error adding product to cart'); }
                 }
                 if (json['success']) {
-                    toastr.success(json['success']);
+                    if (window.notyf) { notyf.success(json['success']); }
                     //alert(json['success']); // Bisa ganti pakai notifikasi lebih bagus
                     updateCheckoutPanel();
                     var target = $('#checkout-summary');
@@ -355,7 +360,7 @@ $(document).ready(function() {
                 }
             },
             error: function() {
-                toastr.error('Error: Could not add to cart');
+                if (window.notyf) { notyf.error('Error: Could not add to cart'); }
                 //alert('Error: Could not add to cart');
             }
         });
@@ -445,10 +450,13 @@ var API = {
   cart_summary:     'index.php?route=bpos/checkout/cart/summary',        // GET -> { subtotal: 125000 }
   apply_discount:   'index.php?route=bpos/checkout/cart/apply_discount', // POST {percent, fixed}
   apply_charge:     'index.php?route=bpos/checkout/cart/apply_charge',   // POST {percent, fixed}
+  remove_discount:  'index.php?route=bpos/checkout/cart/remove_discount',// POST
+  remove_charge:    'index.php?route=bpos/checkout/cart/remove_charge',  // POST
   customers_login:  'index.php?route=bpos/customer/login',      // POST {id}
   customers_unset:  'index.php?route=bpos/customer/clear',      // POST
   coupons_list:     'index.php?route=bpos/checkout/cart/coupons',        // GET -> { coupons: [...] }
-  apply_coupon:     'index.php?route=bpos/checkout/cart/apply_coupon'    // POST {code}
+  apply_coupon:     'index.php?route=bpos/checkout/cart/apply_coupon',   // POST {code}
+  remove_coupon:    'index.php?route=bpos/checkout/cart/remove_coupon'   // POST
 };
 
 /* =========================
@@ -509,9 +517,13 @@ function ajaxLoadCoupons(){
 function applyCoupon(payload) {
   return $.post(API.apply_coupon, payload, null, 'json');
 }
+function removeCoupon(){
+  return $.post(API.remove_coupon, {}, null, 'json');
+}
 function fetchCartSummary(){
+  // Return full summary object: { subtotal, discount:{percent,fixed,amount}, charge:{percent,fixed,amount}, total }
   return $.getJSON(API.cart_summary).then(function(res){
-    return (res && typeof res.subtotal !== 'undefined') ? Number(res.subtotal) : 0;
+    return res || { subtotal:0, discount:{percent:0,fixed:0,amount:0}, charge:{percent:0,fixed:0,amount:0}, total:0 };
   });
 }
 function applyDiscount(payload) {
@@ -519,6 +531,12 @@ function applyDiscount(payload) {
 }
 function applyCharge(payload) {
   return $.post(API.apply_charge, payload, null, 'json');
+}
+function removeDiscount(){
+  return $.post(API.remove_discount, {}, null, 'json');
+}
+function removeCharge(){
+  return $.post(API.remove_charge, {}, null, 'json');
 }
 function ajaxUnsetCustomer(){
   return $.post(API.customers_unset, {}, null, 'json');
@@ -602,7 +620,6 @@ function buildCouponHTML(list){
         '<label>Coupon code</label>'+
         '<div style="display:flex;gap:6px;">'+
           '<input type="text" id="swal_coupon_code" class="form-control" placeholder="Enter coupon code" style="flex:1" />'+
-          '<button type="button" id="swal_coupon_paste" class="btn btn-default">Paste</button>'+
         '</div>'+
       '</div>'+
       '<div id="swal_coupon_list" style="max-height:220px;overflow:auto">'+items+'</div>'+
@@ -691,20 +708,28 @@ function openSwal(type, onSubmit){
       title: 'Coupon',
       html: '<div style="text-align:center;padding:14px 0;">Loading...</div>',
       didOpen: function(){
-        ajaxLoadCoupons().then(function(list){
-          Swal.update({ html: buildCouponHTML(list) });
-          $(document).off('click.swal_coupon').on('click.swal_coupon', '#swal_coupon_list .swal-coupon-item', function(){
-            var code = $(this).data('code');
-            $('#swal_coupon_code').val(code).focus();
+        Promise.all([fetchCartSummary(), ajaxLoadCoupons()])
+          .then(function(tuple){
+            var summary = tuple[0] || {};
+            var list = tuple[1] || [];
+            Swal.update({ html: buildCouponHTML(list) });
+            if (summary && summary.coupon){
+              $('#swal_coupon_code').val(summary.coupon);
+            }
+            $(document).off('click.swal_coupon').on('click.swal_coupon', '#swal_coupon_list .swal-coupon-item', function(){
+              var code = $(this).data('code');
+              $('#swal_coupon_code').val(code).focus();
+            });
+            // Optional paste support
+            // $(document).off('click.swal_coupon_paste').on('click.swal_coupon_paste', '#swal_coupon_paste', function(){
+            //   if (navigator.clipboard && navigator.clipboard.readText){
+            //     navigator.clipboard.readText().then(function(t){ $('#swal_coupon_code').val((t||'').trim()).focus(); });
+            //   }
+            // });
+          })
+          .catch(function(){
+            Swal.update({ html: '<p style="color:#ef4444;">Failed to load coupons</p>' });
           });
-//          $(document).off('click.swal_coupon_paste').on('click.swal_coupon_paste', '#swal_coupon_paste', function(){
-//            if (navigator.clipboard && navigator.clipboard.readText){
-//              navigator.clipboard.readText().then(function(t){ $('#swal_coupon_code').val((t||'').trim()).focus(); });
-//            }
-//          });
-        }).catch(function(){
-          Swal.update({ html: '<p style="color:#ef4444;">Failed to load coupons</p>' });
-        });
       },
       preConfirm: function(){
         var code = ($('#swal_coupon_code').val()||'').trim();
@@ -720,21 +745,32 @@ function openSwal(type, onSubmit){
       html: isDiscount ? buildDiscountHTML() : buildChargeHTML(),
       willOpen: function() { Swal.showLoading(); },
       didOpen: function() {
-        fetchCartSummary().then(function(subtotal){
+        fetchCartSummary().then(function(summary){
+          var subtotal = Number(summary && summary.subtotal || 0);
           var wrap = isDiscount ? '#swal_discount_preview' : '#swal_charge_preview';
           var $wrap = $(wrap);
           $wrap.find('[data-subtotal]').text(formatIDR(subtotal));
+
+          // Prefill from session if available
+          if (isDiscount && summary && summary.discount) {
+            $('#swal_discount_pct').val(toNumber(summary.discount.percent));
+            $('#swal_discount_fix').val(toNumber(summary.discount.fixed));
+          } else if (!isDiscount && summary && summary.charge) {
+            $('#swal_charge_pct').val(toNumber(summary.charge.percent));
+            $('#swal_charge_fix').val(toNumber(summary.charge.fixed));
+          }
+
           var recalc = debounce(function(){
-          var pct = toNumber($(isDiscount ? '#swal_discount_pct' : '#swal_charge_pct').val());
-          var fix = toNumber($(isDiscount ? '#swal_discount_fix' : '#swal_charge_fix').val());
-          var fromPct = Math.floor(subtotal * (pct/100));
-          var fromFix = fix;
-          var delta = fromPct + fromFix;
-          var newTotal = isDiscount ? Math.max(0, subtotal - delta) : subtotal + delta;
-          $wrap.find('[data-from-pct]').text(formatIDR(fromPct));
-          $wrap.find('[data-from-fix]').text(formatIDR(fromFix));
-          $wrap.find(isDiscount ? '[data-total-disc]' : '[data-total-charge]').text(formatIDR(delta));
-          $wrap.find('[data-new-total]').text(formatIDR(newTotal));
+            var pct = toNumber($(isDiscount ? '#swal_discount_pct' : '#swal_charge_pct').val());
+            var fix = toNumber($(isDiscount ? '#swal_discount_fix' : '#swal_charge_fix').val());
+            var fromPct = Math.floor(subtotal * (pct/100));
+            var fromFix = fix;
+            var delta = fromPct + fromFix;
+            var newTotal = isDiscount ? Math.max(0, subtotal - delta) : subtotal + delta;
+            $wrap.find('[data-from-pct]').text(formatIDR(fromPct));
+            $wrap.find('[data-from-fix]').text(formatIDR(fromFix));
+            $wrap.find(isDiscount ? '[data-total-disc]' : '[data-total-charge]').text(formatIDR(delta));
+            $wrap.find('[data-new-total]').text(formatIDR(newTotal));
           }, 120);
           $(document).on('input', isDiscount ? '#swal_discount_pct,#swal_discount_fix' : '#swal_charge_pct,#swal_charge_fix', recalc);
           recalc();
@@ -759,8 +795,8 @@ function openSwal(type, onSubmit){
     html: cfg.html,
     showCancelButton: true,
     confirmButtonText: 'Apply',
-    showDenyButton: (type === 'customer'),
-    denyButtonText: (type === 'customer') ? 'Remove' : undefined,
+    showDenyButton: (type === 'customer' || type === 'discount' || type === 'charge' || type === 'coupon'),
+    denyButtonText: (type === 'customer' || type === 'discount' || type === 'charge' || type === 'coupon') ? 'Remove' : undefined,
     focusConfirm: false,
     willOpen: cfg.willOpen || null,
     didOpen: cfg.didOpen || null,
@@ -778,6 +814,45 @@ function openSwal(type, onSubmit){
         })
         .catch(function(err){
           Swal.fire('Error', (err && err.message) || 'Failed to unset customer', 'error');
+        });
+    } else if (result.isDenied && type === 'discount') {
+      removeDiscount()
+        .then(function(res){
+          if (res && res.ok){
+            if (typeof updateCheckoutPanel === 'function') { updateCheckoutPanel(); }
+            Swal.fire('Removed','Discount removed','success');
+          } else {
+            Swal.fire('Error', (res && res.error) || 'Failed to remove discount', 'error');
+          }
+        })
+        .catch(function(err){
+          Swal.fire('Error', (err && err.message) || 'Failed to remove discount', 'error');
+        });
+    } else if (result.isDenied && type === 'charge') {
+      removeCharge()
+        .then(function(res){
+          if (res && res.ok){
+            if (typeof updateCheckoutPanel === 'function') { updateCheckoutPanel(); }
+            Swal.fire('Removed','Charge removed','success');
+          } else {
+            Swal.fire('Error', (res && res.error) || 'Failed to remove charge', 'error');
+          }
+        })
+        .catch(function(err){
+          Swal.fire('Error', (err && err.message) || 'Failed to remove charge', 'error');
+        });
+    } else if (result.isDenied && type === 'coupon') {
+      removeCoupon()
+        .then(function(res){
+          if (res && res.ok){
+            if (typeof updateCheckoutPanel === 'function') { updateCheckoutPanel(); }
+            Swal.fire('Removed','Coupon removed','success');
+          } else {
+            Swal.fire('Error', (res && res.error) || 'Failed to remove coupon', 'error');
+          }
+        })
+        .catch(function(err){
+          Swal.fire('Error', (err && err.message) || 'Failed to remove coupon', 'error');
         });
     } else if (result.isConfirmed) {
       if (result.value && result.value.type === 'discount'){
