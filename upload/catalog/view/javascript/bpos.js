@@ -1036,3 +1036,67 @@ $(document).on('click', '.mini-btn[data-action="coupon"]', function(){
     console.log('Coupon applied:', payload);
   });
 });
+
+// ========================
+// BARCODE SCANNER HANDLER
+// ========================
+
+let barcodeBuffer = "";
+let barcodeTimer = null;
+
+// Fokuskan ke input agar scanner bisa langsung mengetik
+$(document).on('keydown', function (e) {
+  // Abaikan jika sedang input manual di form
+  if ($(e.target).is('input, textarea')) return;
+
+  // Jika waktu antar karakter lebih dari 300ms, reset buffer
+  if (barcodeTimer) clearTimeout(barcodeTimer);
+  barcodeTimer = setTimeout(() => (barcodeBuffer = ""), 300);
+
+  // Enter = akhir barcode
+  if (e.key === 'Enter' && barcodeBuffer.length > 0) {
+    let code = barcodeBuffer.trim();
+    barcodeBuffer = "";
+    handleBarcodeScan(code);
+    return;
+  }
+
+  // Simpan karakter (angka/huruf saja)
+  if (e.key.length === 1) barcodeBuffer += e.key;
+});
+
+function handleBarcodeScan(code) {
+  console.log("Barcode scanned:", code);
+
+  // Panggil endpoint untuk cari product berdasarkan model
+  $.ajax({
+    url: 'index.php?route=bpos/product/getByModel&model=' + encodeURIComponent(code),
+    dataType: 'json',
+    success: function (json) {
+      if (json && json.product_id) {
+        // Otomatis add to cart
+        $.ajax({
+          url: 'index.php?route=bpos/checkout/cart/add',
+          type: 'post',
+          data: { product_id: json.product_id, quantity: 1 },
+          dataType: 'json',
+          success: function (res) {
+            if (res.success && window.notyf) {
+              notyf.success(res.success);
+            }
+            updateCheckoutPanel();
+            $('.cart .counter').html(res.total_cart || 0);
+          },
+          error: function () {
+            if (window.notyf) notyf.error('Failed to add product');
+          }
+        });
+      } else {
+        if (window.notyf) notyf.error('Product not found for barcode: ' + code);
+      }
+    },
+    error: function () {
+      if (window.notyf) notyf.error('Error checking barcode');
+    }
+  });
+}

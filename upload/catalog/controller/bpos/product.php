@@ -78,4 +78,19 @@ class ControllerBposProduct extends Controller {
         $this->response->setOutput($this->load->view('bpos/product_options', $data));
     }
 
+    public function getByModel() {
+        $model = $this->request->get['model'] ?? '';
+
+        $query = $this->db->query("SELECT product_id FROM " . DB_PREFIX . "product WHERE model = '" . $this->db->escape($model) . "' LIMIT 1");
+
+        if ($query->num_rows) {
+            $json = ['product_id' => $query->row['product_id']];
+        } else {
+            $json = ['error' => 'Not found'];
+        }
+
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode($json));
+    }
+
 }
