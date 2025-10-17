@@ -570,7 +570,7 @@ function buildCustomerHTML(){
   '<div class="swal-form">'+
     '<div class="btn-group" style="width:100%;gap:6px;display:flex;margin-top:10px;">'+
       '<button type="button" class="btn btn-success" id="swal_add_customer" style="flex:1;">Add</button>'+
-      '<button type="button" class="btn btn-warning" id="swal_edit_customer" style="flex:1;">Edit</button>'+
+   
     '</div>'+
     '<div class="form-group" style="margin-bottom:8px;">'+
       '<div style="font-size:14px;">Current Customer: <strong>'+ $('<div>').text(cur).html() +'</strong></div>'+
@@ -811,12 +811,25 @@ function openSwal(type, onSubmit){
     };
   }
 
+let showDeny = false;
+let denyText = undefined;
+
+if (type === 'customer') {
+  const el = document.getElementById('pos-current-customer');
+  const curId = el ? el.getAttribute('data-customer-id') : '';
+  showDeny = !!(curId && curId !== '0' && curId !== '');
+  denyText = showDeny ? 'Remove' : undefined;
+} else if (type === 'discount' || type === 'charge' || type === 'coupon') {
+  showDeny = true;
+  denyText = 'Remove';
+}
+
   Swal.fire({
     title: cfg.title,
     html: cfg.html,
     showCancelButton: true,
     confirmButtonText: 'Apply',
-    showDenyButton: (type === 'customer' || type === 'discount' || type === 'charge' || type === 'coupon'),
+    showDenyButton: showDeny,
     denyButtonText: (type === 'customer' || type === 'discount' || type === 'charge' || type === 'coupon') ? 'Remove' : undefined,
     focusConfirm: false,
     willOpen: cfg.willOpen || null,

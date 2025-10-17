@@ -104,7 +104,6 @@ form, form input, form select, form textarea, .dropdown-menu {
 .header {
     height: 88px;
     background-color: var(--bg);
-    padding-right: 410px
 }
 .logo {
     height: 30px;
@@ -427,9 +426,9 @@ form, form input, form select, form textarea, .dropdown-menu {
 
 @media (min-width: 992px) {
     #checkout-summary {
-        position: absolute;
+        position: fixed;
         right: 20px;
-        top: 20px;
+        top: 80px;
     }
     body header {
         padding-right: 400px;
@@ -2140,4 +2139,20 @@ a.text-hover-primary:hover {
 }
 div:where(.swal2-container) div:where(.swal2-html-container) {
     height: 300px;
+}
+.container {
+    width: min(1200px, 92%);
+    margin: 0 auto;
+}
+.table tbody td {
+    font-size: 14px;
+}
+.toolbar input, .toolbar select, .toolbar button {
+    font-size: 14px;
+}
+button i {
+    margin-right: 5px;
+}
+.table tbody td button {
+    font-size: 13px;
 }
