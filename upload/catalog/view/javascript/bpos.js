@@ -700,11 +700,13 @@ function openSwal(type, onSubmit){
       // willOpen: function(){  },
       didOpen: function(){
         ajaxLoadCustomers().then(function(){
-          Swal.update({ html: buildCustomerHTML() });
+          // Swal.update({ html: buildCustomerHTML() });
+          const html = buildCustomerHTML();
+            Swal.getHtmlContainer().innerHTML = html;  // ✅ tanpa update()
           bindCustomerButtons();
           bindCustomerAutocomplete();
         }).catch(function(){
-          Swal.update({ html: '<p style="color:#ef4444;">Failed to load Sustomers</p>' });
+          Swal.getHtmlContainer().innerHTML = '<p style="color:#ef4444;">Failed to load customers</p>';
         });
       },
       preConfirm: function(){

@@ -1,9 +1,19 @@
 <?php
 class ControllerBposInvoice extends Controller {
-    public function index() {
+    public function __construct($registry) {
+        parent::__construct($registry);
+        if (!$this->config->get('bpos_status')) {
+            $this->response->redirect($this->url->link('common/home', '', true));
+        }
+        // Load library user dari admin
+        $this->user = new Cart\User($this->registry);
+
+        // Cek login
         if (!$this->user->isLogged()) {
             $this->response->redirect($this->url->link('bpos/login', '', true));
         }
+    }
+    public function index() {
         if (!isset($this->request->get['order_id'])) {
             return $this->response->redirect($this->url->link('bpos/home'));
         }

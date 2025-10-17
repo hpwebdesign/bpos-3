@@ -17,7 +17,7 @@ class ControllerBposCustomer extends Controller {
         $customers=array();
 
         // Load DB model (use direct query to be version-agnostic)
-        $query=$this->db->query("SELECT customer_id, CONCAT(TRIM(firstname),' ',TRIM(lastname)) AS fullname FROM `".DB_PREFIX."customer` ORDER BY date_added DESC LIMIT 200");
+        $query=$this->db->query("SELECT customer_id, CONCAT(TRIM(firstname),' ',TRIM(lastname)) AS fullname FROM `".DB_PREFIX."customer` ORDER BY date_added DESC");
         foreach($query->rows as $row){
             $name=trim($row['fullname']);
             if($name===''){$name='(No Name)';}

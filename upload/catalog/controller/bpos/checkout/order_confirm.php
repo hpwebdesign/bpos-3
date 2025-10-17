@@ -44,14 +44,14 @@ class ControllerBposCheckoutOrderConfirm extends Controller {
             );
         }
 
-        $data['content'] = $this->load->view('bpos/order_confirm', $data);
+        $data['content'] = $this->load->view('bpos/checkout/order_confirm', $data);
 
         // Support AJAX (format=json)
         if (isset($this->request->get['format']) && $this->request->get['format'] == 'json') {
             $this->response->addHeader('Content-Type: application/json');
             $this->response->setOutput(json_encode(['output' => $data['content']]));
         } else {
-            $this->response->setOutput($this->load->view('bpos/checkout/layout', $data));
+            $this->response->setOutput($this->load->view('bpos/common/layout', $data));
         }
     }
 }

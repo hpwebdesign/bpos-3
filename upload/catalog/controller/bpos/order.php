@@ -98,7 +98,7 @@ class ControllerBposOrder extends Controller {
                 '<div class="dropdown text-end">
                     <button class="btn btn-actions dropdown-toggle" data-bs-toggle="dropdown">Actions</button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                      <li><a class="dropdown-item" href="'.$this->url->link('bpos/invoice','order_id='.$result['order_id']).'">Invoice</a></li>
+                      <li><a class="dropdown-item" href="'.$this->url->link('bpos/checkout/order_confirm&order_id=','order_id='.$result['order_id']).'">Invoice</a></li>
                       <li><a class="dropdown-item" href="'.$this->url->link('bpos/order/view','order_id='.$result['order_id']).'">View</a></li>
                       <li><hr class="dropdown-divider"></li>
                       <li><a class="dropdown-item text-danger" href="'.$this->url->link('bpos/order/delete','order_id='.$result['order_id']).'" onclick="return confirm(\'Delete this order?\')">Delete</a></li>

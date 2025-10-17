@@ -332,7 +332,6 @@ form, form input, form select, form textarea, .dropdown-menu {
     padding: 7px;
     min-width: 60px;
 }
-
 .paybtn.active, .shippingbtn.active, .customer-btn.active {
     outline: 2px solid #d4f1e1;
     background: #f2fff7;
@@ -365,6 +364,7 @@ form, form input, form select, form textarea, .dropdown-menu {
     white-space: nowrap;
 }
 */
+
 .checkout-btn {
     width: 100%;
     border: none;
@@ -383,6 +383,7 @@ form, form input, form select, form textarea, .dropdown-menu {
     cursor: pointer;
 }
 /* Product card hover animation */
+
 .product-item {
     transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
     will-change: transform;
@@ -415,6 +416,7 @@ form, form input, form select, form textarea, .dropdown-menu {
     color: var(--good);
 }
 /* Respect reduced motion preferences */
+
 @media (prefers-reduced-motion: reduce) {
     .product-item, .product-item * {
         transition: none !important;
@@ -429,7 +431,6 @@ form, form input, form select, form textarea, .dropdown-menu {
         right: 20px;
         top: 20px;
     }
-
     body header {
         padding-right: 400px;
     }
@@ -1938,14 +1939,14 @@ a.text-hover-primary:hover {
     content: "›";
     font-size: 18px;
 }
-
 /* Container for buttons */
-.action-row {
-  display: flex;
-  gap: 5px;
-}
 
+.action-row {
+    display: flex;
+    gap: 5px;
+}
 /* mini buttons */
+
 .mini-buttons {
     display: flex;
     justify-content: space-between;
@@ -1971,8 +1972,8 @@ a.text-hover-primary:hover {
     background: var(--brand-darker);
     color: #2a6cf6;
 }
-
 /* Print */
+
 .checkout-btn {
     padding: 10px 14px;
     font-size: 15px;
@@ -1985,56 +1986,78 @@ a.text-hover-primary:hover {
 .checkout-btn:hover {
     background: var(--brand-darker);
 }
-
 /* Checkout */
-.mini-buttons{
-  display:grid;
-  grid-template-columns:repeat(2, 1fr); /* 2 kolom sama lebar */
-  gap:5px;
+
+.mini-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 kolom sama lebar */
+    gap: 5px;
 }
-
-.mini-btn{
-  flex:1 1 0;
-  padding:8px 10px;
-  font-size:13px;
-  line-height:1.2;
-  border-radius:10px;
-  border:1px solid var(--ring, #e5e7eb);
-  color: var(--fg, #1f2937);
-  background-color: var(--mini-bg, var(--card-bg, #fff)) !important; /* override .btn */
-  transition: background-color .2s, box-shadow .2s, transform .08s;
+.mini-btn {
+    flex: 1 1 0;
+    padding: 8px 10px;
+    font-size: 13px;
+    line-height: 1.2;
+    border-radius: 10px;
+    border: 1px solid var(--ring, #e5e7eb);
+    color: var(--fg, #1f2937);
+    background-color: var(--mini-bg, var(--card-bg, #fff)) !important;
+    /* override .btn */
+    transition: background-color .2s, box-shadow .2s, transform .08s;
 }
-
-.mini-btn{ width:100%; }
-
-.mini-btn:active{ transform: translateY(1px); }
-
-.mini-btn[data-action="customer"]{ --mini-bg:#e8f4ff; }   /* sky-100 */
-.mini-btn[data-action="discount"]{ --mini-bg:#ecfdf5; }   /* green-50 */
-.mini-btn[data-action="charge"]  { --mini-bg:#fff7e0; }   /* amber-100 */
-.mini-btn[data-action="coupon"]  { --mini-bg:#fde8f3; }   /* pink-100 */
-
-.mini-btn[data-action="customer"]:hover{ background-color:#dbeafe !important; }
-.mini-btn[data-action="discount"]:hover{ background-color:#d1fae5 !important; }
-.mini-btn[data-action="charge"]:hover  { background-color:#fde68a !important; }
-.mini-btn[data-action="coupon"]:hover  { background-color:#fbcfe8 !important; }
-
-.mini-btn:focus{
-  outline:0;
-  box-shadow:0 0 0 3px rgba(124,141,90,.2);
+.mini-btn {
+    width: 100%;
 }
+.mini-btn:active {
+    transform: translateY(1px);
+}
+.mini-btn[data-action="customer"] {
+    --mini-bg: #e8f4ff;
+}
+/* sky-100 */
 
+.mini-btn[data-action="discount"] {
+    --mini-bg: #ecfdf5;
+}
+/* green-50 */
+
+.mini-btn[data-action="charge"] {
+    --mini-bg: #fff7e0;
+}
+/* amber-100 */
+
+.mini-btn[data-action="coupon"] {
+    --mini-bg: #fde8f3;
+}
+/* pink-100 */
+
+.mini-btn[data-action="customer"]:hover {
+    background-color: #dbeafe !important;
+}
+.mini-btn[data-action="discount"]:hover {
+    background-color: #d1fae5 !important;
+}
+.mini-btn[data-action="charge"]:hover {
+    background-color: #fde68a !important;
+}
+.mini-btn[data-action="coupon"]:hover {
+    background-color: #fbcfe8 !important;
+}
+.mini-btn:focus {
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(124, 141, 90, .2);
+}
 /* popup restyle */
+
 #swal2-html-container, .swal2-actions * {
-  font-size: 14px !important;
+    font-size: 14px !important;
 }
-
 #swal2-title {
-  font-size: 20px !important;
+    font-size: 20px !important;
 }
-
-
 /* Product card hover animation */
+
 .product-item {
     transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
     will-change: transform;
@@ -2067,56 +2090,54 @@ a.text-hover-primary:hover {
     color: var(--good);
 }
 /* Respect reduced motion preferences */
+
 @media (prefers-reduced-motion: reduce) {
     .product-item, .product-item * {
         transition: none !important;
         transform: none !important;
     }
 }
-
 #pos-search:focus {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: #d8e5ff;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #d8e5ff;
 }
-
 #pos-search .search input:focus::placeholder {
-  color: #a8a8a8;
+    color: #a8a8a8;
 }
-
 /* POPUP */
+
 .swal-form p {
-  font-size: 12px;
-  padding: 6px 0;
+    font-size: 12px;
+    padding: 6px 0;
 }
 .swal-form {
-  text-align: left;
-  font-size: 13px;
+    text-align: left;
+    font-size: 13px;
 }
 #swal_total_preview {
-  text-align: left;
-  margin-top: 8px;
-  padding: 8px;
-  border: 1px dashed #e5e7eb;
-  border-radius: 8px;
-  font-size: 12px;
-  line-height: 1.4;
+    text-align: left;
+    margin-top: 8px;
+    padding: 8px;
+    border: 1px dashed #e5e7eb;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.4;
 }
 .swal-form .btn-group {
-  margin-bottom: 15px;
+    margin-bottom: 15px;
 }
-
-
 /*Experimental*/
+
 #checkout-summary button span {
     font-size: 12px;
 }
-
 #checkout-summary button.active span {
-/* display: none;*/
+    /* display: none;*/
     color: #009539;
 }
-
-
-#checkout-summary button.active > i {
-  color: #009539;
+#checkout-summary button.active>i {
+    color: #009539;
+}
+div:where(.swal2-container) div:where(.swal2-html-container) {
+    height: 300px;
 }
