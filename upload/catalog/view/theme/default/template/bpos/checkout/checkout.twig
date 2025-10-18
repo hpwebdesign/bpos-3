@@ -3,7 +3,7 @@
     <h3>Current Order</h3>
     <div class="d-flex justify-content-between text-muted mb-2">
       <span></span>
-      <a href="#" id="clear-cart" class="text-muted text-decoration-none">{{ text_clear_all }}</a>
+      <a href="#" id="clear-cart" class="btn btn-danger text-muted text-decoration-none">{{ text_clear_all }}</a>
     </div>
 
     {% if products %}
@@ -52,7 +52,7 @@
     <div class="pay mt-3">
       {% if shipping_methods and shipping_required %}
       <h4>Shipping Method</h4>
-      <div class="row row-cols-3 g-2 mb-3">
+      <div class="row row-cols-3 g-2 mb-3 shipping-methods">
         {% for shipping_method in shipping_methods %}
         {% if not shipping_method.error %}
         {% for quote in shipping_method.quote %}
@@ -72,7 +72,7 @@
       {% endif %}
       {% if payment_methods %}
       <h4>Payment Method</h4>
-      <div class="row row-cols-3 g-2 mb-3">
+      <div class="row row-cols-3 g-2 mb-3 shipping-methods">
         {% for payment_method in payment_methods %}
         <div class="col">
           <button data-original-title="{{ payment_method.title }}" class="paybtn w-100 {% if payment_method.code == default_payment %}active{% endif %}" data-code="{{ payment_method.code }}">
