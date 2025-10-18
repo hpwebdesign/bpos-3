@@ -76,6 +76,7 @@ class ControllerBposHome extends Controller {
         $data['currency'] = $this->load->controller('bpos/common/currency');
         $data['store']    = $this->load->controller('bpos/common/store');
         $data['checkout'] = $this->load->controller('bpos/checkout/checkout');
+        $data['product_categories'] = $this->productCategories($data);
 
         if (isset($this->request->get['format']) && $this->request->get['format'] == 'json') {
             $this->response->addHeader('Content-Type: application/json');
@@ -88,6 +89,10 @@ class ControllerBposHome extends Controller {
             $data['server']  = HTTPS_SERVER;
             $this->response->setOutput($this->load->view('bpos/common/layout', $data));
         }
+    }
+
+    private function productCategories($data) {
+        return $this->load->view('bpos/common/product_categories', $data);
     }
 
     public function products() {

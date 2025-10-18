@@ -3,45 +3,10 @@
 	</div>
 
 <div id="home" class="content-wrapper">
-	<div class="row">
-		<div class="col-md-8 col-lg-9 order-0" id="product-categories">
-			<div class="categories d-flex gap-3 mb-4">
-				<div class="cat {% if category_id == 0 %}active{% endif %}" data-id="0">
-					<div><i class="bi bi-egg-fried"></i></div>
-					<span class="name">All Categories</span>
-					<span class="meta">{{ total_product }} {{ text_products }}</span>
-				</div>
-				{% if categories %}
-				{% for category in categories %}
-				<div class="cat  {% if category_id == category.id %}active{% endif %}" data-id="{{ category.id }}">
-					<div><i class="bi bi-egg"></i></div>
-					<span class="name">{{ category.name }}</span>
-					<span class="meta">{{ category.total_product }} {{ text_products }}</span>
-				</div>
-				{% endfor %}
-				{% endif %}
-			</div>
+	<div class="row g-4">
 
-			<div class="d-flex flex-wrap gap-3" id="products-list">
-				{% for product in products %}
-				<div class="flex-item">
-					<div class="card h-100 p-2 product-item" data-id="{{ product.product_id }}">
-						<div class="product-image">
-							<img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" class="plate img-responsive">
-						</div>
-						<div class="name">{{ product.name }}</div>
-						<div class="cook">{{ product.model }}</div>
-						<div class="price">{{ product.price }}</div>
-					</div>
-				</div>
-				{% endfor %}
-			</div>
-			{% if pagination %}
-			 <div class="home-paginate" id="products_paginate">
-				  {{ pagination|raw }}
-				</div>
-			{% endif %}
-		</div>
+		{{ product_categories }}
+
 		{{ checkout }}
 
 	</div>

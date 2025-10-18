@@ -426,9 +426,7 @@ form, form input, form select, form textarea, .dropdown-menu {
 
 @media (min-width: 992px) {
     #checkout-summary {
-        position: fixed;
-        right: 20px;
-        top: 80px;
+
     }
     body header {
         padding-right: 400px;
