@@ -2137,9 +2137,11 @@ a.text-hover-primary:hover {
 #checkout-summary button.active>i {
     color: #009539;
 }
-div:where(.swal2-container) div:where(.swal2-html-container) {
-    height: 300px;
+
+#swal2-html-container:has(input) {
+  min-height: 300px;
 }
+
 .container {
     width: min(1200px, 92%);
     margin: 0 auto;
