@@ -2173,12 +2173,8 @@ button i {
   padding: 0 10px;
 }
 
-
 .shipping-methods button i, .payment-methods button i {
   display: none !important;
-}
-
-element {
 }
 
 #clear-cart {
