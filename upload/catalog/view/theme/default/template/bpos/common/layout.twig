@@ -36,13 +36,13 @@
                 <div class="inner-header">
                     <div class="logo-wrapper d-md-block flex-shrink-0">
                         <div class="logo me-2">Barik</div>
-                        <div class="title me-2">POS System</div>
+                        <div class="title me-2 d-sm-none d-xs-none">POS System</div>
                     </div>
 
-                    <div class="head-actions d-flex align-items-center justify-content-between flex-shrink-0 w-100">
+                    <div class="head-actions d-flex align-items-center justify-content-between flex-shrink-0 w-100 gap-2">
                         {{ language }} {{ currency }} {{ store }}
                         <button class="icon-btn" title="Notifications"><i class="bi bi-bell"></i></button>
-                        <button class="icon-btn" title="Settings"><i class="bi bi-gear"></i></button>
+<!--                        <button class="icon-btn" title="Settings"><i class="bi bi-gear"></i></button>-->
                         <button id="btn-logout" class="icon-btn text-danger" title="Logout"><i class="bi bi-box-arrow-right"></i></button>
                     </div>
 
@@ -56,7 +56,7 @@
             </header>
 
             <div class="d-flex">
-                <div class="col-auto d-md-block d-sm-none" id="left-menu">
+                <div class="col-auto d-md-block d-sm-none d-xs-none" id="left-menu">
                     <div class="sidebar  d-flex flex-column align-items-center">
                         <div class="home bubble active"><i class="bi bi-house"></i></div>
                         {# <div class="invoices bubble"><i class="bi bi-receipt"></i></div> #}

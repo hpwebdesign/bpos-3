@@ -2188,8 +2188,8 @@ button i {
 
 #clear-cart {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 0;
+  right: 0;
   color: #fff !important;
 }
 
@@ -2201,7 +2201,7 @@ button i {
   display: flex;
   gap: 12px;
   transition: transform 0.3s ease;
-  padding: 10px 0;
+  padding: 10px;
 }
 
 
@@ -2214,15 +2214,16 @@ button i {
   padding: 0;
 }
 
+.summary-head {
+  position: relative;
+}
 
 .inner-header {
-  max-width: 1000px;
   display: grid;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   grid-template-columns: auto auto 1fr;
-  min-width: 700px;
 }
 
 
