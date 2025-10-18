@@ -2,6 +2,7 @@
   <div class="panel p-3">
     <div class="summary-head">
     <h3>Current Order</h3>
+      <span class="cart-sum">0 Products</span>
       <a href="#" id="clear-cart" class="btn btn-danger text-muted text-decoration-none">{{ text_clear_all }}</a>
     </div>
 
@@ -48,10 +49,10 @@
       {% endfor %}
     </div>
 
-    <div class="pay mt-3">
+    <div class="pay mt-2">
       {% if shipping_methods and shipping_required %}
       <h4>Shipping Method</h4>
-      <div class="row row-cols-3 g-2 mb-3 shipping-methods">
+      <div class="row row-cols-3 g-2 mb-2 shipping-methods">
         {% for shipping_method in shipping_methods %}
         {% if not shipping_method.error %}
         {% for quote in shipping_method.quote %}
@@ -71,7 +72,7 @@
       {% endif %}
       {% if payment_methods %}
       <h4>Payment Method</h4>
-      <div class="row row-cols-3 g-2 mb-3 shipping-methods">
+      <div class="row row-cols-3 g-2 mb-2 shipping-methods">
         {% for payment_method in payment_methods %}
         <div class="col">
           <button data-original-title="{{ payment_method.title }}" class="paybtn w-100 {% if payment_method.code == default_payment %}active{% endif %}" data-code="{{ payment_method.code }}">
@@ -84,7 +85,7 @@
       {% endif %}
       <h4>Customer</h4>
       {% set current_customer = customer_name|default('Guest Customer') %}
-      <div class="row row-cols-3 g-2 mb-3">
+      <div class="row row-cols-3 g-2 mb-2">
         <div class="col">
           <button type="button" id="pos-current-customer" data-original-title="{{ customer_name.title }}" data-customer-id="{{ customer_id }}" data-action="customer" class="mini-btn customer-btn w-100 active"
                   data-customer-name="{{ current_customer }}">

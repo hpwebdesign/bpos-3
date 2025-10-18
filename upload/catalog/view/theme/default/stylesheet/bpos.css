@@ -353,7 +353,9 @@ form, form input, form select, form textarea, .dropdown-menu {
     font-size: 15px;
 }
 #checkout-summary h3 {
-    font-size: 1.2rem;
+  font-size: 1rem;
+  padding: 0;
+  margin: 0;
 }
 #checkout-summary h4 {
     font-size: 1rem;
@@ -2250,4 +2252,9 @@ button i {
   .d-md-none {
     display: none !important;
   }
+}
+
+.cart-sum {
+  color: #555;
+  font-size: 12px;
 }
