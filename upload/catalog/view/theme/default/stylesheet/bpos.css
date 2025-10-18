@@ -2257,4 +2257,5 @@ button i {
 .cart-sum {
   color: #555;
   font-size: 12px;
+  display: none;
 }
