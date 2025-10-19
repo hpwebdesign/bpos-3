@@ -15,9 +15,16 @@
   --shadow: 0 6px 24px rgba(18, 34, 58, 0.08);
   --brand-darker: #0f1c31;
 }
+
+/* Global overflow prevention */
+* {
+  max-width: 100%;
+}
+
 html,
 body {
   height: 100%;
+  overflow-x: hidden;
 }
 body {
   margin: 0;
@@ -135,7 +142,15 @@ body {
   border-color: var(--warn);
   color: #fff;
 }
-.btn.ghost {
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  text-shadow: none;
+}
+
+.btn-ghost {
   background: #f7f9fe;
 }
 
@@ -144,7 +159,6 @@ body {
   display: grid;
   grid-template-columns: 1.1fr auto;
   gap: 18px;
-  padding: 18px;
 }
 
 /* Panels */
@@ -434,34 +448,35 @@ footer.bar {
   align-items: center;
   justify-content: space-between;
   padding: 10px 16px;
-  background: #0f1c31;
+  background: linear-gradient(to right, #0f1c31, #fff);
   color: #c8d3ff;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   width: 100%;
 }
-.tabs {
+footer .tabs {
   display: flex;
   gap: 8px;
   align-items: center;
 }
-.tab {
+footer .tab {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 8px 10px;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.3);
   color: #dfe7ff;
   cursor: pointer;
 }
-.tab:hover {
+footer .tab:hover {
   background: rgba(255, 255, 255, 0.08);
 }
-.bar .hint {
+footer.bar .hint {
   display: flex;
   gap: 10px;
   align-items: center;
+  display: none;
 }
 .bar kbd {
   background: rgba(255, 255, 255, 0.08);
@@ -515,13 +530,9 @@ footer.bar {
   padding: 14px 16px;
 }
 
-/* Global overflow prevention */
-* {
-  max-width: 100%;
-}
-html,
-body {
-  overflow-x: hidden;
+
+#checkout-summary {
+  z-index: 99999;
 }
 
 #checkout-summary .order-line {
@@ -563,23 +574,24 @@ body {
 }
 
 #checkout-summary .summary {
-  background: #12bf55;
-  color: #fff;
+  background: #e8f4ff;
+  color: #474747;
   border-radius: 8px;
   padding: 10px 15px;
   margin-top: 12px;
+  border: 2px solid #d4e1f1;
 }
 .summary .subtotal {
   display: flex;
   justify-content: space-between;
-  color: #d7fbe7;
+  color: #474747;
 }
 .summary .total {
   display: flex;
   justify-content: space-between;
   /*    margin-top: 8px;*/
-  font-weight: 800;
-  color: #fff;
+  font-weight: 600;
+  color: #474747;
   font-size: 16px;
 }
 .paybtn, .shippingbtn, .customer-btn {
