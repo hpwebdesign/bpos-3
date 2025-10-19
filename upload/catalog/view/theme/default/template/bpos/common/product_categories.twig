@@ -1,40 +1,40 @@
-<div class="col-lg-9 col-md-7 order-0" id="product-categories">
-	<div class="categories">
-		<div class="cat {% if category_id == 0 %}active{% endif %}" data-id="0">
-			<div><i class="bi bi-egg-fried"></i></div>
-			<span class="name">All Categories</span>
-			<span class="meta">{{ total_product }} {{ text_products }}</span>
+<section id="product-categories" class="panel catalog" aria-labelledby="catalog-title">
+	<div class="head">
+		<h3 id="catalog-title">Products</h3>
+		<div class="filters" role="tablist" aria-label="Category filters">
+			<button class="btn is-active" data-id="0" data-cat="all" role="tab" aria-selected="true">All</button>
+
+			{% if categories %}
+			{% for category in categories %}
+				<button class="btn {% if category_id == category.id %}is-active{% endif %}" data-id="{{ category.id }}" data-cat="{{ category.name }}" role="tab">{{ category.name }}</button>
+			{% endfor %}
+			{% endif %}
 		</div>
-		{% if categories %}
-		{% for category in categories %}
-		<div class="cat  {% if category_id == category.id %}active{% endif %}" data-id="{{ category.id }}">
-			<div><i class="bi bi-egg"></i></div>
-			<span class="name">{{ category.name }}</span>
-			<span class="meta">{{ category.total_product }} {{ text_products }}</span>
-		</div>
-		{% endfor %}
-		{% endif %}
 
 	</div>
-
-	<div class="d-flex flex-wrap gap-3" id="products-list">
-		{% for product in products %}
-		<div class="flex-item">
-			<div class="card h-100 p-2 product-item" data-id="{{ product.product_id }}">
-				<div class="product-image">
-					<img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" class="plate img-responsive">
-				</div>
+	<div class="body">
+		<div class="grid" id="catalogGrid" aria-live="polite">
+				{% for product in products %}
+		<article data-id="{{ product.product_id }}" class="card product-item" data-name="{{ product.name }}" data-price="{{ product.price }}">
+			<div class="thumb">
+				<img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" class="plate img-responsive"></div>
+			<div class="meta">
 				<div class="name">{{ product.name }}</div>
-				<div class="cook">{{ product.model }}</div>
-				<div class="price">{{ product.price }}</div>
+				<div class="row2">
+<!--					<span class="stock">Stock: 40</span>-->
+					<span class="price">{{ product.price }}</span></div>
+<!--				<button class="add">+ Add</button>-->
 			</div>
-		</div>
+			</article>
 		{% endfor %}
-	</div>
-	{% if pagination %}
-	<div class="home-paginate" id="products_paginate">
-		{{ pagination|raw }}
-	</div>
-	{% endif %}
-</div>
 
+		</div>
+
+			{% if pagination %}
+			<div class="home-paginate" id="products_paginate">
+				{{ pagination|raw }}
+			</div>
+			{% endif %}
+
+	</div>
+</section>

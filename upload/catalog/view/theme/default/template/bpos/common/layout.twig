@@ -30,41 +30,33 @@
 
     </head>
     <body>
-        <div class="wrap">
-            <header class="header container-fluid d-flex align-items-center justify-content-md-between gap-3">
+            <header class="topbar" aria-label="Bar POS">
+                <div class="brand"><i>🧾</i> <span class="hide">Barik POS</span></div>
+                <div class="search" aria-label="Search products or scan barcode">
+                    <span>🔎</span>
 
-                <div class="inner-header">
-                    <div class="logo-wrapper d-md-block flex-shrink-0">
-                        <div class="logo me-2">BPOS</div>
-<!--                        <div class="title me-2 d-sm-none d-xs-none">POS System</div>-->
-                    </div>
+                 <input id="pos-search" aria-label="Search input" type="text" placeholder="Search / Scan barcode (Ctrl + K)" >
 
-                    <div class="head-actions d-flex align-items-center justify-content-between flex-shrink-0 w-100 gap-2">
-                        {{ language }} {{ currency }} {{ store }}
-                        <button class="icon-btn" title="Notifications"><i class="bi bi-bell"></i></button>
-<!--                        <button class="icon-btn" title="Settings"><i class="bi bi-gear"></i></button>-->
-                        <button id="btn-logout" class="icon-btn text-danger" title="Logout"><i class="bi bi-box-arrow-right"></i></button>
-                    </div>
+                <input id="barcode-input" type="text" class="form-control position-absolute"
+                           style="opacity:0;position:absolute;z-index:-1;" autocomplete="off">
 
-                    <div class="search position-relative d-md-block flex-grow-1">
-                        <i class="bi bi-search position-absolute"></i>
-                        <input id="pos-search" type="text" class="form-control ps-5" placeholder="Find Products">
-                        <input id="barcode-input" type="text" class="form-control position-absolute"
-                               style="opacity:0;position:absolute;z-index:-1;" autocomplete="off">
-                    </div>
+                    <kbd>Ctrl</kbd><kbd>K</kbd>
+                </div>
+                <div class="actions">
+                    {{ language }} {{ currency }} {{ store }}
+
+                    <button class="icon-btn" title="Notifications"><i class="bi bi-bell"></i></button>
+
+                    <button class="icon-btn">Cashier: Rina</button>
+                    <button class="icon-btn">Shift: 09:00–17:00</button>
+
+                    <button id="btn-logout" class="icon-btn text-danger" title="Logout"><i class="bi bi-box-arrow-right"></i></button>
+
+
                 </div>
             </header>
 
             <div class="d-flex">
-                <div class="col-auto d-md-block d-sm-none d-xs-none" id="left-menu">
-                    <div class="sidebar  d-flex flex-column align-items-center">
-                        <div class="home bubble active"><i class="bi bi-house"></i></div>
-                        {# <div class="invoices bubble"><i class="bi bi-receipt"></i></div> #}
-                        <div class="orders bubble"><i class="bi bi-box"></i></div>
-                        <div class="reports bubble"><i class="bi bi-graph-up"></i></div>
-                        <div class="setting bubble"><i class="bi bi-gear"></i></div>
-                    </div>
-                </div>
                 <div id="loading-spinner" class="loading-spinner" style="display:none;">
                     <div class="dot"></div>
                     <div class="dot"></div>
@@ -72,20 +64,9 @@
                 </div>
 
                 <div id="main-content" class="container-fluid py-0">{{ content|raw }}</div>
-
-                <!-- Mobile sidebar -->
-                <div class="d-md-none mt-3" id="mobile-menu">
-                    <div class="sidebar d-flex justify-content-between">
-                        <div class="home bubble active"><i class="bi bi-house"></i></div>
-                        {# <div class="invoices bubble"><i class="bi bi-receipt"></i></div> #}
-                        <div class="orders bubble"><i class="bi bi-box"></i></div>
-                        <div class="reports bubble"><i class="bi bi-graph-up"></i></div>
-                        <!--                        <div class="bubble"><i class="bi bi-gear"></i></div>-->
-                        {# <div class="cart bubble"><i class="bi bi-cart"></i> <span class="counter">{{ total_cart }}</span></div> #}
-                    </div>
-                </div>
             </div>
-        </div>
+
+
         <div class="modal fade" id="productOptionModal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -93,6 +74,7 @@
                 </div>
             </div>
         </div>
+
         <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -110,10 +92,23 @@
                 </div>
             </div>
         </div>
-        <button class="cart btn-floating bubble d-md-block">
-            <i class="bi bi-cart"></i>
-            <span class="counter">{{ total_cart }}</span>
-        </button>
+
+        <footer class="bar" aria-label="Tabs &amp; Shortcuts">
+            <div class="tabs" role="tablist" aria-label="Main menu">
+                <button class="tab home active" data-nav="sales">🏠 <span class="hide">Home</span></button>
+                <!--          <button class="tab invoices" data-nav="sales">🧾 <span class="hide">Sales</span></button>-->
+                <button class="tab orders" data-nav="orders">📦 <span class="hide">Orders</span></button>
+                <button class="tab reports" data-nav="reports">📊 <span class="hide">Reports</span></button>
+                <button class="tab customers" data-nav="customers">👥 <span class="hide">Customers</span></button>
+                <button class="tab settings" data-nav="settings">⚙️ <span class="hide">Settings</span></button>
+            </div>
+            <div class="hint">Shortcuts: <kbd>F1</kbd> Search <kbd>F2</kbd> Payment <kbd>F3</kbd> Park <kbd>Esc</kbd> Void</div>
+        </footer>
+
+
+        <div class="fab fab-cart" aria-live="polite"> <button class="btn btn--cart" aria-label="Open Cart"> <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm10 0a2 2 0 1 0 .001 3.999A2 2 0 0 0 17 18zM6 4H3v2h2l3.6 7.59-1.35 2.45A2 2 0 0 0 9 19h10v-2H9.42a.25.25 0 0 1-.23-.36L10 14h6.55a2 2 0 0 0 1.8-1.11l3.24-6.49A1 1 0 0 0 20.7 5H7.12L6.27 3.59A1 1 0 0 0 5.42 3H3v1z"></path></svg> <span class="badge-count counter" aria-label="Items in cart">{{ total_cart }}</span> </button>
+           </div>
+
         <script src="https://cdn.jsdelivr.net/npm/busy-load/dist/app.min.js"></script>
         <!-- Moment.js -->
         <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>

@@ -15,8 +15,8 @@ $(document).ready(function() {
 //  closeButton: false
 //};
 
-    $('.sidebar .bubble').on('click', function() {
-        $('.sidebar .bubble').removeClass('active');
+    $('footer .tab').on('click', function() {
+        $('footer .tab').removeClass('active');
         $(this).addClass('active');
 
         let route = '';
@@ -158,10 +158,10 @@ $(document).ready(function() {
 
 
     // Category
-    $(document).on('click', '.categories .cat', function (e) {
+    $(document).on('click', '.filters .btn', function (e) {
         e.preventDefault();
-        $('.categories .cat').removeClass('active');
-        $(this).addClass('active');
+        $('.filters .btn').removeClass('is-active');
+        $(this).addClass('is-active');
 
         const category_id = $(this).data('id');
         loadPage('index.php?route=bpos/home&category_id='+category_id);
@@ -570,7 +570,7 @@ function buildCustomerHTML(){
   '<div class="swal-form">'+
     '<div class="btn-group" style="width:100%;gap:6px;display:flex;margin-top:10px;">'+
       '<button type="button" class="btn btn-success" id="swal_add_customer" style="flex:1;">Add</button>'+
-   
+
     '</div>'+
     '<div class="form-group" style="margin-bottom:8px;">'+
       '<div style="font-size:14px;">Current Customer: <strong>'+ $('<div>').text(cur).html() +'</strong></div>'+
