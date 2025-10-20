@@ -218,6 +218,7 @@ body {
     transition: transform .3s ease, box-shadow .3s ease;
     border: 1px solid rgba(16, 24, 40, 0.08);
     box-shadow: 0 4px 12px rgba(2, 6, 23, 0.05);
+    max-width: 200px;
 }
 
 #catalogGrid .card:hover {
