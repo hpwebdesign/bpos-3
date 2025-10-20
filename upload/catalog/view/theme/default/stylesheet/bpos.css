@@ -1094,8 +1094,10 @@ white-space: nowrap;
 /*Override*/
 
 .modal.show .modal-dialog {
-    z-index: 999999;
+  z-index: 9999999 !important;
+  top: 100px;
 }
+
 /* ============================
    NOTYF ANTI-OVERRIDE PATCH
    Place after all theme CSS
