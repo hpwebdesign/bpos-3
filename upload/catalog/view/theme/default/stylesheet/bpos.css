@@ -1137,11 +1137,6 @@ body .notyf .notyf__toast--success {
 
 .sub-heading {
   background: linear-gradient(0deg, #0f1c31, #0f1c31) padding-box, linear-gradient(135deg, #2646a6, #80a4ff) border-box;
-}
-
-
-.sub-heading {
-  background: linear-gradient(0deg, #0f1c31, #0f1c31) padding-box, linear-gradient(135deg, #2646a6, #80a4ff) border-box;
   height: 40px;
   text-align: center;
   color: #cdd3e2;
