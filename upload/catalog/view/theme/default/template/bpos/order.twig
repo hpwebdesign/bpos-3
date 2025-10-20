@@ -159,47 +159,30 @@ $(document).ready(function () {
         ],
         pageLength: 10,
         dom:
-        "<'row'<'col-sm-12 d-flex justify-content-end'B>>" +
-        "<'row'<'col-sm-12'tr>>" +
-        "<'row'<'col-sm-12 col-md-5 d-flex align-items-center justify-content-center justify-content-md-start'i>" +
-        "<'col-sm-12 col-md-7 d-flex align-items-center justify-content-center justify-content-md-end'p>>",
-    buttons: [
-        { 
-            extend: 'copy', 
-            title: 'Export Data Order', 
-            className: 'd-none',
-            exportOptions: { columns: ':not(:last-child)' }
-        },
-        { 
-            extend: 'excel', 
-            title: 'Export Data Order', 
-            className: 'd-none',
-            exportOptions: { columns: ':not(:last-child)' }
-        },
-        { 
-            extend: 'csv', 
-            title: 'Export Data Order', 
-            className: 'd-none',
-            exportOptions: { columns: ':not(:last-child)' }
-        },
-        { 
-            extend: 'pdf', 
-            title: 'Export Data Order', 
-            className: 'd-none',
-            exportOptions: { columns: ':not(:last-child)' }
+            "<'row'<'col-sm-12 d-flex justify-content-end'B>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5 d-flex align-items-center justify-content-center justify-content-md-start'i>" +
+            "<'col-sm-12 col-md-7 d-flex align-items-center justify-content-center justify-content-md-end'p>>",
+        buttons: [
+            { extend: 'copy', title: 'Export Data Order', className: 'd-none', exportOptions: { columns: ':not(:last-child)' } },
+            { extend: 'excel', title: 'Export Data Order', className: 'd-none', exportOptions: { columns: ':not(:last-child)' } },
+            { extend: 'csv', title: 'Export Data Order', className: 'd-none', exportOptions: { columns: ':not(:last-child)' } },
+            { extend: 'pdf', title: 'Export Data Order', className: 'd-none', exportOptions: { columns: ':not(:last-child)' } }
+        ],
+        
+       
+        pagingType: "simple_numbers", 
+        
+        language: {
+            paginate: {
+                previous: '<i class="previous"></i>',
+                next: '<i class="next"></i>'
+            },
+            search: "",
+            info: "Displays _START_ to _END_ of _TOTAL_ data",
+            infoEmpty: "No Data",
+            zeroRecords: "Data not found"
         }
-    ],
-    pagingType: "simple_numbers",
-    language: {
-        paginate: {
-            previous: '<i class="previous"></i>',
-            next: '<i class="next"></i>'
-        },
-        search: "",
-        info: "Displays _START_ to _END_ of _TOTAL_ data",
-        infoEmpty: "No Data",
-        zeroRecords: "Data not found"
-    }
     });
 
     $('#btn-filter').on('click', function(){

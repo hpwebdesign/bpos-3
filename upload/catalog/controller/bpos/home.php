@@ -44,12 +44,13 @@ class ControllerBposHome extends Controller {
             ];
             $product_total = $this->model_catalog_product->getTotalProducts($filter_data);
             $total_product_all += $product_total;
-
-            $data['categories'][] = [
-                'id'            => $category['category_id'],
-                'name'          => $category['name'],
-                'total_product' => $product_total
-            ];
+            if ($product_total > 0) {
+                $data['categories'][] = [
+                    'id'            => $category['category_id'],
+                    'name'          => $category['name'],
+                    'total_product' => $product_total
+                ];
+            }
         }
 
         $data['total_product'] = $total_product_all;

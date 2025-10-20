@@ -1,4 +1,5 @@
 /* ---------- TABLE ---------- */
+
 .orders-board table {
     margin: 0;
 }
@@ -255,8 +256,6 @@
 .min-w-300px {
     min-width: 300px!important
 }
-
-
 .card .card-header {
     display: flex;
     justify-content: space-between;
@@ -628,4 +627,236 @@
 }
 .fs-4 {
     font-size: 1.15rem!important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0
+}
+.pagination.pagination-circle .page-link {
+    border-radius: 50%
+}
+.pagination.pagination-outline .page-link {
+    border: 1px solid var(--bs-border-color)
+}
+.pagination.pagination-outline .page-item.active .page-link, .pagination.pagination-outline .page-item:hover:not(.disabled) .page-link {
+    border-color: var(--bs-primary-light)
+}
+.page-item {
+    margin-right: .5rem
+}
+.page-item:last-child {
+    margin-right: 0
+}
+.page-item.active {
+    background: transparent;
+}
+.page-item .page-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: .95rem !important;
+    height: 2.5rem;
+    min-width: 2.5rem;
+    font-weight: 500;
+    font-size: 14px;
+    background: transparent;
+}
+.page-item .page-link i {
+    font-size: .85rem
+}
+.page-item .page-link .next, .page-item .page-link .previous {
+    display: block;
+    height: .875rem;
+    width: .875rem
+}
+/* ========== BASE ========== */
+
+.page-item .page-link {
+    --pg-icon-color: var(--bs-gray-700);
+}
+.page-link .first, .page-link .previous {
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    background-color: var(--pg-icon-color);
+    -webkit-mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 6'%3e%3cpath d='M2.72011 2.76429L4.46358 1.02083c.1726-.17259.17259-.45241 0-.625-.17259-.17259-.4524-.17259-.62497 0L1.52904 2.70537a.42.42 0 0 0 0 .58925l2.30957 2.30957c.17256.17256.45238.17256.62497 0 .17259-.17263.17259-.45244 0-.625L2.72011 3.23571a.36.36 0 0 1 0-.47142z'/%3e%3c/svg%3e");
+    mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 6'%3e%3cpath d='M2.72011 2.76429L4.46358 1.02083c.1726-.17259.17259-.45241 0-.625-.17259-.17259-.4524-.17259-.62497 0L1.52904 2.70537a.42.42 0 0 0 0 .58925l2.30957 2.30957c.17256.17256.45238.17256.62497 0 .17259-.17263.17259-.45244 0-.625L2.72011 3.23571a.36.36 0 0 1 0-.47142z'/%3e%3c/svg%3e");
+}
+.page-link .last, .page-link .next {
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    background-color: var(--pg-icon-color);
+    -webkit-mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 6'%3e%3cpath d='M3.27989 3.23571 1.53642 4.97917c-.1726.17259-.17259.45241 0 .625.17259.17259.4524.17259.62497 0l2.30957-2.30954a.42.42 0 0 0 0-.58925L2.16139.39581c-.17256-.17256-.45238-.17256-.62497 0-.17259.17263-.17259.45244 0 .625l1.74347 1.74348c.13017.13017.13017.34125 0 .47142z'/%3e%3c/svg%3e");
+    mask-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 6'%3e%3cpath d='M3.27989 3.23571 1.53642 4.97917c-.1726.17259-.17259.45241 0 .625.17259.17259.4524.17259.62497 0l2.30957-2.30954a.42.42 0 0 0 0-.58925L2.16139.39581c-.17256-.17256-.45238-.17256-.62497 0-.17259.17263-.17259.45244 0 .625l1.74347 1.74348c.13017.13017.13017.34125 0 .47142z'/%3e%3c/svg%3e");
+}
+/* ========== WARNA (STATE) ========== */
+
+.page-item:focus .page-link {
+    color: var(--bs-pagination-focus-color);
+    --pg-icon-color: var(--bs-pagination-focus-color);
+}
+.page-item:hover:not(.active):not(.offset):not(.disabled) .page-link {
+    color: var(--bs-pagination-hover-color);
+    --pg-icon-color: var(--bs-pagination-hover-color);
+}
+.page-item.active .page-link {
+    color: var(--bs-pagination-active-color);
+    --pg-icon-color: var(--bs-pagination-active-color);
+}
+.page-item.disabled .page-link {
+    color: var(--bs-pagination-disabled-color);
+    --pg-icon-color: var(--bs-pagination-disabled-color);
+}
+/* optional: sinkronkan ikon font lain (jika dipakai) */
+
+.page-item .page-link .svg-icon, .page-item .page-link i {
+    color: var(--pg-icon-color);
+}
+@media (max-width:991.98px) {
+    .page-item {
+        margin-right: .25rem
+    }
+    .page-item:last-child {
+        margin-right: 0
+    }
+}
+/* ========== BASE ========== */
+
+.separator {
+    display: block;
+    height: 0;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+/* jenis garis */
+
+.separator-dotted {
+    border-bottom-style: dotted;
+    border-bottom-color: var(--bs-border-dashed-color);
+}
+.separator-dashed {
+    border-bottom-style: dashed;
+    border-bottom-color: var(--bs-border-dashed-color);
+}
+/* ========== CONTENT ========== */
+
+.separator-content {
+    display: flex;
+    align-items: center;
+    border-bottom: 0;
+    text-align: center;
+}
+.separator-content::before, .separator-content::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+.separator-content::before {
+    margin-right: 1.25rem;
+}
+.separator-content::after {
+    margin-left: 1.25rem;
+}
+/* style garis di content */
+
+.separator-content.separator-dotted::before, .separator-content.separator-dotted::after {
+    border-bottom-style: dotted;
+    border-bottom-color: var(--bs-border-dashed-color);
+}
+.separator-content.separator-dashed::before, .separator-content.separator-dashed::after {
+    border-bottom-style: dashed;
+    border-bottom-color: var(--bs-border-dashed-color);
+}
+/* ========== WARNA ========== */
+
+.separator-content.border-light::before, .separator-content.border-light::after {
+    border-color: #f9f9f9 !important;
+}
+.separator-content.border-primary::before, .separator-content.border-primary::after {
+    border-color: #1b84ff !important;
+}
+.separator-content.border-secondary::before, .separator-content.border-secondary::after {
+    border-color: #f1f1f4 !important;
+}
+.separator-content.border-success::before, .separator-content.border-success::after {
+    border-color: #17c653 !important;
+}
+.separator-content.border-info::before, .separator-content.border-info::after {
+    border-color: #7239ea !important;
+}
+.separator-content.border-warning::before, .separator-content.border-warning::after {
+    border-color: #f6c000 !important;
+}
+.separator-content.border-danger::before, .separator-content.border-danger::after {
+    border-color: #f8285a !important;
+}
+.separator-content.border-dark::before, .separator-content.border-dark::after {
+    border-color: #1e2129 !important;
+}
+.order-line .flex-grow-1 {
+    max-width: calc(100% - 125px);
+}
+.home-paginate {
+    padding: 20px;
+}
+.home-paginate .pagination .active {
+    background: transparent;
+}
+.home-paginate .pagination {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+}
+/* item & link */
+
+.home-paginate .pagination>li>a, .home-paginate .pagination>li>span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    text-decoration: none;
+    line-height: 1;
+    padding: 0;
+    font-size: 14px;
+    color: #1a73e8;
+}
+.home-paginate .pagination>li>a:hover {
+    background: rgba(26, 115, 232, 0.12);
+}
+/* aktif & disabled */
+
+.home-paginate .pagination>li.active>a, .home-paginate .pagination>li.active>span {
+    background: #1a73e8;
+    color: #fff;
+}
+.home-paginate .pagination>li.disabled>a, .home-paginate .pagination>li.disabled>span {
+    color: #c7c7c7;
+    pointer-events: none;
+}
+/* opsional: bikin prev/next tampak icon */
+
+.home-paginate .pagination>li:first-child>a, .home-paginate .pagination>li:last-child>a {
+    font-size: 0;
+    /* sembunyikan teks bawaan (‹ › « ») */
+}
+.home-paginate .pagination>li:first-child>a::before {
+    content: "‹";
+    font-size: 18px;
+}
+.home-paginate .pagination>li:last-child>a::before {
+    content: "›";
+    font-size: 18px;
 }

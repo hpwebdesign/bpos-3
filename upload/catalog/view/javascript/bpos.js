@@ -824,129 +824,128 @@ if (type === 'customer') {
   denyText = 'Remove';
 }
 
-  Swal.fire({
-    title: cfg.title,
-    html: cfg.html,
-    showCancelButton: true,
-    confirmButtonText: 'Apply',
-    showDenyButton: showDeny,
-    denyButtonText: (type === 'customer' || type === 'discount' || type === 'charge' || type === 'coupon') ? 'Remove' : undefined,
-    focusConfirm: false,
-    willOpen: cfg.willOpen || null,
-    didOpen: cfg.didOpen || null,
-    preConfirm: cfg.preConfirm
-  }).then(function(result){
-    if (result.isDenied && type === 'customer') {
-      ajaxUnsetCustomer()
+Swal.fire({
+  title: cfg.title,
+  html: cfg.html,
+  showCancelButton: true,
+  confirmButtonText: 'Apply',
+  showDenyButton: showDeny,
+  denyButtonText: (type === 'customer' || type === 'discount' || type === 'charge' || type === 'coupon') ? 'Remove' : undefined,
+  focusConfirm: false,
+  willOpen: cfg.willOpen || null,
+  didOpen: cfg.didOpen || null,
+  preConfirm: cfg.preConfirm
+}).then(function(result){
+  if (result.isDenied && type === 'customer') {
+    ajaxUnsetCustomer()
+      .then(function(res){
+        if (res && res.ok){
+          if (typeof updateCheckoutPanel === 'function') updateCheckoutPanel();
+          if (window.notyf) notyf.success('Customer unset to guest');
+        } else {
+          if (window.notyf) notyf.error((res && res.error) || 'Failed to unset customer');
+        }
+      })
+      .catch(function(err){
+        if (window.notyf) notyf.error((err && err.message) || 'Failed to unset customer');
+      });
+  } else if (result.isDenied && type === 'discount') {
+    removeDiscount()
+      .then(function(res){
+        if (res && res.ok){
+          if (typeof updateCheckoutPanel === 'function') updateCheckoutPanel();
+          if (window.notyf) notyf.success('Discount removed');
+        } else {
+          if (window.notyf) notyf.error((res && res.error) || 'Failed to remove discount');
+        }
+      })
+      .catch(function(err){
+        if (window.notyf) notyf.error((err && err.message) || 'Failed to remove discount');
+      });
+  } else if (result.isDenied && type === 'charge') {
+    removeCharge()
+      .then(function(res){
+        if (res && res.ok){
+          if (typeof updateCheckoutPanel === 'function') updateCheckoutPanel();
+          if (window.notyf) notyf.success('Charge removed');
+        } else {
+          if (window.notyf) notyf.error((res && res.error) || 'Failed to remove charge');
+        }
+      })
+      .catch(function(err){
+        if (window.notyf) notyf.error((err && err.message) || 'Failed to remove charge');
+      });
+  } else if (result.isDenied && type === 'coupon') {
+    removeCoupon()
+      .then(function(res){
+        if (res && res.ok){
+          if (typeof updateCheckoutPanel === 'function') updateCheckoutPanel();
+          if (window.notyf) notyf.success('Coupon removed');
+        } else {
+          if (window.notyf) notyf.error((res && res.error) || 'Failed to remove coupon');
+        }
+      })
+      .catch(function(err){
+        if (window.notyf) notyf.error((err && err.message) || 'Failed to remove coupon');
+      });
+  } else if (result.isConfirmed) {
+    if (result.value && result.value.type === 'discount'){
+      Swal.showLoading();
+      applyDiscount({percent: result.value.percent, fixed: result.value.fixed})
+        .then(function(res){
+          if (typeof onSubmit === 'function') onSubmit({ok:true, type:'discount', server:res});
+          updateCheckoutPanel();
+          if (window.notyf) notyf.success('Discount applied');
+        })
+        .catch(function(err){
+          if (window.notyf) notyf.error((err && err.message) || 'Failed to apply discount');
+        });
+    } else if (result.value && result.value.type === 'charge'){
+      Swal.showLoading();
+      applyCharge({percent: result.value.percent, fixed: result.value.fixed})
+        .then(function(res){
+          if (typeof onSubmit === 'function') onSubmit({ok:true, type:'charge', server:res});
+          updateCheckoutPanel();
+          if (window.notyf) notyf.success('Charge applied');
+        })
+        .catch(function(err){
+          if (window.notyf) notyf.error((err && err.message) || 'Failed to apply charge');
+        });
+    } else if (result.value && result.value.type === 'coupon'){
+      applyCoupon({code: result.value.code})
         .then(function(res){
           if (res && res.ok){
-            if (typeof updateCheckoutPanel === 'function') { updateCheckoutPanel(); }
-            Swal.fire('Removed','Customer unset to guest','success');
+            if (typeof onSubmit === 'function') onSubmit({ok:true, type:'coupon', code: result.value.code});
+            if (typeof updateCheckoutPanel === 'function') updateCheckoutPanel();
+            if (window.notyf) notyf.success('Coupon applied');
           } else {
-            Swal.fire('Error', (res && res.error) || 'Failed to unset customer', 'error');
+            if (window.notyf) notyf.error((res && res.error) || 'Failed to apply coupon');
           }
         })
         .catch(function(err){
-          Swal.fire('Error', (err && err.message) || 'Failed to unset customer', 'error');
+          if (window.notyf) notyf.error((err && err.message) || 'Failed to apply coupon');
         });
-    } else if (result.isDenied && type === 'discount') {
-      removeDiscount()
-        .then(function(res){
-          if (res && res.ok){
-            if (typeof updateCheckoutPanel === 'function') { updateCheckoutPanel(); }
-            Swal.fire('Removed','Discount removed','success');
-          } else {
-            Swal.fire('Error', (res && res.error) || 'Failed to remove discount', 'error');
-          }
-        })
-        .catch(function(err){
-          Swal.fire('Error', (err && err.message) || 'Failed to remove discount', 'error');
-        });
-    } else if (result.isDenied && type === 'charge') {
-      removeCharge()
-        .then(function(res){
-          if (res && res.ok){
-            if (typeof updateCheckoutPanel === 'function') { updateCheckoutPanel(); }
-            Swal.fire('Removed','Charge removed','success');
-          } else {
-            Swal.fire('Error', (res && res.error) || 'Failed to remove charge', 'error');
-          }
-        })
-        .catch(function(err){
-          Swal.fire('Error', (err && err.message) || 'Failed to remove charge', 'error');
-        });
-    } else if (result.isDenied && type === 'coupon') {
-      removeCoupon()
-        .then(function(res){
-          if (res && res.ok){
-            if (typeof updateCheckoutPanel === 'function') { updateCheckoutPanel(); }
-            Swal.fire('Removed','Coupon removed','success');
-          } else {
-            Swal.fire('Error', (res && res.error) || 'Failed to remove coupon', 'error');
-          }
-        })
-        .catch(function(err){
-          Swal.fire('Error', (err && err.message) || 'Failed to remove coupon', 'error');
-        });
-    } else if (result.isConfirmed) {
-      if (result.value && result.value.type === 'discount'){
-        Swal.showLoading();
-        applyDiscount({percent: result.value.percent, fixed: result.value.fixed})
-          .then(function(res){
-            if (typeof onSubmit === 'function') onSubmit({ok:true, type:'discount', server:res});
-             updateCheckoutPanel();
-            Swal.fire('Applied','Discount applied','success');
-
-          })
-          .catch(function(err){
-            Swal.fire('Error', (err && err.message) || 'Failed to apply discount', 'error');
-          });
-      } else if (result.value && result.value.type === 'charge'){
-        Swal.showLoading();
-        applyCharge({percent: result.value.percent, fixed: result.value.fixed})
-          .then(function(res){
-            if (typeof onSubmit === 'function') onSubmit({ok:true, type:'charge', server:res});
-            updateCheckoutPanel();
-            Swal.fire('Applied','Charge applied','success');
-          })
-          .catch(function(err){
-            Swal.fire('Error', (err && err.message) || 'Failed to apply charge', 'error');
-          });
-      } else if (result.value && result.value.type === 'coupon'){
-        applyCoupon({code: result.value.code})
+    } else {
+      if (result.value && result.value.type === 'customer' && result.value.customer && result.value.customer.id){
+        ajaxLoginCustomer({id: result.value.customer.id})
           .then(function(res){
             if (res && res.ok){
-              if (typeof onSubmit === 'function') onSubmit({ok:true, type:'coupon', code: result.value.code});
-              if (typeof updateCheckoutPanel === 'function') { updateCheckoutPanel(); }
-              Swal.fire('Applied','Coupon applied','success');
+              if (typeof onSubmit === 'function') onSubmit({ok:true, type:'customer', customer: res.customer});
+              if (window.notyf) notyf.success('Customer selected');
+              if (typeof updateCheckoutPanel === 'function') updateCheckoutPanel();
             } else {
-              Swal.fire('Error', (res && res.error) || 'Failed to apply coupon', 'error');
+              if (window.notyf) notyf.error((res && res.error) || 'Failed to login customer');
             }
           })
           .catch(function(err){
-            Swal.fire('Error', (err && err.message) || 'Failed to apply coupon', 'error');
+            if (window.notyf) notyf.error((err && err.message) || 'Failed to login customer');
           });
       } else {
-        if (result.value && result.value.type === 'customer' && result.value.customer && result.value.customer.id){
-          ajaxLoginCustomer({id: result.value.customer.id})
-            .then(function(res){
-              if (res && res.ok){
-                if (typeof onSubmit === 'function') onSubmit({ok:true, type:'customer', customer: res.customer});
-                Swal.fire('Applied','Customer selected','success');
-                if (typeof updateCheckoutPanel === 'function') { updateCheckoutPanel(); }
-              } else {
-                Swal.fire('Error', (res && res.error) || 'Failed to login customer', 'error');
-              }
-            })
-            .catch(function(err){
-              Swal.fire('Error', (err && err.message) || 'Failed to login customer', 'error');
-            });
-        } else {
-          if (typeof onSubmit === 'function') onSubmit(result.value);
-        }
+        if (typeof onSubmit === 'function') onSubmit(result.value);
       }
     }
-  });
+  }
+});
 
   function bindCustomerButtons(){
     $('#swal_add_customer').on('click', function(){
@@ -1115,3 +1114,83 @@ function handleBarcodeScan(code) {
     }
   });
 }
+
+$(document).on('keydown', function(e) {
+  // pastikan tidak aktif di dalam input/textarea lain
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'textarea') return;
+
+  // Windows: Ctrl+K, Mac: Command+K
+  const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+  if ((isMac && e.metaKey && e.key.toLowerCase() === 'k') || (!isMac && e.ctrlKey && e.key.toLowerCase() === 'k')) {
+    e.preventDefault();
+    $('#barcode-input').focus();  // fokus ke input barcode
+  }
+});
+
+// $('.filters.bslide').each(function(){
+//   const track=$(this).find('.bslide-track');
+//   track.css({
+//     display:'flex',
+//     overflowX:'auto',
+//     scrollBehavior:'smooth',
+//     gap:'8px'
+//   });
+//   // opsional: auto hide scrollbar
+//   track.on('wheel', function(e){
+//     e.preventDefault();
+//     this.scrollLeft += e.originalEvent.deltaY;
+//   });
+// });
+
+$(function(){
+  const $wrap = $('.filters.bslide');
+  const $view = $wrap.find('.bslide-viewport'); // <- scroll container
+  const $track = $wrap.find('.bslide-track');
+  const $prev = $wrap.find('.bslide-nav.prev');
+  const $next = $wrap.find('.bslide-nav.next');
+
+  // Wheel -> horizontal
+  $view.on('wheel', function(e){
+    e.preventDefault();
+    this.scrollLeft += e.originalEvent.deltaY;
+  });
+
+  // Drag to scroll (mouse)
+  let isDown = false, startX = 0, startLeft = 0;
+  $view.on('mousedown', function(e){
+    isDown = true;
+    startX = e.pageX;
+    startLeft = this.scrollLeft;
+    $(this).addClass('dragging');
+  });
+  $(document).on('mousemove', function(e){
+    if(!isDown) return;
+    const dx = e.pageX - startX;
+    $view[0].scrollLeft = startLeft - dx;
+  }).on('mouseup mouseleave', function(){
+    isDown = false;
+    $view.removeClass('dragging');
+  });
+
+  // Step per klik panah: 3/4/6 item
+  function itemsPerViewport(){
+    const w = window.innerWidth;
+    if (w >= 1200) return 6;   // desktop
+    if (w >= 768)  return 4;   // tablet
+    return 3;                  // mobile
+  }
+  function itemWidth(){
+    const $first = $track.find('.btn').first();
+    return $first.outerWidth(true) || 120;
+  }
+  function stepSize(){ return itemsPerViewport() * itemWidth(); }
+
+  function scrollBy(dx){
+    const target = $view.scrollLeft() + dx;
+    $view.stop().animate({ scrollLeft: target }, 220);
+  }
+
+  $prev.on('click', function(e){ e.preventDefault(); scrollBy(-stepSize()); });
+  $next.on('click', function(e){ e.preventDefault(); scrollBy( stepSize()); });
+});
