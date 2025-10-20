@@ -36,8 +36,8 @@ body {
     box-sizing: border-box;
 }
 #main-content {
-    padding: 15px !important;
-    margin-bottom: 60px
+  margin: 0 auto 60px 0;
+  width: 100%;
 }
 .app {
     min-height: 100%;
@@ -1126,4 +1126,25 @@ body .notyf .notyf__toast--success {
 }
 .swal-ac-list {
     position: relative !important;
+}
+
+
+#home {
+  padding: 15px;
+}
+
+.sub-heading {
+  background: linear-gradient(0deg, #0f1c31, #0f1c31) padding-box, linear-gradient(135deg, #2646a6, #80a4ff) border-box;
+}
+
+
+.sub-heading {
+  background: linear-gradient(0deg, #0f1c31, #0f1c31) padding-box, linear-gradient(135deg, #2646a6, #80a4ff) border-box;
+  height: 40px;
+  text-align: center;
+  color: #cdd3e2;
+  line-height: 40px;
+  text-transform: capitalize;
+  font-weight: 500;
+  font-size: 15px;
 }

@@ -900,3 +900,17 @@
     color: var(--text-500);
     line-height: 1;
 }
+
+.panel button, .panel a {
+    font-size: 13px;
+}
+
+
+.btn.btn-light-primary {
+  width: 100%;
+  height: 30px;
+  line-height: 30px;
+  align-items: center;
+  display: grid;
+  align-content: center;
+}
