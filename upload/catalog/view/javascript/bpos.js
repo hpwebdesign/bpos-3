@@ -47,7 +47,7 @@ $(document).ready(function() {
     $(document).on('click', '.print', function(e) {
         e.preventDefault();
 
-        let activePayment = $('.paybtn.active').data('code');
+        let activePayment = $('.paymentbtn.active').data('code');
 
 
         $('.payment-error').remove();
@@ -102,10 +102,10 @@ $(document).ready(function() {
     });
 
 
-    $(document).on('click', '.paybtn', function() {
+    $(document).on('click', '.paymentbtn', function() {
         let code = $(this).data('code');
 
-        $('.paybtn').removeClass('active');
+        $('.paymentbtn').removeClass('active');
         $(this).addClass('active');
 
         $.ajax({

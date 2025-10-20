@@ -148,6 +148,7 @@ body {
   font-size: 13px;
   font-weight: 500;
   text-shadow: none;
+  border-radius: 8px;
 }
 
 .btn-ghost {
@@ -292,98 +293,6 @@ article .meta {
   font-weight: 700;
 }
 
-/* Cart */
-.cart .list {
-  display: grid;
-  gap: 8px;
-}
-.cart .item {
-  display: grid;
-  grid-template-columns: 1fr 68px 100px 26px;
-  gap: 8px;
-  align-items: center;
-  padding: 8px 10px;
-  border: 1px solid #eef2f7;
-  border-radius: 12px;
-}
-.cart .item .title {
-  font-weight: 600;
-}
-/*
-.cart .qty {
-display: flex;
-border: 1px solid #e6ebf3;
-border-radius: 10px;
-overflow: hidden;
-}
-*/
-.cart .qty button {
-  all: unset;
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  cursor: pointer;
-}
-.cart .qty input {
-  all: unset;
-  width: 40px;
-  text-align: center;
-}
-.cart .price {
-  text-align: right;
-  font-weight: 700;
-}
-.cart .remove {
-  color: #9aa7bd;
-  cursor: pointer;
-}
-
-.totals {
-  margin-top: 10px;
-  border-top: 1px dashed #e2e8f0;
-  padding-top: 10px;
-  display: grid;
-  gap: 6px;
-}
-.totals .row {
-  display: flex;
-  justify-content: space-between;
-  color: var(--muted);
-}
-.totals .row.total {
-  color: var(--ink);
-  font-weight: 800;
-  font-size: 18px;
-}
-
-.pay {
-  margin-top: 12px;
-  border-top: 1px solid #eef2f7;
-  padding-top: 12px;
-  display: grid;
-  gap: 10px;
-}
-.pay .methods {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
-}
-.method {
-  padding: 10px;
-  border: 1px solid #e6ebf3;
-  border-radius: 12px;
-  text-align: center;
-  cursor: pointer;
-}
-.method.is-active {
-  border-color: #b9c6ff;
-  background: #eef2ff;
-}
-.pay .actions {
-  display: flex;
-  gap: 10px;
-}
 
 /* Sidebar (Customer & Shift) */
 .aside {
@@ -439,7 +348,7 @@ overflow: hidden;
 
 /* Footer / Tabs + Shortcuts */
 footer.bar {
-  position: sticky;
+  position: fixed;
   bottom: 0;
   z-index: 99;
   display: flex;
@@ -579,9 +488,9 @@ footer.bar .hint {
   border-radius: 8px;
   padding: 10px 15px;
   margin-top: 12px;
-  border: 2px solid #d4e1f1;
+  border: 1px solid #d4e1f1;
 }
-.summary .subtotal {
+#checkout-summary .summary .subtotal {
   display: flex;
   justify-content: space-between;
   color: #474747;
@@ -594,7 +503,23 @@ footer.bar .hint {
   color: #474747;
   font-size: 16px;
 }
-.paybtn, .shippingbtn, .customer-btn {
+
+.shipping-methods, .payment-methods, .customers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.shipping-methods .shippingbtn, .payment-methods .paymentbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.paymentbtn, .shippingbtn, .customer-btn {
   border: 1px solid var(--line);
   background: #f7f9fd;
   border-radius: 14px;
@@ -602,13 +527,101 @@ footer.bar .hint {
   padding: 7px;
   min-width: 60px;
 }
-.paybtn.active, .shippingbtn.active, .customer-btn.active {
-  outline: 2px solid #d4f1e1;
+.paymentbtn.active, .shippingbtn.active, .customer-btn.active {
+  outline: 1px solid #d4f1e1;
   background: #f2fff7;
 }
+
+
+/* Cart */
+.cart .list {
+  display: grid;
+  gap: 8px;
+}
+.cart .item {
+  display: grid;
+  grid-template-columns: 1fr 68px 100px 26px;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid #eef2f7;
+  border-radius: 12px;
+}
+.cart .item .title {
+  font-weight: 600;
+}
+/*
+.cart .qty {
+display: flex;
+border: 1px solid #e6ebf3;
+border-radius: 10px;
+overflow: hidden;
+}
+*/
+.cart .qty button {
+  all: unset;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+.cart .qty input {
+  all: unset;
+  width: 40px;
+  text-align: center;
+}
+.cart .price {
+  text-align: right;
+  font-weight: 700;
+}
+.cart .remove {
+  color: #9aa7bd;
+  cursor: pointer;
+}
+
+.totals {
+  margin-top: 10px;
+  border-top: 1px dashed #e2e8f0;
+  padding-top: 10px;
+  display: grid;
+  gap: 6px;
+}
+.totals .row {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+}
+.totals .row.total {
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.pay .methods {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.method {
+  padding: 10px;
+  border: 1px solid #e6ebf3;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+}
+.method.is-active {
+  border-color: #b9c6ff;
+  background: #eef2ff;
+}
+.pay .actions {
+  display: flex;
+  gap: 10px;
+}
+
 /* Checkout Summary */
 
-#checkout-summary .paybtn i, #checkout-summary .shippingbtn i {
+#checkout-summary .paymentbtn i, #checkout-summary .shippingbtn i {
   display: block;
   margin-right: 6px;
   vertical-align: middle;
@@ -625,20 +638,17 @@ footer.bar .hint {
   padding: 0 0 5px 0;
   display: none;
 }
+
 #checkout-summary .pay {
+  margin-top: 10px;
   border-top: 1px solid #eef2f7;
-  padding-top: 14px;
+  padding-top: 10px;
+  display: grid;
+  gap: 5px;
 }
-.paybtn span {
-  vertical-align: middle;
-}
-.pay .paybtn i {
-  line-height: 1;
-  display: inline-block;
-  font-size: 1.1rem;
-}
+
 /*
-.pay .paybtn span {
+.pay .paymentbtn span {
 display: inline-block;
 white-space: nowrap;
 }
@@ -1065,3 +1075,38 @@ white-space: nowrap;
   }
 }
 
+
+/*Override*/
+
+.modal.show .modal-dialog {
+  z-index: 999999;
+}
+
+
+/* ============================
+   NOTYF ANTI-OVERRIDE PATCH
+   Place after all theme CSS
+   ============================ */
+
+/* Pastikan di atas segalanya */
+body .notyf {
+  z-index: 2147483647 !important;
+  pointer-events: none;
+}
+
+/* Toast base */
+body .notyf .notyf__toast {
+  background: var(--notyf-bg, rgba(34, 34, 34, 0.95)) !important;
+  color: var(--notyf-fg, #fff) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25) !important;
+  border: 0 !important;
+  /* Netralisir utility yang suka nempel */
+  text-decoration: none !important;
+}
+
+/* Varian status (pakai warna tegas + teks putih) */
+body .notyf .notyf__toast--success {
+  background: var(--notyf-success, #2e7d32) !important;
+  color: #fff !important;
+}
