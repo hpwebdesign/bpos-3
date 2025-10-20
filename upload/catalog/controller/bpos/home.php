@@ -156,11 +156,23 @@ class ControllerBposHome extends Controller {
                 'product_id' => $result['product_id'],
                 'thumb'      => $image,
                 'name'       => $result['name'],
-                'stock'      => $result['stock'],
+                'stock'      => $this->formatStock($result['stock']),
                 'price'      => $this->currency->format($result['price'], $this->session->data['currency']),
                 'special'    => $special
             ];
         }
         return $products;
     }
+
+    private function formatStock($number) {
+    if ($number >= 1000) {
+        $formatted = number_format($number / 1000, 1);
+        // Check if it's a whole number
+        if ($number % 1000 === 0) {
+            return number_format($number / 1000) . 'k'; // No decimals
+        }
+        return $formatted . 'k';
+    }
+    return $number;
+}
 }

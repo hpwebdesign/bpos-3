@@ -229,6 +229,7 @@ body {
 #catalogGrid article {
     cursor: pointer;
 }
+
 article .thumb {
     aspect-ratio: 1/1;
     background: transparent;
@@ -236,7 +237,21 @@ article .thumb {
     place-items: center;
     text-align: center;
     padding: 10px;
+    border: 1px dashed #e6eaf2;
+    margin: 10px;
+    border-radius: 4px;
+    transition: border-color .22s ease, transform .28s ease;
 }
+
+article .thumb:hover {
+  border-color: #cfe0ff;
+  transform: scale(1.02);
+}
+
+article .thumb:hover .thumb img {
+  transform: scale(1.2) rotate(1deg);
+}
+
 article .thumb img {
     /*    filter: drop-shadow(0 14px 18px rgba(8, 17, 58, 0.1));*/
     transform: translateY(0) scale(1);
@@ -257,6 +272,15 @@ article .meta {
 article .meta .name {
     font-weight: 600;
 }
+
+article:hover .meta .name {
+    color: var(--brand) !important;
+}
+
+article:hover .meta .price {
+    color: var(--ok) !important;
+}
+
 article .meta .price {
     color: var(--navy);
     font-weight: 700;
