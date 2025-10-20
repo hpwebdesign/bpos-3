@@ -1,7 +1,7 @@
 <?php
 class ModelBposProduct extends Model {
-    public function getProductsLite($data=array()) {
-        // Tentukan customer group
+    public function getProductsLite($data = array()) {
+
         if ($this->customer->isLogged()) {
             $customer_group_id = (int)$this->customer->getGroupId();
         } else {
@@ -10,7 +10,6 @@ class ModelBposProduct extends Model {
 
         $start = isset($data['start']) ? (int)$data['start'] : 0;
         $limit = isset($data['limit']) ? (int)$data['limit'] : 12;
-
         if ($start < 0) $start = 0;
         if ($limit < 1) $limit = 12;
 
@@ -22,7 +21,7 @@ class ModelBposProduct extends Model {
                     pd.name,
                     p.image,
                     p.price,
-                    p.quantity as stock,
+                    p.quantity AS stock,
                     p.model,
                     (
                         SELECT pd2.price FROM " . DB_PREFIX . "product_discount pd2
@@ -43,27 +42,52 @@ class ModelBposProduct extends Model {
                         ORDER BY ps.priority ASC, ps.price ASC
                         LIMIT 1
                     ) AS special
-                FROM " . DB_PREFIX . "product p
-                INNER JOIN " . DB_PREFIX . "product_description pd
+                ";
+
+        if (!empty($data['filter_category_id'])) {
+            if (!empty($data['filter_sub_category'])) {
+                $sql .= " FROM " . DB_PREFIX . "category_path cp 
+                          LEFT JOIN " . DB_PREFIX . "product_to_category p2c ON (cp.category_id = p2c.category_id)";
+            } else {
+                $sql .= " FROM " . DB_PREFIX . "product_to_category p2c";
+            }
+
+            if (!empty($data['filter_filter'])) {
+                $sql .= " LEFT JOIN " . DB_PREFIX . "product_filter pf ON (p2c.product_id = pf.product_id)
+                          LEFT JOIN " . DB_PREFIX . "product p ON (pf.product_id = p.product_id)";
+            } else {
+                $sql .= " LEFT JOIN " . DB_PREFIX . "product p ON (p2c.product_id = p.product_id)";
+            }
+        } else {
+            $sql .= " FROM " . DB_PREFIX . "product p";
+        }
+
+        $sql .= " INNER JOIN " . DB_PREFIX . "product_description pd
                     ON (p.product_id = pd.product_id AND pd.language_id = '" . $language_id . "')
-                INNER JOIN " . DB_PREFIX . "product_to_store p2s
+                  INNER JOIN " . DB_PREFIX . "product_to_store p2s
                     ON (p.product_id = p2s.product_id AND p2s.store_id = '" . $store_id . "')";
 
-        // Tambahkan join ke product_to_category jika filter_category_id diisi
+        $sql .= " WHERE p.status = '1' AND p.date_available <= NOW()";
+
         if (!empty($data['filter_category_id'])) {
-            $sql .= " INNER JOIN " . DB_PREFIX . "product_to_category p2c
-                      ON (p.product_id = p2c.product_id)";
+            if (!empty($data['filter_sub_category'])) {
+                $sql .= " AND cp.path_id = '" . (int)$data['filter_category_id'] . "'";
+            } else {
+                $sql .= " AND p2c.category_id = '" . (int)$data['filter_category_id'] . "'";
+            }
+
+            if (!empty($data['filter_filter'])) {
+                $implode = array();
+                $filters = explode(',', $data['filter_filter']);
+                foreach ($filters as $filter_id) {
+                    $implode[] = (int)$filter_id;
+                }
+                if ($implode) {
+                    $sql .= " AND pf.filter_id IN (" . implode(',', $implode) . ")";
+                }
+            }
         }
 
-        $sql .= " WHERE p.status = '1'
-                  AND p.date_available <= NOW()";
-
-        // Filter kategori
-        if (!empty($data['filter_category_id'])) {
-            $sql .= " AND p2c.category_id = '" . (int)$data['filter_category_id'] . "'";
-        }
-
-        // Filter pencarian opsional
         if (!empty($data['filter_search'])) {
             $search = $this->db->escape($data['filter_search']);
             $sql .= " AND (pd.name LIKE '%" . $search . "%'
@@ -71,10 +95,9 @@ class ModelBposProduct extends Model {
                         OR p.sku LIKE '%" . $search . "%')";
         }
 
-        // Sorting
+
         $sort = isset($data['sort']) ? $data['sort'] : 'pd.name';
         $order = (isset($data['order']) && strtoupper($data['order']) === 'DESC') ? 'DESC' : 'ASC';
-
         $sortable = array('pd.name','p.price','p.product_id','p.model');
         if (!in_array($sort, $sortable)) {
             $sort = 'pd.name';
@@ -83,8 +106,8 @@ class ModelBposProduct extends Model {
         $sql .= " ORDER BY " . $sort . " " . $order;
         $sql .= " LIMIT " . $start . ", " . $limit;
 
-        $query = $this->db->query($sql);
 
+        $query = $this->db->query($sql);
         $rows = array();
         foreach ($query->rows as $row) {
             $effective = $row['price'];
@@ -108,6 +131,7 @@ class ModelBposProduct extends Model {
 
         return $rows;
     }
+
 
     public function getProductsSpecial($data = array()) {
         // Determine customer group

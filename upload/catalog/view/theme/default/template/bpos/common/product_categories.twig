@@ -1,27 +1,14 @@
 <section id="product-categories" class="panel catalog" aria-labelledby="catalog-title">
 	<div class="head">
 		<h3 id="catalog-title">Products</h3>
-		<div class="filters bslide" data-bslide="cat-filters" aria-label="Category filters">
-		  <button class="bslide-nav prev" aria-label="Previous"><i class="fa fa-chevron-left"></i></button>
+		<div class="filters" role="tablist" aria-label="Category filters">
+			<button class="btn is-active" data-id="0" data-cat="all" role="tab" aria-selected="true">All</button>
 
-		  <div class="bslide-viewport">
-		    <div class="bslide-track">
-		      <button class="btn is-active" data-id="0" data-cat="all" role="tab" aria-selected="true">All</button>
-
-		      {% if categories %}
-		        {% for category in categories %}
-		          <button class="btn {% if category_id == category.id %}is-active{% endif %}"
-		                  data-id="{{ category.id }}"
-		                  data-cat="{{ category.name }}"
-		                  role="tab">
-		            {{ category.name }}
-		          </button>
-		        {% endfor %}
-		      {% endif %}
-		    </div>
-		  </div>
-
-		  <button class="bslide-nav next" aria-label="Next"><i class="fa fa-chevron-right"></i></button>
+			{% if categories %}
+			{% for category in categories %}
+				<button class="btn {% if category_id == category.id %}is-active{% endif %}" data-id="{{ category.id }}" data-cat="{{ category.name }}" role="tab">{{ category.name }}</button>
+			{% endfor %}
+			{% endif %}
 		</div>
 
 	</div>

@@ -1058,16 +1058,13 @@ $(document).on('click', '.mini-btn[data-action="coupon"]', function(){
 let barcodeBuffer = "";
 let barcodeTimer = null;
 
-// Fokuskan ke input agar scanner bisa langsung mengetik
 $(document).on('keydown', function (e) {
-  // Abaikan jika sedang input manual di form
+
   if ($(e.target).is('input, textarea')) return;
 
-  // Jika waktu antar karakter lebih dari 300ms, reset buffer
   if (barcodeTimer) clearTimeout(barcodeTimer);
   barcodeTimer = setTimeout(() => (barcodeBuffer = ""), 300);
 
-  // Enter = akhir barcode
   if (e.key === 'Enter' && barcodeBuffer.length > 0) {
     let code = barcodeBuffer.trim();
     barcodeBuffer = "";
@@ -1075,14 +1072,33 @@ $(document).on('keydown', function (e) {
     return;
   }
 
-  // Simpan karakter (angka/huruf saja)
   if (e.key.length === 1) barcodeBuffer += e.key;
+});
+$(function () {
+  const $icon = $('.search span');
+  const $search = $('#pos-search');
+  const $barcode = $('#barcode-input');
+
+  $search.on('focus', function() {
+    $icon.text('🔎');
+  });
+
+  $barcode.on('focus', function() {
+    $icon.text('🏷️');
+  });
+
+  $search.add($barcode).on('blur', function() {
+    setTimeout(function(){
+      if (!$search.is(':focus') && !$barcode.is(':focus')) {
+        $icon.text('🔎');
+      }
+    }, 50);
+  });
 });
 
 function handleBarcodeScan(code) {
   console.log("Barcode scanned:", code);
 
-  // Panggil endpoint untuk cari product berdasarkan model
   $.ajax({
     url: 'index.php?route=bpos/product/getByModel&model=' + encodeURIComponent(code),
     dataType: 'json',

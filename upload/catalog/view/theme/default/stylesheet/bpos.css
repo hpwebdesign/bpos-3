@@ -51,7 +51,7 @@ body {
     top: 0;
     z-index: 6;
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: auto 1fr auto;
     gap: 16px;
     align-items: center;
     padding: 14px 18px;
@@ -186,8 +186,12 @@ body {
 .filters {
     display: flex;
     gap: 8px;
-    flex-wrap: nowrap;
-    width: 600px;
+    flex-wrap: wrap;
+}
+.filters .btn.is-active {
+    background: #e8eeff;
+    border-color: #c8d3ff;
+    color: #1a2a5e;
 }
 .filters .btn {
     padding: 8px 10px;
@@ -196,13 +200,6 @@ body {
     border-radius: 999px;
     color: #2d3b53;
     cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-}
-.filters .btn.is-active {
-    background: #e8eeff;
-    border-color: #c8d3ff;
-    color: #1a2a5e;
 }
 .grid {
     display: grid;
@@ -210,12 +207,17 @@ body {
     gap: 12px;
     margin-top: 12px;
 }
-.card {
+#catalogGrid .card {
     border: 1px solid #eef2f7;
     border-radius: 14px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+#catalogGrid .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 #catalogGrid article {
     cursor: pointer;
@@ -229,7 +231,7 @@ article .thumb {
     padding: 10px;
 }
 article .thumb img {
-    filter: drop-shadow(0 14px 18px rgba(8, 17, 58, 0.1));
+    /*    filter: drop-shadow(0 14px 18px rgba(8, 17, 58, 0.1));*/
     transform: translateY(0) scale(1);
     transition: transform .35s ease;
     width: 100%;
@@ -938,7 +940,7 @@ white-space: nowrap;
     }
     /* Topbar & Layout */
     .topbar {
-        grid-template-columns: 30px auto auto;
+        grid-template-columns: auto 1fr auto;
         gap: 10px;
     }
     .cashier {
@@ -969,22 +971,20 @@ white-space: nowrap;
     .filters {
         display: flex;
         gap: 8px;
-        width: 400px;
+        flex-wrap: wrap;
     }
-    .filters::-webkit-scrollbar {
-        height: 6px;
-    }
-    .filters::-webkit-scrollbar-thumb {
-        background-color: rgba(0, 0, 0, 0.2);
-        border-radius: 3px;
-    }
-    .filters::-webkit-scrollbar-track {
-        background: transparent;
+    .filters .btn.is-active {
+        background: #e8eeff;
+        border-color: #c8d3ff;
+        color: #1a2a5e;
     }
     .filters .btn {
-        flex: 0 0 auto;
-        white-space: nowrap;
-        flex-shrink: 0;
+        padding: 8px 10px;
+        border: 1px solid #e6ebf3;
+        background: #f7f9fe;
+        border-radius: 999px;
+        color: #2d3b53;
+        cursor: pointer;
     }
     /* Cart */
     .cart .item {
@@ -1089,76 +1089,4 @@ body .notyf .notyf__toast--success {
 }
 .swal-ac-list {
     position: relative !important;
-}
-.filters.bslide .bslide-track::-webkit-scrollbar {
-    display: none;
-}
-.home-paginate .pagination>li:first-child>a {
-    display: none;
-}
-.home-paginate .pagination>li:last-child>a {
-    display: none;
-}
-/* Container & viewport */
-
-.filters.bslide {
-    position: relative;
-}
-.filters.bslide .bslide-viewport {
-    overflow-x: auto;
-    /* <- viewport yg scroll */
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-    /* optional */
-    padding: 2px 0;
-}
-.filters.bslide .bslide-viewport::-webkit-scrollbar {
-    display: none;
-}
-.filters.bslide .bslide-track {
-    display: flex;
-    /* <- hanya layout, TIDAK scroll */
-    gap: 8px;
-}
-.filters.bslide .btn {
-    flex: 0 0 auto;
-    white-space: nowrap;
-    padding: 8px 14px;
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    background: #fff;
-    font-size: 14px;
-    transition: .2s;
-    cursor: pointer;
-}
-.filters.bslide .btn.is-active {
-    background: var(--brand, #1f2b45);
-    color: #fff;
-    border-color: var(--brand, #1f2b45);
-}
-/* Nav */
-
-.filters.bslide .bslide-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    border: 0;
-    background: #fff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 2;
-    pointer-events: auto;
-}
-.filters.bslide .bslide-nav.prev {
-    left: -6px;
-}
-.filters.bslide .bslide-nav.next {
-    right: -6px;
 }
