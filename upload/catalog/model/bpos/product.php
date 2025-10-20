@@ -22,6 +22,7 @@ class ModelBposProduct extends Model {
                     pd.name,
                     p.image,
                     p.price,
+                    p.quantity as stock,
                     p.model,
                     (
                         SELECT pd2.price FROM " . DB_PREFIX . "product_discount pd2
@@ -97,6 +98,7 @@ class ModelBposProduct extends Model {
                 'product_id' => (int)$row['product_id'],
                 'name'       => $row['name'],
                 'image'      => $row['image'],
+                'stock'      => $row['stock'],
                 'price'      => (float)$row['price'],
                 'discount'   => $row['discount'] !== null ? (float)$row['discount'] : null,
                 'special'    => $row['special'] !== null ? (float)$row['special'] : null,

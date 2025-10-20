@@ -1,6 +1,8 @@
 <?php
 
 $_['text_products']     = 'Products';
+$_['text_all']          = 'All';
+$_['text_stock']        = 'Stock';
 $_['text_clear_all']    = 'Clear All';
 $_['text_checkout']     = 'Checkout';
 $_['text_view']         = 'View';

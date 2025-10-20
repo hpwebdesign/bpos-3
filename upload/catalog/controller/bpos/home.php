@@ -148,11 +148,16 @@ class ControllerBposHome extends Controller {
                 ? $this->model_tool_image->resize($result['image'], 200, 200)
                 : $this->model_tool_image->resize('placeholder.png', 200, 200);
 
+
+            $special = $result['special'] ? $this->currency->format($result['special'], $this->session->data['currency']) : 0;
+
             $products[] = [
                 'product_id' => $result['product_id'],
                 'thumb'      => $image,
                 'name'       => $result['name'],
-                'price'      => $this->currency->format($result['price'], $this->session->data['currency'])
+                'stock'      => $result['stock'],
+                'price'      => $this->currency->format($result['price'], $this->session->data['currency']),
+                'special'    => $special
             ];
         }
         return $products;

@@ -297,7 +297,7 @@ $(document).ready(function() {
                         success: function(json) {
                             if (json['success']) {
                                 if (window.notyf) { notyf.success(json['success']); }
-                                $('.cart .counter').html(json['total_cart']);
+                                $('.btn--cart .counter').html(json['total_cart']);
                                 updateCheckoutPanel();
                             }
 
@@ -342,7 +342,7 @@ $(document).ready(function() {
                 if (json['success']) {
                     $('#productOptionModal').modal('hide');
                     if (window.notyf) { notyf.success(json['success']); }
-                    $('.cart .counter').html(json['total_cart']);
+                    $('.btn--cart .counter').html(json['total_cart']);
                     updateCheckoutPanel();
                 }
             }
@@ -1100,7 +1100,7 @@ function handleBarcodeScan(code) {
               notyf.success(res.success);
             }
             updateCheckoutPanel();
-            $('.cart .counter').html(res.total_cart || 0);
+            $('.btn--cart .counter').html(res.total_cart || 0);
           },
           error: function () {
             if (window.notyf) notyf.error('Failed to add product');

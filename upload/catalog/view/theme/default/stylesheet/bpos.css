@@ -11,6 +11,8 @@
   --warn: #f79009;
   --danger: #ef4444;
   --chip: #e9eef7;
+  --line: #b9c6ff;
+  --active-bg: #eef2ff;
   --radius: 16px;
   --shadow: 0 6px 24px rgba(18, 34, 58, 0.08);
   --brand-darker: #0f1c31;
@@ -39,6 +41,7 @@ body {
 
 #main-content {
   padding: 15px !important;
+  margin-bottom: 60px
 }
 
 .app {
@@ -229,13 +232,21 @@ body {
 
 article .thumb {
   aspect-ratio: 1/1;
-  background: #f1f5ff;
+  background: transparent;
   display: grid;
   place-items: center;
   text-align: center;
   padding: 10px;
 }
-.thumb span {
+
+article .thumb img {
+  filter: drop-shadow(0 14px 18px rgba(8, 17, 58, 0.1));
+  transform: translateY(0) scale(1);
+  transition: transform .35s ease;
+  width: 100%;
+}
+
+article .thumb span {
   font-weight: 700;
   color: #294081;
 }
@@ -246,18 +257,18 @@ article .meta {
   background: #fff;
   z-index: 9;
 }
-.meta .name {
+article .meta .name {
   font-weight: 600;
 }
-.meta .price {
+article .meta .price {
   color: var(--navy);
   font-weight: 700;
 }
-.meta .stock {
+article .meta .stock {
   font-size: 12px;
   color: var(--muted);
 }
-.meta .add {
+article .meta .add {
   margin-top: 6px;
   padding: 9px 10px;
   border-radius: 10px;
@@ -265,7 +276,7 @@ article .meta {
   background: #f6f9ff;
   cursor: pointer;
 }
-.meta .add:hover {
+article .meta .add:hover {
   border-style: solid;
 }
 
@@ -288,7 +299,7 @@ article .meta {
   min-width: 36px;
 }
 .pager .is-current {
-  background: #eef2ff;
+  background: var(--active-bg);
   border-color: #b9c6ff;
   font-weight: 700;
 }
@@ -488,7 +499,7 @@ footer.bar .hint {
   border-radius: 8px;
   padding: 10px 15px;
   margin-top: 12px;
-  border: 1px solid #d4e1f1;
+  border: 1px solid var(--line);
 }
 #checkout-summary .summary .subtotal {
   display: flex;
@@ -514,7 +525,7 @@ footer.bar .hint {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid #e6ebf3;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -528,8 +539,8 @@ footer.bar .hint {
   min-width: 60px;
 }
 .paymentbtn.active, .shippingbtn.active, .customer-btn.active {
-  outline: 1px solid #d4f1e1;
-  background: #f2fff7;
+  background: var(--active-bg);
+  border-color: var(--line);
 }
 
 
@@ -612,7 +623,7 @@ overflow: hidden;
 }
 .method.is-active {
   border-color: #b9c6ff;
-  background: #eef2ff;
+  background: var(--active-bg);
 }
 .pay .actions {
   display: flex;
@@ -687,7 +698,7 @@ white-space: nowrap;
   flex: 1;
   padding: 6px 10px;
   font-size: 13px;
-  border: 1px solid var(--ring, #ddd);
+  border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--card-bg, #f8f8f8);
   cursor: pointer;
@@ -794,6 +805,7 @@ white-space: nowrap;
   z-index: 1000;
   font-family: "Inter", system-ui, sans-serif;
   display: none;
+  z-index: 9999999;
 }
 
 .fab-cart .btn--cart {
@@ -956,6 +968,10 @@ white-space: nowrap;
   }
 }
 @media (max-width: 680px) {
+  .d-xs-none {
+    display: none;
+  }
+
   .fab.fab-cart {
     display: block;
   }
