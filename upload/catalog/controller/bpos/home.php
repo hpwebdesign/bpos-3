@@ -107,7 +107,7 @@ class ControllerBposHome extends Controller {
         $data['products'] = $products;
 
         // hapus header JSON
-        $this->response->setOutput($this->load->view('bpos/product_list', $data));
+        $this->response->setOutput($this->load->view('bpos/common/product_list', $data));
     }
 
 
@@ -127,7 +127,7 @@ class ControllerBposHome extends Controller {
             ];
         }
 
-        $this->response->setOutput($this->load->view('bpos/product_list', $data));
+        $this->response->setOutput($this->load->view('bpos/common/product_list', $data));
     }
 
     private function getProductsList($category_id, $start = 0, $limit = 16) {

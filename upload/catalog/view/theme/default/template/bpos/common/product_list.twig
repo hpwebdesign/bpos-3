@@ -1,0 +1,13 @@
+{% for product in products %}
+    <article data-id="{{ product.product_id }}" class="card product-item" data-name="{{ product.name }}" data-price="{{ product.price }}">
+        <div class="thumb">
+            <img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" class="plate img-responsive"></div>
+        <div class="meta">
+            <div class="name">{{ product.name }}</div>
+            <div class="row2">
+                <span class="stock">{{ text_stock }}: {{ product.stock }}</span>
+                <span class="price">{{ product.price }}</span></div>
+            <!--				<button class="add">+ Add</button>-->
+        </div>
+    </article>
+{% endfor %}

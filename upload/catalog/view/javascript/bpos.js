@@ -146,7 +146,7 @@ $(document).ready(function() {
                 type: 'get',
                 dataType: 'html',
                 success: function(html) {
-                    $('#products-list').html(html);
+                    $('#catalogGrid').html(html);
                     $('#products_paginate').hide();
                 }
             });

@@ -25,8 +25,9 @@ class ControllerBposProduct extends Controller {
             ];
         }
 
-        $this->response->setOutput($this->load->view('bpos/product_list', $data));
+        $this->response->setOutput($this->load->view('bpos/common/product_list', $data));
     }
+
     public function checkOptions() {
         $json = ['has_option' => false];
         $this->load->model('catalog/product');
@@ -75,7 +76,7 @@ class ControllerBposProduct extends Controller {
             ];
         }
 
-        $this->response->setOutput($this->load->view('bpos/product_options', $data));
+        $this->response->setOutput($this->load->view('bpos/common/product_options', $data));
     }
 
     public function getByModel() {

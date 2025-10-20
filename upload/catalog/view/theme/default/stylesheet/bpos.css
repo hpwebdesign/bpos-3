@@ -200,25 +200,31 @@ body {
     border-radius: 999px;
     color: #2d3b53;
     cursor: pointer;
+    font-size: 13px;
 }
-.grid {
+
+#catalogGrid.grid {
     display: grid;
-    grid-template-columns: repeat(5, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 12px;
     margin-top: 12px;
 }
+
 #catalogGrid .card {
-    border: 1px solid #eef2f7;
     border-radius: 14px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     transition: transform .3s ease, box-shadow .3s ease;
+    border: 1px solid rgba(16, 24, 40, 0.08);
+    box-shadow: 0 4px 12px rgba(2, 6, 23, 0.05);
 }
+
 #catalogGrid .card:hover {
     transform: translateY(-6px);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
+
 #catalogGrid article {
     cursor: pointer;
 }
@@ -357,7 +363,7 @@ footer.bar {
     align-items: center;
     justify-content: space-between;
     padding: 10px 16px;
-    background: linear-gradient(to right, #0f1c31, #fff);
+    background: linear-gradient(to right, #0f1c31, #0f1c31);
     color: #c8d3ff;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     width: 100%;
@@ -932,7 +938,13 @@ white-space: nowrap;
     }
 }
 @media (max-width: 680px) {
+    #catalogGrid.grid {
+       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
     .d-xs-none {
+        display: none;
+    }
+    .panel .head h3 {
         display: none;
     }
     .fab.fab-cart {

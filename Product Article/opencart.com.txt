@@ -1,0 +1,84 @@
+[b]💼 BPOS — Point of Sales System for OpenCart[/b]
+BPOS (Barik Point of Sales) turns your OpenCart store into a fast, modern, and connected Point of Sales system that runs right from your website — no separate login or app needed.
+Simply open:
+👉 yourstore.com/pos and start selling.
+
+[b][color=#a8c700][size=120]◈ TRY THE DEMO[/size][/color][/b]
+[url=https://hpwebdesign.io/demo/bpos][img]https://opencart.id/image/catalog/opencart.com/frontend-demo.jpg[/img][/url]
+
+[b]🛍️ What is BPOS[/b]
+BPOS is a complete POS extension for OpenCart that helps you handle both in-store and online sales in one place.
+It connects directly to your existing catalog, customers, and stock — so everything stays in sync automatically.
+
+It’s built for real retail environments — fast, lightweight, and easy to use for cashiers and store owners.
+
+[b]⚙️ Main Features[/b]
+[list]
+[*] Runs on Frontend – Access the POS directly at yourstore.com/pos
+[*] Barcode Scanner Ready – Scan products instantly using USB or Bluetooth scanners
+[*] Responsive Design – Optimized for desktop, laptop, and touchscreen tablets
+[*] Multi-Language Support – Works seamlessly with all OpenCart languages
+[*] Multi-Store Support – Operate the POS for any store or sub-store
+[*] Online Status Indicator – Shows real-time online/offline connection state
+[*] Sales Export – Export sales data to CSV or Excel
+[*] Customer Management – Add or select customers without leaving the sales screen
+[*] Real-Time Stock Sync – Inventory updates automatically after every sale
+[/list]
+
+[b]🧾 Coming Soon[/b]
+[list]
+[*] Thermal Receipt Printing (58mm / 80mm)
+[*] Offline Mode – Make transactions without internet connection
+[*] Sales Dashboard – Daily, weekly, and monthly insights
+[/list]
+
+[b]🖥️ Interface Highlights[/b]
+[list]
+[*] Modern and clean design (Barik UI Framework)
+[*] Quick search-as-you-type product filtering
+[*] Large product grid with instant add-to-cart
+[*] Compact side order form for fast checkout
+[*] Customer popup and export tools
+[/list]
+
+[b]🔒 Secure and Lightweight[/b]
+[list]
+[*] Built on OpenCart 3.x core framework
+[*] Uses HTTPS session authentication
+[*] No third-party services or external APIs
+[*] Minimal setup — just install and start using
+[/list]
+
+[b]🧩 Compatibility[/b]
+[list]
+[*] OpenCart 3.0.x
+[*] PHP 7.3 or higher
+[*] Compatible with most OpenCart themes
+[/list]
+
+[b]🧰 Included in Package[/b]
+[list]
+[*] Full extension (frontend + admin)
+[*] Easy OCMOD installer
+[*] English documentation
+[*] 1 year of free updates
+[/list]
+
+💬 Who It’s For
+[list]
+[*] Retail stores selling both online and offline
+[*] Boutiques or cafés with on-site cashiers
+[*] Shop owners who want real-time stock sync
+[*] OpenCart users needing an integrated POS
+[/list]
+
+
+[b][color=#a8c700][size=120]◈ TRY THE DEMO[/size][/color][/b]
+[url=https://hpwebdesign.io/demo/bpos][img]https://opencart.id/image/catalog/opencart.com/frontend-demo.jpg[/img][/url]
+
+[url=https://demo03.hpwebdesign.id/admin/index.php?route=extension/module/hp_advanced_affiliate&user_token=QWyU10boQ2EIv7LvWpMhtT7h8tWweX50][img]https://opencart.id/image/catalog/opencart.com/backend-demo.jpg[/img][/url]
+[b][color=#a8c700][size=120]◈ SUPERB TECHNICAL SUPPORT[/size][/color][/b]
+We've got you covered!
+[img]https://image.opencart.com/original/58c341560e92f.jpg[/img]
+[list] ✪ Free Installation
+✪ Free 12 Months Technical Support[/list]
