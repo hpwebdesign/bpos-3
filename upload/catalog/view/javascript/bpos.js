@@ -4,7 +4,7 @@ if (typeof window !== 'undefined' && typeof window.Notyf !== 'undefined') {
 }
 
 $(document).ready(function() {
-
+    initCategoryCarousel();
 //toastr.options = {
 //  timeOut: 1000,
 //  extendedTimeOut: 0,
@@ -37,6 +37,18 @@ $(document).ready(function() {
             target.attr('tabindex', -1).focus();
         }
         if (route) loadContent(route);
+    });
+
+     $(document).on('click','.fab-cart', function() {
+         var target = $('#checkout-summary');
+            var scrollBottom = target.offset().top + target.outerHeight() - $(window).height();
+
+            $('html, body').animate({
+                scrollTop: scrollBottom
+            }, 500);
+
+            // Opsional: beri fokus
+            target.attr('tabindex', -1).focus();
     });
 
     $(document).on('click','#btn-logout', function() {
@@ -160,10 +172,12 @@ $(document).ready(function() {
     // Category
     $(document).on('click', '.filters .btn', function (e) {
         e.preventDefault();
-        $('.filters .btn').removeClass('is-active');
-        $(this).addClass('is-active');
+       const $btn = $(this);
+       const category_id = $btn.data('id');
 
-        const category_id = $(this).data('id');
+       $('.filters .btn').removeClass('is-active');
+       $btn.addClass('is-active');
+
         loadPage('index.php?route=bpos/home&category_id='+category_id);
         // $('#products-list').html('<div class="text-center py-5">Loading...</div>');
 
@@ -446,6 +460,7 @@ function loadPage(route) {
             if (json.output) {
                 $('#main-content').html(json.output);
                  $('html, body').animate({ scrollTop: 0 }, 'smooth');
+                 initCategoryCarousel();
                 // window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
                 $('#main-content').html('<p>No content</p>');
@@ -457,6 +472,36 @@ function loadPage(route) {
         complete: function() {
         }
     });
+}
+
+function initCategoryCarousel() {
+  const $carousel = $('#category-carousel.filters');
+
+  if ($carousel.length) {
+    // kalau sudah diinisialisasi sebelumnya, destroy dulu
+    if ($carousel.hasClass('owl-loaded')) {
+      $carousel.trigger('destroy.owl.carousel');
+      $carousel.find('.owl-stage-outer').children().unwrap();
+    }
+
+    $carousel.owlCarousel({
+      loop: false,
+      margin: 8,
+      nav: false,
+      dots: false,
+      autoWidth: true,
+      smartSpeed: 400,
+      responsive: {
+        0: { items: 2 },
+        768: { items: 3 },
+        1200: { items: 4 }
+      }
+    });
+
+    // tombol manual
+    $('.owl-prev').off('click').on('click', () => $carousel.trigger('prev.owl.carousel'));
+    $('.owl-next').off('click').on('click', () => $carousel.trigger('next.owl.carousel'));
+  }
 }
 
 /* =========================
@@ -1159,54 +1204,55 @@ $(document).on('keydown', function(e) {
 //   });
 // });
 
-$(function(){
-  const $wrap = $('.filters.bslide');
-  const $view = $wrap.find('.bslide-viewport'); // <- scroll container
-  const $track = $wrap.find('.bslide-track');
-  const $prev = $wrap.find('.bslide-nav.prev');
-  const $next = $wrap.find('.bslide-nav.next');
+// $(function(){
+//   const $wrap = $('.filters.bslide');
+//   const $view = $wrap.find('.bslide-viewport'); // <- scroll container
+//   const $track = $wrap.find('.bslide-track');
+//   const $prev = $wrap.find('.bslide-nav.prev');
+//   const $next = $wrap.find('.bslide-nav.next');
 
-  // Wheel -> horizontal
-  $view.on('wheel', function(e){
-    e.preventDefault();
-    this.scrollLeft += e.originalEvent.deltaY;
-  });
+//   // Wheel -> horizontal
+//   $view.on('wheel', function(e){
+//     e.preventDefault();
+//     this.scrollLeft += e.originalEvent.deltaY;
+//   });
 
-  // Drag to scroll (mouse)
-  let isDown = false, startX = 0, startLeft = 0;
-  $view.on('mousedown', function(e){
-    isDown = true;
-    startX = e.pageX;
-    startLeft = this.scrollLeft;
-    $(this).addClass('dragging');
-  });
-  $(document).on('mousemove', function(e){
-    if(!isDown) return;
-    const dx = e.pageX - startX;
-    $view[0].scrollLeft = startLeft - dx;
-  }).on('mouseup mouseleave', function(){
-    isDown = false;
-    $view.removeClass('dragging');
-  });
+//   // Drag to scroll (mouse)
+//   let isDown = false, startX = 0, startLeft = 0;
+//   $view.on('mousedown', function(e){
+//     isDown = true;
+//     startX = e.pageX;
+//     startLeft = this.scrollLeft;
+//     $(this).addClass('dragging');
+//   });
+//   $(document).on('mousemove', function(e){
+//     if(!isDown) return;
+//     const dx = e.pageX - startX;
+//     $view[0].scrollLeft = startLeft - dx;
+//   }).on('mouseup mouseleave', function(){
+//     isDown = false;
+//     $view.removeClass('dragging');
+//   });
 
-  // Step per klik panah: 3/4/6 item
-  function itemsPerViewport(){
-    const w = window.innerWidth;
-    if (w >= 1200) return 6;   // desktop
-    if (w >= 768)  return 4;   // tablet
-    return 3;                  // mobile
-  }
-  function itemWidth(){
-    const $first = $track.find('.btn').first();
-    return $first.outerWidth(true) || 120;
-  }
-  function stepSize(){ return itemsPerViewport() * itemWidth(); }
+//   // Step per klik panah: 3/4/6 item
+//   function itemsPerViewport(){
+//     const w = window.innerWidth;
+//     if (w >= 1200) return 6;   // desktop
+//     if (w >= 768)  return 4;   // tablet
+//     return 3;                  // mobile
+//   }
+//   function itemWidth(){
+//     const $first = $track.find('.btn').first();
+//     return $first.outerWidth(true) || 120;
+//   }
+//   function stepSize(){ return itemsPerViewport() * itemWidth(); }
 
-  function scrollBy(dx){
-    const target = $view.scrollLeft() + dx;
-    $view.stop().animate({ scrollLeft: target }, 220);
-  }
+//   function scrollBy(dx){
+//     const target = $view.scrollLeft() + dx;
+//     $view.stop().animate({ scrollLeft: target }, 220);
+//   }
 
-  $prev.on('click', function(e){ e.preventDefault(); scrollBy(-stepSize()); });
-  $next.on('click', function(e){ e.preventDefault(); scrollBy( stepSize()); });
-});
+//   $prev.on('click', function(e){ e.preventDefault(); scrollBy(-stepSize()); });
+//   $next.on('click', function(e){ e.preventDefault(); scrollBy( stepSize()); });
+// });
+

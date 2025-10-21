@@ -1,105 +1,126 @@
-  const $ = (q, ctx=document)=>ctx.querySelector(q);
-    const $$ = (q, ctx=document)=>Array.from(ctx.querySelectorAll(q));
 
-    const tabPassword = $('#tab-password');
-    const tabPin = $('#tab-pin');
-    const panelPassword = $('#panel-password');
-    const panelPin = $('#panel-pin');
+$(function () {
+  // Tabs & panels
+  var $tabPassword   = $('#tab-password');
+  var $tabPin        = $('#tab-pin');
+  var $panelPassword = $('#panel-password');
+  var $panelPin      = $('#panel-pin');
 
-    const html = document.documentElement;
-    const themeToggle = $('#themeToggle');
+  // Theme toggle
+  var $html        = $(document.documentElement);
+  var $themeToggle = $('#themeToggle');
 
-    function toggleTheme(){
-      const isWhite = html.getAttribute('data-theme') === 'white';
-      html.setAttribute('data-theme', isWhite ? 'navy' : 'white');
+  function toggleTheme() {
+    var isWhite = $html.attr('data-theme') === 'white';
+    $html.attr('data-theme', isWhite ? 'navy' : 'white');
+  }
+  $themeToggle.on('click', toggleTheme);
+
+  // Switch tab
+  function setTab(which) {
+    
+    var pinMode = (which === 'pin');
+
+    $tabPassword.attr('aria-selected', String(!pinMode));
+    $tabPin.attr('aria-selected', String(pinMode));
+
+    if (pinMode) {
+      $panelPassword.hide();
+      $panelPin.show();
+      $('#pinInput').focus();
+    } else {
+      $panelPassword.show();
+      $panelPin.hide();
+      $('#username').focus();
     }
+    checkOnlineState();
+  }
+  $tabPassword.on('click', function(){ $('.alert-login').html(''); setTab('password'); });
+  $tabPin.on('click', function(){ $('.alert-login').html(''); setTab('pin'); });
 
-    themeToggle.addEventListener('click', toggleTheme);
+  // PIN keypad
+  var $pinInput = $('#pinInput');
+  var $dots     = $('.pin-dot');
 
-    function setTab(which){
-      const pinMode = which === 'pin';
-      tabPassword.setAttribute('aria-selected', String(!pinMode));
-      tabPin.setAttribute('aria-selected', String(pinMode));
-      panelPassword.style.display = pinMode ? 'none' : 'block';
-      panelPin.style.display = pinMode ? 'block' : 'none';
-      if(pinMode){ $('#pinInput').focus(); } else { $('#username').focus(); }
-      checkOnlineState();
-    }
-
-    tabPassword.addEventListener('click', ()=> setTab('password'));
-    tabPin.addEventListener('click', ()=> setTab('pin'));
-
-    const pinInput = $('#pinInput');
-    const dots = $$('.pin-dot');
-
-    function renderDots(){
-      const v = pinInput.value;
-      dots.forEach((d,i)=> d.classList.toggle('filled', i < v.length));
-    }
-
-    function addDigit(d){
-      if(pinInput.value.length >= 6) return;
-      pinInput.value += d;
-      renderDots();
-      checkOnlineState();
-    }
-
-    function backspace(){
-      pinInput.value = pinInput.value.slice(0, -1);
-      renderDots();
-      checkOnlineState();
-    }
-
-    function clearPin(){
-      pinInput.value = '';
-      renderDots();
-      checkOnlineState();
-    }
-
-    $$('.keypad .key').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const key = btn.getAttribute('data-key');
-        const action = btn.getAttribute('data-action');
-        if(key){ addDigit(key); return; }
-        if(action === 'backspace'){ backspace(); return; }
-        if(action === 'clear'){ clearPin(); return; }
-      });
+  function renderDots() {
+    var v = $pinInput.val();
+    $dots.each(function(i, el){
+      $(el).toggleClass('filled', i < v.length);
     });
+  }
 
-    ['username','password'].forEach(id=>{
-      $('#'+id).addEventListener('focus',()=> checkOnlineState());
-    });
+  function addDigit(d) {
+    if ($pinInput.val().length >= 6) return;
+    $pinInput.val($pinInput.val() + d);
+    renderDots();
+    checkOnlineState();
+  }
 
-    panelPassword.addEventListener('submit', (e)=>{
-      e.preventDefault();
-      checkOnlineState();
-      alert('Password login submitted');
-    });
-    panelPin.addEventListener('submit', (e)=>{
-      e.preventDefault();
-      checkOnlineState();
-      if(pinInput.value.length !== 6){
-        alert('Please enter a 6-digit PIN');
-        return;
-      }
-      alert('PIN login submitted: ' + pinInput.value.replace(/\\d/g,'•'));
-      clearPin();
-    });
+  function backspace() {
+    $pinInput.val($pinInput.val().slice(0, -1));
+    renderDots();
+    checkOnlineState();
+  }
 
-    const statusDot = $('#statusDot');
-    const statusText = $('#statusText');
-    function setOnlineState(isOnline){
-      statusDot.className = 'dot ' + (isOnline ? 'ok' : 'off');
-      statusText.textContent = isOnline ? 'Online' : 'Offline';
+  function clearPin() {
+    $pinInput.val('');
+    renderDots();
+    checkOnlineState();
+  }
+
+  $('.keypad .key').on('click', function(){
+    var $btn   = $(this);
+    var key    = $btn.attr('data-key');
+    var action = $btn.attr('data-action');
+
+    if (key) { addDigit(key); return; }
+    if (action === 'backspace') { backspace(); return; }
+    if (action === 'clear') { clearPin(); return; }
+  });
+
+  // Focus listeners to refresh status
+  $.each(['username','password'], function(_, id){
+    $('#' + id).on('focus', function(){ checkOnlineState(); });
+  });
+
+  // Submit handlers
+  // $panelPassword.on('submit', function(e){
+  //   e.preventDefault();
+  //   checkOnlineState();
+  //   // alert('Password login submitted');
+  // });
+
+  $panelPin.on('submit', function(e){
+    e.preventDefault();
+    checkOnlineState();
+    if ($pinInput.val().length !== 6) {
+      alert('Please enter a 6-digit PIN');
+      return;
     }
+    alert('PIN login submitted: ' + $pinInput.val().replace(/\d/g,'•'));
+    clearPin();
+  });
 
-    function checkOnlineState(){
-      setOnlineState(navigator.onLine);
-    }
+  // Online status
+  var $statusDot  = $('#statusDot');
+  var $statusText = $('#statusText');
 
-    window.addEventListener('online', ()=> setOnlineState(true));
-    window.addEventListener('offline', ()=> setOnlineState(false));
+  function setOnlineState(isOnline) {
+    $statusDot.attr('class', 'dot ' + (isOnline ? 'ok' : 'off'));
+    $statusText.text(isOnline ? 'Online' : 'Offline');
+  }
 
-    setInterval(checkOnlineState, 3000);
+  function checkOnlineState() {
+    setOnlineState(navigator.onLine);
+  }
 
-    setTab('password');
+  $(window).on('online',  function(){ setOnlineState(true);  });
+  $(window).on('offline', function(){ setOnlineState(false); });
+
+  // Check every 3 seconds
+  setInterval(checkOnlineState, 3000);
+
+  // Init
+  setTab('password');
+  renderDots();
+});

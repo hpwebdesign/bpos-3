@@ -183,11 +183,12 @@ body {
     display: grid;
     grid-template-rows: auto 1fr;
 }
-.filters {
+/*.filters {
     display: flex;
     gap: 8px;
-    flex-wrap: wrap;
-}
+    flex-wrap: nowrap;
+}*/
+
 .filters .btn.is-active {
     background: #e8eeff;
     border-color: #c8d3ff;
@@ -993,11 +994,11 @@ white-space: nowrap;
         padding: 8px;
     }
     /* Filters */
-    .filters {
+    /*.filters {
         display: flex;
         gap: 8px;
-        flex-wrap: wrap;
-    }
+        flex-wrap: nowrap;
+    }*/
     .filters .btn.is-active {
         background: #e8eeff;
         border-color: #c8d3ff;
@@ -1134,4 +1135,111 @@ body .notyf .notyf__toast--success {
 }
 .home-paginate .pagination>li:first-child>a, .home-paginate .pagination>li:last-child>a {
     display: none;
+}
+/* ============================
+   CATEGORY SLIDER (SINGLE LINE)
+   ============================ */
+
+.panel.catalog .head {
+    min-width: 0 !important;
+    overflow: hidden;
+}
+/* override khusus untuk .filters di dalam Owl */
+
+#category-carousel.filters {
+    display: block !important;
+    /* hilangkan flex utama */
+    flex-wrap: nowrap !important;
+    overflow: hidden !important;
+    min-width: 0;
+}
+/* pastikan Owl stage tetap horizontal */
+
+#category-carousel .owl-stage {
+    display: flex !important;
+    align-items: center;
+}
+#category-carousel .owl-item {
+    flex: 0 0 auto !important;
+    width: auto !important;
+}
+/* gaya tombol chip */
+
+#category-carousel .btn {
+    white-space: nowrap;
+    border-radius: 999px;
+    padding: 8px 14px;
+    margin-right: 8px;
+    font-size: 13px;
+    background: #f7f9fe;
+    border: 1px solid #e6ebf3;
+    color: #2d3b53;
+    transition: all .2s ease;
+}
+#category-carousel .btn.is-active {
+    background: #e8eeff;
+    border-color: #c8d3ff;
+    color: #1a2a5e;
+}
+/* tombol navigasi */
+
+.category-carousel-wrapper {
+    position: relative;
+    overflow: hidden;
+    padding: 0 36px;
+    /* sebelumnya 40px, sedikit dikurangi agar panah tidak keluar */
+    margin-top: 8px;
+}
+/* tombol navigasi kiri-kanan */
+
+.owl-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #e6ebf3;
+    background: #fff;
+    /* lebih netral, mengikuti warna panel */
+    color: #1a2a5e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: all .25s ease;
+    z-index: 5;
+}
+/* posisikan agar tidak keluar kontainer */
+
+.owl-prev {
+    left: 6px;
+    /* sebelumnya 0 */
+}
+.owl-next {
+    right: 6px;
+    /* sebelumnya 0 */
+}
+.owl-nav-btn:hover {
+    background: #eef2ff;
+    transform: translateY(-50%) scale(1.1);
+}
+/* Responsif untuk layar kecil */
+
+@media (max-width: 680px) {
+    .category-carousel-wrapper {
+        padding: 0 28px;
+    }
+    .owl-prev {
+        left: 0;
+    }
+    .owl-next {
+        right: 0;
+    }
+    .owl-nav-btn {
+        width: 28px;
+        height: 28px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
 }

@@ -1,17 +1,19 @@
 <section id="product-categories" class="panel catalog" aria-labelledby="catalog-title">
 	<div class="head">
 		<h3 id="catalog-title">{{ text_products }}</h3>
-		<div class="filters" role="tablist" aria-label="Category filters">
-			<button class="btn is-active" data-id="0" data-cat="all" role="tab" aria-selected="true">{{ text_all }}</button>
+		    <div class="category-carousel-wrapper">
+      <div id="category-carousel" class="filters owl-carousel" role="tablist" aria-label="Category filters">
+        <button class="btn {% if category_id == 0 %}is-active{% endif %}" data-id="0">{{ text_all }}</button>
+        {% for category in categories %}
+        <button class="btn {% if category_id == category.id %}is-active{% endif %}" data-id="{{ category.id }}">{{ category.name }}</button>
+        {% endfor %}
+      </div>
 
-			{% if categories %}
-			{% for category in categories %}
-			<button class="btn {% if category_id == category.id %}is-active{% endif %}" data-id="{{ category.id }}" data-cat="{{ category.name }}" role="tab">{{ category.name }}</button>
-			{% endfor %}
-			{% endif %}
-		</div>
+      <button class="owl-nav-btn owl-prev"><i class="bi bi-chevron-left"></i></button>
+      <button class="owl-nav-btn owl-next"><i class="bi bi-chevron-right"></i></button>
+    </div>
+			  </div>
 
-	</div>
 	<div class="body">
 		<div class="grid" id="catalogGrid" aria-live="polite">
 			{% for product in products %}

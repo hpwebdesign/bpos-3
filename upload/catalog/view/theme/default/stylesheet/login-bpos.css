@@ -324,3 +324,7 @@ html[data-theme="navy"] .key.fn {
 .login-logo {
     text-align: center;
 }
+.alert-login {
+    color: #f44336;
+    text-align: center;
+}
