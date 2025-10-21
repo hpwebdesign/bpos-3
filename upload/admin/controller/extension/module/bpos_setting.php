@@ -16,7 +16,7 @@ class ControllerExtensionModuleBposSetting extends Controller {
 
 		$this->language->load('extension/module/bpos_setting');
 
-		// $this->rightman();
+		 $this->rightman();
 
 		if (!$this->validateTable()) {
 
@@ -45,13 +45,13 @@ class ControllerExtensionModuleBposSetting extends Controller {
 			$this->response->setOutput($this->load->view('extension/module/hpwd_notification', $data));
 
 		} else {
-			// if ($this->domain != $this->v_d) {
-			// 	$this->storeAuth();
-			// } else {
-			// 	$this->getData();
-			// }
+			if ($this->domain != $this->v_d) {
+				$this->storeAuth();
+			} else {
+				$this->getData();
+			}
 		}
-		$this->getData();
+
 	}
 
 	public function installEvent() {
