@@ -12,9 +12,13 @@ $_['text_confirm_to_logout']  = 'Are you sure you want to exit the POS System?';
 $_['text_cancel']             = 'Cancel';
 $_['text_logout']             = 'Logout';
 $_['text_welcome']         = 'Welcome to BPOS!';
-$_['text_login_desc']         = 'Please sign in using your admin account to access the POS system.';
+$_['text_login_desc']         = 'Fast, touch-friendly, and reliable — optimized for cashier workflow. Works great on tablets and desktops.';
 $_['text_signin']         = 'Sign In';
-$_['text_signin_desc']         = 'Enter your username and password';
+$_['text_login']         = 'Login';
+$_['text_username']         = 'Username or Email';
+$_['text_password']         = 'Password';
+$_['text_remember_me']         = 'Remember me';
+$_['text_signin_desc']         = 'Sign in to your POS';
 $_['text_success_cart']         = 'Success: You have added %s to your shopping cart!';
 
 // Button

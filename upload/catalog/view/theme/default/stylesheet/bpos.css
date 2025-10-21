@@ -36,8 +36,8 @@ body {
     box-sizing: border-box;
 }
 #main-content {
-  margin: 0 auto 60px 0;
-  width: 100%;
+    margin: 0 auto 60px 0;
+    width: 100%;
 }
 .app {
     min-height: 100%;
@@ -202,14 +202,12 @@ body {
     cursor: pointer;
     font-size: 13px;
 }
-
 #catalogGrid.grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 12px;
     margin-top: 12px;
 }
-
 #catalogGrid .card {
     border-radius: 14px;
     overflow: hidden;
@@ -220,16 +218,13 @@ body {
     box-shadow: 0 4px 12px rgba(2, 6, 23, 0.05);
     max-width: 200px;
 }
-
 #catalogGrid .card:hover {
     transform: translateY(-6px);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
-
 #catalogGrid article {
     cursor: pointer;
 }
-
 article .thumb {
     aspect-ratio: 1/1;
     background: transparent;
@@ -242,16 +237,13 @@ article .thumb {
     border-radius: 4px;
     transition: border-color .22s ease, transform .28s ease;
 }
-
 article .thumb:hover {
-  border-color: #cfe0ff;
-  transform: scale(1.02);
+    border-color: #cfe0ff;
+    transform: scale(1.02);
 }
-
 article .thumb:hover .thumb img {
-  transform: scale(1.2) rotate(1deg);
+    transform: scale(1.2) rotate(1deg);
 }
-
 article .thumb img {
     /*    filter: drop-shadow(0 14px 18px rgba(8, 17, 58, 0.1));*/
     transform: translateY(0) scale(1);
@@ -272,15 +264,12 @@ article .meta {
 article .meta .name {
     font-weight: 600;
 }
-
 article:hover .meta .name {
     color: var(--brand) !important;
 }
-
 article:hover .meta .price {
     color: var(--ok) !important;
 }
-
 article .meta .price {
     color: var(--navy);
     font-weight: 700;
@@ -443,7 +432,6 @@ footer.bar .hint {
     display: none;
     place-items: center;
     background: rgba(6, 16, 35, 0.5);
-    z-index: 50;
 }
 .modal.is-open {
     display: grid;
@@ -470,7 +458,7 @@ footer.bar .hint {
     padding: 14px 16px;
 }
 #checkout-summary {
-    z-index: 99999;
+    z-index: 999;
 }
 #checkout-summary .order-line {
     display: flex;
@@ -964,7 +952,7 @@ white-space: nowrap;
 }
 @media (max-width: 680px) {
     #catalogGrid.grid {
-       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     }
     .d-xs-none {
         display: none;
@@ -1094,10 +1082,12 @@ white-space: nowrap;
 /*Override*/
 
 .modal.show .modal-dialog {
-  z-index: 9999999 !important;
-  top: 100px;
+    z-index: 9999999 !important;
+    top: 100px;
 }
-
+.modal-backdrop {
+    z-index: 1040 !important;
+}
 /* ============================
    NOTYF ANTI-OVERRIDE PATCH
    Place after all theme CSS
@@ -1129,19 +1119,19 @@ body .notyf .notyf__toast--success {
 .swal-ac-list {
     position: relative !important;
 }
-
-
 #home {
-  padding: 15px;
+    padding: 15px;
 }
-
 .sub-heading {
-  background: linear-gradient(0deg, #0f1c31, #0f1c31) padding-box, linear-gradient(135deg, #2646a6, #80a4ff) border-box;
-  height: 40px;
-  text-align: center;
-  color: #cdd3e2;
-  line-height: 40px;
-  text-transform: capitalize;
-  font-weight: 500;
-  font-size: 15px;
+    background: linear-gradient(0deg, #0f1c31, #0f1c31) padding-box, linear-gradient(135deg, #2646a6, #80a4ff) border-box;
+    height: 40px;
+    text-align: center;
+    color: #cdd3e2;
+    line-height: 40px;
+    text-transform: capitalize;
+    font-weight: 500;
+    font-size: 15px;
+}
+.home-paginate .pagination>li:first-child>a, .home-paginate .pagination>li:last-child>a {
+    display: none;
 }

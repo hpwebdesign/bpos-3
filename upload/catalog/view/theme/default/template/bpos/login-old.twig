@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BPOS</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root{
+      --accent:#2a1a88;
+      --accent-2:#7a2bf6;
+      --cta:#2f80ff;
+      --muted:#8d94a6;
+      --field:#f3f6fb;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background:#fff;
+      overflow-x: hidden;
+    }
+
+    /* Left welcome panel */
+    .welcome-panel{
+      position:relative;
+      min-height:100vh;
+      color:#fff;
+      background: radial-gradient(1200px 600px at -10% -20%, #8a4cff 0%, #5c2bd6 35%, #3a1ea6 60%, #2a1a88 100%);
+      overflow:hidden;
+    }
+    /* soft diagonal accents */
+    .welcome-panel::after{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        linear-gradient(110deg, rgba(255,255,255,.08) 0 2px, transparent 2px 100%),
+        linear-gradient(110deg, transparent 0 8%, rgba(255,255,255,.05) 8% 9%, transparent 9% 100%);
+      background-size: 1400px 400px, 1200px 600px;
+      background-position: -200px 0, -150px 200px;
+      pointer-events:none;
+    }
+    .brand-mark{
+      width:46px; height:46px; border-radius:12px;
+      background:linear-gradient(180deg,#ff7a7a,#ff4d4d);
+      position:relative;
+      display:inline-block;
+    }
+    .brand-mark::before,
+    .brand-mark::after{
+      content:""; position:absolute; top:9px; bottom:9px; width:14px; border-radius:8px;
+      background:#fff;
+      transform:skewX(-12deg);
+    }
+    .brand-mark::before{ left:8px; }
+    .brand-mark::after{ right:8px; opacity:.6; }
+
+    .welcome-content{
+      position:relative;
+      padding:3rem 2rem 2rem;
+      height:100%;
+      display:flex; flex-direction:column; justify-content:space-between;
+    }
+    .welcome-copy h2{
+      font-weight:700; letter-spacing:.2px;
+    }
+    .welcome-copy p{
+      color:rgba(255,255,255,.8);
+      max-width:420px;
+    }
+    .welcome-footer a{
+      color:rgba(255,255,255,.85);
+      text-decoration:none;
+      white-space: nowrap;
+    }
+    .welcome-footer a:hover{ text-decoration:underline; }
+
+    /* Right sign-in area */
+    .auth-wrapper{
+      min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      position:relative;
+      padding: 2rem 1rem;
+    }
+    .top-links{
+      position:absolute; top:20px; right:24px; font-size:.9rem;
+    }
+    .top-links a{ text-decoration:none; }
+    .muted{ color:var(--muted); }
+
+    .auth-card{
+      width:100%;
+      max-width:420px;
+      padding: 0 1rem;
+    }
+    .auth-title{ font-weight:600; }
+
+    .form-control{
+      background:var(--field);
+      border:none;
+      padding:.9rem 1rem;
+      border-radius:.5rem;
+    }
+    .form-control:focus{
+      background:#fff;
+      box-shadow:0 0 0 .25rem rgba(47,128,255,.15);
+      border:1px solid #e6efff;
+    }
+    .btn-cta{
+      background:var(--cta);
+      border-color:var(--cta);
+      padding: 0.5rem 1.5rem;
+    }
+    .btn-cta:hover{
+      filter:brightness(.95);
+    }
+
+    .link-sm{
+      font-size:.9rem;
+      text-decoration:none;
+      color:var(--muted);
+    }
+    .link-sm:hover{
+      color:#58709a;
+      text-decoration:underline;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1199.98px) {
+      .welcome-panel::after {
+        background-size: 1000px 300px, 800px 400px;
+      }
+    }
+
+    @media (max-width: 991.98px) {
+      .welcome-panel {
+        min-height: 40vh;
+      }
+      .welcome-content {
+        padding: 2rem 1.5rem;
+      }
+      .welcome-copy h2 {
+        font-size: 1.75rem;
+      }
+      .welcome-copy p {
+        max-width: 100%;
+      }
+      .welcome-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+      }
+      .auth-wrapper {
+        padding: 1.5rem 1rem 2rem;
+        min-height: auto;
+      }
+      .top-links {
+        position: static;
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+       .auth-card {
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 767.98px) {
+      .welcome-panel {
+        min-height: 35vh;
+      }
+      .welcome-content {
+        padding: 1.5rem 1rem;
+      }
+      .welcome-copy h2 {
+        font-size: 1.5rem;
+      }
+      .form-control {
+        padding: 0.75rem 1rem;
+      }
+
+      .auth-wrapper {
+        flex-direction: column;
+        align-items: stretch; /* biar full width */
+      }
+      .top-links {
+        position: static;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+      .auth-card {
+        max-width: 100%;
+        width: 100%;
+      }
+
+    }
+
+    @media (max-width: 575.98px) {
+      .welcome-panel {
+        min-height: 30vh;
+      }
+      .welcome-content {
+        padding: 1.25rem 1rem;
+      }
+      .welcome-copy h2 {
+        font-size: 1.35rem;
+        margin-bottom: 0.5rem;
+      }
+      .auth-title {
+        font-size: 1.25rem;
+      }
+      .d-flex.align-items-center.justify-content-between {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+      .btn-cta {
+        width: 100%;
+      }
+      .auth-wrapper {
+        padding: 1rem 0.5rem 1.5rem;
+        flex-direction: column;
+        align-items: stretch; /* biar full width */
+      }
+      .top-links {
+        position: static;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+      .auth-card {
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+
+.table.table-invoice thead th {
+  color: #b3b9c9;
+}
+
+  </style>
+</head>
+<body>
+
+<div class="container-fluid g-0">
+  <div class="row g-0">
+    <!-- Left Panel -->
+    <div class="col-lg-5 d-lg-block welcome-panel">
+      <div class="welcome-content">
+        <div class="d-flex align-items-center gap-2">
+          <span class="brand-mark"></span>
+        </div>
+        <div class="welcome-copy mt-auto">
+          <h2 class="mb-2">{{ text_welcome }}</h2>
+          <p class="mb-0">
+            {{ text_login_desc }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="col-lg-7">
+      <div class="auth-wrapper">
+        <div class="auth-card w-100">
+              {% if logo %}
+            <div class="text-center mb-3">
+              <img src="{{ logo }}" alt="Logo" class="img-fluid mb-2">
+            </div>
+          {% endif %}
+          <h4 class="auth-title text-center mb-1">{{ text_signin }}</h4>
+          <p class="text-center muted mb-4">{{ text_signin_desc }}</p>
+
+          {% if error_warning %}
+            <div class="alert alert-danger">{{ error_warning }}</div>
+          {% endif %}
+
+          <form action="{{ action }}" method="post">
+            <div class="mb-3">
+              <input type="text" class="form-control" placeholder="Username" name="username" required>
+            </div>
+            <div class="mb-3">
+              <input type="password" class="form-control" placeholder="Password" name="password" required>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between">
+              <button type="submit" class="btn btn-cta text-white">{{ text_signin }}</button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
