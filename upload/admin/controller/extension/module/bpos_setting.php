@@ -54,24 +54,6 @@ class ControllerExtensionModuleBposSetting extends Controller {
 
 	}
 
-	public function installEvent() {
-		$this->load->model('setting/event');
-		foreach ($this->events as $event) {
-			if (!$this->model_setting_event->getEventByCode($event['code'])) {
-				$this->model_setting_event->addEvent($event['code'], $event['trigger'], $event['action']);
-			}
-		}
-	}
-
-	public function deleteEvent() {
-		$this->load->model('setting/event');
-		foreach ($this->events as $event) {
-			if ($this->model_setting_event->getEventByCode($event['code'])) {
-				$this->model_setting_event->deleteEventByCode($event['code']);
-			}
-		}
-	}
-
 	public function getData() {
 		$data['version'] 		= $this->version;
 		$data['extension_code'] = $this->extension_code;
@@ -450,7 +432,6 @@ class ControllerExtensionModuleBposSetting extends Controller {
 	}
 
 	public function install() {
-		$this->installEvent();
 		$this->houseKeeping();
 	}
 
