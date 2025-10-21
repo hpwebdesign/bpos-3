@@ -267,6 +267,14 @@ article .meta .name {
 }
 article:hover .meta .name {
     color: var(--brand) !important;
+    text-transform: capitalize;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4em;
+    max-height: calc(1.4em * 3);
+    text-decoration: none;
 }
 article:hover .meta .price {
     color: var(--ok) !important;
@@ -1144,64 +1152,52 @@ body .notyf .notyf__toast--success {
     min-width: 0 !important;
     overflow: hidden;
 }
-/* override khusus untuk .filters di dalam Owl */
-
 #category-carousel.filters {
     display: block !important;
-    /* hilangkan flex utama */
     flex-wrap: nowrap !important;
-    overflow: hidden !important;
+    overflow: hidden;
     min-width: 0;
 }
-/* pastikan Owl stage tetap horizontal */
-
 #category-carousel .owl-stage {
-    display: flex !important;
-    align-items: center;
+    display: flex;
+    gap: 4px;
 }
 #category-carousel .owl-item {
-    flex: 0 0 auto !important;
-    width: auto !important;
+    flex: 0 0 auto;
 }
-/* gaya tombol chip */
-
 #category-carousel .btn {
+    display: block;
     white-space: nowrap;
     border-radius: 999px;
-    padding: 8px 14px;
-    margin-right: 8px;
+    padding: 6px 12px;
     font-size: 13px;
+    margin: 0;
     background: #f7f9fe;
     border: 1px solid #e6ebf3;
     color: #2d3b53;
     transition: all .2s ease;
+    width: 100%;
 }
 #category-carousel .btn.is-active {
     background: #e8eeff;
     border-color: #c8d3ff;
     color: #1a2a5e;
 }
-/* tombol navigasi */
-
 .category-carousel-wrapper {
     position: relative;
     overflow: hidden;
     padding: 0 36px;
-    /* sebelumnya 40px, sedikit dikurangi agar panah tidak keluar */
     margin-top: 8px;
 }
-/* tombol navigasi kiri-kanan */
-
 .owl-nav-btn {
     position: absolute;
-    top: 50%;
+    top: 30%;
     transform: translateY(-50%);
     width: 32px;
     height: 32px;
     border-radius: 50%;
     border: 1px solid #e6ebf3;
     background: #fff;
-    /* lebih netral, mengikuti warna panel */
     color: #1a2a5e;
     display: flex;
     align-items: center;
@@ -1211,22 +1207,16 @@ body .notyf .notyf__toast--success {
     transition: all .25s ease;
     z-index: 5;
 }
-/* posisikan agar tidak keluar kontainer */
-
 .owl-prev {
-    left: 6px;
-    /* sebelumnya 0 */
+    left: 0px;
 }
 .owl-next {
-    right: 6px;
-    /* sebelumnya 0 */
+    right: 0px;
 }
 .owl-nav-btn:hover {
     background: #eef2ff;
     transform: translateY(-50%) scale(1.1);
 }
-/* Responsif untuk layar kecil */
-
 @media (max-width: 680px) {
     .category-carousel-wrapper {
         padding: 0 28px;
@@ -1241,5 +1231,46 @@ body .notyf .notyf__toast--success {
         width: 28px;
         height: 28px;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+    #category-carousel.filters {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+}
+@media (min-width: 992px) {
+    #category-carousel.filters {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+}
+#category-carousel .owl-dots {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    margin-top: 8px;
+    gap: 6px;
+    position: relative;
+    z-index: 3;
+}
+#category-carousel .owl-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d8ddeb;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+#category-carousel .owl-dot.active {
+    background: #6b7cff;
+    transform: scale(1.3);
+}
+@media (max-width: 680px) {
+    #category-carousel .owl-dots {
+        margin-top: 6px;
+        gap: 4px;
+    }
+    #category-carousel .owl-dot {
+        width: 6px;
+        height: 6px;
     }
 }

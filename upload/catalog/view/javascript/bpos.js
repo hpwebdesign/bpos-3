@@ -434,6 +434,9 @@ function loadContent(route) {
             success: function(json) {
                 if (json['output']) {
                     $('#main-content').html(json['output']);
+                    if (route == 'bpos/home') {
+                         initCategoryCarousel();
+                    }
                 } else {
                     $('#main-content').html('<p>No content</p>');
                 }
@@ -478,7 +481,6 @@ function initCategoryCarousel() {
   const $carousel = $('#category-carousel.filters');
 
   if ($carousel.length) {
-    // kalau sudah diinisialisasi sebelumnya, destroy dulu
     if ($carousel.hasClass('owl-loaded')) {
       $carousel.trigger('destroy.owl.carousel');
       $carousel.find('.owl-stage-outer').children().unwrap();
@@ -486,19 +488,19 @@ function initCategoryCarousel() {
 
     $carousel.owlCarousel({
       loop: false,
-      margin: 8,
+      margin: 4,
       nav: false,
-      dots: false,
-      autoWidth: true,
+      dots: true,
+      autoWidth: false,  // biar pakai sistem grid item, bukan lebar konten
       smartSpeed: 400,
       responsive: {
-        0: { items: 2 },
-        768: { items: 3 },
-        1200: { items: 4 }
+        0:    { items: 2 },
+        600:  { items: 3 },
+        992:  { items: 4 },   // desktop hanya 4 item
+        1400: { items: 4 }
       }
     });
 
-    // tombol manual
     $('.owl-prev').off('click').on('click', () => $carousel.trigger('prev.owl.carousel'));
     $('.owl-next').off('click').on('click', () => $carousel.trigger('next.owl.carousel'));
   }
