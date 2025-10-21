@@ -264,9 +264,6 @@ article .meta {
 }
 article .meta .name {
     font-weight: 600;
-}
-article:hover .meta .name {
-    color: var(--brand) !important;
     text-transform: capitalize;
     display: -webkit-box;
     -webkit-line-clamp: 3;
@@ -275,6 +272,9 @@ article:hover .meta .name {
     line-height: 1.4em;
     max-height: calc(1.4em * 3);
     text-decoration: none;
+}
+article:hover .meta .name {
+    color: var(--brand) !important;
 }
 article:hover .meta .price {
     color: var(--ok) !important;
