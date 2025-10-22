@@ -1274,3 +1274,9 @@ body .notyf .notyf__toast--success {
         height: 6px;
     }
 }
+
+.invoice-wrap {
+  padding: 15px;
+    padding-right: 15px;
+    padding-left: 15px;
+}
