@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BPOS · Customer List</title>
+  <style>
+    :root{
+      --navy:#1f2b45; /* Barik navy */
+      --navy-600:#273556;
+      --sky:#eef3ff;
+      --ink:#1e2329;
+      --muted:#6b7280;
+      --line:#e6e8ef;
+      --fg:#0b1020;
+      --bg:#ffffff;
+      --chip:#f3f5f9;
+      --brand:#2f6bff;
+      --ok:#0bb57b; --warn:#f4ae3a; --bad:#ec5b55;
+      --radius:16px;
+      --shadow:0 8px 28px rgba(31,43,69,.08);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font:14px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--fg);background:linear-gradient(180deg,#f8faff, #fff)}
+    .container{max-width:1200px;margin:0 auto;padding:20px}
+
+    /* Topbar */
+    .topbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .title{display:flex;align-items:center;gap:10px}
+    .title h1{font-size:18px;margin:0;color:var(--navy)}
+    .stats{display:flex;gap:10px;flex-wrap:wrap}
+    .stat{background:#fff;border:1px solid var(--line);padding:8px 10px;border-radius:10px;display:flex;align-items:center;gap:8px}
+    .stat b{font-size:13px}
+
+    /* Controls */
+    .controls{display:flex;gap:10px;flex-wrap:wrap}
+    .input{position:relative}
+    .input input{width:280px;max-width:60vw;padding:10px 12px 10px 36px;border:1px solid var(--line);border-radius:12px;background:#fff;outline:none}
+    .input svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.6}
+    .btn{appearance:none;border:0;border-radius:12px;padding:10px 14px;background:var(--navy);color:#fff;cursor:pointer;box-shadow:var(--shadow);display:inline-flex;gap:8px;align-items:center}
+    .btn:active{transform:translateY(1px)}
+    .btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--line);box-shadow:none}
+    .btn.tiny{padding:6px 10px;border-radius:10px;font-size:12px}
+    .select{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff}
+
+    /* Surface */
+    .surface{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+
+    /* Table */
+    table{width:100%;border-collapse:separate;border-spacing:0}
+    thead th{position:sticky;top:0;background:#fbfcff;border-bottom:1px solid var(--line);text-align:left;font-weight:600;color:var(--muted);font-size:12px;padding:12px}
+    tbody td{padding:14px 12px;border-bottom:1px solid var(--line)}
+    tbody tr:hover{background:#fbfdff}
+    .name{display:flex;align-items:center;gap:10px}
+    .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#cfe2ff,#e9efff);display:grid;place-items:center;color:var(--navy);font-weight:700}
+    .muted{color:var(--muted)}
+    .badge{font-size:11px;padding:4px 8px;border-radius:999px;background:var(--chip);border:1px solid var(--line);display:inline-flex;align-items:center;gap:6px}
+    .badge.vip{background:rgba(47,107,255,.08);border-color:#cfe0ff;color:var(--brand)}
+    .badge.gold{background:linear-gradient(180deg,#fff7d6,#fff);border-color:#ffe9a6;color:#c48f00}
+    .money{font-variant-numeric:tabular-nums}
+    .actions{display:flex;gap:8px}
+
+    /* Footer / Pager */
+    .table-footer{display:flex;justify-content:space-between;align-items:center;padding:12px;border-top:1px solid var(--line)}
+    .pager{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+    .page-btn{padding:6px 10px;border-radius:10px;font-size:12px;border:1px solid var(--line);background:#fff;color:var(--navy);cursor:pointer}
+    .page-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+    .page-btn[disabled]{opacity:.5;cursor:not-allowed}
+
+    /* Card mode (mobile) */
+    @media (max-width: 860px){
+      thead{display:none}
+      table, tbody, tr, td{display:block;width:100%}
+      tbody tr{border-bottom:1px solid var(--line)}
+      tbody td{border:0;padding:8px 12px}
+      tbody td[data-label]{display:flex;justify-content:space-between;gap:10px}
+      .input input{width:220px}
+    }
+
+    /* Drawer */
+    .drawer{position:fixed;inset:0;display:none}
+    .drawer.open{display:block}
+    .drawer .backdrop{position:absolute;inset:0;background:rgba(13,18,30,.35);backdrop-filter:blur(2px);}
+    .drawer .panel{position:absolute;top:0;right:0;height:100%;width:min(520px,92vw);background:#fff;border-left:1px solid var(--line);box-shadow: -8px 0 28px rgba(0,0,0,.12);display:flex;flex-direction:column}
+    .panel header{padding:16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+    .panel header h3{margin:0;font-size:16px;color:var(--navy)}
+    .panel .content{padding:16px;overflow:auto;display:grid;gap:12px}
+    .kv{display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:center}
+    .chips{display:flex;gap:6px;flex-wrap:wrap}
+    .orders{border:1px dashed var(--line);border-radius:12px;padding:10px}
+  </style>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div class="title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 10h8M8 14h5"/></svg>
+        <h1>Customers</h1>
+        <span class="badge" title="data freshness">POS</span>
+      </div>
+      <div class="stats">
+        <div class="stat"><span class="muted">Total</span> <b id="stat-total">0</b></div>
+        <div class="stat"><span class="muted">New (7d)</span> <b id="stat-new">0</b></div>
+        <div class="stat"><span class="muted">Top Spender</span> <b id="stat-top">—</b></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <label class="input" aria-label="Search customers">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-3.5-3.5"></path></svg>
+        <input id="q" type="search" placeholder="Search name, phone, email…" autocomplete="off" />
+      </label>
+      <select id="sort" class="select" aria-label="Sort customers">
+        <option value="name">Sort: Name (A–Z)</option>
+        <option value="latest">Sort: Latest Purchase</option>
+        <option value="orders">Sort: Total Orders</option>
+        <option value="spent">Sort: Total Spent</option>
+      </select>
+      <button class="btn ghost" id="filterVip" title="Filter VIP">🏆 VIP</button>
+      <button class="btn" id="addBtn">➕ Add Customer</button>
+    </div>
+
+    <div class="surface" style="overflow:hidden;margin-top:12px">
+      <table id="grid" aria-label="Customer list">
+        <thead>
+          <tr>
+            <th style="width:34%">Customer</th>
+            <th style="width:26%">Contact</th>
+            <th style="width:12%">Orders</th>
+            <th style="width:16%">Last Purchase</th>
+            <th style="width:12%">Total Spent</th>
+            <th style="width:6%">Action</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="table-footer">
+        <div class="muted" id="hint">Showing <span id="showing">0</span> of <span id="total">0</span></div>
+        <div class="pager" id="pager">
+          <button class="page-btn" id="prev">Prev</button>
+          <span id="pageNumbers" class="pager-numbers"></span>
+          <button class="page-btn" id="next">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drawer Detail -->
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="backdrop" data-close></div>
+    <div class="panel" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+      <header>
+        <h3 id="drawerTitle">Customer Detail</h3>
+        <div style="display:flex;gap:8px">
+          <button class="btn tiny ghost" id="deleteBtn">Delete</button>
+          <button class="btn tiny" id="saveBtn">Save</button>
+          <button class="btn tiny ghost" data-close>Close</button>
+        </div>
+      </header>
+      <div class="content" id="detail"></div>
+    </div>
+  </div>
+
+<script>
+// --- Sample Data (can be replaced with AJAX) ---
+const seeded = [
+  {id:1, name:'Johnathan Doe', phone:'+62812-1111-2222', email:'john@example.com', address:'Jl. Melati No. 10, Jakarta', tier:'Gold', orders:12, last:'2025-10-15', spent:5200000, joined:'2024-03-12', notes:'Prefers COD; allergic to peanuts'},
+  {id:2, name:'Ayu Lestari', phone:'+62822-3333-4444', email:'ayu@example.com', address:'Gianyar, Bali', tier:'VIP', orders:31, last:'2025-10-18', spent:18200000, joined:'2023-12-01', notes:'Top spender; likes bundle promo'},
+  {id:3, name:'Budi Santoso', phone:'+62813-5555-6666', email:'budi@example.com', address:'Bandung', tier:'Silver', orders:6, last:'2025-09-30', spent:2100000, joined:'2024-10-03', notes:'Ask for gift wrap'},
+  {id:4, name:'Clara Wijaya', phone:'+62857-7777-8888', email:'clara@example.com', address:'Tangerang', tier:'New', orders:1, last:'2025-10-17', spent:180000, joined:'2025-10-12', notes:'New customer from IG'},
+  {id:5, name:'Dimas Pratama', phone:'+62895-9999-0000', email:'dimas@example.com', address:'Surabaya', tier:'VIP', orders:19, last:'2025-10-08', spent:9600000, joined:'2022-08-22', notes:'Often buys toys; member points active'},
+  {id:6, name:'Elisa Hartono', phone:'+62819-1212-3434', email:'elisa@example.com', address:'Semarang', tier:'Bronze', orders:3, last:'2025-08-28', spent:750000, joined:'2024-11-09', notes:'Prefers morning delivery'},
+  {id:7, name:'Farhan Akbar', phone:'+62818-1111-2222', email:'farhan@example.com', address:'Makassar', tier:'Gold', orders:14, last:'2025-10-12', spent:6300000, joined:'2023-06-19', notes:'Likes electronics'},
+  {id:8, name:'Grace Natalia', phone:'+62821-9999-1212', email:'grace@example.com', address:'Bekasi', tier:'New', orders:2, last:'2025-10-16', spent:420000, joined:'2025-10-10', notes:'Came from Shopee'},
+  {id:9, name:'Hana Kusuma', phone:'+62812-0000-1111', email:'hana@example.com', address:'Yogyakarta', tier:'VIP', orders:27, last:'2025-10-18', spent:13900000, joined:'2023-10-29', notes:'Ask for paperless receipt'},
+  {id:10, name:'Ivan Nugraha', phone:'+62855-1212-5656', email:'ivan@example.com', address:'Medan', tier:'Silver', orders:5, last:'2025-08-15', spent:1100000, joined:'2024-01-03', notes:'Slow payer; confirm first'},
+  ...Array.from({length:28}).map((_,i)=>({
+    id:100+i,
+    name:`Sample Customer ${i+1}`,
+    phone:`+6281${i%10}${i}${i}${i}${i}${i}${i}`,
+    email:`sample${i+1}@example.com`,
+    address:`Sample Address ${i+1}`,
+    tier:['New','Bronze','Silver','Gold','VIP'][i%5],
+    orders:Math.floor(Math.random()*32),
+    last:new Date(Date.now()-Math.random()*60*864e5).toISOString().slice(0,10),
+    spent:Math.floor(Math.random()*20000000),
+    joined:new Date(Date.now()-Math.random()*600*864e5).toISOString().slice(0,10),
+    notes:'—'
+  }))
+];
+
+const state={ q:'', sort:'name', vipOnly:false, page:0, perPage:10, data:[...seeded] };
+
+// helpers
+const money = n => 'Rp ' + n.toLocaleString('id-ID');
+const daysAgo = (d)=> (Date.now()-new Date(d).getTime())/864e5;
+
+function tierBadge(t){
+  const cls = t==='VIP'?'badge vip':(t==='Gold'?'badge gold':'badge');
+  return `<span class="${cls}">🏷️ ${t}</span>`;
+}
+
+function renderRows(list){
+  const $rows = $('#rows');
+  const html = list.map(c=>`
+    <tr>
+      <td data-label="Customer">
+        <div class="name">
+          <div class="avatar" aria-hidden="true">${c.name.split(' ').map(s=>s[0]).slice(0,2).join('')}</div>
+          <div>
+            <div style="font-weight:600">${c.name} ${tierBadge(c.tier)}</div>
+            <div class="muted">Joined ${c.joined}</div>
+          </div>
+        </div>
+      </td>
+      <td data-label="Contact">
+        <div>${c.phone}</div>
+        <div class="muted">${c.email}</div>
+        <div class="muted">${c.address||''}</div>
+      </td>
+      <td data-label="Orders">${c.orders}</td>
+      <td data-label="Last Purchase">${c.last}</td>
+      <td data-label="Total Spent" class="money">${money(c.spent)}</td>
+      <td data-label="Action">
+        <div class="actions">
+          <button class="btn tiny ghost btn-view" data-id="${c.id}">View</button>
+          <button class="btn tiny ghost btn-edit" data-id="${c.id}">Edit</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+  $rows.html(html);
+}
+
+function computeStats(list){
+  $('#stat-total').text(list.length);
+  $('#stat-new').text(list.filter(c=> daysAgo(c.joined) <= 7).length);
+  const top = list.slice().sort((a,b)=>b.spent-a.spent)[0];
+  $('#stat-top').text(top? top.name : '—');
+}
+
+function apply(){
+  const q = state.q.trim().toLowerCase();
+  let list = state.data.filter(c => (
+    !state.vipOnly || c.tier==='VIP'
+  ) && (
+    !q || [c.name,c.phone,c.email,(c.address||'')].some(v=>String(v).toLowerCase().includes(q))
+  ));
+
+  switch(state.sort){
+    case 'latest': list.sort((a,b)=> new Date(b.last)-new Date(a.last)); break;
+    case 'orders': list.sort((a,b)=> b.orders-a.orders); break;
+    case 'spent': list.sort((a,b)=> b.spent-a.spent); break;
+    default: list.sort((a,b)=> a.name.localeCompare(b.name));
+  }
+
+  const start = state.page*state.perPage;
+  const slice = list.slice(start, start+state.perPage);
+
+  renderRows(slice);
+  $('#showing').text(slice.length);
+  $('#total').text(list.length);
+  computeStats(list);
+
+  $('#prev').prop('disabled', state.page===0);
+  $('#next').prop('disabled', start+state.perPage>=list.length);
+  renderPager(list.length);
+}
+
+function renderPager(totalCount){
+  const pageCount = Math.ceil(totalCount/state.perPage) || 1;
+  const $nums = $('#pageNumbers').empty();
+  const windowSize = 2;
+  let start = Math.max(0, state.page - windowSize);
+  let end = Math.min(pageCount - 1, state.page + windowSize);
+  if (state.page < windowSize) end = Math.min(pageCount-1, windowSize*2);
+  if (state.page > pageCount-1-windowSize) start = Math.max(0, pageCount-1-windowSize*2);
+
+  function addBtn(i){
+    const $b = $('<button/>', {class:'page-btn', text: i+1});
+    if(i===state.page) $b.addClass('active');
+    $b.on('click', function(){ state.page=i; apply(); });
+    $nums.append($b);
+  }
+  if(start>0){ addBtn(0); if(start>1) $nums.append($('<span/>',{text:'…',class:'muted'})); }
+  for(let i=start;i<=end;i++) addBtn(i);
+  if(end<pageCount-1){ if(end<pageCount-2) $nums.append($('<span/>',{text:'…',class:'muted'})); addBtn(pageCount-1); }
+}
+
+function openDetail(id){
+  const c = state.data.find(x=>x.id===id);
+  if(!c) return;
+  const $drawer = $('#drawer');
+  $drawer.addClass('open').attr('aria-hidden','false');
+  const html = `
+    <div class="kv"><div class="muted">Name</div><div><input id="f_name" value="${c.name}" class="inp" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px"></div></div>
+    <div class="kv"><div class="muted">Tier</div><div class="chips">
+      ${['New','Bronze','Silver','Gold','VIP'].map(t=>`<label class="badge ${t==='VIP'?'vip':t==='Gold'?'gold':''}"><input type="radio" name="tier" value="${t}" ${t===c.tier?'checked':''}> ${t}</label>`).join('')}
+    </div></div>
+    <div class="kv"><div class="muted">Phone</div><div><input id="f_phone" value="${c.phone}" class="inp" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px"></div></div>
+    <div class="kv"><div class="muted">Email</div><div><input id="f_email" value="${c.email}" class="inp" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px"></div></div>
+    <div class="kv"><div class="muted">Address</div><div><input id="f_address" value="${c.address||''}" class="inp" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px"></div></div>
+    <div class="kv"><div class="muted">Joined</div><div>${c.joined}</div></div>
+    <div class="kv"><div class="muted">Orders</div><div>${c.orders}</div></div>
+    <div class="kv"><div class="muted">Total Spent</div><div class="money">${money(c.spent)}</div></div>
+    <div>
+      <div class="muted" style="margin-bottom:6px">Notes</div>
+      <textarea id="f_notes" rows="4" class="inp" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px">${c.notes||''}</textarea>
+    </div>
+    <div class="orders">
+      <div class="muted" style="margin-bottom:6px">Recent Orders (mock)</div>
+      <ul style="margin:0 0 0 16px;padding:0">
+        ${Array.from({length:Math.min(3,Math.max(1,c.orders%5))}).map((_,i)=>`<li>INV-${c.id}${i+1} • ${c.last} • ${money(Math.max(120000, Math.round(c.spent/(c.orders||1))))}</li>`).join('')}
+      </ul>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn ghost" id="actStartOrder" data-id="${c.id}">Start Order</button>
+      <button class="btn ghost" id="actSendReceipt" data-id="${c.id}">Send Receipt</button>
+      <button class="btn ghost" id="actAddPoints" data-id="${c.id}">Add Points</button>
+    </div>
+  `;
+  $('#detail').html(html);
+  $('#saveBtn').data('id', id);
+  $('#deleteBtn').data('id', id);
+}
+
+function closeDrawer(){ $('#drawer').removeClass('open').attr('aria-hidden','true'); }
+
+function toast(msg, type='success'){
+  if(!window.notyf){ window.notyf = new Notyf({ duration: 1800, position:{x:'right', y:'bottom'} }); }
+  if(type==='error') window.notyf.error(msg); else window.notyf.success(msg);
+}
+
+function saveCustomer(id){
+  const c = state.data.find(x=>x.id===id); if(!c) return;
+  const name = $('#f_name').val().trim();
+  const phone = $('#f_phone').val().trim();
+  if(!name || !phone){ toast('Name and Telephone are required','error'); return; }
+  c.name = name;
+  c.phone = phone;
+  c.email = $('#f_email').val().trim();
+  c.address = $('#f_address').val().trim();
+  c.notes = $('#f_notes').val();
+  const tier = $('input[name="tier"]:checked').val(); if(tier) c.tier=tier;
+  toast('Customer saved');
+  apply();
+}
+
+function removeCustomer(id){
+  if(window.confirm('Delete this customer?')){
+    state.data = state.data.filter(x=>x.id!==id);
+    closeDrawer();
+    toast('Customer deleted');
+    apply();
+  }
+}
+
+// mock actions (delegated)
+$(document).on('click','#actStartOrder', function(){ toast('Start order for #'+$(this).data('id')); });
+$(document).on('click','#actSendReceipt', function(){ toast('Receipt sent to email'); });
+$(document).on('click','#actAddPoints', function(){ toast('Added points'); });
+
+// events (jQuery)
+$(function(){
+  // search/sort/filter
+  $('#q').on('input', function(){ state.q=$(this).val(); state.page=0; apply(); });
+  $('#sort').on('change', function(){ state.sort=$(this).val(); state.page=0; apply(); });
+  $('#filterVip').on('click', function(){ state.vipOnly=!state.vipOnly; $(this).toggleClass('ghost').toggleClass('btn'); state.page=0; apply(); });
+
+  // pager
+  $('#prev').on('click', function(){ if(state.page>0){ state.page--; apply(); }});
+  $('#next').on('click', function(){ state.page++; apply(); });
+
+  // add customer
+  $('#addBtn').on('click', function(){
+    const id = Math.max.apply(null, state.data.map(x=>x.id))+1;
+    const newItem = {id, name:'', phone:'', email:'', address:'', tier:'New', orders:0, last:new Date().toISOString().slice(0,10), spent:0, joined:new Date().toISOString().slice(0,10), notes:''};
+    state.data.unshift(newItem);
+    state.page=0; apply(); openDetail(id);
+    setTimeout(()=> $('#f_name').focus(), 50);
+  });
+
+  // global drawer actions
+  $(document).on('click','[data-close]', closeDrawer);
+  $('#saveBtn').on('click', function(){ saveCustomer($(this).data('id')); });
+  $('#deleteBtn').on('click', function(){ removeCustomer($(this).data('id')); });
+
+  // table action buttons (delegated)
+  $(document).on('click','.btn-view, .btn-edit', function(){ openDetail(Number($(this).data('id'))); });
+
+  // init
+  apply();
+});
+</script>
+</body>
+</html>

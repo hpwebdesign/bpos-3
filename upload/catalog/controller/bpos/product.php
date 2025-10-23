@@ -1,18 +1,18 @@
 <?php
 class ControllerBposProduct extends Controller {
     public function search() {
-        $this->load->model('catalog/product');
+        $this->load->language('bpos/bpos');
         $this->load->model('tool/image');
-
+         $this->load->model('bpos/product');
         $filter_name = isset($this->request->get['filter_name']) ? $this->request->get['filter_name'] : '';
 
         $filter_data = [
-            'filter_name' => $filter_name,
+            'filter_search' => $filter_name,
             'start'       => 0,
             'limit'       => 50
         ];
 
-        $results = $this->model_catalog_product->getProducts($filter_data);
+        $results = $this->model_bpos_product->getProductsLite($filter_data);
         $data['products'] = [];
 
         foreach ($results as $result) {
@@ -21,11 +21,25 @@ class ControllerBposProduct extends Controller {
                 'thumb'      => $result['image'] ? $this->model_tool_image->resize($result['image'], 200, 200) : $this->model_tool_image->resize('placeholder.png', 200, 200),
                 'name'       => $result['name'],
                 'model'      => $result['model'],
+                'stock'      => $this->formatStock($result['stock']),
                 'price'      => $this->currency->format($result['price'], $this->session->data['currency'])
             ];
         }
 
         $this->response->setOutput($this->load->view('bpos/common/product_list', $data));
+    }
+
+    private function formatStock($number) {
+
+        if ($number >= 1000) {
+            $formatted = number_format($number / 1000, 1);
+            // Check if it's a whole number
+            if ($number % 1000 === 0) {
+                return number_format($number / 1000) . 'k'; // No decimals
+            }
+            return $formatted . 'k';
+        }
+        return $number;
     }
 
     public function checkOptions() {

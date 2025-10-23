@@ -2,9 +2,12 @@
 if (typeof window !== 'undefined' && typeof window.Notyf !== 'undefined') {
   window.notyf = window.notyf || new Notyf({ duration: 1000, position: { x: 'right', y: 'top' } });
 }
-
+let currentCarouselPage = 0;
+let CUSTOMER_GROUPS = [];
 $(document).ready(function() {
+    
     initCategoryCarousel();
+    loadCustomerGroups();
 //toastr.options = {
 //  timeOut: 1000,
 //  extendedTimeOut: 0,
@@ -177,7 +180,10 @@ $(document).ready(function() {
 
        $('.filters .btn').removeClass('is-active');
        $btn.addClass('is-active');
-
+       const $owl = $('#category-carousel');
+      if ($owl.data('owl.carousel')) {
+        currentCarouselPage = $owl.data('owl.carousel').relative($owl.find('.owl-item.active').first().index());
+      }
         loadPage('index.php?route=bpos/home&category_id='+category_id);
         // $('#products-list').html('<div class="text-center py-5">Loading...</div>');
 
@@ -503,8 +509,306 @@ function initCategoryCarousel() {
 
     $('.owl-prev').off('click').on('click', () => $carousel.trigger('prev.owl.carousel'));
     $('.owl-next').off('click').on('click', () => $carousel.trigger('next.owl.carousel'));
+     if (currentCarouselPage > 0) {
+         $carousel.trigger('to.owl.carousel', [currentCarouselPage, 0, true]);
+    }
   }
 }
+
+
+
+function loadCustomerGroups() {
+  return $.getJSON('index.php?route=bpos/customer/customer_group')
+    .then(res => {
+      if (res && res.ok && Array.isArray(res.groups)) {
+        CUSTOMER_GROUPS = res.groups;
+      }
+    })
+    .catch(err => console.error('Customer group error:', err));
+}
+
+const seeded = [
+  {id:1, name:'Johnathan Doe', phone:'+62812-1111-2222', email:'john@example.com', address:'Jl. Melati No. 10, Jakarta', tier:'Gold', orders:12, last:'2025-10-15', spent:5200000, joined:'2024-03-12', notes:'Prefers COD; allergic to peanuts'},
+  {id:2, name:'Ayu Lestari', phone:'+62822-3333-4444', email:'ayu@example.com', address:'Gianyar, Bali', tier:'VIP', orders:31, last:'2025-10-18', spent:18200000, joined:'2023-12-01', notes:'Top spender; likes bundle promo'},
+  {id:3, name:'Budi Santoso', phone:'+62813-5555-6666', email:'budi@example.com', address:'Bandung', tier:'Silver', orders:6, last:'2025-09-30', spent:2100000, joined:'2024-10-03', notes:'Ask for gift wrap'},
+  {id:4, name:'Clara Wijaya', phone:'+62857-7777-8888', email:'clara@example.com', address:'Tangerang', tier:'New', orders:1, last:'2025-10-17', spent:180000, joined:'2025-10-12', notes:'New customer from IG'},
+  {id:5, name:'Dimas Pratama', phone:'+62895-9999-0000', email:'dimas@example.com', address:'Surabaya', tier:'VIP', orders:19, last:'2025-10-08', spent:9600000, joined:'2022-08-22', notes:'Often buys toys; member points active'},
+  {id:6, name:'Elisa Hartono', phone:'+62819-1212-3434', email:'elisa@example.com', address:'Semarang', tier:'Bronze', orders:3, last:'2025-08-28', spent:750000, joined:'2024-11-09', notes:'Prefers morning delivery'},
+  {id:7, name:'Farhan Akbar', phone:'+62818-1111-2222', email:'farhan@example.com', address:'Makassar', tier:'Gold', orders:14, last:'2025-10-12', spent:6300000, joined:'2023-06-19', notes:'Likes electronics'},
+  {id:8, name:'Grace Natalia', phone:'+62821-9999-1212', email:'grace@example.com', address:'Bekasi', tier:'New', orders:2, last:'2025-10-16', spent:420000, joined:'2025-10-10', notes:'Came from Shopee'},
+  {id:9, name:'Hana Kusuma', phone:'+62812-0000-1111', email:'hana@example.com', address:'Yogyakarta', tier:'VIP', orders:27, last:'2025-10-18', spent:13900000, joined:'2023-10-29', notes:'Ask for paperless receipt'},
+  {id:10, name:'Ivan Nugraha', phone:'+62855-1212-5656', email:'ivan@example.com', address:'Medan', tier:'Silver', orders:5, last:'2025-08-15', spent:1100000, joined:'2024-01-03', notes:'Slow payer; confirm first'},
+  ...Array.from({length:28}).map((_,i)=>({
+    id:100+i,
+    name:`Sample Customer ${i+1}`,
+    phone:`+6281${i%10}${i}${i}${i}${i}${i}${i}`,
+    email:`sample${i+1}@example.com`,
+    address:`Sample Address ${i+1}`,
+    tier:['New','Bronze','Silver','Gold','VIP'][i%5],
+    orders:Math.floor(Math.random()*32),
+    last:new Date(Date.now()-Math.random()*60*864e5).toISOString().slice(0,10),
+    spent:Math.floor(Math.random()*20000000),
+    joined:new Date(Date.now()-Math.random()*600*864e5).toISOString().slice(0,10),
+    notes:'—'
+  }))
+];
+
+const state={ q:'', sort:'name', vipOnly:false, page:0, perPage:10, data:[...seeded] };
+
+// helpers
+const money = n => 'Rp ' + n.toLocaleString('id-ID');
+const daysAgo = (d)=> (Date.now()-new Date(d).getTime())/864e5;
+
+function tierBadge(t){
+  const cls = t==='VIP'?'badge vip':(t==='Gold'?'badge gold':'badge');
+  return `<span class="${cls}">🏷️ ${t}</span>`;
+}
+
+function renderRows(list){
+  const $rows = $('#rows');
+  const html = list.map(c=>`
+    <tr>
+      <td data-label="Customer">
+        <div class="name">
+          <div class="avatar" aria-hidden="true">${c.name.split(' ').map(s=>s[0]).slice(0,2).join('')}</div>
+          <div>
+            <div style="font-weight:600">${c.name} ${tierBadge(c.tier)}</div>
+            <div class="muted">Joined ${c.joined}</div>
+          </div>
+        </div>
+      </td>
+      <td data-label="Contact">
+        <div>${c.phone}</div>
+        <div class="muted">${c.email}</div>
+        <div class="muted">${c.address||''}</div>
+      </td>
+      <td data-label="Orders">${c.orders}</td>
+      <td data-label="Last Purchase">${c.last}</td>
+      <td data-label="Total Spent" class="money">${money(c.spent)}</td>
+      <td data-label="Action">
+        <div class="actions">
+          <button class="btn tiny ghost btn-view" data-id="${c.id}">View</button>
+          <button class="btn tiny ghost btn-edit" data-id="${c.id}">Edit</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+  $rows.html(html);
+}
+
+function computeStats(list){
+  $('#stat-total').text(list.length);
+  $('#stat-new').text(list.filter(c=> daysAgo(c.joined) <= 7).length);
+  const top = list.slice().sort((a,b)=>b.spent-a.spent)[0];
+  $('#stat-top').text(top? top.name : '—');
+}
+
+function apply(){
+  const q = state.q.trim().toLowerCase();
+  let list = state.data.filter(c => (
+    !state.vipOnly || c.tier==='VIP'
+  ) && (
+    !q || [c.name,c.phone,c.email,(c.address||'')].some(v=>String(v).toLowerCase().includes(q))
+  ));
+
+  switch(state.sort){
+    case 'latest': list.sort((a,b)=> new Date(b.last)-new Date(a.last)); break;
+    case 'orders': list.sort((a,b)=> b.orders-a.orders); break;
+    case 'spent': list.sort((a,b)=> b.spent-a.spent); break;
+    default: list.sort((a,b)=> a.name.localeCompare(b.name));
+  }
+
+  const start = state.page*state.perPage;
+  const slice = list.slice(start, start+state.perPage);
+
+  renderRows(slice);
+  $('#showing').text(slice.length);
+  $('#total').text(list.length);
+  computeStats(list);
+
+  $('#prev').prop('disabled', state.page===0);
+  $('#next').prop('disabled', start+state.perPage>=list.length);
+  renderPager(list.length);
+}
+
+function renderPager(totalCount){
+  const pageCount = Math.ceil(totalCount/state.perPage) || 1;
+  const $nums = $('#pageNumbers').empty();
+  const windowSize = 2;
+  let start = Math.max(0, state.page - windowSize);
+  let end = Math.min(pageCount - 1, state.page + windowSize);
+  if (state.page < windowSize) end = Math.min(pageCount-1, windowSize*2);
+  if (state.page > pageCount-1-windowSize) start = Math.max(0, pageCount-1-windowSize*2);
+
+  function addBtn(i){
+    const $b = $('<button/>', {class:'page-btn', text: i+1});
+    if(i===state.page) $b.addClass('active');
+    $b.on('click', function(){ state.page=i; apply(); });
+    $nums.append($b);
+  }
+  if(start>0){ addBtn(0); if(start>1) $nums.append($('<span/>',{text:'…',class:'muted'})); }
+  for(let i=start;i<=end;i++) addBtn(i);
+  if(end<pageCount-1){ if(end<pageCount-2) $nums.append($('<span/>',{text:'…',class:'muted'})); addBtn(pageCount-1); }
+}
+
+function openDetail(id){
+  const c = state.data.find(x=>x.id===id);
+  if(!c) return;
+  const $drawer = $('#drawer');
+  $drawer.addClass('open').attr('aria-hidden','false');
+  const html = `
+    <div class="kv"><div class="muted">Name</div><div><input id="f_name" value="${c.name}" class="inp" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px"></div></div>
+    <div class="kv"><div class="muted">Customer Group</div><div class="chips">
+      ${
+        CUSTOMER_GROUPS.map(g => `
+          <label class="badge vip">
+            <input type="radio" name="tier" value="${g.id}" ${Number(c.tier) === Number(g.id) ? 'checked' : ''}>
+            ${g.name}
+          </label>
+        `).join('')
+      }
+    </div></div>
+    <div class="kv"><div class="muted">Phone</div><div><input id="f_phone" value="${c.phone}" class="inp" style="width:100%;padding:10px;border:1px solid #e6e8ef;border-radius:10px"></div></div>
+    <div class="kv"><div class="muted">Email</div><div><input id="f_email" value="${c.email}" class="inp" style="width:100%;padding:10px;border:1px solid #e6e8ef;border-radius:10px"></div></div>
+    <div class="kv"><div class="muted">Address</div><div><input id="f_address" value="${c.address||''}" class="inp" style="width:100%;padding:10px;border:1px solid #e6e8ef;border-radius:10px"></div></div>
+    <div class="kv"><div class="muted">Joined</div><div>${c.joined}</div></div>
+    <div class="kv"><div class="muted">Orders</div><div>${c.orders}</div></div>
+    <div class="kv"><div class="muted">Total Spent</div><div class="money">${money(c.spent)}</div></div>
+    <div>
+      <div class="muted" style="margin-bottom:6px">Notes</div>
+      <textarea id="f_notes" rows="4" class="inp" style="width:100%;padding:10px;border:1px solid #e6e8ef;border-radius:10px">${c.notes||''}</textarea>
+    </div>
+    <!-- <div class="orders">
+      <div class="muted" style="margin-bottom:6px">Recent Orders (mock)</div>
+      <ul style="margin:0 0 0 16px;padding:0">
+        ${Array.from({length:Math.min(3,Math.max(1,c.orders%5))}).map((_,i)=>`<li>INV-${c.id}${i+1} • ${c.last} • ${money(Math.max(120000, Math.round(c.spent/(c.orders||1))))}</li>`).join('')}
+      </ul>
+    </div> -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn ghost" id="actStartOrder" data-id="${c.id}">Start Order</button>
+      <button class="btn ghost" id="actSendReceipt" data-id="${c.id}">Send Receipt</button> 
+      <button class="btn ghost" id="actAddPoints" data-id="${c.id}">Save</button>
+    </div>
+  `;
+  $('#detail').html(html);
+  $('#saveBtn').data('id', id);
+  $('#deleteBtn').data('id', id);
+}
+
+function closeDrawer(){ $('#drawer').removeClass('open').attr('aria-hidden','true'); }
+
+function toast(msg, type='success'){
+  if(!window.notyf){ window.notyf = new Notyf({ duration: 1800, position:{x:'right', y:'bottom'} }); }
+  if(type==='error') window.notyf.error(msg); else window.notyf.success(msg);
+}
+
+function saveCustomer(id){
+  const c = state.data.find(x => x.id === id);
+  if (!c) return;
+
+  const name = $('#f_name').val().trim();
+  const phone = $('#f_phone').val().trim();
+  if (!name || !phone) {
+    toast('Name and Telephone are required', 'error');
+    return;
+  }
+
+  // 🔹 Update data lokal
+  c.name = name;
+  c.phone = phone;
+  c.email = $('#f_email').val().trim();
+  c.address = $('#f_address').val().trim();
+  c.notes = $('#f_notes').val();
+  const tier = $('input[name="tier"]:checked').val();
+  if (tier) c.tier = tier;
+
+  toast('Saving customer...', 'info');
+
+  // 🔹 Kirim ke server
+  ajaxCreateCustomer({
+    name: c.name,
+    phone: c.phone,
+    email: c.email,
+    address: c.address,
+    note: c.note,
+    customer_group_id: c.tier
+  })
+  .done(function(res){
+    if (res && res.ok && res.id) {
+      if (res.id !== c.id) c.id = res.id;
+
+    // toast('Customer saved successfully');
+
+      ajaxLoginCustomer({ id: res.id })
+        .then(function(loginRes){
+          if (loginRes && loginRes.ok) {
+            if (typeof updateCheckoutPanel === 'function') updateCheckoutPanel();
+            toast('Customer applied to current POS session');
+          } else {
+            toast((loginRes && loginRes.error) || 'Failed to apply customer', 'error');
+          }
+        })
+        .catch(function(err){
+          toast((err && err.message) || 'Failed to apply customer', 'error');
+        });
+
+      apply(); // Refresh UI tabel/list
+      closeDrawer(); // Optional: tutup drawer setelah simpan
+    } else {
+      toast((res && res.error) || 'Failed to save customer', 'error');
+    }
+  })
+  .fail(function(xhr){
+    console.error(xhr);
+    toast('Network or server error while saving customer', 'error');
+  });
+}
+
+
+function removeCustomer(id){
+  if(window.confirm('Delete this customer?')){
+    state.data = state.data.filter(x=>x.id!==id);
+    closeDrawer();
+    toast('Customer deleted');
+    apply();
+  }
+}
+
+// mock actions (delegated)
+$(document).on('click','#actStartOrder', function(){ saveCustomer($(this).data('id')); });
+$(document).on('click','#actSendReceipt', function(){ toast('Receipt sent to email'); });
+$(document).on('click','#actAddPoints', function(){ saveCustomer($(this).data('id'));});
+
+// events (jQuery)
+
+  // search/sort/filter
+  $('#q').on('input', function(){ state.q=$(this).val(); state.page=0; apply(); });
+  $('#sort').on('change', function(){ state.sort=$(this).val(); state.page=0; apply(); });
+  $('#filterVip').on('click', function(){ state.vipOnly=!state.vipOnly; $(this).toggleClass('ghost').toggleClass('btn'); state.page=0; apply(); });
+
+  // pager
+  $('#prev').on('click', function(){ if(state.page>0){ state.page--; apply(); }});
+  $('#next').on('click', function(){ state.page++; apply(); });
+
+  // add customer
+  $('#addBtn').on('click', function(){
+    const id = Math.max.apply(null, state.data.map(x=>x.id))+1;
+    const newItem = {id, name:'', phone:'', email:'', address:'', tier:'New', orders:0, last:new Date().toISOString().slice(0,10), spent:0, joined:new Date().toISOString().slice(0,10), notes:''};
+    state.data.unshift(newItem);
+    state.page=0; apply(); openDetail(id);
+    setTimeout(()=> $('#f_name').focus(), 50);
+  });
+
+  // global drawer actions
+  $(document).on('click','[data-close]', closeDrawer);
+  $('#saveBtn').on('click', function(){ saveCustomer($(this).data('id')); });
+  $('#deleteBtn').on('click', function(){ removeCustomer($(this).data('id')); });
+
+  // table action buttons (delegated)
+  $(document).on('click','.btn-view, .btn-edit', function(){ openDetail(Number($(this).data('id'))); });
+
+  // init
+  apply();
 
 /* =========================
    CONFIG ENDPOINTS
@@ -996,20 +1300,14 @@ Swal.fire({
 
   function bindCustomerButtons(){
     $('#swal_add_customer').on('click', function(){
-      openCustomerEditor('add').then(function(r){
-        if (r.isConfirmed && r.value){
-          ajaxLoadCustomers().then(function(){
-            var html = buildCustomerHTML();
-            Swal.update({html: html});
-            bindCustomerButtons();
-            bindCustomerAutocomplete();
-            setTimeout(function(){
-              $('#swal_customer_input').val(r.value.name);
-              $('#swal_customer_id').val(r.value.id);
-            }, 0);
-          });
+         if (typeof Swal !== 'undefined' && Swal.isVisible()) {
+          Swal.close();
         }
-      });
+       const id = Math.max.apply(null, state.data.map(x=>x.id))+1;
+        const newItem = {id, name:'', phone:'', email:'', address:'', tier:'New', orders:0, last:new Date().toISOString().slice(0,10), spent:0, joined:new Date().toISOString().slice(0,10), notes:''};
+        state.data.unshift(newItem);
+        state.page=0; apply(); openDetail(id);
+        setTimeout(()=> $('#f_name').focus(), 50);
     });
     $('#swal_edit_customer').on('click', function(){
       var id = $('#swal_customer_id').val();
@@ -1097,6 +1395,8 @@ $(document).on('click', '.mini-btn[data-action="coupon"]', function(){
     console.log('Coupon applied:', payload);
   });
 });
+
+
 
 // ========================
 // BARCODE SCANNER HANDLER
@@ -1190,71 +1490,4 @@ $(document).on('keydown', function(e) {
     $('#barcode-input').focus();  // fokus ke input barcode
   }
 });
-
-// $('.filters.bslide').each(function(){
-//   const track=$(this).find('.bslide-track');
-//   track.css({
-//     display:'flex',
-//     overflowX:'auto',
-//     scrollBehavior:'smooth',
-//     gap:'8px'
-//   });
-//   // opsional: auto hide scrollbar
-//   track.on('wheel', function(e){
-//     e.preventDefault();
-//     this.scrollLeft += e.originalEvent.deltaY;
-//   });
-// });
-
-// $(function(){
-//   const $wrap = $('.filters.bslide');
-//   const $view = $wrap.find('.bslide-viewport'); // <- scroll container
-//   const $track = $wrap.find('.bslide-track');
-//   const $prev = $wrap.find('.bslide-nav.prev');
-//   const $next = $wrap.find('.bslide-nav.next');
-
-//   // Wheel -> horizontal
-//   $view.on('wheel', function(e){
-//     e.preventDefault();
-//     this.scrollLeft += e.originalEvent.deltaY;
-//   });
-
-//   // Drag to scroll (mouse)
-//   let isDown = false, startX = 0, startLeft = 0;
-//   $view.on('mousedown', function(e){
-//     isDown = true;
-//     startX = e.pageX;
-//     startLeft = this.scrollLeft;
-//     $(this).addClass('dragging');
-//   });
-//   $(document).on('mousemove', function(e){
-//     if(!isDown) return;
-//     const dx = e.pageX - startX;
-//     $view[0].scrollLeft = startLeft - dx;
-//   }).on('mouseup mouseleave', function(){
-//     isDown = false;
-//     $view.removeClass('dragging');
-//   });
-
-//   // Step per klik panah: 3/4/6 item
-//   function itemsPerViewport(){
-//     const w = window.innerWidth;
-//     if (w >= 1200) return 6;   // desktop
-//     if (w >= 768)  return 4;   // tablet
-//     return 3;                  // mobile
-//   }
-//   function itemWidth(){
-//     const $first = $track.find('.btn').first();
-//     return $first.outerWidth(true) || 120;
-//   }
-//   function stepSize(){ return itemsPerViewport() * itemWidth(); }
-
-//   function scrollBy(dx){
-//     const target = $view.scrollLeft() + dx;
-//     $view.stop().animate({ scrollLeft: target }, 220);
-//   }
-
-//   $prev.on('click', function(e){ e.preventDefault(); scrollBy(-stepSize()); });
-//   $next.on('click', function(e){ e.preventDefault(); scrollBy( stepSize()); });
-// });
 

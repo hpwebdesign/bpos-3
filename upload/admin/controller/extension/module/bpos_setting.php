@@ -256,18 +256,33 @@ class ControllerExtensionModuleBposSetting extends Controller {
 	}
 
 	private function validateTable() {
-		return true;
+		$queries[] = $this->db->query("SHOW COLUMNS FROM `" . DB_PREFIX . "customer` LIKE 'note';");
+		$error = 0;
+
+		foreach ($queries as $query) {
+			$error += ($query->num_rows) ? 0 : 1;
+		}
+
+		return $error ? false : true;
 	}
 
 	public function patch() {
-
+		$check_username = $this->db->query("SHOW COLUMNS FROM `" . DB_PREFIX . "customer` LIKE 'note'");
+		if(!$check_username->num_rows){
+			$this->db->query("ALTER TABLE `" . DB_PREFIX . "customer` ADD `note` TEXT DEFAULT NULL AFTER `lastname`;");
+		}
+		$data['success'] = true;
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($data));
 
 	}
 
 	public function installDatabase() {
-
+		$check_username = $this->db->query("SHOW COLUMNS FROM `" . DB_PREFIX . "customer` LIKE 'note'");
+		if(!$check_username->num_rows){
+			$this->db->query("ALTER TABLE `" . DB_PREFIX . "customer` ADD `note` TEXT DEFAULT NULL AFTER `lastname`;");
+		}
+		$this->response->redirect($this->url->link('extension/module/bpos_setting', 'user_token=' . $this->session->data['user_token'] . "&install=true", true));
 	}
 
 	public function uninstallPage() {

@@ -95,6 +95,22 @@
             </div>
         </div>
 
+        {# Modal customer #}
+        <div class="drawer" id="drawer" aria-hidden="true">
+            <div class="backdrop" data-close></div>
+            <div class="panel" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+              <header>
+                <h3 id="drawerTitle">Customer</h3>
+                <div style="display:flex;gap:8px">
+                  <button class="btn tiny ghost" id="deleteBtn">Delete</button>
+                  <button class="btn tiny" id="saveBtn">Save</button>
+                  <button class="btn tiny ghost" data-close>Close</button>
+                </div>
+              </header>
+              <div class="content" id="detail"></div>
+            </div>
+          </div>
+
         <footer class="bar" aria-label="Tabs &amp; Shortcuts">
             <div class="tabs" role="tablist" aria-label="Main menu">
                 <button class="tab home active" data-nav="sales">🏠 <span class="hide">Home</span></button>
