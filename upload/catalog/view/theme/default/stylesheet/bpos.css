@@ -1274,8 +1274,6 @@ body .notyf .notyf__toast--success {
         height: 6px;
     }
 }
-/* Drawer */
-
 .drawer {
     position: fixed;
     inset: 0;
@@ -1347,4 +1345,9 @@ body .notyf .notyf__toast--success {
     align-items: center;
     gap: 6px;
     color: #0b1020;
+}
+.invoice-wrap {
+    padding: 15px;
+    padding-right: 15px;
+    padding-left: 15px;
 }
