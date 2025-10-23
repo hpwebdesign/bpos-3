@@ -685,9 +685,9 @@ function openDetail(id){
       </ul>
     </div> -->
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn ghost" id="actStartOrder" data-id="${c.id}">Start Order</button>
+      <button class="btn btn-success ghost" id="actStartOrder" data-id="${c.id}">Start Order</button>
       <button class="btn ghost" id="actSendReceipt" data-id="${c.id}">Send Receipt</button> 
-      <button class="btn ghost" id="actAddPoints" data-id="${c.id}">Save</button>
+      <button class="btn btn-primary ghost" id="actAddPoints" data-id="${c.id}">Save</button>
     </div>
   `;
   $('#detail').html(html);
