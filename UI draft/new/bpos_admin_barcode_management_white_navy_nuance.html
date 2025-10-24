@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="white">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BPOS · Barcode Management</title>
+  <style>
+    :root{
+      --navy-900:#0b1628; --navy-800:#0f1a2b; --navy-700:#14223a; --navy-600:#1c2f52;
+      --navy-500:#234068; --navy-400:#35527a; --navy-300:#59729a; --navy-200:#90a4c3; --navy-100:#d7dfef;
+      --barik:#1c2f52; --ink:#101828; --muted:#475467; --line:#e5e7eb; --bg:#f7f8fb; --white:#fff;
+      --green:#16a34a; --blue:#2563eb; --amber:#d97706; --red:#dc2626;
+      --radius-xl:18px; --radius-lg:14px; --radius-md:10px; --radius-sm:8px;
+      --shadow-sm:0 2px 8px rgba(2,6,23,.06);
+      --shadow-md:0 6px 18px rgba(2,6,23,.08);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,"Helvetica Neue",Arial,"Apple Color Emoji","Segoe UI Emoji";color:var(--ink);background:var(--bg)}
+
+    /* Shell */
+    .page{display:grid;grid-template-rows:auto 1fr;min-height:100vh}
+    .topbar{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,var(--white),#fafbff);border-bottom:1px solid var(--line)}
+    .topbar .wrap{max-width:1200px;margin:auto;display:flex;gap:14px;align-items:center;padding:14px 16px}
+    .brand{display:flex;align-items:center;gap:10px}
+    .logo{width:28px;height:28px;border-radius:8px;background:conic-gradient(from 30deg at 50% 50%, var(--navy-500), var(--navy-700));box-shadow:inset 0 0 0 2px rgba(255,255,255,.6),0 3px 10px rgba(0,0,0,.08)}
+    .brand b{font-weight:800;letter-spacing:.3px;color:var(--barik)}
+    .crumbs{margin-left:auto;font-size:12px;color:var(--muted)}
+
+    .container{max-width:1200px;margin:auto;padding:18px 16px}
+
+    /* Header section */
+    .header{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;margin-bottom:14px}
+    .title h1{margin:0;font-size:22px;color:var(--navy-800)}
+    .title .kicker{font-size:12px;color:var(--muted)}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{appearance:none;border:1px solid var(--line);background:var(--white);color:var(--navy-700);padding:9px 12px;border-radius:10px;font-weight:600;cursor:pointer;transition:.2s;display:inline-flex;gap:8px;align-items:center;box-shadow:var(--shadow-sm)}
+    .btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
+    .btn.primary{background:var(--barik);border-color:var(--barik);color:#fff}
+    .btn.ghost{background:transparent}
+    .btn.icon{padding:9px}
+    .btn.success{background:var(--green);border-color:var(--green);color:#fff}
+    .btn.warn{background:var(--amber);border-color:var(--amber);color:#fff}
+
+    /* Panel */
+    .panel{background:var(--white);border:1px solid var(--line);border-radius:var(--radius-xl);box-shadow:var(--shadow-md)}
+
+    /* Toolbar */
+    .toolbar{display:grid;grid-template-columns:1.2fr .9fr .8fr .8fr .7fr auto;gap:10px;padding:14px;border-bottom:1px solid var(--line)}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .label{font-size:12px;color:var(--muted)}
+    .input,.select{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;padding:10px 12px;border-radius:12px}
+    .input input, .select select{border:0;outline:0;width:100%;font:inherit}
+    .chips{display:flex;gap:6px;flex-wrap:wrap}
+    .chip{border:1px dashed var(--navy-100);background:linear-gradient(180deg,#fff,#fafcff);padding:6px 10px;border-radius:999px;font-size:12px;color:var(--navy-600)}
+
+    /* Content area */
+    .content{display:grid;grid-template-columns:1fr 360px;gap:14px;padding:14px}
+    @media (max-width:1100px){.content{grid-template-columns:1fr}}
+
+    /* Table */
+    .table-wrap{overflow:auto;border-radius:14px;border:1px solid var(--line)}
+    table{width:100%;border-collapse:separate;border-spacing:0}
+    thead th{position:sticky;top:0;background:linear-gradient(180deg,#f9fbff,#f5f7fb);color:var(--navy-700);font-weight:700;border-bottom:1px solid var(--line);text-align:left;font-size:12px;padding:12px}
+    tbody td{padding:12px;border-bottom:1px solid #f0f2f6;font-size:13px;color:#334155}
+    tbody tr:hover{background:#fbfcff}
+    td.check, th.check{width:36px}
+    .prod{display:flex;align-items:center;gap:10px}
+    .thumb{width:40px;height:40px;border-radius:10px;background:#eef1f7;display:grid;place-items:center;font-size:11px;color:#6b7280;border:1px solid #e6eaf3}
+    .sku{display:block;font-size:11px;color:#6b7280}
+    .stock.badge{padding:4px 8px;border-radius:999px;font-size:11px;border:1px solid var(--line);background:#f6faf7;color:#065f46}
+    .stock.low{background:#fff7ed;color:#b45309}
+    .stock.out{background:#fef2f2;color:#991b1b}
+    .qty{display:flex;gap:6px;align-items:center}
+    .qty input{width:66px;text-align:center;border:1px solid var(--line);border-radius:10px;padding:6px}
+    .row-actions{display:flex;gap:6px}
+
+    /* Footer / Pagination */
+    .footer{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-top:1px solid var(--line)}
+    .pagination{display:flex;gap:6px;align-items:center}
+    .page-btn{border:1px solid var(--line);background:#fff;padding:6px 10px;border-radius:10px;cursor:pointer;font-weight:600}
+    .page-btn.is-active{background:var(--barik);border-color:var(--barik);color:#fff}
+
+    /* Right drawer preview */
+    .side{position:relative}
+    .card{position:sticky;top:82px;border:1px solid var(--line);border-radius:var(--radius-xl);padding:14px;background:#fff;box-shadow:var(--shadow-sm)}
+    .card h3{margin:0 0 8px;font-size:15px;color:var(--navy-700)}
+    .hr{height:1px;background:var(--line);margin:12px 0}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .form-row{display:grid;gap:6px}
+    .form-row input, .form-row select{border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+    .hint{font-size:12px;color:var(--muted)}
+    .preview{display:grid;place-items:center;padding:10px;background:linear-gradient(180deg,#fbfcff,#f7f9ff);border:1px dashed var(--navy-100);border-radius:12px}
+
+    /* Fake barcode label */
+    .label{width:240px;height:140px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;display:grid;grid-template-rows:auto 1fr auto;padding:10px;gap:6px}
+    .label .brand{gap:6px}
+    .label .brand .logo{width:16px;height:16px;border-radius:4px}
+    .barcode{height:68px;background:repeating-linear-gradient(90deg, #111 0 2px, #fff 2px 5px);border:1px solid #ddd;border-radius:6px}
+    .label .meta{display:flex;justify-content:space-between;font-size:11px;color:#111}
+
+    /* Small helper icons */
+    .i{width:16px;height:16px;display:inline-block}
+    .i.printer{background:conic-gradient(from 90deg at 50% 50%, var(--navy-400), var(--navy-700));-webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000" viewBox="0 0 24 24"><path d="M6 9V3h12v6h1a3 3 0 0 1 3 3v5h-4v4H6v-4H2v-5a3 3 0 0 1 3-3h1Zm2-4v4h8V5H8Zm8 10H8v4h8v-4Z"/></svg>') center/contain no-repeat}
+    .i.wand{background:linear-gradient(45deg,var(--amber),var(--red));-webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000" viewBox="0 0 24 24"><path d="M3 21 14 10l-1-1 3-3 2 2 3-3-3-3-3 3 2 2-3 3-1-1L3 21Z"/></svg>') center/contain no-repeat}
+    .i.download{background:linear-gradient(45deg,var(--blue),var(--navy-500));-webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000" viewBox="0 0 24 24"><path d="M12 3v10.586l3.293-3.293 1.414 1.414L12 17.414l-4.707-4.707 1.414-1.414L11 13.586V3h2ZM5 19h14v2H5v-2Z"/></svg>') center/contain no-repeat}
+    .i.refresh{background:linear-gradient(45deg,var(--green),#34d399);-webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000" viewBox="0 0 24 24"><path d="M12 6V3l5 4-5 4V8a5 5 0 1 0 5 5h2a7 7 0 1 1-7-7Z"/></svg>') center/contain no-repeat}
+    .i.filter{background:linear-gradient(45deg,var(--navy-300),var(--navy-600));-webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23000" viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4 2v-8L3 5Z"/></svg>') center/contain no-repeat}
+
+    /* Utility */
+    .muted{color:var(--muted)}
+    .w-100{width:100%}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div class="wrap">
+        <div class="brand"><span class="logo"></span><b>BPOS</b><span class="muted">/ Admin</span></div>
+        <div class="crumbs">Inventory ▸ Barcode Management</div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="header">
+        <div class="title">
+          <div class="kicker">Inventory Tools</div>
+          <h1>Barcode Management</h1>
+        </div>
+        <div class="actions">
+          <button class="btn icon" title="Regenerate for selected"><span class="i refresh"></span></button>
+          <button class="btn" title="Download PDF"><span class="i download"></span> Download PDF</button>
+          <button class="btn primary" title="Print now"><span class="i printer"></span> Print Selected</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <!-- Toolbar Filters -->
+        <div class="toolbar">
+          <div class="field">
+            <div class="label">Search product</div>
+            <div class="input"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14Zm9 17-5-5" stroke="#6b7280" stroke-width="2" stroke-linecap="round"/></svg>
+              <input type="text" placeholder="Name, SKU, UPC/EAN" />
+            </div>
+          </div>
+          <div class="field">
+            <div class="label">Category</div>
+            <div class="select">
+              <select>
+                <option>All categories</option>
+                <option>Electronics</option>
+                <option>Beverages</option>
+                <option>Beauty & Care</option>
+                <option>Groceries</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <div class="label">Barcode type</div>
+            <div class="select">
+              <select>
+                <option>Auto (based on product)</option>
+                <option>EAN-13</option>
+                <option>UPC-A</option>
+                <option>Code-128</option>
+                <option>QR (SKU)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <div class="label">Label size</div>
+            <div class="select">
+              <select>
+                <option>50×30 mm (2×1.18 in)</option>
+                <option>40×30 mm</option>
+                <option>58×40 mm</option>
+                <option>70×35 mm</option>
+                <option>Custom (via Settings)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <div class="label">Status</div>
+            <div class="select">
+              <select>
+                <option>All</option>
+                <option>With barcode</option>
+                <option>Missing barcode</option>
+                <option>Out of stock</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <div class="label">Quick chips</div>
+            <div class="chips">
+              <span class="chip">Today</span>
+              <span class="chip">Low stock</span>
+              <span class="chip">Best sellers</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+          <!-- Table -->
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th class="check"><input type="checkbox" title="Select all" /></th>
+                  <th>Product</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Barcode</th>
+                  <th>Label Qty</th>
+                  <th>Last Generated</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="check"><input type="checkbox" /></td>
+                  <td>
+                    <div class="prod">
+                      <div class="thumb">IMG</div>
+                      <div>
+                        <div><strong>Organic Honey 500g</strong></div>
+                        <small class="sku">SKU: HON-500 · Cat: Groceries</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>$9.99</td>
+                  <td><span class="stock badge">In stock · 34</span></td>
+                  <td>EAN-13 · 8991234567890</td>
+                  <td>
+                    <div class="qty">
+                      <input type="number" value="6" min="1" />
+                    </div>
+                  </td>
+                  <td>2025-10-21 15:20</td>
+                  <td>
+                    <div class="row-actions">
+                      <button class="btn">Preview</button>
+                      <button class="btn">Generate</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="check"><input type="checkbox" /></td>
+                  <td>
+                    <div class="prod">
+                      <div class="thumb">IMG</div>
+                      <div>
+                        <div><strong>Arabica Coffee Beans 1kg</strong></div>
+                        <small class="sku">SKU: COF-AR-1K · Cat: Beverages</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>$24.00</td>
+                  <td><span class="stock badge low">Low · 5</span></td>
+                  <td>Code-128 · 9A1B-COF-0001</td>
+                  <td>
+                    <div class="qty"><input type="number" value="10" min="1" /></div>
+                  </td>
+                  <td>—</td>
+                  <td>
+                    <div class="row-actions">
+                      <button class="btn">Preview</button>
+                      <button class="btn">Generate</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="check"><input type="checkbox" /></td>
+                  <td>
+                    <div class="prod">
+                      <div class="thumb">IMG</div>
+                      <div>
+                        <div><strong>Vitamin C 1000mg (30 tabs)</strong></div>
+                        <small class="sku">SKU: VIT-C-30 · Cat: Beauty & Care</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>$6.50</td>
+                  <td><span class="stock badge out">Out · 0</span></td>
+                  <td>— missing —</td>
+                  <td><div class="qty"><input type="number" value="4" min="1" /></div></td>
+                  <td>—</td>
+                  <td>
+                    <div class="row-actions">
+                      <button class="btn warn">Create Code</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="check"><input type="checkbox" /></td>
+                  <td>
+                    <div class="prod">
+                      <div class="thumb">IMG</div>
+                      <div>
+                        <div><strong>Facial Cleanser 200ml</strong></div>
+                        <small class="sku">SKU: FAC-CL-200 · Cat: Beauty & Care</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>$7.80</td>
+                  <td><span class="stock badge">In stock · 120</span></td>
+                  <td>UPC-A · 12345678901</td>
+                  <td><div class="qty"><input type="number" value="12" min="1" /></div></td>
+                  <td>2025-10-19 11:05</td>
+                  <td>
+                    <div class="row-actions">
+                      <button class="btn">Preview</button>
+                      <button class="btn">Generate</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="footer">
+              <div class="muted">128 products • 4 selected</div>
+              <div class="pagination">
+                <button class="page-btn">« Prev</button>
+                <button class="page-btn">1</button>
+                <button class="page-btn is-active">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">…</button>
+                <button class="page-btn">9</button>
+                <button class="page-btn">Next »</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Side: Settings & Preview -->
+          <aside class="side">
+            <div class="card">
+              <h3>Print Settings</h3>
+              <div class="grid">
+                <div class="form-row"><label class="label">Paper</label><select><option>A4 (Portrait)</option><option>A4 (Landscape)</option><option>US Letter</option></select></div>
+                <div class="form-row"><label class="label">DPI</label><select><option>300</option><option>203</option><option>600</option></select></div>
+              </div>
+              <div class="grid" style="margin-top:8px">
+                <div class="form-row"><label class="label">Columns</label><input type="number" min="1" value="3" /></div>
+                <div class="form-row"><label class="label">Rows</label><input type="number" min="1" value="8" /></div>
+              </div>
+              <div class="grid" style="margin-top:8px">
+                <div class="form-row"><label class="label">H Gap (mm)</label><input type="number" min="0" value="4" /></div>
+                <div class="form-row"><label class="label">V Gap (mm)</label><input type="number" min="0" value="3" /></div>
+              </div>
+              <div class="hr"></div>
+              <div class="form-row">
+                <label class="label">Template</label>
+                <select>
+                  <option>Default: Name + SKU + Price</option>
+                  <option>Compact: Name + Barcode</option>
+                  <option>Retail: Price Large + Barcode</option>
+                </select>
+                <div class="hint">Adjust your label layout before printing.</div>
+              </div>
+
+              <div class="hr"></div>
+              <h3>Live Preview</h3>
+              <div class="preview">
+                <div class="label">
+                  <div class="brand"><span class="logo"></span><b>BPOS</b></div>
+                  <div class="barcode" aria-label="fake barcode"></div>
+                  <div class="meta"><span>HON-500</span><span>$9.99</span></div>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:12px">
+                <button class="btn success w-100"><span class="i printer"></span> Print Now</button>
+                <button class="btn w-100"><span class="i download"></span> PDF</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <!-- Secondary actions row -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
+        <div class="muted">Tip: Use a thermal barcode printer for best results. Supported: 203–600 DPI.</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost"><span class="i filter"></span> Save Filter</button>
+          <button class="btn"><span class="i refresh"></span> Regenerate Missing</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

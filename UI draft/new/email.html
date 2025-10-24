@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="white">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>BPOS Email Settings</title>
+  <!-- Inter font (optional) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Bootstrap Icons (for visuals) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <!-- Notyf -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+  <style>
+    :root{
+      --navy:#103057;
+      --navy-600:#123a6a;
+      --accent:#1b5fb3;
+      --bg:#f6f8fb;
+      --card:#ffffff;
+      --muted:#667085;
+      --border:#e5e7eb;
+      --radius:14px;
+      --radius-sm:10px;
+      --shadow:0 8px 30px rgba(2,6,23,.08);
+    }
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      background:var(--bg); color:#0f172a;
+    }
+    .wrap{max-width:1100px;margin:24px auto;padding:0 16px;}
+    .breadcrumb{font-size:12px;color:#6b7280;margin-bottom:8px}
+    .breadcrumb a{color:#6b7280;text-decoration:none}
+    .page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .title{font-weight:800;font-size:22px;color:var(--navy);letter-spacing:.2px}
+    .subtitle{color:#64748b;font-size:13px;margin-top:2px}
+    .toolbar{display:flex;gap:10px;align-items:center}
+    .btn{
+      appearance:none;border:1px solid var(--border);background:#fff;color:#0f172a;
+      padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600;font-size:14px;
+      transition:.2s ease box-shadow,.2s ease transform,.2s ease background,.2s ease border;
+    }
+    .btn:hover{box-shadow:0 6px 16px rgba(2,6,23,.10)}
+    .btn.navy{background:var(--navy);color:#fff;border-color:var(--navy)}
+    .btn.ghost{background:#fff;border-color:var(--border);color:#0f172a}
+    .btn.icon{display:inline-flex;gap:8px;align-items:center}
+    .tabs{
+      display:flex;gap:6px;flex-wrap:wrap;background:#fff;border:1px solid var(--border);
+      padding:6px;border-radius:var(--radius);margin:14px 0 16px;box-shadow:var(--shadow);
+    }
+    .tab{padding:10px 12px;border-radius:10px;border:1px solid transparent;color:#0f172a;background:#fff;font-weight:600;cursor:pointer}
+    .tab[aria-selected="true"]{background:linear-gradient(0deg,#fff, #fff); border-color:#dbe3f2; box-shadow:inset 0 0 0 1px rgba(27,95,179,.08); color:var(--navy)}
+    .panel{
+      background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+      box-shadow:var(--shadow);padding:18px;margin-bottom:16px;
+    }
+    .panel-head{display:flex;gap:10px;align-items:center;margin:0 0 12px}
+    .panel-head i{color:var(--accent)}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media (max-width:900px){.grid-2{grid-template-columns:1fr}}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field label{font-weight:600;font-size:13px;color:#0f172a}
+    .hint{color:#6b7280;font-size:12px}
+    .input, select, .textarea{
+      padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:#fff;outline:none;
+    }
+    .textarea{min-height:120px;resize:vertical}
+    .inline{display:flex;gap:10px;align-items:center}
+    .divider{height:1px;background:var(--border);margin:14px 0}
+    .kicker{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
+    .muted{color:var(--muted)}
+    .flex{display:flex;gap:12px;align-items:center}
+    .space-between{justify-content:space-between}
+    /* Templates table */
+    .table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    .table th{font-size:12px;color:#64748b;text-align:left;padding:0 12px}
+    .table td{
+      background:#fff;border:1px solid var(--border);padding:12px;border-left:none;border-right:none
+    }
+    .row-card{border-radius:12px;overflow:hidden;box-shadow:0 4px 14px rgba(2,6,23,.06)}
+    .badge{font-size:12px;border:1px solid #e5e7eb;padding:2px 8px;border-radius:999px;background:#f8fafc;color:#0f172a}
+    /* Preview email */
+    .preview-surface{
+      background:#eef3fb;border:1px dashed #c7d5ee;border-radius:12px;padding:12px;overflow:auto;
+      min-height:480px;
+    }
+    .device-toggle{display:flex;gap:8px}
+    .device-toggle .btn{padding:8px 10px}
+    .email-canvas{
+      max-width:680px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden
+    }
+    .email-header{background:linear-gradient(135deg,#123a6a,#1b5fb3);color:#fff;padding:18px 20px;display:flex;align-items:center;gap:12px}
+    .email-header img{height:28px;width:auto}
+    .email-body{padding:20px}
+    .email-footer{padding:16px 20px;color:#6b7280;border-top:1px solid #e5e7eb;font-size:12px}
+    .email-button{display:inline-block;padding:10px 16px;font-weight:700;border-radius:10px;text-decoration:none}
+    .sticky-actions{
+      position:sticky;bottom:0;z-index:30;background:rgba(255,255,255,.9);backdrop-filter:blur(6px);
+      border-top:1px solid var(--border);padding:10px;border-bottom-left-radius:var(--radius);border-bottom-right-radius:var(--radius);
+      display:flex;gap:8px;justify-content:flex-end
+    }
+    /* Modal */
+    .modal{
+      position:fixed;inset:0;background:rgba(15,23,42,.48);display:none;align-items:center;justify-content:center;padding:14px;z-index:50
+    }
+    .modal.open{display:flex}
+    .modal-card{
+      width:min(860px,96vw);max-height:90vh;overflow:auto;background:#fff;border-radius:16px;border:1px solid var(--border);box-shadow:var(--shadow)
+    }
+    .modal-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+    .modal-body{padding:16px}
+    .pill{background:#eff6ff;color:#1d4ed8;border:1px solid #c7d2fe;border-radius:999px;padding:2px 8px;font-weight:600;font-size:12px}
+    .vars{display:flex;flex-wrap:wrap;gap:6px}
+    .vars .badge{cursor:pointer}
+    .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+  </style>
+</head>
+<body>
+  <section class="wrap">
+    <div class="breadcrumb">Home › Extensions › Barik POS › Email Settings</div>
+    <div class="page-head">
+      <div>
+        <div class="title">BPOS Email Settings</div>
+        <div class="subtitle">Manage customer email notifications & templates</div>
+      </div>
+      <div class="toolbar">
+        <button class="btn ghost icon" id="btnDocs"><i class="bi bi-journal-text"></i>Docs</button>
+        <button class="btn ghost icon" id="btnTickets"><i class="bi bi-life-preserver"></i>Support</button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <nav class="tabs" role="tablist" aria-label="Email settings tabs">
+      <button class="tab" role="tab" aria-selected="true" data-tab="general"><i class="bi bi-envelope-gear"></i> General</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="design"><i class="bi bi-palette2"></i> Design</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="templates"><i class="bi bi-files"></i> Templates</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="preview"><i class="bi bi-eye"></i> Preview & Test</button>
+    </nav>
+
+    <!-- GENERAL -->
+    <section class="panel" data-panel="general">
+      <h3 class="panel-head"><i class="bi bi-envelope-gear"></i><span>Mail Configuration</span></h3>
+      <div class="grid-2">
+        <div class="field">
+          <label for="protocol">Mail Protocol</label>
+          <select id="protocol" class="input">
+            <option>SMTP</option>
+            <option>Mail</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="encryption">Encryption</label>
+          <select id="encryption" class="input">
+            <option>TLS</option>
+            <option>SSL</option>
+            <option>None</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="smtpHost">SMTP Host</label>
+          <input id="smtpHost" class="input" placeholder="smtp.mailtrap.io">
+        </div>
+        <div class="field">
+          <label for="smtpPort">SMTP Port</label>
+          <input id="smtpPort" class="input" type="number" value="587">
+        </div>
+
+        <div class="field">
+          <label for="smtpUser">SMTP Username</label>
+          <input id="smtpUser" class="input" placeholder="user@mailtrap.io">
+        </div>
+        <div class="field">
+          <label for="smtpPass">SMTP Password</label>
+          <input id="smtpPass" class="input" type="password" value="">
+        </div>
+
+        <div class="field">
+          <label for="senderEmail">Sender Email</label>
+          <input id="senderEmail" class="input" type="email" placeholder="noreply@yourstore.com">
+        </div>
+        <div class="field">
+          <label for="senderName">Sender Name</label>
+          <input id="senderName" class="input" placeholder="Barik POS">
+        </div>
+
+        <div class="field">
+          <label for="replyTo">Reply-To Email <span class="hint">(optional)</span></label>
+          <input id="replyTo" class="input" type="email" placeholder="support@yourstore.com">
+        </div>
+        <div class="field">
+          <label for="logo">Logo</label>
+          <input id="logo" class="input" type="file" accept="image/*">
+          <div class="hint">Max 200KB. Shown in header.</div>
+        </div>
+      </div>
+      <div class="sticky-actions">
+        <button class="btn ghost icon" id="btnResetGeneral"><i class="bi bi-arrow-counterclockwise"></i>Reset</button>
+        <button class="btn navy icon" id="btnSaveGeneral"><i class="bi bi-check2-circle"></i>Save Changes</button>
+      </div>
+    </section>
+
+    <!-- DESIGN -->
+    <section class="panel" data-panel="design" style="display:none">
+      <div class="panel-head"><i class="bi bi-palette2"></i><span>Global Email Design</span></div>
+      <div class="grid-2">
+        <div>
+          <div class="field">
+            <label for="brandColor">Primary Color</label>
+            <input id="brandColor" class="input" type="color" value="#1b5fb3">
+          </div>
+          <div class="field">
+            <label for="accentColor">Button Text Color</label>
+            <input id="buttonTextColor" class="input" type="color" value="#ffffff">
+          </div>
+          <div class="field">
+            <label for="fontFamily">Font Family</label>
+            <select id="fontFamily" class="input">
+              <option>Inter</option>
+              <option>Poppins</option>
+              <option>system-ui</option>
+            </select>
+          </div>
+          <div class="divider"></div>
+          <div class="field">
+            <label>Header Title</label>
+            <input id="headerTitle" class="input" placeholder="Your Store">
+          </div>
+          <div class="field">
+            <label>Footer Text</label>
+            <textarea id="footerText" class="textarea" placeholder="© Your Store, address, links"></textarea>
+          </div>
+          <div class="field">
+            <label>CTA Button Label</label>
+            <input id="ctaLabel" class="input" placeholder="View your order">
+          </div>
+          <div class="field">
+            <label>CTA Link (placeholder)</label>
+            <input id="ctaHref" class="input" placeholder="https://yourstore.com/account/order/{order_id}">
+          </div>
+        </div>
+        <div>
+          <div class="kicker">Live Preview</div>
+          <div class="preview-surface">
+            <div class="email-canvas" id="previewEmail">
+              <div class="email-header"><img id="previewLogo" alt="logo" style="display:none"><strong id="previewTitle">Your Store</strong></div>
+              <div class="email-body" id="previewBody">
+                <h2 style="margin-top:0">Hello {customer_name},</h2>
+                <p>Thanks for your order <strong>#{order_id}</strong>. Your total is <strong>{total}</strong>.</p>
+                <p><a id="previewCTA" class="email-button" href="#" style="background:#1b5fb3;color:#fff">View your order</a></p>
+                <p class="muted">This is a design preview. Actual content is controlled by Templates tab.</p>
+              </div>
+              <div class="email-footer" id="previewFooter">© Your Store — All rights reserved.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sticky-actions">
+        <button class="btn ghost icon" id="btnResetDesign"><i class="bi bi-arrow-counterclockwise"></i>Reset</button>
+        <button class="btn navy icon" id="btnSaveDesign"><i class="bi bi-check2-circle"></i>Save Design</button>
+      </div>
+    </section>
+
+    <!-- TEMPLATES -->
+    <section class="panel" data-panel="templates" style="display:none">
+      <div class="panel-head"><i class="bi bi-files"></i><span>Templates</span></div>
+      <table class="table" aria-label="Email templates">
+        <thead>
+          <tr>
+            <th>Event</th><th>Description</th><th>Last Edited</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="tplTableBody">
+          <!-- rows injected by JS -->
+        </tbody>
+      </table>
+      <div class="sticky-actions">
+        <button class="btn ghost icon" id="btnRestoreDefaults"><i class="bi bi-magic"></i>Restore Defaults</button>
+        <button class="btn navy icon" id="btnSaveTemplates"><i class="bi bi-check2-circle"></i>Save Templates</button>
+      </div>
+    </section>
+
+    <!-- PREVIEW & TEST -->
+    <section class="panel" data-panel="preview" style="display:none">
+      <div class="flex space-between">
+        <div class="panel-head"><i class="bi bi-eye"></i><span>Preview & Test</span></div>
+        <div class="device-toggle" role="group" aria-label="Device preview">
+          <button class="btn ghost" data-device="desktop"><i class="bi bi-laptop"></i></button>
+          <button class="btn ghost" data-device="mobile"><i class="bi bi-phone"></i></button>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="field">
+            <label>Select Template</label>
+            <select id="previewTemplate" class="input"></select>
+          </div>
+          <div class="field">
+            <label>Test Recipient Email</label>
+            <input id="testEmail" class="input" type="email" placeholder="you@example.com">
+          </div>
+          <div class="inline">
+            <button class="btn navy icon" id="btnTestSend"><i class="bi bi-send"></i> Send Test Email</button>
+            <span class="hint">Sends with current Design + selected Template</span>
+          </div>
+          <div class="divider"></div>
+          <div class="kicker">Variables</div>
+          <div class="vars">
+            <span class="badge" data-var="{customer_name}">{customer_name}</span>
+            <span class="badge" data-var="{order_list}">{order_list}</span>
+            <span class="badge" data-var="{order_id}">{order_id}</span>
+            <span class="badge" data-var="{total}">{total}</span>
+            <span class="badge" data-var="{points}">{points}</span>
+            <span class="badge" data-var="{tier}">{tier}</span>
+            <span class="badge" data-var="{store_name}">{store_name}</span>
+          </div>
+        </div>
+        <div>
+          <div class="preview-surface" id="finalPreviewSurface">
+            <!-- final composed preview injected -->
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- MODAL: Template Editor -->
+  <div class="modal" id="tplModal" role="dialog" aria-modal="true" aria-labelledby="tplModalTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="flex">
+          <strong id="tplModalTitle">Edit Template</strong>
+          <span class="pill" id="tplEventBadge">Event</span>
+        </div>
+        <button class="btn ghost icon" id="tplClose"><i class="bi bi-x-lg"></i> Close</button>
+      </div>
+      <div class="modal-body">
+        <div class="grid-2">
+          <div>
+            <div class="field">
+              <label>Subject</label>
+              <input id="tplSubject" class="input" placeholder="[store_name] Your order #[order_id]">
+            </div>
+            <div class="field">
+              <label>Body (HTML allowed)</label>
+              <textarea id="tplBody" class="textarea" placeholder="Dear {customer_name}, ..."></textarea>
+              <div class="hint">Tip: use variables — click to insert below</div>
+            </div>
+            <div class="vars" id="tplVars">
+              <span class="badge" data-var="{customer_name}">{customer_name}</span>
+              <span class="badge" data-var="{order_list}">{order_list}</span>
+              <span class="badge" data-var="{order_id}">{order_id}</span>
+              <span class="badge" data-var="{total}">{total}</span>
+              <span class="badge" data-var="{points}">{points}</span>
+              <span class="badge" data-var="{tier}">{tier}</span>
+              <span class="badge" data-var="{store_name}">{store_name}</span>
+            </div>
+          </div>
+          <div>
+            <div class="kicker">Live Template Preview</div>
+            <div class="preview-surface" id="tplPreview"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sticky-actions" style="position:sticky">
+        <button class="btn ghost icon" id="tplUseDefault"><i class="bi bi-arrow-repeat"></i>Use Default</button>
+        <button class="btn navy icon" id="tplSave"><i class="bi bi-check2-circle"></i>Save Template</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- jQuery + Notyf -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+  <script>
+    // --- Data (mock; replace with OC settings when wiring) ---
+    const state = {
+      general:{
+        protocol:'SMTP', encryption:'TLS', smtpHost:'smtp.mailtrap.io', smtpPort:587,
+        smtpUser:'', smtpPass:'', senderEmail:'', senderName:'Barik POS', replyTo:'', logoDataURL:''
+      },
+      design:{
+        primary:'#1b5fb3', btnText:'#ffffff', font:'Inter',
+        headerTitle:'Your Store', footerText:'© Your Store — All rights reserved.',
+        ctaLabel:'View your order', ctaHref:'https://yourstore.com/account/order/{order_id}'
+      },
+      templates:[
+        {
+          key:'order_confirmation',
+          name:'Order Confirmation',
+          desc:'Sent after checkout success',
+          edited:'2025-10-22',
+          subject:'[{store_name}] Order #{order_id} confirmed',
+body:`<p>Hi {customer_name},</p>
+<p>Thank you for your order <strong>#{order_id}</strong>. Here’s a summary:</p>
+{order_list}
+<p>Total billed: <strong>{total}</strong></p>
+<p>We’ll let you know when it ships. You can track it from your account.</p>`
+        },
+        {
+          key:'reward_points_added',
+          name:'Reward Points Added',
+          desc:'Sent when customer earns new points',
+          edited:'2025-10-20',
+          subject:'[{store_name}] You earned {points} points!',
+          body:`<p>Hi {customer_name},</p>
+<p>Great news — you just earned <strong>{points}</strong> points. Keep shopping to reach VIP status!</p>`
+        },
+        {
+          key:'vip_upgrade',
+          name:'VIP Tier Upgrade',
+          desc:'Sent when user reaches VIP tier',
+          edited:'2025-10-18',
+          subject:'[{store_name}] You are now {tier} 🎉',
+          body:`<p>Hi {customer_name},</p>
+<p>Welcome to our <strong>{tier}</strong> tier. Enjoy priority support and exclusive deals.</p>`
+        },
+        {
+          key:'password_reset',
+          name:'Password Reset',
+          desc:'Default OpenCart template',
+          edited:'2025-10-10',
+          subject:'[{store_name}] Password reset request',
+          body:`<p>Hi {customer_name},</p>
+<p>Click the button below to reset your password.</p>`
+        }
+      ],
+      currentEdit:null
+    };
+
+state.sample = {
+  store_name: 'Barik POS Demo',
+  customer_name: 'John Doe',
+  order_id: 'PO-10293',
+  total: '$142.00',
+  points: '50',
+  tier: 'VIP',
+  order: {
+    items: [
+      { name:'Wireless Keyboard', qty:1, price:59.00, subtotal:59.00 },
+      { name:'USB-C Hub 6-in-1', qty:1, price:49.00, subtotal:49.00 },
+      { name:'Cable USB-C to C 1m', qty:2, price:12.00, subtotal:24.00 }
+    ],
+    totals: {
+      subtotal: 132.00,
+      shipping: 5.00,
+      discount: -0.00,
+      grand_total: 137.00
+    },
+    currency: '$'
+  }
+};
+
+
+    const notyf = new Notyf({ duration:1800, position:{x:'right', y:'bottom'} });
+
+    function updateDesignPreview(){
+      const d = state.design;
+      // Header
+      $('#previewTitle').text(d.headerTitle || 'Your Store');
+      $('#previewEmail .email-header').css('background', `linear-gradient(135deg, ${shade(d.primary, -18)}, ${d.primary})`);
+      // Body font
+      $('#previewEmail').css('font-family', d.font);
+      // CTA
+      $('#previewCTA').text(d.ctaLabel || 'View your order').attr('href', '#')
+        .css({ background:d.primary, color:d.btnText });
+      // Footer
+      $('#previewFooter').text(d.footerText || '© Your Store — All rights reserved.');
+      // Logo (if set)
+      const hasLogo = !!state.general.logoDataURL;
+      $('#previewLogo').attr('src', state.general.logoDataURL || '').css('display', hasLogo ? 'block' : 'none');
+    }
+
+
+function interpolateVars(str){
+  if(!str) return '';
+  const m = state.sample;
+  const map = {
+    '{store_name}': m.store_name,
+    '{customer_name}': m.customer_name,
+    '{order_id}': m.order_id,
+    '{total}': m.total,
+    '{points}': m.points,
+    '{tier}': m.tier
+  };
+  let out = String(str);
+  // Replace simple tokens
+  Object.keys(map).forEach(k=>{
+    out = out.split(k).join(escapeHTML(map[k]));
+  });
+  // Replace {order_list} with rendered table (HTML, no escaping)
+  if(out.includes('{order_list}')){
+    out = out.replaceAll('{order_list}', renderOrderList(m.order));
+  }
+  return out;
+}
+
+function composeEmailHTML(subject, bodyHTML){
+  const d = state.design;
+  const headerImg = state.general.logoDataURL ? `<img alt="logo" src="${state.general.logoDataURL}" style="height:28px;width:auto;vertical-align:middle;margin-right:8px">` : '';
+  const content = interpolateVars(bodyHTML);
+  return `
+  <div class="email-canvas" style="margin:0 auto;max-width:680px;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;font-family:${d.font}">
+    <div class="email-header" style="background:linear-gradient(135deg, ${shade(d.primary,-18)}, ${d.primary});color:#fff;padding:18px 20px;display:flex;align-items:center;gap:12px">
+      ${headerImg}<strong>${escapeHTML(d.headerTitle || 'Your Store')}</strong>
+    </div>
+    <div class="email-body" style="padding:20px">
+      ${content}
+      <p><a href="${d.ctaHref || '#'}" style="display:inline-block;padding:10px 16px;font-weight:700;border-radius:10px;text-decoration:none;background:${d.primary};color:${d.btnText}">${escapeHTML(d.ctaLabel || 'View')}</a></p>
+    </div>
+    <div class="email-footer" style="padding:16px 20px;color:#6b7280;border-top:1px solid #e5e7eb;font-size:12px">
+      ${escapeHTML(d.footerText || '© Your Store — All rights reserved.')}
+    </div>
+  </div>`;
+}
+
+
+    function fillTemplatesTable(){
+      const $tbody = $('#tplTableBody').empty();
+      state.templates.forEach(t=>{
+        const $tr = $(`
+          <tr class="row-card">
+            <td style="border-top-left-radius:12px;border-bottom-left-radius:12px">
+              <div class="flex"><i class="bi bi-lightning-charge"></i><strong>${t.name}</strong></div>
+            </td>
+            <td>${t.desc}</td>
+            <td><span class="badge">${t.edited}</span></td>
+            <td style="text-align:right;border-top-right-radius:12px;border-bottom-right-radius:12px">
+              <button class="btn icon" data-edit="${t.key}"><i class="bi bi-pencil-square"></i>Edit</button>
+            </td>
+          </tr>
+        `);
+        $tbody.append($tr);
+      });
+      // Preview select
+      const $sel = $('#previewTemplate').empty();
+      state.templates.forEach(t=> $sel.append(`<option value="${t.key}">${t.name}</option>`));
+      renderFinalPreview();
+    }
+
+    function openTemplateModal(key){
+      const t = state.templates.find(x=>x.key===key);
+      if(!t) return;
+      state.currentEdit = key;
+      $('#tplModalTitle').text(`Edit: ${t.name}`);
+      $('#tplEventBadge').text(t.name);
+      $('#tplSubject').val(t.subject);
+      $('#tplBody').val(t.body);
+      // First preview
+      const html = composeEmailHTML(t.subject, t.body);
+      $('#tplPreview').html(html);
+      $('#tplModal').addClass('open');
+    }
+
+    function saveCurrentTemplate(){
+      if(!state.currentEdit) return;
+      const t = state.templates.find(x=>x.key===state.currentEdit);
+      if(!t) return;
+      t.subject = $('#tplSubject').val();
+      t.body = $('#tplBody').val();
+      t.edited = new Date().toISOString().slice(0,10);
+      notyf.success('Template saved');
+      fillTemplatesTable();
+      renderFinalPreview();
+      $('#tplModal').removeClass('open');
+    }
+
+    function renderFinalPreview(){
+      const sel = $('#previewTemplate').val();
+      const t = state.templates.find(x=>x.key===sel) || state.templates[0];
+      if(!t) return;
+      const html = composeEmailHTML(t.subject, t.body);
+      $('#finalPreviewSurface').html(html);
+      applyDevice();
+    }
+
+    function applyDevice(){
+      const device = $('.device-toggle .btn.active').data('device') || 'desktop';
+      const $canvas = $('#finalPreviewSurface .email-canvas');
+      if(device==='mobile'){
+        $canvas.css({ maxWidth:'380px' });
+      } else {
+        $canvas.css({ maxWidth:'680px' });
+      }
+    }
+
+    function shade(hex,percent){
+      // simple shade function for header gradient
+      try{
+        const f = parseInt(hex.slice(1),16), t = percent<0?0:255, p = Math.abs(percent)/100;
+        const R = f>>16, G = f>>8&0x00FF, B = f&0x0000FF;
+        const to = (v)=>Math.round((t - v)*p)+v;
+        return `#${(0x1000000 + (to(R)<<16) + (to(G)<<8) + to(B)).toString(16).slice(1)}`;
+      }catch(e){ return hex }
+    }
+
+function formatMoney(n, cur){
+  return `${cur}${(Math.round(n*100)/100).toFixed(2)}`;
+}
+
+function renderOrderList(order){
+  const cur = order.currency || '$';
+  const rows = order.items.map(it => `
+    <tr>
+      <td style="padding:8px 10px;border-bottom:1px solid #e5e7eb">${escapeHTML(it.name)}</td>
+      <td style="padding:8px 10px;text-align:center;border-bottom:1px solid #e5e7eb">${it.qty}</td>
+      <td style="padding:8px 10px;text-align:right;border-bottom:1px solid #e5e7eb">${formatMoney(it.price,cur)}</td>
+      <td style="padding:8px 10px;text-align:right;border-bottom:1px solid #e5e7eb">${formatMoney(it.subtotal,cur)}</td>
+    </tr>
+  `).join('');
+
+  const t = order.totals || {};
+  return `
+  <div style="margin:14px 0">
+    <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden">
+      <thead>
+        <tr style="background:#f8fafc">
+          <th style="text-align:left;padding:10px;border-bottom:1px solid #e5e7eb">Product</th>
+          <th style="text-align:center;padding:10px;border-bottom:1px solid #e5e7eb">Qty</th>
+          <th style="text-align:right;padding:10px;border-bottom:1px solid #e5e7eb">Price</th>
+          <th style="text-align:right;padding:10px;border-bottom:1px solid #e5e7eb">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3" style="padding:10px;text-align:right;border-top:1px solid #e5e7eb">Subtotal</td>
+          <td style="padding:10px;text-align:right;border-top:1px solid #e5e7eb">${formatMoney(t.subtotal||0,cur)}</td>
+        </tr>
+        <tr>
+          <td colspan="3" style="padding:10px;text-align:right;border-top:1px solid #e5e7eb">Shipping</td>
+          <td style="padding:10px;text-align:right;border-top:1px solid #e5e7eb">${formatMoney(t.shipping||0,cur)}</td>
+        </tr>
+        ${typeof t.discount==='number' ? `
+        <tr>
+          <td colspan="3" style="padding:10px;text-align:right;border-top:1px solid #e5e7eb">Discount</td>
+          <td style="padding:10px;text-align:right;border-top:1px solid #e5e7eb">${formatMoney(t.discount,cur)}</td>
+        </tr>`:''}
+        <tr>
+          <td colspan="3" style="padding:12px 10px;text-align:right;border-top:2px solid #e5e7eb;font-weight:700">Total</td>
+          <td style="padding:12px 10px;text-align:right;border-top:2px solid #e5e7eb;font-weight:700">${formatMoney(t.grand_total||t.subtotal||0,cur)}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>`;
+}
+
+
+
+    function escapeHTML(s){return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
+
+    // --- Events ---
+    $(function(){
+
+      // Tabs
+      $('.tab').on('click', function(){
+        const tab = $(this).data('tab');
+        $('.tab').attr('aria-selected','false');
+        $(this).attr('aria-selected','true');
+        $('[data-panel]').hide();
+        $(`[data-panel="${tab}"]`).show();
+        if(tab==='preview') renderFinalPreview();
+      });
+
+      // General save/reset
+      $('#btnSaveGeneral').on('click', function(){
+        // Collect
+        state.general.protocol = $('#protocol').val();
+        state.general.encryption = $('#encryption').val();
+        state.general.smtpHost = $('#smtpHost').val();
+        state.general.smtpPort = Number($('#smtpPort').val()||587);
+        state.general.smtpUser = $('#smtpUser').val();
+        state.general.smtpPass = $('#smtpPass').val();
+        state.general.senderEmail = $('#senderEmail').val();
+        state.general.senderName = $('#senderName').val();
+        state.general.replyTo = $('#replyTo').val();
+        notyf.success('General settings saved');
+        updateDesignPreview();
+        renderFinalPreview();
+      });
+      $('#btnResetGeneral').on('click', function(){
+        notyf.success('General settings reset (demo)');
+      });
+      // Logo preview
+      $('#logo').on('change', function(e){
+        const f = e.target.files && e.target.files[0];
+        if(!f) return;
+        const r = new FileReader();
+        r.onload = ()=>{ state.general.logoDataURL = r.result; updateDesignPreview(); renderFinalPreview(); }
+        r.readAsDataURL(f);
+      });
+
+      // Design
+      $('#brandColor').on('input', function(){ state.design.primary = $(this).val(); updateDesignPreview(); renderFinalPreview(); });
+      $('#buttonTextColor').on('input', function(){ state.design.btnText = $(this).val(); updateDesignPreview(); renderFinalPreview(); });
+      $('#fontFamily').on('change', function(){ state.design.font = $(this).val(); updateDesignPreview(); renderFinalPreview(); });
+      $('#headerTitle').on('input', function(){ state.design.headerTitle = $(this).val(); updateDesignPreview(); renderFinalPreview(); });
+      $('#footerText').on('input', function(){ state.design.footerText = $(this).val(); updateDesignPreview(); renderFinalPreview(); });
+      $('#ctaLabel').on('input', function(){ state.design.ctaLabel = $(this).val(); updateDesignPreview(); renderFinalPreview(); });
+      $('#ctaHref').on('input', function(){ state.design.ctaHref = $(this).val(); updateDesignPreview(); renderFinalPreview(); });
+
+      $('#btnSaveDesign').on('click', function(){ notyf.success('Design saved'); });
+      $('#btnResetDesign').on('click', function(){ notyf.success('Design reset (demo)'); });
+
+      // Templates table
+      fillTemplatesTable();
+
+      // Edit clicks
+      $('#tplTableBody').on('click','[data-edit]', function(){
+        openTemplateModal($(this).data('edit'));
+      });
+      // Modal vars -> insert
+      $('#tplVars').on('click','.badge', function(){
+        const v = $(this).data('var');
+        const $ta = $('#tplBody');
+        $ta.val($ta.val() + v).trigger('input');
+      });
+      // Modal close
+      $('#tplClose').on('click', ()=>$('#tplModal').removeClass('open'));
+      // Modal save
+      $('#tplSave').on('click', saveCurrentTemplate);
+      // Use default (demo)
+      $('#tplUseDefault').on('click', function(){
+        notyf.success('Reverted to default (demo)');
+      });
+      // Live template preview
+      $('#tplSubject, #tplBody').on('input', function(){
+        const subj = $('#tplSubject').val();
+        const body = $('#tplBody').val();
+        $('#tplPreview').html(composeEmailHTML(subj, body));
+      });
+
+      // Templates Save / Restore
+      $('#btnSaveTemplates').on('click', ()=>notyf.success('Templates saved'));
+      $('#btnRestoreDefaults').on('click', ()=>notyf.success('Restored default templates (demo)'));
+
+      // Preview tab
+      $('#previewTemplate').on('change', renderFinalPreview);
+      $('.device-toggle .btn').on('click', function(){
+        $('.device-toggle .btn').removeClass('active');
+        $(this).addClass('active');
+        applyDevice();
+      });
+      // set default device = desktop
+      $('.device-toggle .btn[data-device="desktop"]').addClass('active');
+
+      // Quick insert var in Preview (no editor here; hint feature)
+      $('.vars .badge').on('click', function(){
+        notyf.success(`Variable copied: ${$(this).data('var')}`);
+      });
+
+      // Test send (mock)
+      $('#btnTestSend').on('click', function(){
+        const to = $('#testEmail').val();
+        if(!to){ notyf.error('Enter recipient email'); return; }
+        notyf.success('Test email queued (demo)');
+      });
+
+      // Init design preview once
+      updateDesignPreview();
+      renderFinalPreview();
+
+      // Docs & tickets (demo)
+      $('#btnDocs').on('click', ()=>notyf.success('Open Docs (wire this to your URL)'));
+      $('#btnTickets').on('click', ()=>notyf.success('Open Support (wire this to your URL)'));
+    });
+  </script>
+</body>
+</html>

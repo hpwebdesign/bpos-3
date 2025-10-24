@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="white">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Barik POS — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --barik-900:#0e1b2c;
+      --barik-800:#16253c;
+      --barik-700:#1a2a44;
+      --barik-500:#2b4470;
+      --accent:#2fb9b2;
+      --radius:12px;
+      --shadow:0 16px 40px rgba(17, 27, 44, .12);
+      --line-white:#e8edf6;
+    }
+
+    html[data-theme="white"]{ --bg:#f7f9fc; --panel:#ffffff; --text:#111317; --muted:#6b778c; --line:var(--line-white); }
+    html[data-theme="navy"]{ --bg:linear-gradient(135deg, var(--barik-700), var(--barik-900)); --panel:#0f1a2b; --text:#eaf0ff; --muted:#a9b6d3; --line:#263651; }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);display:grid;place-items:center;}
+
+    .top-controls{position:fixed;top:16px;right:16px;display:flex;gap:10px;z-index:10;}
+    .ghost{background:transparent;border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;color:var(--text);font-size:13px}
+
+    .login-shell{width:min(980px,94vw);display:grid;grid-template-columns:1.05fr .95fr;gap:32px;align-items:center;}
+    @media(max-width:980px){.login-shell{width:min(1160px,96vw);}}
+    @media(max-width:860px){.login-shell{grid-template-columns:1fr;gap:18px;padding:16px 0;}}
+
+    .brand-pane{padding:10px 6px;}
+    .logo{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+    .logo .mark{width:44px;height:44px;border-radius:12px;background:linear-gradient(145deg,var(--barik-700),var(--barik-900));display:grid;place-items:center;color:#fff;font-weight:800;box-shadow:0 8px 18px rgba(26,42,68,.35);} 
+    .logo .word{font-weight:800;letter-spacing:.2px;font-size:20px;color:var(--text);} 
+
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:40px;}
+
+    .card h2{margin:0 0 18px;font-size:18px;color:var(--text)}
+    .field{margin-bottom:14px}
+    .label{font-size:13px;color:var(--muted);margin-bottom:8px}
+    .input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;color:#111;font-size:15px;transition:border-color .2s,box-shadow .2s}
+    html[data-theme="navy"] .input{background:#0b1424;color:#e8eeff;border-color:#20314d}
+    .input:focus{outline:none;border-color:var(--barik-700);box-shadow:0 0 0 3px rgba(26,42,68,.25)}
+
+    .btn{width:100%;border:0;border-radius:10px;background:var(--barik-700);color:#fff;font-weight:700;font-size:15px;padding:12px 14px;cursor:pointer;transition:transform .05s ease,background .2s}
+    .btn:hover{background:var(--barik-900)}
+    .btn:active{transform:translateY(1px)}
+
+    .statusbar{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:14px;color:var(--muted);font-size:12px}
+    .dot{width:8px;height:8px;border-radius:50%}
+    .dot.ok{background:#22c55e}
+    .dot.off{background:#9aa5bb}
+
+    .tabs{display:flex;gap:8px;margin:10px 0 18px}
+    .tab{flex:1;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:999px;padding:8px 10px;font-size:13px;color:var(--barik-700);background:#fff;cursor:pointer;user-select:none}
+    .tab[aria-selected="true"]{background:var(--barik-700);color:#fff;border-color:transparent}
+    html[data-theme="navy"] .tab{background:#0b1424;color:#cfe1ff;border-color:#20314d}
+    html[data-theme="navy"] .tab[aria-selected="true"]{background:#16253c;color:#fff;border-color:#16253c}
+
+    .pin-wrap{display:none}
+    .pin-input{display:flex;gap:8px;margin:4px 0 12px}
+    .pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);background:transparent}
+    .pin-dot.filled{background:var(--barik-700);border-color:var(--barik-700)}
+    html[data-theme="navy"] .pin-dot.filled{background:#eaf0ff;border-color:#eaf0ff}
+
+    .keypad{display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;}
+    .key{display:grid;place-items:center;height:56px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--barik-700);font-weight:700;font-size:20px;cursor:pointer;user-select:none;transition:transform .05s ease, background .15s}
+    .key:active{transform:translateY(1px)}
+    .key.fn{background:linear-gradient(145deg,var(--barik-700),var(--barik-800));color:#fff;border-color:transparent}
+    .key.fn.secondary{background:#fff;color:var(--barik-700);border:1px dashed var(--line)}
+    html[data-theme="navy"] .key{background:#0b1424;color:#eaf0ff;border-color:#20314d}
+    html[data-theme="navy"] .key.fn{background:#16253c}
+
+    .row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:2px 0 16px}
+    .row a{font-size:13px;color:var(--accent);text-decoration:none}
+    .row a:hover{text-decoration:underline}
+
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  </style>
+</head>
+<body>
+  <div class="top-controls">
+    <button class="ghost" id="themeToggle">Toggle Theme</button>
+  </div>
+
+  <main class="login-shell">
+    <section class="brand-pane">
+      <div class="logo"><div class="mark">B</div><div class="word">Barik <span style="opacity:.75">POS</span></div></div>
+      <h1 style="font-size:32px;margin:8px 0;color:var(--barik-700)">Sign in to your POS</h1>
+      <p style="color:var(--muted);max-width:520px">Fast, touch-friendly, and reliable — optimized for cashier workflow. Works great on tablets and desktops.</p>
+      <div class="tabs" role="tablist" aria-label="Login method">
+        <button class="tab" id="tab-password" role="tab" aria-selected="true" aria-controls="panel-password">Password</button>
+        <button class="tab" id="tab-pin" role="tab" aria-selected="false" aria-controls="panel-pin">PIN & Keypad</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Login</h2>
+      <form id="panel-password" role="tabpanel" aria-labelledby="tab-password">
+        <div class="field">
+          <label class="label" for="username">Username or Email</label>
+          <input class="input" id="username" name="username" type="text" autocomplete="username" required autofocus>
+        </div>
+        <div class="field">
+          <label class="label" for="password">Password</label>
+          <input class="input" id="password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+        <div class="row">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)">
+            <input type="checkbox" id="remember"> Remember me
+          </label>
+          <a href="#" id="forgot">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn">Sign In</button>
+      </form>
+
+      <form id="panel-pin" role="tabpanel" aria-labelledby="tab-pin" class="pin-wrap" autocomplete="off">
+        <label class="label" for="pinInput">Enter your 6-digit PIN</label>
+        <input id="pinInput" name="pin" type="password" inputmode="numeric" pattern="\\d*" maxlength="6" class="sr-only" aria-hidden="false">
+        <div class="pin-input" aria-live="polite" aria-label="PIN dots">
+          <div class="pin-dot" data-i="0"></div>
+          <div class="pin-dot" data-i="1"></div>
+          <div class="pin-dot" data-i="2"></div>
+          <div class="pin-dot" data-i="3"></div>
+          <div class="pin-dot" data-i="4"></div>
+          <div class="pin-dot" data-i="5"></div>
+        </div>
+        <div class="keypad" aria-label="Numeric keypad">
+          <button type="button" class="key" data-key="1">1</button>
+          <button type="button" class="key" data-key="2">2</button>
+          <button type="button" class="key" data-key="3">3</button>
+          <button type="button" class="key" data-key="4">4</button>
+          <button type="button" class="key" data-key="5">5</button>
+          <button type="button" class="key" data-key="6">6</button>
+          <button type="button" class="key" data-key="7">7</button>
+          <button type="button" class="key" data-key="8">8</button>
+          <button type="button" class="key" data-key="9">9</button>
+          <button type="button" class="key fn secondary" data-action="clear" title="Clear">CLR</button>
+          <button type="button" class="key" data-key="0">0</button>
+          <button type="button" class="key fn" data-action="backspace" title="Backspace">⌫</button>
+        </div>
+        <div class="row" style="margin-top:14px">
+          <button type="submit" class="btn" id="btnPinSign">Sign In</button>
+        </div>
+      </form>
+
+      <div class="statusbar" id="statusbar"><span>v1.0.0</span><span>•</span><span class="dot ok" id="statusDot"></span><span id="statusText">Online</span><span>•</span><span>© 2025 Barik</span></div>
+    </section>
+  </main>
+
+  <script>
+    const $ = (q, ctx=document)=>ctx.querySelector(q);
+    const $$ = (q, ctx=document)=>Array.from(ctx.querySelectorAll(q));
+
+    const tabPassword = $('#tab-password');
+    const tabPin = $('#tab-pin');
+    const panelPassword = $('#panel-password');
+    const panelPin = $('#panel-pin');
+
+    const html = document.documentElement;
+    const themeToggle = $('#themeToggle');
+
+    function toggleTheme(){
+      const isWhite = html.getAttribute('data-theme') === 'white';
+      html.setAttribute('data-theme', isWhite ? 'navy' : 'white');
+    }
+
+    themeToggle.addEventListener('click', toggleTheme);
+
+    function setTab(which){
+      const pinMode = which === 'pin';
+      tabPassword.setAttribute('aria-selected', String(!pinMode));
+      tabPin.setAttribute('aria-selected', String(pinMode));
+      panelPassword.style.display = pinMode ? 'none' : 'block';
+      panelPin.style.display = pinMode ? 'block' : 'none';
+      if(pinMode){ $('#pinInput').focus(); } else { $('#username').focus(); }
+      checkOnlineState();
+    }
+
+    tabPassword.addEventListener('click', ()=> setTab('password'));
+    tabPin.addEventListener('click', ()=> setTab('pin'));
+
+    const pinInput = $('#pinInput');
+    const dots = $$('.pin-dot');
+
+    function renderDots(){
+      const v = pinInput.value;
+      dots.forEach((d,i)=> d.classList.toggle('filled', i < v.length));
+    }
+
+    function addDigit(d){
+      if(pinInput.value.length >= 6) return;
+      pinInput.value += d;
+      renderDots();
+      checkOnlineState();
+    }
+
+    function backspace(){
+      pinInput.value = pinInput.value.slice(0, -1);
+      renderDots();
+      checkOnlineState();
+    }
+
+    function clearPin(){
+      pinInput.value = '';
+      renderDots();
+      checkOnlineState();
+    }
+
+    $$('.keypad .key').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const key = btn.getAttribute('data-key');
+        const action = btn.getAttribute('data-action');
+        if(key){ addDigit(key); return; }
+        if(action === 'backspace'){ backspace(); return; }
+        if(action === 'clear'){ clearPin(); return; }
+      });
+    });
+
+    ['username','password'].forEach(id=>{
+      $('#'+id).addEventListener('focus',()=> checkOnlineState());
+    });
+
+    panelPassword.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      checkOnlineState();
+      alert('Password login submitted');
+    });
+    panelPin.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      checkOnlineState();
+      if(pinInput.value.length !== 6){
+        alert('Please enter a 6-digit PIN');
+        return;
+      }
+      alert('PIN login submitted: ' + pinInput.value.replace(/\\d/g,'•'));
+      clearPin();
+    });
+
+    const statusDot = $('#statusDot');
+    const statusText = $('#statusText');
+    function setOnlineState(isOnline){
+      statusDot.className = 'dot ' + (isOnline ? 'ok' : 'off');
+      statusText.textContent = isOnline ? 'Online' : 'Offline';
+    }
+
+    function checkOnlineState(){
+      setOnlineState(navigator.onLine);
+    }
+
+    window.addEventListener('online', ()=> setOnlineState(true));
+    window.addEventListener('offline', ()=> setOnlineState(false));
+
+    setInterval(checkOnlineState, 3000);
+
+    setTab('password');
+  </script>
+</body>
+</html>

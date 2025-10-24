@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Barik POS — Settings (Users + Hover Animations)</title>
+<style>
+  :root{
+    --navy:#0f1a2b; --navy-700:#12223b; --navy-600:#1b2d47; --brand:#1b5fb3;
+    --accent:#16a34a; --warn:#f59e0b; --danger:#ef4444; --muted:#64748b;
+    --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0; --radius:12px; --shadow:0 8px 24px rgba(2,6,23,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:#0b1220;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+  a{color:var(--brand);text-decoration:none;transition:color .2s ease}
+  a:hover{color:#114a8c}
+  .container{max-width:1100px;margin:24px auto;padding:0 16px}
+  .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px}
+  .title{display:flex;align-items:center;gap:12px;transition:transform .25s ease}
+  .title:hover{transform:translateY(-2px)}
+  .title h1{font-size:20px;margin:0;color:var(--navy)}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-weight:600;padding:6px 10px;border-radius:999px;background:#e8fff1;color:#065f46;border:1px solid #86efac;transition:transform .2s ease, box-shadow .2s ease}
+  .badge.dot::before{content:"";width:8px;height:8px;border-radius:999px;background:#22c55e;display:inline-block;box-shadow:0 0 0 0 rgba(34,197,94,.5);animation:pulse 1.8s infinite}
+  .badge:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(16,185,129,.2)}
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{appearance:none;border:1px solid var(--border);background:var(--card);padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:600;color:#0f1a2b;box-shadow:0 1px 0 rgba(2,6,23,.04);transition:transform .18s ease, box-shadow .18s ease, background .2s ease, border-color .2s ease}
+  .btn:hover{background:#f1f5f9;transform:translateY(-1px);box-shadow:0 8px 18px rgba(2,6,23,.08)}
+  .btn:active{transform:translateY(0)}
+  .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  .btn.primary:hover{background:#184f96;box-shadow:0 10px 22px rgba(27,95,179,.28)}
+  .btn.ghost{background:transparent}
+  .btn.small{padding:6px 10px;border-radius:8px;font-size:12px}
+  .btn.danger{border-color:#fecaca;background:#fee2e2;color:#b91c1c}
+  .btn.warn{border-color:#fde68a;background:#fef9c3;color:#92400e}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);transition:box-shadow .25s ease, transform .25s ease}
+  .card:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(2,6,23,.12)}
+  /* Tabs */
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding:12px;background:linear-gradient(#fff, #f8fbff)}
+  .tabs button{padding:10px 12px;border:none;background:transparent;border-radius:10px;font-weight:700;color:var(--navy-600);cursor:pointer;position:relative;transition:transform .18s ease, background .2s ease, color .2s ease}
+  .tabs button[aria-selected="true"]{background:var(--navy);color:#fff}
+  .tabs button::after{content:"";position:absolute;left:12px;right:12px;bottom:6px;height:2px;background:transparent;transform:scaleX(0);transform-origin:left;transition:transform .22s ease, background .22s ease}
+  .tabs button:hover{transform:translateY(-1px)}
+  .tabs button:hover::after{background:currentColor;transform:scaleX(1)}
+  .panel{padding:16px;animation:fadeIn .25s ease}
+  /* Grid form */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .field{display:flex;flex-direction:column;gap:6px;background:#fff;border:1px solid var(--border);padding:12px;border-radius:10px;transition:box-shadow .2s ease, transform .2s ease, border-color .2s ease}
+  .field:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(2,6,23,.08);border-color:#dbe3ee}
+  .field:focus-within{border-color:#9ec2ff;box-shadow:0 0 0 3px rgba(27,95,179,.18), 0 10px 26px rgba(2,6,23,.10)}
+  .field.invalid{border-color:var(--danger);box-shadow:0 0 0 3px rgba(239,68,68,.12), 0 10px 26px rgba(239,68,68,.06)}
+  .field label{font-weight:700;color:var(--navy-600)}
+  .hint{font-size:12px;color:#5b6b83;transition:color .2s ease}
+  .field:hover .hint{color:#334155}
+  input[type=text], input[type=number], input[type=password], textarea, select{
+    width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;color:#0b1220;transition:border-color .2s ease, box-shadow .2s ease, transform .08s ease
+  }
+  input:hover, textarea:hover, select:hover{border-color:#d1d9e6}
+  input:focus, textarea:focus, select:focus{outline:none;border-color:#9ec2ff;box-shadow:0 0 0 3px rgba(27,95,179,.18)}
+  textarea{min-height:84px;resize:vertical}
+  /* Toggle */
+  .toggle{position:relative;width:44px;height:26px;background:#cbd5e1;border-radius:999px;cursor:pointer;transition:.2s all, box-shadow .2s ease}
+  .toggle i{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:999px;background:#fff;transition:.2s all;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  .toggle:hover{box-shadow:0 6px 18px rgba(2,6,23,.08)}
+  .toggle:hover i{animation:wiggle .35s ease}
+  .toggle.on{background:#22c55e}
+  .toggle.on i{left:21px}
+  .row{display:flex;align-items:center;gap:10px}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .section-title{font-weight:800;color:var(--navy);margin:4px 0 8px}
+  /* Language pills */
+  .lang-pills{display:flex;gap:6px;flex-wrap:wrap}
+  .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--border);cursor:pointer;background:#fff;font-weight:600;transition:transform .18s ease, box-shadow .18s ease, background .2s ease, color .2s ease}
+  .pill:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(2,6,23,.08)}
+  .pill[aria-selected="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .lang-group{display:none}
+  .lang-group.active{display:block;animation:fadeIn .25s ease}
+  /* Sticky save bar */
+  .savebar{position:sticky;bottom:0;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);border-top:1px solid var(--border);padding:12px;border-bottom-left-radius:var(--radius);border-bottom-right-radius:var(--radius);display:flex;justify-content:space-between;align-items:center;transition:box-shadow .25s ease}
+  .savebar:hover{box-shadow:0 -10px 24px rgba(2,6,23,.08)}
+  .savebar .left{color:var(--muted);font-weight:600;transition:transform .2s ease}
+  .savebar:hover .left{transform:translateY(-1px)}
+  /* Toast */
+  .toast{position:fixed;right:16px;bottom:16px;background:#0ea5e9;color:#fff;padding:12px 14px;border-radius:10px;opacity:0;transform:translateY(8px);transition:.25s all;box-shadow:var(--shadow);z-index:50}
+  .toast.show{opacity:1;transform:none}
+  /* Users */
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:8px;transition:transform .2s ease}
+  .toolbar:hover{transform:translateY(-1px)}
+  .search{display:flex;align-items:center;gap:8px}
+  .table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--border);border-radius:10px;background:#fff;transition:box-shadow .25s ease}
+  .table:hover{box-shadow:0 10px 26px rgba(2,6,23,.08)}
+  .table th, .table td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:middle}
+  .table th{background:#f8fafc;color:#0f172a;font-weight:800}
+  .table tr{transition:background-color .18s ease, transform .18s ease}
+  .table tr:hover{background:#f7fbff;transform:translateY(-1px)}
+  .badge-sm{padding:4px 8px;border-radius:999px;border:1px solid var(--border);font-size:12px;font-weight:700;transition:transform .18s ease}
+  .badge-sm:hover{transform:translateY(-1px)}
+  .ok{background:#e8fff1;color:#065f46;border-color:#86efac}
+  .off{background:#fee2e2;color:#991b1b;border-color:#fecaca}
+  .muted{background:#f1f5f9;color:#334155;border-color:#e2e8f0}
+  .right{display:flex;gap:8px;align-items:center}
+  /* Modal */
+  .modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:60;animation:fadeIn .18s ease}
+  .modal .sheet{background:#fff;border-radius:16px;border:1px solid var(--border);box-shadow:var(--shadow);width:100%;max-width:520px;transform:translateY(8px) scale(.98);opacity:0;animation:popIn .26s ease forwards}
+  .sheet header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+  .sheet .body{padding:16px}
+  .sheet footer{padding:14px 16px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+  /* Animations */
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+  @keyframes wiggle{0%{transform:translateX(0)}35%{transform:translateX(1px)}70%{transform:translateX(-1px)}100%{transform:translateX(0)}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  @keyframes popIn{to{opacity:1;transform:translateY(0) scale(1)}}
+  /* Motion accessibility */
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important}
+  }
+  /* Adaptive */
+  @media (max-width:900px){
+    .grid,.split{grid-template-columns:1fr}
+    .tabs{overflow:auto}
+  }
+  /* Small helpers */
+  .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;background:#e2e8f0;border:1px solid #cbd5e1;padding:0 6px;border-radius:6px}
+  .hr{height:1px;background:var(--border);margin:12px 0}
+  .note{padding:10px 12px;background:#f8fafc;border:1px dashed var(--border);border-radius:10px;color:#334155}
+  .status{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:#0f766e;transition:transform .18s ease}
+  .status:hover{transform:translateY(-1px)}
+  .status i{width:8px;height:8px;border-radius:999px;background:#10b981;display:inline-block}
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header" style="padding:16px 16px 0 16px">
+        <div class="title">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="transition:transform .25s ease">
+            <path d="M5 7h14l-1 12H6L5 7Z" stroke="#1b5fb3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9 7V5a3 3 0 0 1 6 0v2" stroke="#1b5fb3" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <h1>Barik Point of Sales — Settings</h1>
+          <span class="badge dot" id="status-badge">Online</span>
+        </div>
+        <div class="actions">
+          <button class="btn ghost" id="btn-docs">📖 Documentation</button>
+          <button class="btn ghost" id="btn-ticket">🎫 Support Ticket</button>
+          <button class="btn" id="btn-test">🔄 Test Connection</button>
+        </div>
+      </div>
+
+      <nav class="tabs" role="tablist" aria-label="BPOS Settings Tabs">
+        <button role="tab" aria-selected="true" data-tab="general">General</button>
+        <button role="tab" aria-selected="false" data-tab="store">Store &amp; Language</button>
+        <button role="tab" aria-selected="false" data-tab="device">Device &amp; Printer</button>
+        <button role="tab" aria-selected="false" data-tab="cashier">Cashier &amp; Permission</button>
+        <button role="tab" aria-selected="false" data-tab="users">User</button>
+        <button role="tab" aria-selected="false" data-tab="sales">Sales &amp; Sync</button>
+        <button role="tab" aria-selected="false" data-tab="advanced">Advanced</button>
+        <button role="tab" aria-selected="false" data-tab="help">Help</button>
+      </nav>
+
+      <!-- Panels -->
+      <section class="panel" id="panel-general">
+        <div class="grid">
+          <div class="field" data-field="pos_name">
+            <label for="pos_name">POS Display Name</label>
+            <input id="pos_name" type="text" placeholder="e.g., Cashier — Main Store" value="" data-value="">
+            <div class="hint">Shown at the top bar of POS.</div>
+          </div>
+          <div class="field" data-field="pos_path">
+            <label for="pos_path">POS URL Path</label>
+            <input id="pos_path" type="text" placeholder="/pos" value="/pos" data-value="/pos">
+            <div class="hint">Public route to access POS (e.g., <span class="kbd">/pos</span>).</div>
+          </div>
+          <div class="field" data-field="currency">
+            <label for="currency">Default Currency</label>
+            <select id="currency" data-value="IDR">
+              <option value="IDR">IDR — Indonesian Rupiah</option>
+              <option value="USD">USD — US Dollar</option>
+              <option value="NZD">NZD — New Zealand Dollar</option>
+            </select>
+          </div>
+          <div class="field" data-field="timezone">
+            <label for="timezone">Timezone</label>
+            <select id="timezone" data-value="Asia/Jakarta">
+              <option value="Asia/Jakarta">Asia/Jakarta (UTC+7)</option>
+              <option value="Asia/Singapore">Asia/Singapore (UTC+8)</option>
+              <option value="Pacific/Auckland">Pacific/Auckland (UTC+13/+12)</option>
+            </select>
+          </div>
+          <div class="field" data-field="date_format">
+            <label for="date_format">Date Format</label>
+            <select id="date_format" data-value="YYYY-MM-DD">
+              <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+              <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+              <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+            </select>
+          </div>
+          <div class="field" data-field="darkmode">
+            <label>Theme</label>
+            <div class="row">
+              <div class="toggle" data-bind="darkmode"><i></i></div>
+              <span>Enable Dark Mode</span>
+            </div>
+          </div>
+          <div class="field" data-field="offline">
+            <label>Offline Mode</label>
+            <div class="row">
+              <div class="toggle" data-bind="offline"><i></i></div>
+              <span>Allow POS to work without internet temporarily.</span>
+            </div>
+          </div>
+          <div class="field" data-field="dashboard_view">
+            <label for="dashboard_view">Default Dashboard View</label>
+            <select id="dashboard_view" data-value="today">
+              <option value="today">Today</option>
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-store" hidden>
+        <div class="grid">
+          <div class="field" data-field="store_id">
+            <label for="store_id">Store Selection</label>
+            <select id="store_id" data-value="0">
+              <option value="0">Default Store</option>
+              <option value="1">Outlet — Jakarta</option>
+              <option value="2">Outlet — Bandung</option>
+            </select>
+            <div class="hint">Multi-store supported.</div>
+          </div>
+          <div class="field">
+            <label>Languages Enabled</label>
+            <div class="lang-pills" role="tablist" aria-label="Language">
+              <button class="pill" aria-selected="true" data-lang="en">EN</button>
+              <button class="pill" aria-selected="false" data-lang="id">ID</button>
+            </div>
+            <div class="hr"></div>
+            <div class="lang-group active" data-group="en">
+              <div class="field" data-field="title_en">
+                <label for="title_en">POS Title (EN)</label>
+                <input type="text" id="title_en" placeholder="Barik POS" value="" data-value="">
+              </div>
+              <div class="field" data-field="header_en">
+                <label for="header_en">Receipt Header (EN)</label>
+                <textarea id="header_en" data-value="">Thank you for shopping!</textarea>
+              </div>
+            </div>
+            <div class="lang-group" data-group="id">
+              <div class="field" data-field="title_id">
+                <label for="title_id">Judul POS (ID)</label>
+                <input type="text" id="title_id" placeholder="Barik POS" value="" data-value="">
+              </div>
+              <div class="field" data-field="header_id">
+                <label for="header_id">Kop Struk (ID)</label>
+                <textarea id="header_id" data-value="">Terima kasih telah berbelanja!</textarea>
+              </div>
+            </div>
+          </div>
+          <div class="field" data-field="tax_included">
+            <label>Tax Inclusion</label>
+            <div class="row">
+              <div class="toggle" data-bind="tax_included"><i></i></div>
+              <span>Prices include tax</span>
+            </div>
+          </div>
+          <div class="field" data-field="rounding">
+            <label>Price Rounding</label>
+            <div class="split">
+              <div class="row">
+                <div class="toggle" data-bind="rounding"><i></i></div>
+                <span>Enable rounding</span>
+              </div>
+              <input id="round_precision" type="number" min="0" max="100" value="0" data-value="0" placeholder="Precision">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-device" hidden>
+        <div class="grid">
+          <div class="field" data-field="device_id">
+            <label for="device_id">Device ID</label>
+            <select id="device_id" data-value="">
+              <option value="">Auto (this browser)</option>
+              <option value="POS-01">POS-01</option>
+              <option value="POS-02">POS-02</option>
+            </select>
+            <div class="hint">Devices are tied to cashier sessions.</div>
+          </div>
+          <div class="field" data-field="scanner">
+            <label>Barcode Scanner</label>
+            <div class="row">
+              <div class="toggle" data-bind="scanner"><i></i></div>
+              <span>Enable scanner input focus</span>
+            </div>
+          </div>
+          <div class="field" data-field="printer">
+            <label for="printer">Receipt Printer</label>
+            <select id="printer" data-value="none">
+              <option value="none">— Not Connected —</option>
+              <option value="thermal-58">Thermal 58mm</option>
+              <option value="thermal-80">Thermal 80mm</option>
+              <option value="a4">A4 Printer</option>
+            </select>
+            <div class="hint">Auto Print on Checkout <span class="row"><div class="toggle" data-bind="autoprint"></div></span></div>
+          </div>
+          <div class="field" data-field="print_logo">
+            <label for="print_logo">Print Logo</label>
+            <input id="print_logo" type="text" placeholder="Paste image URL (data URL supported)" value="" data-value="">
+            <div class="hint">Keep it monochrome for thermal printers.</div>
+          </div>
+          <div class="field" data-field="receipt_footer">
+            <label for="receipt_footer">Receipt Footer</label>
+            <textarea id="receipt_footer" data-value="">Return policy • Contact • Socials</textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-cashier" hidden>
+        <div class="grid">
+          <div class="field" data-field="role_default">
+            <label for="role_default">Default Role</label>
+            <select id="role_default" data-value="Staff">
+              <option>Staff</option>
+              <option>Admin</option>
+            </select>
+          </div>
+          <div class="field" data-field="session_timeout">
+            <label for="session_timeout">Session Timeout (minutes)</label>
+            <input id="session_timeout" type="number" value="30" data-value="30" min="1">
+          </div>
+          <div class="field" data-field="permissions">
+            <label>Permissions</label>
+            <div class="note">
+              <label><input type="checkbox" checked> New Order</label><br>
+              <label><input type="checkbox" checked> Refund</label><br>
+              <label><input type="checkbox" checked> Edit Item Price</label><br>
+              <label><input type="checkbox"> View Cost</label><br>
+              <label><input type="checkbox"> Export Sales</label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Users Panel -->
+      <section class="panel" id="panel-users" hidden>
+        <div class="field">
+          <label class="section-title">POS Users</label>
+          <div class="toolbar">
+            <div class="search">
+              <input id="user-search" type="text" placeholder="Search username or role">
+              <button class="btn small" id="user-search-clear">Clear</button>
+            </div>
+            <div class="right">
+              <span class="badge-sm muted" id="user-count">0 users</span>
+              <button class="btn primary" id="btn-add-user">+ New User</button>
+            </div>
+          </div>
+          <table class="table" id="user-table" aria-label="POS users">
+            <thead>
+              <tr>
+                <th style="width:34%">Username</th>
+                <th style="width:18%">Role</th>
+                <th style="width:18%">Status</th>
+                <th style="width:30%">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+          <div class="hint">Users are stored locally for demo. Integrate with OC controller to persist.</div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-sales" hidden>
+        <div class="grid">
+          <div class="field" data-field="autosync">
+            <label>Auto Sync Sales</label>
+            <div class="row">
+              <div class="toggle" data-bind="autosync"><i></i></div>
+              <span>Sync to server periodically</span>
+            </div>
+          </div>
+          <div class="field" data-field="sync_interval">
+            <label for="sync_interval">Sync Interval</label>
+            <select id="sync_interval" data-value="5m">
+              <option value="5m">Every 5 minutes</option>
+              <option value="10m">Every 10 minutes</option>
+              <option value="30m">Every 30 minutes</option>
+            </select>
+          </div>
+          <div class="field" data-field="online_status">
+            <label>Online Status Tracking</label>
+            <div class="row">
+              <div class="toggle" data-bind="online_status"><i></i></div>
+              <span>Show cashier online/idle</span>
+            </div>
+          </div>
+          <div class="field" data-field="stock_deduct">
+            <label>Stock Deduction</label>
+            <div class="row">
+              <div class="toggle" data-bind="stock_deduct"><i></i></div>
+              <span>Deduct stock on checkout</span>
+            </div>
+          </div>
+          <div class="field" data-field="export_fmt">
+            <label>Export Sales</label>
+            <div class="row" style="gap:8px">
+              <select id="export_fmt" data-value="csv">
+                <option value="csv">CSV</option>
+                <option value="xlsx">XLSX</option>
+              </select>
+              <button class="btn">Export</button>
+            </div>
+          </div>
+          <div class="field" data-field="sync_log">
+            <label>Last Sync Log</label>
+            <div class="status"><i></i><span id="sync-log">No sync yet</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-advanced" hidden>
+        <div class="grid">
+          <div class="field" data-field="api_url">
+            <label for="api_url">API Endpoint</label>
+            <input id="api_url" type="text" placeholder="https://example.com/api/bpos" value="" data-value="https://example.com/api/bpos">
+          </div>
+          <div class="field" data-field="api_key">
+            <label for="api_key">API Key</label>
+            <input id="api_key" type="password" placeholder="••••••••••" value="" data-value="">
+          </div>
+          <div class="field">
+            <label>Cache</label>
+            <div class="row" style="gap:8px">
+              <button class="btn" id="btn-clear-cache">Clear Cache</button>
+              <button class="btn" id="btn-reset-ls">Reset Local Storage</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Diagnostics</label>
+            <button class="btn" id="btn-test-conn">Test Connection</button>
+            <div class="hint" id="diag-hint">Run a quick ping to the API endpoint.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-help" hidden>
+        <div class="grid">
+          <div class="field">
+            <label class="section-title">Quick Start</label>
+            <div class="note">
+              1) Set <b>Store</b>, <b>Language</b>, and <b>Currency</b>.<br>
+              2) Enable <b>Barcode Scanner</b> and <b>Printer</b> if needed.<br>
+              3) Configure <b>Cashier & Permission</b>.<br>
+              4) Open your POS at <span class="kbd">/pos</span> and start selling 🎉
+            </div>
+          </div>
+          <div class="field">
+            <label class="section-title">Troubleshooting</label>
+            <div class="note">
+              If printing fails on thermal printer, switch <b>Print Type</b> or reduce logo density.<br>
+              Use <b>Reset Local Storage</b> if UI behaves oddly after updates.
+            </div>
+          </div>
+          <div class="field">
+            <label class="section-title">Contact</label>
+            <div class="row" style="gap:8px;flex-wrap:wrap">
+              <button class="btn ghost" id="help-docs">📖 Documentation</button>
+              <button class="btn ghost" id="help-ticket">🎫 Open Ticket</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="savebar">
+        <div class="left">Changes are not saved</div>
+        <div class="right" style="display:flex;gap:8px">
+          <button class="btn" id="discard">Discard</button>
+          <button class="btn primary" id="save">Save Settings</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Saved successfully</div>
+
+  <!-- Add/Edit User Modal -->
+  <div class="modal" id="user-modal" aria-hidden="true" role="dialog" aria-labelledby="user-modal-title">
+    <div class="sheet">
+      <header>
+        <strong id="user-modal-title">New User</strong>
+        <button class="btn small" id="user-modal-close">✕</button>
+      </header>
+      <div class="body">
+        <div class="grid">
+          <div class="field">
+            <label for="u-username">Username</label>
+            <input id="u-username" type="text" placeholder="e.g., cashier01">
+          </div>
+          <div class="field">
+            <label for="u-pin">PIN</label>
+            <input id="u-pin" type="password" placeholder="4–6 digits">
+          </div>
+          <div class="field">
+            <label for="u-role">Role</label>
+            <select id="u-role">
+              <option value="Staff">Staff</option>
+              <option value="Admin">Admin</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="u-active">Active</label>
+            <div class="row"><div id="u-active" class="toggle on"><i></i></div><span>Enable login</span></div>
+          </div>
+        </div>
+      </div>
+      <footer>
+        <button class="btn" id="user-modal-cancel">Cancel</button>
+        <button class="btn primary" id="user-modal-save">Save User</button>
+      </footer>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const REQUIRED_FIELDS = ['pos_name','pos_path'];
+
+  // Tabs
+  const tabButtons = document.querySelectorAll('.tabs [role="tab"]');
+  const panels = {
+    general: document.getElementById('panel-general'),
+    store: document.getElementById('panel-store'),
+    device: document.getElementById('panel-device'),
+    cashier: document.getElementById('panel-cashier'),
+    users: document.getElementById('panel-users'),
+    sales: document.getElementById('panel-sales'),
+    advanced: document.getElementById('panel-advanced'),
+    help: document.getElementById('panel-help')
+  };
+  tabButtons.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      tabButtons.forEach(b=>b.setAttribute('aria-selected','false'));
+      btn.setAttribute('aria-selected','true');
+      const key = btn.dataset.tab;
+      Object.keys(panels).forEach(k=>{ panels[k].hidden = (k!==key); });
+    });
+  });
+
+  // Language pills
+  const pillWrap = document.querySelector('.lang-pills');
+  if(pillWrap){
+    pillWrap.addEventListener('click', (e)=>{
+      const tgt = e.target.closest('.pill'); if(!tgt) return;
+      pillWrap.querySelectorAll('.pill').forEach(p=>p.setAttribute('aria-selected','false'));
+      tgt.setAttribute('aria-selected','true');
+      const lang = tgt.dataset.lang;
+      document.querySelectorAll('.lang-group').forEach(g=>g.classList.remove('active'));
+      document.querySelector('.lang-group[data-group="'+lang+'"]').classList.add('active');
+    });
+  }
+
+  // Toggles (generic)
+  document.querySelectorAll('.toggle').forEach(t=>{
+    t.addEventListener('click', ()=>{ t.classList.toggle('on'); dirty(); });
+  });
+
+  // Save/Discard mock for settings
+  const toast = document.getElementById('toast');
+  const savebarLeft = document.querySelector('.savebar .left');
+  function showToast(msg, ok=true){
+    toast.textContent = msg;
+    toast.style.background = ok ? '#10b981' : '#ef4444';
+    toast.classList.add('show');
+    setTimeout(()=>toast.classList.remove('show'), 1600);
+  }
+  function dirty(){ savebarLeft.textContent = 'Unsaved changes'; }
+  document.querySelectorAll('input,select,textarea').forEach(el=>{
+    el.addEventListener('input', dirty);
+    el.addEventListener('change', dirty);
+  });
+
+  function val(id){ const el = document.getElementById(id); return el ? el.value : null; }
+  function markInvalid(ids){
+    let focused = false;
+    ids.forEach(id=>{
+      const wrap = document.querySelector('.field[data-field="'+id+'"]');
+      if(wrap){
+        wrap.classList.add('invalid');
+        if(!focused){
+          const input = wrap.querySelector('input,select,textarea');
+          if(input){ input.focus(); focused = true; }
+        }
+      }
+    });
+  }
+
+  document.getElementById('save').addEventListener('click', ()=>{
+    const missing = REQUIRED_FIELDS.filter(k=>!String(val(k)||'').trim());
+    if(missing.length){ showToast('Please fill required fields: ' + missing.join(', '), false); markInvalid(missing); return; }
+    const fields = ['pos_name','pos_path','currency','timezone','date_format','dashboard_view','store_id','title_en','header_en','title_id','header_id','round_precision','device_id','printer','print_logo','receipt_footer','role_default','session_timeout','sync_interval','export_fmt','api_url','api_key'];
+    const toggles = ['darkmode','offline','tax_included','rounding','scanner','autoprint','autosync','online_status','stock_deduct'];
+    const arr = [];
+    fields.forEach(k=>{ const el=document.getElementById(k); if(el) arr.push([k, el.value]); });
+    toggles.forEach(k=>{ const tg=document.querySelector('.toggle[data-bind="'+k+'"]'); arr.push([k, tg && tg.classList.contains('on')]); });
+    localStorage.setItem('bpos_settings_array', JSON.stringify(arr));
+    savebarLeft.textContent='All changes saved';
+    showToast('Settings saved');
+  });
+  document.getElementById('discard').addEventListener('click', ()=>{ localStorage.removeItem('bpos_settings_array'); location.reload(); });
+
+  function setOnlineState(online){
+    const b = document.getElementById('status-badge');
+    if(online){ b.textContent='Online'; b.classList.add('dot'); b.style.background='#e8fff1'; b.style.borderColor='#86efac'; }
+    else { b.textContent='Offline'; b.classList.remove('dot'); b.style.background='#fee2e2'; b.style.borderColor='#fecaca'; }
+  }
+  setOnlineState(navigator.onLine);
+  window.addEventListener('online', ()=>setOnlineState(true));
+  window.addEventListener('offline', ()=>setOnlineState(false));
+  document.getElementById('btn-test').addEventListener('click', ()=>{ showToast('Pinging…'); setTimeout(()=>showToast('Connection OK'), 600); });
+  const tc = document.getElementById('btn-test-conn'); if(tc){ tc.addEventListener('click', ()=>{ showToast('API reachable ✓'); const d=document.getElementById('diag-hint'); if(d) d.textContent='Last test: OK just now.'; }); }
+  const L = (id, url) => { const el=document.getElementById(id); if(el) el.onclick = ()=>window.open(url,'_blank'); };
+  L('btn-docs','#docs'); L('btn-ticket','#ticket'); L('help-docs','#docs'); L('help-ticket','#ticket');
+
+  // Load settings defaults
+  try{
+    const saved = JSON.parse(localStorage.getItem('bpos_settings_array')||'null');
+    if(saved && Array.isArray(saved)){
+      saved.forEach(([k,v])=>{
+        const el = document.getElementById(k);
+        if(el!=null && typeof v!=='undefined'){ el.value = v; }
+        const tg = document.querySelector('.toggle[data-bind="'+k+'"]');
+        if(tg){ tg.classList.toggle('on', !!v); }
+      });
+      savebarLeft.textContent = 'All changes saved';
+      toast.textContent = 'Loaded saved settings';
+      toast.style.background='#0ea5e9';
+      toast.classList.add('show');
+      setTimeout(()=>toast.classList.remove('show'), 1200);
+    }else{
+      document.querySelectorAll('[data-value]').forEach(el=>{
+        const dv = el.getAttribute('data-value');
+        if(el.tagName==='TEXTAREA'){ if(el.value.trim()==='') el.value = dv || ''; }
+        else{ if(el.value==='' && dv!=null) el.value = dv; }
+      });
+    }
+  }catch(e){ console.warn(e); }
+
+  // ===== USERS (Simple client-side management) =====
+  const U_KEY = 'bpos_users';
+  const tableBody = document.querySelector('#user-table tbody');
+  const countBadge = document.getElementById('user-count');
+  const searchBox = document.getElementById('user-search');
+  const searchClear = document.getElementById('user-search-clear');
+  const modal = document.getElementById('user-modal');
+  const modalTitle = document.getElementById('user-modal-title');
+  const mUser = { id:null, mode:'create' };
+
+  function getUsers(){ try{ return JSON.parse(localStorage.getItem(U_KEY))||[]; }catch(_){ return []; } }
+  function setUsers(list){ localStorage.setItem(U_KEY, JSON.stringify(list)); }
+  function uid(){ return 'U' + Math.random().toString(36).slice(2,8).toUpperCase(); }
+  function nowISO(){ return new Date().toISOString(); }
+
+  function renderUsers(){
+    const q = (searchBox.value||'').trim().toLowerCase();
+    const rows = getUsers().filter(u=>{
+      if(!q) return true;
+      return (u.username||'').toLowerCase().includes(q) || (u.role||'').toLowerCase().includes(q);
+    });
+    countBadge.textContent = rows.length + (rows.length===1 ? ' user' : ' users');
+    tableBody.innerHTML = rows.map(u=>`<tr data-id="${u.id}">
+      <td><strong>${u.username}</strong><div class="hint">Created ${new Date(u.createdAt).toLocaleString()}</div></td>
+      <td>${u.role}</td>
+      <td>${u.active ? '<span class="badge-sm ok">Active</span>' : '<span class="badge-sm off">Disabled</span>'}</td>
+      <td>
+        <div class="right">
+          <button class="btn small" data-act="toggle">${u.active?'Disable':'Enable'}</button>
+          <button class="btn small" data-act="reset">Reset PIN</button>
+          <button class="btn small" data-act="edit">Edit</button>
+          <button class="btn small danger" data-act="delete">Delete</button>
+        </div>
+      </td>
+    </tr>`).join('');
+  }
+
+  function openModal(mode, user){
+    mUser.mode = mode;
+    mUser.id = user ? user.id : null;
+    modalTitle.textContent = mode==='create' ? 'New User' : 'Edit User';
+    document.getElementById('u-username').value = user ? user.username : '';
+    document.getElementById('u-pin').value = '';
+    document.getElementById('u-role').value = user ? user.role : 'Staff';
+    const tog = document.getElementById('u-active');
+    tog.classList.toggle('on', user ? !!user.active : true);
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden','false');
+  }
+  function closeModal(){
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden','true');
+  }
+  document.getElementById('btn-add-user').addEventListener('click', ()=>openModal('create'));
+  document.getElementById('user-modal-close').addEventListener('click', closeModal);
+  document.getElementById('user-modal-cancel').addEventListener('click', closeModal);
+  document.getElementById('u-active').addEventListener('click', e=>e.currentTarget.classList.toggle('on'));
+
+  document.getElementById('user-modal-save').addEventListener('click', ()=>{
+    const username = document.getElementById('u-username').value.trim();
+    const pin = document.getElementById('u-pin').value.trim();
+    const role = document.getElementById('u-role').value;
+    const active = document.getElementById('u-active').classList.contains('on');
+    if(!username){ showToast('Username is required', false); return; }
+    if(mUser.mode==='create' && (!pin || pin.length < 4 || pin.length > 6)){ showToast('PIN must be 4–6 digits', false); return; }
+
+    const list = getUsers();
+    if(mUser.mode==='create'){
+      list.push({ id: uid(), username, role, active, createdAt: nowISO() });
+      setUsers(list);
+      showToast('User created');
+    }else{
+      const idx = list.findIndex(x=>x.id===mUser.id);
+      if(idx>-1){
+        list[idx].username = username;
+        list[idx].role = role;
+        list[idx].active = active;
+        if(pin){ /* integrate reset with backend later */ }
+        setUsers(list);
+        showToast('User updated');
+      }
+    }
+    renderUsers(); closeModal();
+  });
+
+  // Table actions
+  tableBody.addEventListener('click', (e)=>{
+    const btn = e.target.closest('button[data-act]'); if(!btn) return;
+    const tr = btn.closest('tr'); const id = tr.getAttribute('data-id');
+    const act = btn.getAttribute('data-act');
+    const list = getUsers(); const idx = list.findIndex(x=>x.id===id); if(idx<0) return;
+
+    if(act==='toggle'){
+      list[idx].active = !list[idx].active; setUsers(list); renderUsers(); showToast('Status updated');
+    }else if(act==='reset'){
+      showToast('PIN reset link sent');
+    }else if(act==='edit'){
+      openModal('edit', list[idx]);
+    }else if(act==='delete'){
+      if(confirm('Delete this user?')){ list.splice(idx,1); setUsers(list); renderUsers(); showToast('User deleted'); }
+    }
+  });
+
+  // Search
+  searchBox.addEventListener('input', renderUsers);
+  searchClear.addEventListener('click', ()=>{ searchBox.value=''; renderUsers(); });
+
+  // Seed demo users
+  if(getUsers().length===0){
+    setUsers([
+      {id:uid(), username:'cashier01', role:'Staff', active:true, createdAt: nowISO()},
+      {id:uid(), username:'manager', role:'Admin', active:true, createdAt: nowISO()}
+    ]);
+  }
+  renderUsers();
+})();
+</script>
+</body>
+</html>

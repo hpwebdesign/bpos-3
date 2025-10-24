@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BPOS · Orders</title>
+<style>
+  :root{
+    --bg:#f6f8fb;--paper:#ffffff;--ink:#1f2b45;--muted:#65728f;--navy:#1e2a44;--brand:#1f3b73;--chip-bg:#eef2f7;--ok:#12b886;--warn:#ffb020;--danger:#e5484d;--info:#4dabf7;--qr:#2b8a3e;--cash:#1e7a34;--card:#113e6b;--ewallet:#6a1e9a;--shadow:0 6px 18px rgba(20,33,61,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif}
+  .container{max-width:1200px;margin:0 auto;padding:20px}
+  header.header{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+  .logo{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--brand),#0c1f3f);box-shadow:var(--shadow);display:grid;place-items:center;color:#fff;font-weight:800}
+  .title{font-weight:700;font-size:18px}
+  .spacer{flex:1}
+  .search{position:relative;min-width:260px}
+  .search input{width:100%;padding:10px 36px 10px 12px;border:1px solid #d9dfeb;border-radius:10px;background:#fff;outline:none}
+  .search .icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);opacity:.6}
+  .btn{border:0;background:var(--navy);color:#fff;border-radius:10px;padding:10px 14px;font-weight:600;box-shadow:var(--shadow);cursor:pointer}
+  .btn.ghost{background:#fff;color:var(--navy);border:1px solid #d9dfeb}
+  .btn:disabled{opacity:.6;cursor:not-allowed}
+  .status-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px;background:var(--ok)}
+
+  /* Quick range & KPI */
+  .toolbar{background:var(--paper);padding:14px;border-radius:14px;box-shadow:var(--shadow);margin-bottom:14px}
+  .range-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .chip{display:inline-flex;align-items:center;gap:8px;background:var(--chip-bg);border:1px solid #dde3ef;padding:8px 12px;border-radius:999px;font-weight:600;color:var(--brand);cursor:pointer}
+  .chip.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .date-range{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .date-range input{padding:8px 10px;border:1px solid #d9dfeb;border-radius:10px}
+  .compare{margin-left:8px;display:flex;align-items:center;gap:6px;color:var(--muted)}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:12px}
+  .card{background:var(--paper);border-radius:14px;box-shadow:var(--shadow)}
+  .kpi{padding:14px}
+  .kpi .label{color:var(--muted);font-weight:600;font-size:12px}
+  .kpi .value{font-size:22px;font-weight:800;margin:6px 0 4px}
+  .kpi .delta{font-size:12px;font-weight:700}
+  .delta.up{color:var(--ok)}
+  .delta.down{color:var(--danger)}
+  .mini-bar{height:6px;background:#eef3fb;border-radius:999px;overflow:hidden;margin-top:8px}
+  .mini-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brand),#7aa2ff)}
+
+  .breakdown{padding:12px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+  .pay{background:#f7f9fd;border:1px solid #e4e9f5;border-radius:12px;padding:10px}
+  .pay .meta{display:flex;align-items:center;justify-content:space-between}
+  .pay .meter{height:6px;background:#e9eef9;border-radius:999px;overflow:hidden;margin-top:8px}
+  .pay .meter i{display:block;height:100%;width:0}
+  .pay.cash .badge{color:var(--cash)}
+  .pay.qris .badge{color:var(--qr)}
+  .pay.card .badge{color:var(--card)}
+  .pay.ewallet .badge{color:var(--ewallet)}
+
+  /* Filters */
+  .filters{background:var(--paper);padding:10px 12px;border-radius:14px;box-shadow:var(--shadow);display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+  select, .input{padding:8px 10px;border:1px solid #d9dfeb;border-radius:10px;background:#fff}
+
+  /* Table */
+  .table{background:var(--paper);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+  table{width:100%;border-collapse:collapse}
+  thead th{background:#f3f6fb;color:#516083;text-align:left;font-size:12px;letter-spacing:.02em;padding:10px;border-bottom:1px solid #e7ecf7;position:sticky;top:0}
+  tbody td{padding:10px;border-bottom:1px solid #eef2f7;vertical-align:top}
+  tbody tr:hover{background:#fafcff}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700}
+  .status.completed{background:#e9fbf4;color:#136f4d}
+  .status.pending{background:#fff7e6;color:#9a6400}
+  .status.canceled{background:#ffecef;color:#a11a2b}
+  .status.processing{background:#eaf3ff;color:#114a88}
+  .paytag{background:#eef2ff;color:#203b84}
+  .chan{background:#eaf6ff;color:#0b5e92}
+  .member{background:#efeaff;color:#3d1d84}
+  .expander{cursor:pointer}
+  .row-details{background:#fbfdff}
+  .row-details td{padding:12px}
+
+  .pagination{display:flex;align-items:center;gap:6px;padding:12px;justify-content:flex-end}
+  .page{min-width:34px;height:34px;border-radius:8px;border:1px solid #d9dfeb;display:grid;place-items:center;background:#fff;cursor:pointer}
+  .page.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+  /* Responsive */
+  @media (max-width: 980px){
+    .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .breakdown{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+  @media (max-width: 640px){
+    header.header{flex-wrap:wrap}
+    .date-range{width:100%;margin-left:0}
+    .kpis{grid-template-columns:repeat(1,minmax(0,1fr))}
+    .breakdown{grid-template-columns:repeat(1,minmax(0,1fr))}
+    .search{min-width:unset;flex:1}
+    thead{display:none}
+    table, tbody, tr, td{display:block;width:100%}
+    tbody tr{margin:8px 0;border:1px solid #eef2f7;border-radius:12px;overflow:hidden}
+    tbody td{border-bottom:1px solid #eef2f7}
+    tbody td[data-col]::before{content:attr(data-col)": ";font-weight:700;color:var(--muted)}
+    .pagination{justify-content:center}
+  }
+  /* Drawer New Order */
+  .drawer-overlay{position:fixed;inset:0;background:rgba(19,29,48,.38);opacity:0;pointer-events:none;transition:.2s}
+  .drawer-overlay.show{opacity:1;pointer-events:auto;z-index:59}
+  .drawer{position:fixed;top:0;right:-520px;width:520px;max-width:92vw;height:100dvh;background:var(--paper);box-shadow:-16px 0 32px rgba(20,33,61,.18);border-left:1px solid #dde3ef;transition:right .25s ease;z-index:60;display:flex;flex-direction:column}
+  .drawer.open{right:0}
+  .drawer header{padding:14px 16px;border-bottom:1px solid #eef2f7;display:flex;align-items:center;gap:8px}
+  .drawer .body{padding:14px 16px;overflow:auto;display:grid;gap:12px}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .form-row.full{grid-template-columns:1fr}
+  .input,.select, .textarea{width:100%;padding:10px;border:1px solid #d9dfeb;border-radius:10px;background:#fff}
+  .label{font-size:12px;color:var(--muted);font-weight:700;margin-bottom:4px}
+  .line{height:1px;background:#eef2f7;margin:4px 0}
+  .items-table{border:1px solid #e9eef9;border-radius:12px;overflow:hidden}
+  .items-table table{width:100%;border-collapse:collapse}
+  .items-table th,.items-table td{padding:8px;border-bottom:1px solid #eef2f7;font-size:13px}
+  .items-table tfoot td{font-weight:800}
+  .qtyctrl{display:inline-flex;align-items:center;border:1px solid #d9dfeb;border-radius:8px;overflow:hidden}
+  .qtyctrl button{background:#fff;border:0;width:26px;height:26px;cursor:pointer}
+  .qtyctrl input{width:42px;text-align:center;border:0;border-left:1px solid #eef2f7;border-right:1px solid #eef2f7}
+  .actions{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid #eef2f7}
+  .tag{background:var(--chip-bg);border:1px solid #dde3ef;border-radius:999px;padding:4px 8px;font-size:12px}
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo" aria-label="Barik POS">B</div>
+      <div class="title">Orders</div>
+      <span class="status"><i class="status-dot"></i><small>Online</small></span>
+      <div class="spacer"></div>
+      <div class="search"><input id="q" type="search" placeholder="Search order id, customer, phone, SKU…" aria-label="Search"/><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>
+      <button class="btn ghost" id="exportBtn">Export</button>
+      <button class="btn" id="newOrderBtn">+ New Order</button>
+    </header>
+
+    <!-- Quick ranges & KPIs -->
+    <section class="toolbar">
+      <div class="range-row" id="rangeChips">
+        <button class="chip" data-range="today">Today</button>
+        <button class="chip" data-range="yesterday">Yesterday</button>
+        <button class="chip" data-range="last7">Last 7 days</button>
+        <button class="chip" data-range="thisWeek">This Week</button>
+        <button class="chip" data-range="thisMonth">This Month</button>
+        <button class="chip" data-range="lastMonth">Last Month</button>
+        <button class="chip" data-range="ytd">Year to Date</button>
+        <button class="chip" data-range="custom">Custom…</button>
+        <div class="date-range">
+          <input type="date" id="start" aria-label="Start date"/>
+          <span>–</span>
+          <input type="date" id="end" aria-label="End date"/>
+          <label class="compare"><input type="checkbox" id="comparePrev"/> Compare to previous</label>
+        </div>
+      </div>
+      <div class="kpis" id="kpis">
+        <article class="card kpi"><div class="label">Gross Sales</div><div class="value" id="kpiGross">–</div><div class="delta" id="kpiGrossDelta"></div><div class="mini-bar"><i id="barGross"></i></div></article>
+        <article class="card kpi"><div class="label">Orders</div><div class="value" id="kpiOrders">–</div><div class="delta" id="kpiOrdersDelta"></div><div class="mini-bar"><i id="barOrders"></i></div></article>
+        <article class="card kpi"><div class="label">AOV</div><div class="value" id="kpiAOV">–</div><div class="delta" id="kpiAOVDelta"></div><div class="mini-bar"><i id="barAOV"></i></div></article>
+        <article class="card kpi"><div class="label">Items Sold</div><div class="value" id="kpiItems">–</div><div class="delta" id="kpiItemsDelta"></div><div class="mini-bar"><i id="barItems"></i></div></article>
+      </div>
+      <div class="breakdown" id="payBreakdown">
+        <div class="pay cash"><div class="meta"><strong>Cash</strong><span class="badge">IDR <b id="cashAmt">0</b></span></div><div class="meter"><i id="cashPct"></i></div></div>
+        <div class="pay qris"><div class="meta"><strong>QRIS</strong><span class="badge">IDR <b id="qrisAmt">0</b></span></div><div class="meter"><i id="qrisPct"></i></div></div>
+        <div class="pay card"><div class="meta"><strong>Card</strong><span class="badge">IDR <b id="cardAmt">0</b></span></div><div class="meter"><i id="cardPct"></i></div></div>
+        <div class="pay ewallet"><div class="meta"><strong>E‑Wallet</strong><span class="badge">IDR <b id="ewalletAmt">0</b></span></div><div class="meter"><i id="ewalletPct"></i></div></div>
+      </div>
+    </section>
+
+    <!-- Filters -->
+    <section class="filters">
+      <select id="statusFilter" aria-label="Order status">
+        <option value="">All Status</option>
+        <option>Pending</option>
+        <option>Processing</option>
+        <option>Completed</option>
+        <option>Canceled</option>
+      </select>
+      <select id="payFilter" aria-label="Payment status">
+        <option value="">All Payment</option>
+        <option>Paid</option>
+        <option>Partial</option>
+        <option>Unpaid</option>
+      </select>
+      <select id="channelFilter" aria-label="Channel">
+        <option value="">All Channel</option>
+        <option>POS</option>
+        <option>Online</option>
+        <option>Marketplace</option>
+      </select>
+      <input class="input" type="number" id="minTotal" placeholder="Min Total" aria-label="Min total"/>
+      <input class="input" type="number" id="maxTotal" placeholder="Max Total" aria-label="Max total"/>
+      <button class="btn ghost" id="clearFilters">Clear</button>
+    </section>
+
+    <!-- Table -->
+    <section class="table">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:32px"><input type="checkbox" id="checkAll"></th>
+            <th>Order ID</th>
+            <th>Date/Time</th>
+            <th>Customer</th>
+            <th>Channel</th>
+            <th>Status</th>
+            <th>Payment</th>
+            <th>Items</th>
+            <th>Subtotal</th>
+            <th>Discount</th>
+            <th>Tax</th>
+            <th>Shipping</th>
+            <th>Total</th>
+            <th>Cashier</th>
+            <th class="expander">⋯</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="pagination" id="pager"></div>
+    </section>
+  </div>
+
+  <!-- Drawer markup placed BEFORE script to ensure it exists when JS runs -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <aside class="drawer" id="orderDrawer" aria-hidden="true">
+    <header>
+      <div class="title" style="font-weight:800">New Order</div>
+      <div class="spacer"></div>
+      <button class="btn ghost" id="closeDrawerBtn" aria-label="Close">Close</button>
+    </header>
+    <div class="body">
+      <div class="form-row">
+        <div>
+          <div class="label">Customer</div>
+          <input class="input" id="noCustomer" placeholder="Search / type name" />
+        </div>
+        <div>
+          <div class="label">Phone</div>
+          <input class="input" id="noPhone" placeholder="08xx" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <div class="label">Channel</div>
+          <select class="select" id="noChannel"><option>POS</option><option>Online</option><option>Marketplace</option></select>
+        </div>
+        <div>
+          <div class="label">Payment Method</div>
+          <select class="select" id="noMethod"><option>Cash</option><option>QRIS</option><option>Card</option><option>E-Wallet</option></select>
+        </div>
+      </div>
+
+      <div class="line"></div>
+      <div class="form-row full">
+        <div>
+          <div class="label">Add Item</div>
+          <div style="display:flex;gap:8px">
+            <select class="select" id="noProduct"></select>
+            <button class="btn ghost" id="addItemBtn">Add</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="items-table">
+        <table>
+          <thead><tr><th style="width:42%">Product</th><th>Price</th><th>Qty</th><th>Total</th><th></th></tr></thead>
+          <tbody id="noItems"></tbody>
+          <tfoot>
+            <tr><td colspan="3" style="text-align:right">Subtotal</td><td id="noSubtotal">IDR 0</td><td></td></tr>
+            <tr><td colspan="2"></td><td>
+              <div class="label">Discount (IDR)</div>
+              <input class="input" type="number" id="noDiscount" value="0" min="0" />
+            </td><td id="noDiscountView">IDR 0</td><td></td></tr>
+            <tr><td colspan="3" style="text-align:right">Tax (10%)</td><td id="noTax">IDR 0</td><td></td></tr>
+            <tr><td colspan="2"></td><td>
+              <div class="label">Shipping (IDR)</div>
+              <input class="input" type="number" id="noShipping" value="0" min="0" />
+            </td><td id="noShippingView">IDR 0</td><td></td></tr>
+            <tr><td colspan="3" style="text-align:right">Grand Total</td><td id="noGrand" style="font-weight:900">IDR 0</td><td></td></tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="form-row full">
+        <div>
+          <div class="label">Note</div>
+          <textarea class="textarea" id="noNote" rows="3" placeholder="Optional note for this order"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" id="cancelOrder">Cancel</button>
+      <button class="btn" id="saveOrder">Save Order</button>
+    </div>
+  </aside>
+
+<script>
+// Wrap everything to ensure DOM is ready, preventing null refs like overlay/noProduct
+window.addEventListener('DOMContentLoaded', () => {
+(() => {
+  // ---- Utilities ----
+  const fmtIDR = n => n.toLocaleString('id-ID', {style:'currency',currency:'IDR',maximumFractionDigits:0});
+  const fmtNum = n => n.toLocaleString('id-ID');
+  const today = () => new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta'}));
+  const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const endOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23,59,59,999);
+  const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate()+n);
+  const startOfWeek = d => {const nd=new Date(d); const day=(nd.getDay()+6)%7; nd.setDate(nd.getDate()-day); return startOfDay(nd)}; // Monday
+  const endOfWeek = d => endOfDay(addDays(startOfWeek(d),6));
+  const startOfMonth = d => new Date(d.getFullYear(), d.getMonth(), 1);
+  const endOfMonth = d => endOfDay(new Date(d.getFullYear(), d.getMonth()+1, 0));
+  const startOfYear = d => new Date(d.getFullYear(),0,1);
+  const endOfYear = d => new Date(d.getFullYear(),11,31,23,59,59,999);
+
+  // ---- Mock Data ----
+  const STATUS = ['Pending','Processing','Completed','Canceled'];
+  const PAYSTAT = ['Paid','Partial','Unpaid'];
+  const CHANNEL = ['POS','Online','Marketplace'];
+  const METHODS = ['Cash','QRIS','Card','E-Wallet'];
+  const FIRSTN = ['Adi','Budi','Chandra','Dewi','Eka','Fajar','Gita','Hana','Indra','Joko','Kiki','Lia','Maya','Nina','Oka','Putra','Qori','Rafi','Sari','Tono'];
+  const LASTN = ['Santoso','Wijaya','Pratama','Saputra','Utami','Halim','Gunawan','Hidayat'];
+
+  const rand = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+  const choice = arr => arr[rand(0,arr.length-1)];
+  const skus = ['SKU-1001','SKU-1020','SKU-1102','SKU-2031','SKU-3301','SKU-4420','SKU-5501'];
+  const itemsLib = [
+    {name:'Wooden Blocks', price:120000, sku:skus[0]},
+    {name:'Art Kit', price:185000, sku:skus[1]},
+    {name:'Puzzle 100pcs', price:99000, sku:skus[2]},
+    {name:'Plush Dino', price:75000, sku:skus[3]},
+    {name:'STEM Kit', price:245000, sku:skus[4]},
+    {name:'Lego‑like Bricks', price:199000, sku:skus[5]},
+    {name:'Coloring Book', price:39000, sku:skus[6]}
+  ];
+
+  function seedOrders(n=260){
+    const base = today();
+    const out=[];
+    for(let i=0;i<n;i++){
+      const daysAgo = rand(0, 365);
+      const d = addDays(base, -daysAgo);
+      d.setHours(rand(9,21), rand(0,59), rand(0,59), rand(0,999));
+      const itemCount = rand(1,4);
+      const items=[];
+      let subtotal=0, qty=0;
+      for(let k=0;k<itemCount;k++){
+        const it = {...choice(itemsLib)}; it.qty = rand(1,3);
+        subtotal += it.price*it.qty; qty += it.qty; items.push(it);
+      }
+      const discount = Math.random()<.25 ? Math.round(subtotal* [0.05,0.1,0.15][rand(0,2)]) : 0;
+      const tax = Math.round((subtotal-discount)*0.1);
+      const shipping = choice([0,0,0,15000,20000]);
+      const total = subtotal - discount + tax + shipping;
+      const method = choice(METHODS);
+      const paystatus = discount>0 && Math.random()<.1 ? 'Partial' : (Math.random()<.08 ? 'Unpaid' : 'Paid');
+      const status = paystatus==='Unpaid' && Math.random()<.3 ? 'Pending' : (Math.random()<.1 ? 'Canceled' : (Math.random()<.3 ? 'Processing':'Completed'));
+      const customer = `${choice(FIRSTN)} ${choice(LASTN)}`;
+      out.push({
+        id: 100000 + i,
+        date: new Date(d),
+        customer,
+        phone: `08${rand(11,99)}-${rand(1000,9999)}-${rand(1000,9999)}`,
+        channel: choice(CHANNEL),
+        status,
+        paystatus: paystatus,
+        method,
+        items,
+        qty,
+        subtotal, discount, tax, shipping, total,
+        cashier: choice(['Rina','Doni','Mega','Yusuf','Karin']),
+      });
+    }
+    return out.sort((a,b)=>b.date-a.date);
+  }
+
+  const STATE = {
+    all: seedOrders(),
+    filtered: [],
+    page: 1,
+    perPage: 10,
+    range: {start: startOfMonth(today()), end: endOfDay(today())},
+    compare: false,
+    chips: 'thisMonth',
+    q: '',
+    status: '', pay: '', channel: '', minTotal:'', maxTotal:''
+  };
+
+  // ---- DOM refs ----
+  const $ = s => document.querySelector(s);
+  const $$ = s => document.querySelectorAll(s);
+  const tbody = $('#tbody');
+  const pager = $('#pager');
+
+  // guard: critical nodes must exist
+  const MUST = ['#orderDrawer','#drawerOverlay','#noProduct'];
+  MUST.forEach(sel=>{ if(!document.querySelector(sel)) throw new Error(`Missing critical element: ${sel}`); });
+
+  // ---- Ranges ----
+  function applyChip(name){
+    const now = today();
+    const map = {
+      today: [startOfDay(now), endOfDay(now)],
+      yesterday: [startOfDay(addDays(now,-1)), endOfDay(addDays(now,-1))],
+      last7: [startOfDay(addDays(now,-6)), endOfDay(now)],
+      thisWeek: [startOfWeek(now), endOfWeek(now)],
+      thisMonth: [startOfMonth(now), endOfMonth(now)],
+      lastMonth: [startOfMonth(addDays(startOfMonth(now),-1)), endOfMonth(addDays(startOfMonth(now),-1))],
+      ytd: [startOfYear(now), endOfDay(now)],
+      custom: [STATE.range.start, STATE.range.end]
+    };
+    STATE.range.start = map[name][0];
+    STATE.range.end = map[name][1];
+    STATE.chips = name;
+    // Update inputs
+    $('#start').value = STATE.range.start.toISOString().slice(0,10);
+    $('#end').value = STATE.range.end.toISOString().slice(0,10);
+    // Chip UI
+    $$('#rangeChips .chip').forEach(c=>c.classList.toggle('active', c.dataset.range===name));
+    refresh();
+  }
+
+  // ---- Filters and Search ----
+  function passFilters(o){
+    const {start,end} = STATE.range;
+    if(!(o.date>=start && o.date<=end)) return false;
+    if(STATE.status && o.status!==STATE.status) return false;
+    if(STATE.pay && o.paystatus!==STATE.pay) return false;
+    if(STATE.channel && o.channel!==STATE.channel) return false;
+    if(STATE.minTotal && o.total < +STATE.minTotal) return false;
+    if(STATE.maxTotal && o.total > +STATE.maxTotal) return false;
+    if(STATE.q){
+      const q = STATE.q.toLowerCase();
+      const hit = (
+        (''+o.id).includes(q) ||
+        o.customer.toLowerCase().includes(q) ||
+        o.phone.toLowerCase().includes(q) ||
+        o.items.some(it => it.sku.toLowerCase().includes(q) || it.name.toLowerCase().includes(q))
+      );
+      if(!hit) return false;
+    }
+    return true;
+  }
+
+  // ---- KPI compute ----
+  function computeKPIs(list){
+    const k = {gross:0, orders:list.length, items:0, pay:{Cash:0, 'QRIS':0, Card:0, 'E-Wallet':0}};
+    list.forEach(o=>{k.gross+=o.total; k.items+=o.qty; k.pay[o.method]+=o.total;});
+    k.aov = k.orders ? Math.round(k.gross / k.orders) : 0;
+    return k;
+  }
+
+  function periodShift(range){
+    const ms = range.end - range.start;
+    const prevEnd = addDays(range.start, -1);
+    const prevStart = new Date(prevEnd - ms);
+    return {start: startOfDay(prevStart), end: endOfDay(prevEnd)};
+  }
+
+  function percentDelta(cur, prev){
+    if(prev===0 && cur===0) return 0;
+    if(prev===0) return 100;
+    return Math.round(((cur - prev)/prev)*100);
+  }
+
+  // ---- Renderers ----
+  function renderKPIs(){
+    const cur = computeKPIs(STATE.filtered);
+    const prevRange = periodShift(STATE.range);
+    const prevList = STATE.all.filter(o => o.date>=prevRange.start && o.date<=prevRange.end && passFilters({...o}));
+    const prev = computeKPIs(prevList);
+
+    const setVal = (id, v) => $(id).textContent = v;
+    setVal('#kpiGross', fmtIDR(cur.gross));
+    setVal('#kpiOrders', fmtNum(cur.orders));
+    setVal('#kpiAOV', fmtIDR(cur.aov));
+    setVal('#kpiItems', fmtNum(cur.items));
+
+    const showDelta = (id, curV, prevV) => {
+      const d = percentDelta(curV, prevV);
+      const el = $(id);
+      el.className = 'delta ' + (d>=0? 'up':'down');
+      el.textContent = (d>=0? '▲ ':'▼ ') + Math.abs(d) + '% vs prev';
+      if(!STATE.compare){ el.textContent=''; }
+    };
+    showDelta('#kpiGrossDelta', cur.gross, prev.gross);
+    showDelta('#kpiOrdersDelta', cur.orders, prev.orders);
+    showDelta('#kpiAOVDelta', cur.aov, prev.aov);
+    showDelta('#kpiItemsDelta', cur.items, prev.items);
+
+    const maxAmt = Math.max(1, cur.gross);
+    const w = p => Math.max(3, Math.round((p/maxAmt)*100));
+    $('#barGross').style.width = w(cur.gross)+'%';
+    $('#barOrders').style.width = Math.min(100, Math.max(5, cur.orders))+'%';
+    $('#barAOV').style.width = w(cur.aov)+'%';
+    $('#barItems').style.width = Math.min(100, Math.max(5, cur.items))+'%';
+
+    const totalPay = Object.values(cur.pay).reduce((a,b)=>a+b,0)||1;
+    const setPB = (key, amt, amtEl, pctEl)=>{
+      amtEl.textContent = amt.toLocaleString('id-ID');
+      pctEl.style.width = Math.round((amt/totalPay)*100)+'%';
+    }
+    setPB('Cash', cur.pay['Cash'], $('#cashAmt'), $('#cashPct'));
+    setPB('QRIS', cur.pay['QRIS'], $('#qrisAmt'), $('#qrisPct'));
+    setPB('Card', cur.pay['Card'], $('#cardAmt'), $('#cardPct'));
+    setPB('E-Wallet', cur.pay['E-Wallet'], $('#ewalletAmt'), $('#ewalletPct'));
+  }
+
+  function renderTable(){
+    const start = (STATE.page-1)*STATE.perPage;
+    const rows = STATE.filtered.slice(start, start+STATE.perPage);
+    tbody.innerHTML = rows.map(o=>{
+      const statusClass = {
+        'Completed':'completed','Pending':'pending','Processing':'processing','Canceled':'canceled'
+      }[o.status] || 'processing';
+      const dt = o.date.toLocaleString('id-ID', { timeZone: 'Asia/Jakarta'});
+      return `
+        <tr data-id="${o.id}">
+          <td data-col="Select"><input type="checkbox" class="rowcheck"></td>
+          <td data-col="Order ID"><a href="#" aria-label="Open order ${o.id}"><strong>#${o.id}</strong></a></td>
+          <td data-col="Date/Time">${dt}</td>
+          <td data-col="Customer">${o.customer} <span class="badge member">Member</span><br><small>${o.phone}</small></td>
+          <td data-col="Channel"><span class="badge chan">${o.channel}</span></td>
+          <td data-col="Status"><span class="badge status ${statusClass}">${o.status}</span></td>
+          <td data-col="Payment"><span class="badge paytag">${o.paystatus} · ${o.method}</span></td>
+          <td data-col="Items">${o.qty}</td>
+          <td data-col="Subtotal">${fmtIDR(o.subtotal)}</td>
+          <td data-col="Discount">${fmtIDR(o.discount)}</td>
+          <td data-col="Tax">${fmtIDR(o.tax)}</td>
+          <td data-col="Shipping">${fmtIDR(o.shipping)}</td>
+          <td data-col="Total"><strong>${fmtIDR(o.total)}</strong></td>
+          <td data-col="Cashier">${o.cashier}</td>
+          <td class="expander" data-col="More"><button class="btn ghost" data-expand>Details</button></td>
+        </tr>
+        <tr class="row-details" hidden data-for="${o.id}">
+          <td colspan="15">
+            <div style="display:grid;grid-template-columns:1.1fr 0.9fr;gap:16px">
+              <div>
+                <strong>Items</strong>
+                <ul style="margin:6px 0 0 16px;padding:0;list-style:disc;color:var(--muted)">
+                  ${o.items.map(it=>`<li>${it.name} <small>(${it.sku})</small> — ${it.qty}× ${fmtIDR(it.price)} = <strong>${fmtIDR(it.qty*it.price)}</strong></li>`).join('')}
+                </ul>
+              </div>
+              <div>
+                <strong>Actions</strong>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+                  <button class="btn">Print</button>
+                  <button class="btn ghost">Send e‑Receipt</button>
+                  <button class="btn ghost">Refund / Exchange</button>
+                  <button class="btn danger" style="background:var(--danger)">Void</button>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>`
+    }).join('');
+
+    tbody.querySelectorAll('[data-expand]').forEach(btn=>{
+      btn.addEventListener('click', e=>{
+        const id = e.target.closest('tr').dataset.id;
+        const row = tbody.querySelector(`.row-details[data-for="${id}"]`);
+        row.hidden = !row.hidden;
+        btn.textContent = row.hidden ? 'Details' : 'Hide';
+      });
+    });
+  }
+
+  function renderPager(){
+    const pages = Math.max(1, Math.ceil(STATE.filtered.length / STATE.perPage));
+    STATE.page = Math.min(STATE.page, pages);
+    const btn = (p, label=p, active=false, disabled=false) => `
+      <button class="page ${active?'active':''}" data-page="${p}" ${disabled?'disabled':''}>${label}</button>`;
+    let html = '';
+    html += btn(Math.max(1, STATE.page-1), 'Prev', false, STATE.page===1);
+    const window = 3;
+    const start = Math.max(1, STATE.page - window);
+    const end = Math.min(pages, STATE.page + window);
+    for(let p=start;p<=end;p++) html += btn(p, p, p===STATE.page);
+    html += btn(Math.min(pages, STATE.page+1), 'Next', false, STATE.page===pages);
+    pager.innerHTML = html;
+    pager.querySelectorAll('[data-page]').forEach(el=>{
+      el.addEventListener('click', ()=>{ STATE.page = +el.dataset.page; renderTable(); renderPager(); });
+    });
+  }
+
+  function refresh(){
+    STATE.filtered = STATE.all.filter(passFilters);
+    STATE.page = 1;
+    renderKPIs();
+    renderTable();
+    renderPager();
+  }
+
+  $$('#rangeChips .chip').forEach(c=> c.addEventListener('click', ()=>{
+    if(c.dataset.range==='custom'){ STATE.chips='custom'; }
+    applyChip(c.dataset.range);
+  }));
+  $('#start').addEventListener('change', e=>{ STATE.range.start = startOfDay(new Date(e.target.value)); STATE.chips='custom'; refresh(); });
+  $('#end').addEventListener('change', e=>{ STATE.range.end = endOfDay(new Date(e.target.value)); STATE.chips='custom'; refresh(); });
+  $('#comparePrev').addEventListener('change', e=>{ STATE.compare = e.target.checked; renderKPIs(); });
+
+  $('#statusFilter').addEventListener('change', e=>{ STATE.status = e.target.value; refresh(); });
+  $('#payFilter').addEventListener('change', e=>{ STATE.pay = e.target.value; refresh(); });
+  $('#channelFilter').addEventListener('change', e=>{ STATE.channel = e.target.value; refresh(); });
+  $('#minTotal').addEventListener('input', e=>{ STATE.minTotal = e.target.value; refresh(); });
+  $('#maxTotal').addEventListener('input', e=>{ STATE.maxTotal = e.target.value; refresh(); });
+  $('#clearFilters').addEventListener('click', ()=>{ 
+    STATE.status=''; STATE.pay=''; STATE.channel=''; STATE.minTotal=''; STATE.maxTotal='';
+    $('#statusFilter').value=''; $('#payFilter').value=''; $('#channelFilter').value='';
+    $('#minTotal').value=''; $('#maxTotal').value='';
+    refresh();
+  });
+
+  const searchBox = $('#q');
+  let searchTimer; 
+  searchBox.addEventListener('input', e=>{
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(()=>{ STATE.q = e.target.value.trim(); refresh(); }, 200);
+  });
+  document.addEventListener('keydown', e=>{ if(e.key==='/'){ e.preventDefault(); searchBox.focus(); }});
+
+  // header actions (stub)
+  $('#exportBtn').addEventListener('click', ()=> alert('Export current view (CSV/XLSX) – stub'));
+
+  // ---- New Order Drawer ----
+  const drawer = document.querySelector('#orderDrawer');
+  const overlay = document.querySelector('#drawerOverlay');
+  const closeBtn = document.querySelector('#closeDrawerBtn');
+  const noProduct = document.querySelector('#noProduct');
+  const noItems = document.querySelector('#noItems');
+  const noDiscount = document.querySelector('#noDiscount');
+  const noShipping = document.querySelector('#noShipping');
+  const noSubtotal = document.querySelector('#noSubtotal');
+  const noDiscountView = document.querySelector('#noDiscountView');
+  const noTax = document.querySelector('#noTax');
+  const noShippingView = document.querySelector('#noShippingView');
+  const noGrand = document.querySelector('#noGrand');
+
+  function openDrawer(){
+    populateProducts();
+    drawer.classList.add('open');
+    overlay.classList.add('show');
+    drawer.setAttribute('aria-hidden','false');
+  }
+  function closeDrawer(){
+    drawer.classList.remove('open');
+    overlay.classList.remove('show');
+    drawer.setAttribute('aria-hidden','true');
+  }
+  overlay.addEventListener('click', closeDrawer);
+  closeBtn.addEventListener('click', closeDrawer);
+  document.querySelector('#cancelOrder').addEventListener('click', closeDrawer);
+  document.querySelector('#newOrderBtn').addEventListener('click', openDrawer);
+
+  function populateProducts(){
+    if(!noProduct) throw new Error('#noProduct not found');
+    if(noProduct.options.length>0) return; // populate once
+    noProduct.innerHTML = itemsLib.map((it,i)=>`<option value="${i}">${it.name} – ${fmtIDR(it.price)}</option>`).join('');
+  }
+
+  function addItemRow(idx){
+    const it = itemsLib[idx];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${it.name} <br><small>${it.sku}</small></td>
+      <td data-price="${it.price}">${fmtIDR(it.price)}</td>
+      <td>
+        <div class="qtyctrl">
+          <button type="button" data-dec>-</button>
+          <input type="number" min="1" value="1" />
+          <button type="button" data-inc>+</button>
+        </div>
+      </td>
+      <td class="rowTotal">${fmtIDR(it.price)}</td>
+      <td><button class="btn ghost" data-remove>Remove</button></td>`;
+    noItems.appendChild(tr);
+    bindRow(tr);
+    recalcTotals();
+  }
+
+  function bindRow(tr){
+    const input = tr.querySelector('input[type="number"]');
+    tr.querySelector('[data-dec]').addEventListener('click', ()=>{ input.value=Math.max(1, (+input.value-1)); recalcRow(tr); });
+    tr.querySelector('[data-inc]').addEventListener('click', ()=>{ input.value=(+input.value+1); recalcRow(tr); });
+    input.addEventListener('input', ()=>{ if(+input.value<1) input.value=1; recalcRow(tr); });
+    tr.querySelector('[data-remove]').addEventListener('click', ()=>{ tr.remove(); recalcTotals(); });
+  }
+  function recalcRow(tr){
+    const price = +tr.querySelector('[data-price]').dataset.price;
+    const qty = +tr.querySelector('input').value;
+    tr.querySelector('.rowTotal').textContent = fmtIDR(price*qty);
+    recalcTotals();
+  }
+
+  function recalcTotals(){
+    const rows = Array.from(noItems.querySelectorAll('tr'));
+    let subtotal = 0; let qty = 0;
+    rows.forEach(r=>{ const price = +r.querySelector('[data-price]').dataset.price; const q = +r.querySelector('input').value; subtotal += price*q; qty += q; });
+    const discount = Math.max(0, +noDiscount.value||0);
+    const tax = Math.round(Math.max(0, (subtotal - discount) * 0.10));
+    const shipping = Math.max(0, +noShipping.value||0);
+    const grand = Math.max(0, subtotal - discount + tax + shipping);
+    noSubtotal.textContent = fmtIDR(subtotal);
+    noDiscountView.textContent = fmtIDR(discount);
+    noTax.textContent = fmtIDR(tax);
+    noShippingView.textContent = fmtIDR(shipping);
+    noGrand.textContent = fmtIDR(grand);
+  }
+
+  document.querySelector('#addItemBtn').addEventListener('click', ()=>{ if(noProduct.selectedIndex>-1) addItemRow(noProduct.value); });
+  noDiscount.addEventListener('input', recalcTotals);
+  noShipping.addEventListener('input', recalcTotals);
+
+  document.querySelector('#saveOrder').addEventListener('click', ()=>{
+    if(noItems.children.length===0){ alert('Add at least 1 item.'); return; }
+    alert('Order saved (simulation).');
+    closeDrawer();
+  });
+
+  // ---- Tiny Runtime Tests (non‑blocking) ----
+  try {
+    console.assert(document.querySelector('#orderDrawer'), 'Test: #orderDrawer should exist');
+    console.assert(document.querySelector('#drawerOverlay'), 'Test: #drawerOverlay should exist');
+    // Test: open drawer populates products once
+    openDrawer();
+    console.assert(noProduct && noProduct.options.length>0, 'Test: #noProduct should be populated on open');
+    closeDrawer();
+    // Test: totals with zero items
+    recalcTotals();
+    console.assert(document.querySelector('#noSubtotal').textContent === fmtIDR(0), 'Test: subtotal should be IDR 0 when no items');
+    console.assert(document.querySelector('#noGrand').textContent === fmtIDR(0), 'Test: grand should be IDR 0 when no items and no costs');
+  } catch(e){
+    console.warn('Runtime tests warning:', e.message);
+  }
+
+  // init
+  applyChip('thisMonth');
+})();
+});
+</script>
+</body>
+</html>
