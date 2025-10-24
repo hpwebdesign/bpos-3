@@ -31,111 +31,86 @@ class ControllerBposCustomer extends Controller {
     // Body: name
     // Returns: { customer: {id,name} }
     public function create() {
-    $this->jsonHeader();
+        $this->jsonHeader();
+        $this->load->model('bpos/customer');
 
-    $name     = isset($this->request->post['name']) ? $this->clean($this->request->post['name']) : '';
-    $phone    = isset($this->request->post['phone']) ? $this->clean($this->request->post['phone']) : '';
-    $email    = isset($this->request->post['email']) ? $this->clean($this->request->post['email']) : '';
-    $address  = isset($this->request->post['address']) ? $this->clean($this->request->post['address']) : '';
-    $note     = isset($this->request->post['note']) ? $this->clean($this->request->post['note']) : '';
-    $customer_group_id     = isset($this->request->post['customer_group_id']) ? $this->clean($this->request->post['customer_group_id']) : '';
+        $data = [
+            'name' => $this->clean(isset($this->request->post['name']) ? $this->request->post['name'] : ''),
+            'phone' => $this->clean(isset($this->request->post['phone']) ? $this->request->post['phone'] :''),
+            'email' => $this->clean(isset($this->request->post['email']) ? $this->request->post['email'] : ''),
+            'address' => $this->clean(isset($this->request->post['address']) ? $this->request->post['address'] : ''),
+            'note' => $this->clean(isset($this->request->post['note']) ? $this->request->post['note'] : ''),
+            'customer_group_id' => $this->request->post['customer_group_id']
+        ];
 
-    // Validasi minimal
-    if ($name === '') {
-        $this->response->setOutput(json_encode(['error' => 'Name is required']));
-        return;
+        if ($data['name'] === '' || $data['phone'] === '') {
+            $this->response->setOutput(json_encode(['ok'=>false,'error'=>'Name and Phone required']));
+            return;
+        }
+
+        $id = $this->model_bpos_customer->addCustomer($data);
+
+        $this->response->setOutput(json_encode([
+            'ok' => true,
+            'id' => $id,
+            'customer' => [
+                'id' => $id,
+                'name' => $data['name'],
+                'phone' => $data['phone'],
+                'email' => $data['email'],
+                'address' => $data['address'],
+                'tier' => $data['customer_group_id']
+            ]
+        ]));
     }
-    if ($phone === '') {
-        $this->response->setOutput(json_encode(['error' => 'Phone is required']));
-        return;
-    }
-
-    $parts = preg_split('/\s+/', $name, 2);
-    $firstname = $parts[0];
-    $lastname  = isset($parts[1]) ? $parts[1] : '';
-
-    if ($email === '') {
-        $email = 'bpos+' . time() . rand(100, 999) . '@example.local';
-    }
-
-    $password = token(10);
-    $salt = '';
-
-    $customer_group_id = is_numeric($customer_group_id) ? (int)$customer_group_id : (int)$this->config->get('config_customer_group_id');
-
-    $this->db->query("INSERT INTO `" . DB_PREFIX . "customer`
-        SET customer_group_id = '" . (int)$customer_group_id . "',
-            store_id = '0',
-            firstname = '" . $this->db->escape($firstname) . "',
-            lastname = '" . $this->db->escape($lastname) . "',
-            note = '" . $this->db->escape($note) . "',
-            email = '" . $this->db->escape($email) . "',
-            telephone = '" . $this->db->escape($phone) . "',
-            fax = '',
-            custom_field = '',
-            newsletter = '0',
-            address_id = '0',
-            ip = '" . $this->db->escape($this->request->server['REMOTE_ADDR']) . "',
-            status = '1',
-            safe = '0',
-            token = '',
-            code = '',
-            date_added = NOW()");
-
-    $customer_id = $this->db->getLastId();
-
-    if ($address !== '') {
-        $this->db->query("INSERT INTO `" . DB_PREFIX . "address`
-            SET customer_id = '" . (int)$customer_id . "',
-                firstname = '" . $this->db->escape($firstname) . "',
-                lastname = '" . $this->db->escape($lastname) . "',
-                address_1 = '" . $this->db->escape($address) . "',
-                city = '',
-                postcode = '',
-                country_id = '0',
-                zone_id = '0'");
-
-        $address_id = $this->db->getLastId();
-        $this->db->query("UPDATE `" . DB_PREFIX . "customer`
-            SET address_id = '" . (int)$address_id . "'
-            WHERE customer_id = '" . (int)$customer_id . "'");
-    }
-
-    $this->response->setOutput(json_encode([
-        'ok'       => true,
-        'id'       => $customer_id,
-        'customer' => [
-            'id'      => $customer_id,
-            'name'    => $name,
-            'phone'   => $phone,
-            'email'   => $email,
-            'address' => $address,
-            'tier'    => $customer_group_id
-        ]
-    ]));
-}
 
 
     // POST /index.php?route=bpos/customer/edit
     // Body: id, name
     // Returns: { customer: {id,name} }
-    public function edit(){
+   public function edit() {
         $this->jsonHeader();
-        $id=isset($this->request->post['id'])?(int)$this->request->post['id']:0;
-        $name=isset($this->request->post['name'])?$this->clean($this->request->post['name']):'';
-        if($id<=0){$this->response->setOutput(json_encode(array('error'=>'Invalid id')));return;}
-        if($name===''){ $this->response->setOutput(json_encode(array('error'=>'Name is required')));return;}
+        $this->load->model('bpos/customer');
 
-        $parts=preg_split('/\s+/', $name, 2);
-        $firstname=$parts[0];
-        $lastname=isset($parts[1])?$parts[1]:'';
+        $data = [
+            'id' => isset($this->request->post['id']) ? (int)$this->request->post['id'] : 0,
+            'name' => $this->clean($this->request->post['name']),
+            'phone' => $this->clean($this->request->post['phone']),
+            'email' => $this->clean($this->request->post['email']),
+            'address' => $this->clean($this->request->post['address']),
+            'note' => $this->request->post['note'],
+            'customer_group_id' => (int)$this->request->post['customer_group_id']
+        ];
 
-        $this->db->query("UPDATE `".DB_PREFIX."customer`
-            SET firstname='".$this->db->escape($firstname)."',
-                lastname='".$this->db->escape($lastname)."'
-            WHERE customer_id='".(int)$id."'");
+        if ($data['id'] <= 0) {
+            $this->response->setOutput(json_encode(['ok'=>false,'error'=>'Invalid customer ID']));
+            return;
+        }
+        if ($data['name'] === '' || $data['phone'] === '') {
+            $this->response->setOutput(json_encode(['ok'=>false,'error'=>'Name and Phone required']));
+            return;
+        }
 
-        $this->response->setOutput(json_encode(array('customer'=>array('id'=>$id,'name'=>$name))));
+        $ok = $this->model_bpos_customer->editCustomer($data);
+
+        if (!$ok) {
+            $this->response->setOutput(json_encode(['ok'=>false,'error'=>'Customer not found']));
+            return;
+        }
+
+        $this->response->setOutput(json_encode([
+            'ok' => true,
+            'id' => $data['id'],
+            'customer' => [
+                'id' => $data['id'],
+                'name' => $data['name'],
+                'phone' => $data['phone'],
+                'email' => $data['email'],
+                'address' => $data['address'],
+                'tier' => $data['customer_group_id'],
+                'notes' => $data['note']
+            ]
+        ]));
     }
 
     // POST /index.php?route=bpos/customer/login
@@ -206,4 +181,32 @@ class ControllerBposCustomer extends Controller {
             'groups' => $groups
         ]));
     }
+
+   public function getCustomerAjax() {
+        $this->response->addHeader('Content-Type: application/json');
+
+        $id = isset($this->request->get['id']) ? (int)$this->request->get['id'] : 0;
+
+        if ($id <= 0) {
+            $this->response->setOutput(json_encode(['ok' => false, 'error' => 'Invalid ID']));
+            return;
+        }
+
+        $this->load->model('bpos/customer');
+        $result = $this->model_bpos_customer->getCustomerDetail($id);
+
+        if (!$result['ok']) {
+            $this->response->setOutput(json_encode(['ok' => false, 'error' => 'Customer not found']));
+            return;
+        }
+
+        $result['customer']['spent_formatted'] = $this->currency->format(
+            (float)$result['customer']['spent'], 
+            $this->config->get('config_currency')
+        );
+
+        $this->response->setOutput(json_encode($result));
+    }
+
+
 }

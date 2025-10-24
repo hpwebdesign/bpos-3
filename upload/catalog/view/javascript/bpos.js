@@ -587,8 +587,8 @@ function renderRows(list){
       <td data-label="Total Spent" class="money">${money(c.spent)}</td>
       <td data-label="Action">
         <div class="actions">
-          <button class="btn tiny ghost btn-view" data-id="${c.id}">View</button>
-          <button class="btn tiny ghost btn-edit" data-id="${c.id}">Edit</button>
+          <button class="btn btn-sm ghost btn-view" data-id="${c.id}">View</button>
+          <button class="btn btn-sm ghost btn-edit" data-id="${c.id}">Edit</button>
         </div>
       </td>
     </tr>
@@ -651,48 +651,96 @@ function renderPager(totalCount){
   if(end<pageCount-1){ if(end<pageCount-2) $nums.append($('<span/>',{text:'…',class:'muted'})); addBtn(pageCount-1); }
 }
 
-function openDetail(id){
-  const c = state.data.find(x=>x.id===id);
-  if(!c) return;
+function openDetail(id) {
   const $drawer = $('#drawer');
-  $drawer.addClass('open').attr('aria-hidden','false');
+  $drawer.addClass('open').attr('aria-hidden', 'false');
+
+  // 🔹 Jika id > 0 → ambil data dari server
+  if (id > 0) {
+    $('#detail').html('<div style="padding:20px;text-align:center;">Loading customer...</div>');
+
+    $.getJSON('index.php?route=bpos/customer/getCustomerAjax&id=' + id)
+      .done(function(res) {
+        if (res && res.ok && res.customer) {
+          renderCustomerDetail(res.customer);
+        } else {
+          $('#detail').html('<div style="padding:20px;color:#e11;">Failed to load customer data.</div>');
+        }
+      })
+      .fail(function(xhr) {
+        console.error(xhr);
+        $('#detail').html('<div style="padding:20px;color:#e11;">Error loading customer data.</div>');
+      });
+  } 
+  // 🔹 Jika id <= 0 → pakai data lokal
+  else {
+    const c = state.data.find(x => x.id === id);
+    if (!c) return;
+    renderCustomerDetail(c);
+  }
+
+  // Simpan ID aktif ke tombol kontrol
+  $('#saveBtn').data('id', id);
+  $('#deleteBtn').data('id', id);
+}
+
+function renderCustomerDetail(c) {
   const html = `
-    <div class="kv"><div class="muted">Name</div><div><input id="f_name" value="${c.name}" class="inp" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px"></div></div>
+    <div class="kv"><div class="muted">Name</div><div>
+      <input id="f_name" value="${c.name || ''}" class="inp" style="width:100%;padding:10px;border:1px solid #e6e8ef;border-radius:10px">
+    </div></div>
+
     <div class="kv"><div class="muted">Customer Group</div><div class="chips">
       ${
         CUSTOMER_GROUPS.map(g => `
-          <label class="badge vip">
+          <label class="badge ${g.name.toLowerCase().includes('vip') ? 'vip' : g.name.toLowerCase().includes('gold') ? 'gold' : ''}">
             <input type="radio" name="tier" value="${g.id}" ${Number(c.tier) === Number(g.id) ? 'checked' : ''}>
             ${g.name}
           </label>
         `).join('')
       }
     </div></div>
-    <div class="kv"><div class="muted">Phone</div><div><input id="f_phone" value="${c.phone}" class="inp" style="width:100%;padding:10px;border:1px solid #e6e8ef;border-radius:10px"></div></div>
-    <div class="kv"><div class="muted">Email</div><div><input id="f_email" value="${c.email}" class="inp" style="width:100%;padding:10px;border:1px solid #e6e8ef;border-radius:10px"></div></div>
-    <div class="kv"><div class="muted">Address</div><div><input id="f_address" value="${c.address||''}" class="inp" style="width:100%;padding:10px;border:1px solid #e6e8ef;border-radius:10px"></div></div>
-    <div class="kv"><div class="muted">Joined</div><div>${c.joined}</div></div>
-    <div class="kv"><div class="muted">Orders</div><div>${c.orders}</div></div>
-    <div class="kv"><div class="muted">Total Spent</div><div class="money">${money(c.spent)}</div></div>
+
+    <div class="kv"><div class="muted">Phone</div><div>
+      <input id="f_phone" value="${c.phone || ''}" class="inp" style="width:100%;padding:10px;border:1px solid #e6e8ef;border-radius:10px">
+    </div></div>
+
+    <div class="kv"><div class="muted">Email</div><div>
+      <input id="f_email" value="${c.email || ''}" class="inp" style="width:100%;padding:10px;border:1px solid #e6e8ef;border-radius:10px">
+    </div></div>
+
+    <div class="kv"><div class="muted">Address</div><div>
+      <input id="f_address" value="${c.address || ''}" class="inp" style="width:100%;padding:10px;border:1px solid #e6e8ef;border-radius:10px">
+    </div></div>
+
+    <div class="kv"><div class="muted">Joined</div><div>${c.joined || '-'}</div></div>
+    <div class="kv"><div class="muted">Orders</div><div>${c.orders || 0}</div></div>
+    <div class="kv"><div class="muted">Total Spent</div><div class="money">${c.spent}</div></div>
+
     <div>
       <div class="muted" style="margin-bottom:6px">Notes</div>
-      <textarea id="f_notes" rows="4" class="inp" style="width:100%;padding:10px;border:1px solid #e6e8ef;border-radius:10px">${c.notes||''}</textarea>
+      <textarea id="f_notes" rows="4" class="inp" style="width:100%;padding:10px;border:1px solid #e6e8ef;border-radius:10px">${c.notes || ''}</textarea>
     </div>
-    <!-- <div class="orders">
-      <div class="muted" style="margin-bottom:6px">Recent Orders (mock)</div>
-      <ul style="margin:0 0 0 16px;padding:0">
-        ${Array.from({length:Math.min(3,Math.max(1,c.orders%5))}).map((_,i)=>`<li>INV-${c.id}${i+1} • ${c.last} • ${money(Math.max(120000, Math.round(c.spent/(c.orders||1))))}</li>`).join('')}
-      </ul>
-    </div> -->
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-success ghost" id="actStartOrder" data-id="${c.id}">Start Order</button>
-      <button class="btn ghost" id="actSendReceipt" data-id="${c.id}">Send Receipt</button> 
-      <button class="btn btn-primary ghost" id="actAddPoints" data-id="${c.id}">Save</button>
+    <div class="orders">
+    <div class="muted" style="margin-bottom:6px">Recent Orders</div>
+      ${
+        (c.recent_orders && c.recent_orders.length)
+        ? `<ul style="margin:0 0 0 16px;padding:0">
+            ${c.recent_orders.map(o => `
+              <li>
+                <strong>${o.invoice}</strong> • ${o.date} • ${o.total}
+              </li>`).join('')}
+          </ul>`
+        : `<div class="muted">No recent orders</div>`
+      }
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+      <button class="btn btn-sm btn-success ghost" id="actStartOrder" data-id="${c.id}">Start Order</button>
+      <button class="btn btn-sm ghost" id="actSendReceipt" data-id="${c.id}">Send Receipt</button> 
+      <button class="btn btn-sm btn-primary ghost" id="actAddPoints" data-id="${c.id}">Save</button>
     </div>
   `;
   $('#detail').html(html);
-  $('#saveBtn').data('id', id);
-  $('#deleteBtn').data('id', id);
 }
 
 function closeDrawer(){ $('#drawer').removeClass('open').attr('aria-hidden','true'); }
@@ -702,67 +750,88 @@ function toast(msg, type='success'){
   if(type==='error') window.notyf.error(msg); else window.notyf.success(msg);
 }
 
-function saveCustomer(id){
-  const c = state.data.find(x => x.id === id);
-  if (!c) return;
-
-  const name = $('#f_name').val().trim();
+function saveCustomer(id) {
+  const name  = $('#f_name').val().trim();
   const phone = $('#f_phone').val().trim();
   if (!name || !phone) {
     toast('Name and Telephone are required', 'error');
     return;
   }
 
-  // 🔹 Update data lokal
-  c.name = name;
-  c.phone = phone;
-  c.email = $('#f_email').val().trim();
-  c.address = $('#f_address').val().trim();
-  c.notes = $('#f_notes').val();
+  const email   = $('#f_email').val().trim();
+  const address = $('#f_address').val().trim();
+  const notes   = $('#f_notes').val();
   const tier = $('input[name="tier"]:checked').val();
-  if (tier) c.tier = tier;
 
-  toast('Saving customer...', 'info');
 
-  // 🔹 Kirim ke server
-  ajaxCreateCustomer({
-    name: c.name,
-    phone: c.phone,
-    email: c.email,
-    address: c.address,
-    note: c.note,
-    customer_group_id: c.tier
-  })
-  .done(function(res){
-    if (res && res.ok && res.id) {
-      if (res.id !== c.id) c.id = res.id;
+  const payload = {
+    id: id,
+    name: name,
+    phone: phone,
+    email: email,
+    address: address,
+    note: notes,
+    customer_group_id: tier
+  };
 
-    // toast('Customer saved successfully');
+  const doAfterLogin = (id) => {
+      const p = ajaxLoginCustomer({ id });
 
-      ajaxLoginCustomer({ id: res.id })
-        .then(function(loginRes){
-          if (loginRes && loginRes.ok) {
+      if (p && typeof p.then === 'function') {
+        p.then(res => {
+          if (res && res.ok) {
             if (typeof updateCheckoutPanel === 'function') updateCheckoutPanel();
             toast('Customer applied to current POS session');
           } else {
-            toast((loginRes && loginRes.error) || 'Failed to apply customer', 'error');
+            toast((res && res.error) || 'Failed to apply customer', 'error');
           }
         })
-        .catch(function(err){
+        .catch(err => {
           toast((err && err.message) || 'Failed to apply customer', 'error');
+        })
+        .always(() => { 
+          apply();
+          closeDrawer();
         });
+      } else {
+        apply();
+        closeDrawer();
+      }
+    };
 
-      apply(); // Refresh UI tabel/list
-      closeDrawer(); // Optional: tutup drawer setelah simpan
-    } else {
-      toast((res && res.error) || 'Failed to save customer', 'error');
-    }
-  })
-  .fail(function(xhr){
-    console.error(xhr);
-    toast('Network or server error while saving customer', 'error');
-  });
+  if (id > 0) {
+    // ==== Edit ====
+    ajaxEditCustomer(payload)
+      .done(function(res) {
+        if (res && res.ok) {
+          toast('Customer updated successfully');
+          doAfterLogin(id);
+        } else {
+          toast((res && res.error) || 'Failed to update customer', 'error');
+        }
+      })
+      .fail(function(xhr) {
+        toast('Network or server error while updating customer', 'error');
+      });
+
+  } else {
+    // ==== Add ====
+    ajaxCreateCustomer(payload)
+      .done(function(res) {
+        if (res && res.ok && res.id) {
+          id = res.id;
+          toast('Customer created successfully');
+          doAfterLogin(res.id);
+        } else {
+          toast((res && res.error) || 'Failed to create customer', 'error');
+        }
+      })
+      .fail(function(xhr) {
+        toast('Network or server error while creating customer', 'error');
+      });
+  }
 }
+
 
 
 function removeCustomer(id){
@@ -1303,8 +1372,8 @@ Swal.fire({
          if (typeof Swal !== 'undefined' && Swal.isVisible()) {
           Swal.close();
         }
-       const id = Math.max.apply(null, state.data.map(x=>x.id))+1;
-        const newItem = {id, name:'', phone:'', email:'', address:'', tier:'New', orders:0, last:new Date().toISOString().slice(0,10), spent:0, joined:new Date().toISOString().slice(0,10), notes:''};
+       const id = 0;
+        const newItem = {id, name:'', phone:'', email:'', address:'', tier:1, orders:0, last:new Date().toISOString().slice(0,10), spent:0, joined:new Date().toISOString().slice(0,10), notes:'',recent_orders:[]};
         state.data.unshift(newItem);
         state.page=0; apply(); openDetail(id);
         setTimeout(()=> $('#f_name').focus(), 50);
@@ -1375,11 +1444,22 @@ Swal.fire({
 /* =========================
    BUTTON BINDINGS
    ========================= */
+$(document).on('click', '.customer-btn[data-action="customer"]', function(){
+    var id = $(this).data('customer-id');
+    if (id > 0) {
+        openDetail(id);
+    } else {
+      openSwal('customer', function(payload){
+        console.log('Selected customer:', payload);
+      });
+    }
+});
 $(document).on('click', '.mini-btn[data-action="customer"]', function(){
   openSwal('customer', function(payload){
     console.log('Selected customer:', payload);
   });
 });
+
 $(document).on('click', '.mini-btn[data-action="discount"]', function(){
   openSwal('discount', function(payload){
     console.log('Discount applied:', payload);

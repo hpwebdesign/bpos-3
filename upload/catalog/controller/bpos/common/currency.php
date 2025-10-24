@@ -3,7 +3,7 @@ class ControllerBposCommonCurrency extends Controller {
     public function index() {
         $this->load->language('bpos/currency');
 
-        $data['action'] = $this->url->link('bpos/currency/currency', '', $this->request->server['HTTPS']);
+        $data['action'] = $this->url->link('bpos/common/currency/currency', '', $this->request->server['HTTPS']);
 
         $data['code'] = $this->session->data['currency'];
 
@@ -25,7 +25,7 @@ class ControllerBposCommonCurrency extends Controller {
         }
 
         if (!isset($this->request->get['route'])) {
-            $data['redirect'] = $this->url->link('bpos/home');
+            $data['redirect'] = $this->url->link('bpos/home','',true);
         } else {
             $url_data = $this->request->get;
 
@@ -41,7 +41,7 @@ class ControllerBposCommonCurrency extends Controller {
                 $url = '&' . urldecode(http_build_query($url_data, '', '&'));
             }
 
-            $data['redirect'] = $this->url->link($route, $url, $this->request->server['HTTPS']);
+            $data['redirect'] = $this->url->link('bpos/home', '', $this->request->server['HTTPS']);
         }
 
         return $this->load->view('bpos/common/currency', $data);

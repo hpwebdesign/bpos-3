@@ -3,7 +3,7 @@ class ControllerBposCommonLanguage extends Controller {
     public function index() {
         $this->load->language('common/language');
 
-        $data['action'] = $this->url->link('common/language/language', '', $this->request->server['HTTPS']);
+        $data['action'] = $this->url->link('bpos/common/language/language', '', $this->request->server['HTTPS']);
 
         $data['code'] = $this->session->data['language'];
 
@@ -23,7 +23,7 @@ class ControllerBposCommonLanguage extends Controller {
         }
 
         if (!isset($this->request->get['route'])) {
-            $data['redirect'] = $this->url->link('bpos/home');
+            $data['redirect'] = $this->url->link('bpos/home','',true);
         } else {
             $url_data = $this->request->get;
 
@@ -39,7 +39,7 @@ class ControllerBposCommonLanguage extends Controller {
                 $url = '&' . urldecode(http_build_query($url_data, '', '&'));
             }
 
-            $data['redirect'] = $this->url->link($route, $url, $this->request->server['HTTPS']);
+            $data['redirect'] = $this->url->link('bpos/home', '', $this->request->server['HTTPS']);
         }
 
         return $this->load->view('bpos/common/language', $data);
