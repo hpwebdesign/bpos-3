@@ -2,7 +2,8 @@
     --barik-500: #164583;
     --navy: #12223a;
     --navy-700: #162a48;
-    --brand: #335ef7;
+    --brand: #1f2b45;
+    --brand-dark: #162a48;
     --ink: #1e2633;
     --muted: #607089;
     --bg: #f6f8fb;
@@ -129,6 +130,12 @@ body {
     border-color: var(--brand);
     color: #fff;
 }
+
+.btn-primary:hover {
+    background: var(--brand-dark);
+    border-color: var(--brand-dark);
+}
+
 .btn-success {
     background: var(--ok);
     border-color: var(--ok);
@@ -144,11 +151,16 @@ body {
     font-size: 13px;
     font-weight: 500;
     text-shadow: none;
-    border-radius: 8px;
+    border-radius: 10px;
 }
 .btn-ghost {
     background: #f7f9fe;
 }
+
+.btn-danger {
+  border-color: #dc3545;
+}
+
 /* Layout */
 
 .wrap {
@@ -1299,7 +1311,8 @@ body .notyf .notyf__toast--success {
     border-left: 1px solid #e6e8ef;
     box-shadow: -8px 0 28px rgba(0, 0, 0, .12);
     display: flex;
-    flex-direction: column
+    flex-direction: column;
+    border-radius: 0;
 }
 .panel header {
     padding: 16px;
@@ -1345,9 +1358,17 @@ body .notyf .notyf__toast--success {
     align-items: center;
     gap: 6px;
     color: #0b1020;
+    font-weight: normal;
 }
 .invoice-wrap {
     padding: 15px;
     padding-right: 15px;
     padding-left: 15px;
+}
+
+#drawer .panel input, #drawer .panel textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e6e8ef;
+    border-radius: 10px;
 }

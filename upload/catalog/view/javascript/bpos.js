@@ -5,7 +5,7 @@ if (typeof window !== 'undefined' && typeof window.Notyf !== 'undefined') {
 let currentCarouselPage = 0;
 let CUSTOMER_GROUPS = [];
 $(document).ready(function() {
-    
+
     initCategoryCarousel();
     loadCustomerGroups();
 //toastr.options = {
@@ -671,7 +671,7 @@ function openDetail(id) {
         console.error(xhr);
         $('#detail').html('<div style="padding:20px;color:#e11;">Error loading customer data.</div>');
       });
-  } 
+  }
   // 🔹 Jika id <= 0 → pakai data lokal
   else {
     const c = state.data.find(x => x.id === id);
@@ -687,7 +687,7 @@ function openDetail(id) {
 function renderCustomerDetail(c) {
   const html = `
     <div class="kv"><div class="muted">Name</div><div>
-      <input id="f_name" value="${c.name || ''}" class="inp" style="width:100%;padding:10px;border:1px solid #e6e8ef;border-radius:10px">
+      <input id="f_name" value="${c.name || ''}" class="inp">
     </div></div>
 
     <div class="kv"><div class="muted">Customer Group</div><div class="chips">
@@ -702,15 +702,15 @@ function renderCustomerDetail(c) {
     </div></div>
 
     <div class="kv"><div class="muted">Phone</div><div>
-      <input id="f_phone" value="${c.phone || ''}" class="inp" style="width:100%;padding:10px;border:1px solid #e6e8ef;border-radius:10px">
+      <input id="f_phone" value="${c.phone || ''}" class="inp">
     </div></div>
 
     <div class="kv"><div class="muted">Email</div><div>
-      <input id="f_email" value="${c.email || ''}" class="inp" style="width:100%;padding:10px;border:1px solid #e6e8ef;border-radius:10px">
+      <input id="f_email" value="${c.email || ''}" class="inp">
     </div></div>
 
     <div class="kv"><div class="muted">Address</div><div>
-      <input id="f_address" value="${c.address || ''}" class="inp" style="width:100%;padding:10px;border:1px solid #e6e8ef;border-radius:10px">
+      <input id="f_address" value="${c.address || ''}" class="inp">
     </div></div>
 
     <div class="kv"><div class="muted">Joined</div><div>${c.joined || '-'}</div></div>
@@ -719,7 +719,7 @@ function renderCustomerDetail(c) {
 
     <div>
       <div class="muted" style="margin-bottom:6px">Notes</div>
-      <textarea id="f_notes" rows="4" class="inp" style="width:100%;padding:10px;border:1px solid #e6e8ef;border-radius:10px">${c.notes || ''}</textarea>
+      <textarea id="f_notes" rows="2" class="inp">${c.notes || ''}</textarea>
     </div>
     <div class="orders">
     <div class="muted" style="margin-bottom:6px">Recent Orders</div>
@@ -736,7 +736,7 @@ function renderCustomerDetail(c) {
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
       <button class="btn btn-sm btn-success ghost" id="actStartOrder" data-id="${c.id}">Start Order</button>
-      <button class="btn btn-sm ghost" id="actSendReceipt" data-id="${c.id}">Send Receipt</button> 
+      <button class="btn btn-sm ghost" id="actSendReceipt" data-id="${c.id}">Send Receipt</button>
       <button class="btn btn-sm btn-primary ghost" id="actAddPoints" data-id="${c.id}">Save</button>
     </div>
   `;
@@ -789,7 +789,7 @@ function saveCustomer(id) {
         .catch(err => {
           toast((err && err.message) || 'Failed to apply customer', 'error');
         })
-        .always(() => { 
+        .always(() => {
           apply();
           closeDrawer();
         });
