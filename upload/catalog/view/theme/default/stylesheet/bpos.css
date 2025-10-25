@@ -130,12 +130,10 @@ body {
     border-color: var(--brand);
     color: #fff;
 }
-
 .btn-primary:hover {
     background: var(--brand-dark);
     border-color: var(--brand-dark);
 }
-
 .btn-success {
     background: var(--ok);
     border-color: var(--ok);
@@ -156,11 +154,9 @@ body {
 .btn-ghost {
     background: #f7f9fe;
 }
-
 .btn-danger {
-  border-color: #dc3545;
+    border-color: #dc3545;
 }
-
 /* Layout */
 
 .wrap {
@@ -1139,6 +1135,33 @@ body .notyf .notyf__toast--success {
 }
 .swal-ac-list {
     position: relative !important;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    z-index: 9999;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    box-shadow: 0 8px 22px rgba(13, 33, 80, .08);
+    display: none;
+    max-height: 220px;
+    overflow: auto
+}
+#swal_add_customer {
+    flex: 1;
+}
+#wal_customer_suggest {
+    position: relative;
+}
+.swal-form .btn-group {
+    width: 100%;
+    gap: 6px;
+    display: flex;
+    margin-top: 10px;
+}
+.swal-form .form-group {
+    margin-bottom: 8px;
 }
 #home {
     padding: 15px;
@@ -1191,9 +1214,9 @@ body .notyf .notyf__toast--success {
     width: 100%;
 }
 #category-carousel .btn.is-active {
-  background: var(--brand);
-  border-color: var(--brand);
-  color: #fff;
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
 }
 .category-carousel-wrapper {
     position: relative;
@@ -1365,7 +1388,6 @@ body .notyf .notyf__toast--success {
     padding-right: 15px;
     padding-left: 15px;
 }
-
 #drawer .panel input, #drawer .panel textarea {
     width: 100%;
     padding: 10px;

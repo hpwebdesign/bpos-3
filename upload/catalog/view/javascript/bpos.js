@@ -988,18 +988,18 @@ function buildCustomerHTML(){
   var cur = getCurrentCustomerName();
   return ''+
   '<div class="swal-form">'+
-    '<div class="btn-group" style="width:100%;gap:6px;display:flex;margin-top:10px;">'+
-      '<button type="button" class="btn btn-success" id="swal_add_customer" style="flex:1;">Add</button>'+
+    '<div class="btn-group">'+
+      '<button type="button" class="btn btn-sm btn-success" id="swal_add_customer">Add</button>'+
 
     '</div>'+
-    '<div class="form-group" style="margin-bottom:8px;">'+
+    '<div class="form-group">'+
       '<div style="font-size:14px;">Current Customer: <strong>'+ $('<div>').text(cur).html() +'</strong></div>'+
     '</div>'+
     '<label style="display:block;margin-bottom:6px;">Change Customer</label>'+
     '<input type="text" id="swal_customer_input" class="form-control" placeholder="Type name to search" autocomplete="off" />'+
     '<input type="hidden" id="swal_customer_id" />'+
-    '<div id="swal_customer_suggest" style="position:relative;">'+
-      '<div class="swal-ac-list" style="position:absolute;top:100%;left:0;right:0;margin-top:4px;z-index:9999;background:#fff;border:1px solid #e5e7eb;border-radius:6px;box-shadow:0 8px 22px rgba(13,33,80,.08);display:none;max-height:220px;overflow:auto"></div>'+
+    '<div id="swal_customer_suggest">'+
+      '<div class="swal-ac-list"></div>'+
     '</div>'+
   '</div>';
 }
