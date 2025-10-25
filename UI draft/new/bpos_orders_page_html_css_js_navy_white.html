@@ -181,9 +181,10 @@
       </select>
       <select id="channelFilter" aria-label="Channel">
         <option value="">All Channel</option>
-        <option>POS</option>
-        <option>Online</option>
-        <option>Marketplace</option>
+        <option>POS - Store 1</option>
+        <option>POS - Store 2</option>
+        <option>POS - Store 3</option>
+        <option>Website</option>
       </select>
       <input class="input" type="number" id="minTotal" placeholder="Min Total" aria-label="Min total"/>
       <input class="input" type="number" id="maxTotal" placeholder="Max Total" aria-label="Max total"/>
@@ -601,7 +602,7 @@ window.addEventListener('DOMContentLoaded', () => {
   $('#channelFilter').addEventListener('change', e=>{ STATE.channel = e.target.value; refresh(); });
   $('#minTotal').addEventListener('input', e=>{ STATE.minTotal = e.target.value; refresh(); });
   $('#maxTotal').addEventListener('input', e=>{ STATE.maxTotal = e.target.value; refresh(); });
-  $('#clearFilters').addEventListener('click', ()=>{ 
+  $('#clearFilters').addEventListener('click', ()=>{
     STATE.status=''; STATE.pay=''; STATE.channel=''; STATE.minTotal=''; STATE.maxTotal='';
     $('#statusFilter').value=''; $('#payFilter').value=''; $('#channelFilter').value='';
     $('#minTotal').value=''; $('#maxTotal').value='';
@@ -609,7 +610,7 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   const searchBox = $('#q');
-  let searchTimer; 
+  let searchTimer;
   searchBox.addEventListener('input', e=>{
     clearTimeout(searchTimer);
     searchTimer = setTimeout(()=>{ STATE.q = e.target.value.trim(); refresh(); }, 200);
