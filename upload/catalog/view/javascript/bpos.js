@@ -225,10 +225,25 @@ $(document).ready(function() {
     });
 
     $(document).on('input', '.qty-input', function() {
-        let key = $(this).data('key');
-        let qty = $(this).val();
+        let $input = $(this);
+        let key = $input.data('key');
+        let qty = $input.val();
         let prev = qty;
+
         updateCartQty(key, qty, prev);
+
+        // kasih delay sebelum fokus lagi ke input
+        setTimeout(function() {
+        let $target = $(`.qty-input[data-key="${key}"]`);
+        $target.focus();
+
+        // pastikan elemen ini adalah input teks
+        let val = $target.val();
+        let el = $target.get(0);
+        if (el && typeof el.setSelectionRange === 'function') {
+            el.setSelectionRange(val.length, val.length); // kursor di akhir teks
+        }
+    }, 400); // delay 400ms, bisa disesuaikan
     });
 
     function showPaymentConfirmModal(html) {

@@ -443,11 +443,13 @@ class ControllerBposOrder extends Controller {
         }
          $json['is_gateway'] = $is_gateway;
         if ($is_gateway) {
-             $json['gateway'] = true;
+            $json['gateway'] = true;
+            $this->session->data['bpos'] = 1;
             $json['confirm_html'] = $this->load->controller('extension/payment/' . $this->session->data['payment_method']['code']);
         } else {
             $this->model_checkout_order->addOrderHistory($order_id, (int)$this->config->get('config_order_status_id'));
             unset($this->session->data['bpos_customer']);
+            unset($this->session->data['bpos']);
             unset($this->session->data['shipping_method']);
             unset($this->session->data['shipping_methods']);
             unset($this->session->data['payment_method']);
