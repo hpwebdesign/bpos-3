@@ -98,6 +98,10 @@ class ControllerExtensionModuleBposSetting extends Controller {
 				"name" => "payment_methods",
 				"default" => array(),
 			],
+			[
+				"name" => "payment_gateway",
+				"default" => array(),
+			],
 
 			[
 				"name" => "whatsapp_number",

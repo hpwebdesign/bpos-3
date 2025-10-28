@@ -49,6 +49,7 @@ $_['entry_status']             = 'Status';
 $_['entry_shipping_methods']   = 'Shipping Methods';
 $_['entry_default_shipping_method']   = 'Default Shipping Method';
 $_['entry_payment_methods']   = 'Payment Methods';
+$_['entry_payment_gateway']   = 'Payment Gateway';
 $_['entry_default_payment_method']   = 'Default Payment Method';
 $_['entry_complete_order_status']   = 'Complete Order Status';
 $_['entry_whatsapp_number']    = 'WhatsApp Number';

@@ -83,6 +83,9 @@ class ControllerBposCheckoutCheckout extends Controller {
             }
         }
 
+        if (isset($this->session->data['payment_methods'])) {
+            $data['payment_methods'] = $this->session->data['payment_methods']; 
+        } else {
         $method_data = [];
 
         $results = $this->config->get('bpos_payment_methods');
@@ -104,6 +107,7 @@ class ControllerBposCheckoutCheckout extends Controller {
         $this->session->data['payment_methods'] = $method_data;
 
         $data['payment_methods'] = $method_data;
+        }
 
         if (!empty($data['payment_methods']) && !isset($this->session->data['payment_method'])) {
             $this->session->data['payment_method'] = $data['payment_methods'][$this->config->get('bpos_default_payment_method')];
@@ -237,6 +241,7 @@ class ControllerBposCheckoutCheckout extends Controller {
         if (isset($this->request->post['code']) && $this->request->post['code']) {
             $this->session->data['payment_method'] = $this->session->data['payment_methods'][$this->request->post['code']];
             $json['success'] = 'Payment Method Updated';
+            $json['payment_method'] = $this->session->data['payment_method'];
         }
 
         $this->response->addHeader('Content-Type: application/json');

@@ -137,14 +137,16 @@
         link_url('bpos/home');
       }
       function link_url(route) {
+
         $.ajax({
             url: 'index.php?route=' + route + '&format=json',
             type: 'get',
             dataType: 'json',
             success: function(json) {
-                if (json['output']) $('#main-content').html(json['output']);
-                else $('#main-content').html('<p>No content</p>');
-                
+              
+              if (json['output']) $('#main-content').html(json['output']);
+              else $('#main-content').html('<p>No content</p>');
+               initCategoryCarousel();  
             },
             error: function() {
                 $('#main-content').html('<p>Error loading content</p>');

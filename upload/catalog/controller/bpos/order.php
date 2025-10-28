@@ -426,23 +426,46 @@ class ControllerBposOrder extends Controller {
         ];
 
         $order_id = $this->model_checkout_order->addOrder($order_data);
-        $this->model_checkout_order->addOrderHistory($order_id, (int)$this->config->get('config_order_status_id'));
-        unset($this->session->data['bpos_customer']);
-        unset($this->session->data['shipping_method']);
-        unset($this->session->data['shipping_methods']);
-        unset($this->session->data['payment_method']);
-        unset($this->session->data['payment_methods']);
-        unset($this->session->data['guest']);
-        unset($this->session->data['comment']);
-        unset($this->session->data['order_id']);
-        unset($this->session->data['coupon']);
-        unset($this->session->data['reward']);
-        unset($this->session->data['voucher']);
-        unset($this->session->data['vouchers']);
-        unset($this->session->data['totals']);
-        unset($this->session->data['bpos_charge']);
-        unset($this->session->data['bpos_discount']);
-        $this->cart->clear();
+        $this->session->data['order_id'] = $order_id;
+       
+        $payment_code = isset($order_data['payment_code']) ? $order_data['payment_code'] : '';
+        $is_gateway   = false;
+        $confirm_html = '';
+
+        $gateway_methods = $this->config->get('bpos_payment_gateway'); // daftar gateway kamu
+          $json['gateway_methods'] = $gateway_methods;
+           $json['payment_code'] = $payment_code;
+        foreach ($gateway_methods as $g) {
+            if (strpos($payment_code, $g) !== false) {
+                $is_gateway = true;
+                break;
+            }
+        }
+         $json['is_gateway'] = $is_gateway;
+        if ($is_gateway) {
+             $json['gateway'] = true;
+            $json['confirm_html'] = $this->load->controller('extension/payment/' . $this->session->data['payment_method']['code']);
+        } else {
+            $this->model_checkout_order->addOrderHistory($order_id, (int)$this->config->get('config_order_status_id'));
+            unset($this->session->data['bpos_customer']);
+            unset($this->session->data['shipping_method']);
+            unset($this->session->data['shipping_methods']);
+            unset($this->session->data['payment_method']);
+            unset($this->session->data['payment_methods']);
+            unset($this->session->data['guest']);
+            unset($this->session->data['comment']);
+            unset($this->session->data['order_id']);
+            unset($this->session->data['coupon']);
+            unset($this->session->data['reward']);
+            unset($this->session->data['voucher']);
+            unset($this->session->data['vouchers']);
+            unset($this->session->data['totals']);
+            unset($this->session->data['bpos_charge']);
+            unset($this->session->data['bpos_discount']);
+            $this->cart->clear();
+        }
+
+
 
         $json['order_id'] = $order_id;
         $json['success']  = true;

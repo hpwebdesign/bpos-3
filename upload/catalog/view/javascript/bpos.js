@@ -64,7 +64,7 @@ $(document).ready(function() {
 
         let activePayment = $('.paymentbtn.active').data('code');
 
-
+        $('#paymentConfirmModal').modal('hide');
         $('.payment-error').remove();
 
         if (!activePayment) {
@@ -96,6 +96,7 @@ $(document).ready(function() {
             type: 'post',
             dataType: 'json',
             success: function(json) {
+               // console.log(json);
                 $("body").busyLoad("hide");
 
                 if (json.error) {
@@ -103,8 +104,12 @@ $(document).ready(function() {
                     return;
                 }
 
+                if (json.success && json.gateway) {
+                    showPaymentConfirmModal(json.confirm_html);
+                    return;
+                }
+
                 if (json.success) {
-                    console.log(json['order_id']);
                     loadContent('bpos/checkout/order_confirm&order_id='+ json['order_id']);
                     //window.location.href = 'index.php?route=bpos/checkout/order_confirm&order_id=' + json['order_id'];
                 }
@@ -115,6 +120,8 @@ $(document).ready(function() {
             }
         });
     });
+
+    
 
 
     $(document).on('click', '.paymentbtn', function() {
@@ -129,6 +136,7 @@ $(document).ready(function() {
             data: { code: code },
             dataType: 'json',
             success: function(json) {
+               // console.log(json);
                 if (window.notyf) { notyf.success(json['success']); }
                 updateCheckoutPanel();
             }
@@ -137,7 +145,7 @@ $(document).ready(function() {
 
     $(document).on('click', '.shippingbtn', function() {
         let code = $(this).data('code');
-        console.log(code);
+       // console.log(code);
         $('.shippingbtn').removeClass('active');
         $(this).addClass('active');
 
@@ -215,6 +223,29 @@ $(document).ready(function() {
         let prev = parseInt($(this).closest('.qty').find('span').text(), 10) || 0;
         updateCartQty(key, qty, prev);
     });
+
+    function showPaymentConfirmModal(html) {
+    // Hapus modal lama jika ada
+        $('#paymentConfirmModal').remove();
+
+        // Tambahkan modal baru ke body
+        $('body').append(`
+            <div class="modal fade" id="paymentConfirmModal" tabindex="-1" role="dialog" aria-labelledby="paymentConfirmModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="paymentConfirmModalLabel"><i class="bi bi-credit-card"></i> Payment Confirmation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body p-3">${html}</div>
+                </div>
+              </div>
+            </div>
+        `);
+
+        // Tampilkan modal
+        $('#paymentConfirmModal').modal('show');
+    }
 
     function updateCartQty(key, qty, prevQty) {
         $.ajax({
@@ -1450,29 +1481,29 @@ $(document).on('click', '.customer-btn[data-action="customer"]', function(){
         openDetail(id);
     } else {
       openSwal('customer', function(payload){
-        console.log('Selected customer:', payload);
+       // console.log('Selected customer:', payload);
       });
     }
 });
 $(document).on('click', '.mini-btn[data-action="customer"]', function(){
   openSwal('customer', function(payload){
-    console.log('Selected customer:', payload);
+   // console.log('Selected customer:', payload);
   });
 });
 
 $(document).on('click', '.mini-btn[data-action="discount"]', function(){
   openSwal('discount', function(payload){
-    console.log('Discount applied:', payload);
+  //  console.log('Discount applied:', payload);
   });
 });
 $(document).on('click', '.mini-btn[data-action="charge"]', function(){
   openSwal('charge', function(payload){
-    console.log('Charge applied:', payload);
+   // console.log('Charge applied:', payload);
   });
 });
 $(document).on('click', '.mini-btn[data-action="coupon"]', function(){
   openSwal('coupon', function(payload){
-    console.log('Coupon applied:', payload);
+   // console.log('Coupon applied:', payload);
   });
 });
 
@@ -1524,7 +1555,7 @@ $(function () {
 });
 
 function handleBarcodeScan(code) {
-  console.log("Barcode scanned:", code);
+ // console.log("Barcode scanned:", code);
 
   $.ajax({
     url: 'index.php?route=bpos/product/getByModel&model=' + encodeURIComponent(code),
