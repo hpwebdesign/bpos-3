@@ -213,14 +213,21 @@ $(document).ready(function() {
     $(document).on('click', '.qty-plus', function() {
         let key = $(this).data('key');
         let qty = $(this).data('qty');
-        let prev = parseInt($(this).closest('.qty').find('span').text(), 10) || 0;
+        let prev = parseInt($(this).closest('.qty').find('.qty-input').val(), 10) || 0;
         updateCartQty(key, qty, prev);
     });
 
     $(document).on('click', '.qty-minus', function() {
         let key = $(this).data('key');
         let qty = $(this).data('qty');
-        let prev = parseInt($(this).closest('.qty').find('span').text(), 10) || 0;
+        let prev = parseInt($(this).closest('.qty').find('.qty-input').val(), 10) || 0;
+        updateCartQty(key, qty, prev);
+    });
+
+    $(document).on('input', '.qty-input', function() {
+        let key = $(this).data('key');
+        let qty = $(this).val();
+        let prev = qty;
         updateCartQty(key, qty, prev);
     });
 
