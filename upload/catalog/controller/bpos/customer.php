@@ -223,6 +223,26 @@ class ControllerBposCustomer extends Controller {
         $this->response->setOutput(json_encode(array('ok'=>true)));
     }
 
+    public function delete() {
+        $this->jsonHeader();
+        $this->load->model('bpos/customer');
+
+        $id = isset($this->request->post['id']) ? (int)$this->request->post['id'] : 0;
+
+        if ($id <= 0) {
+            $this->response->setOutput(json_encode(['ok' => false, 'error' => 'Invalid customer ID']));
+            return;
+        }
+
+        $deleted = $this->model_bpos_customer->deleteCustomer($id);
+
+        if ($deleted) {
+            $this->response->setOutput(json_encode(['ok' => true]));
+        } else {
+            $this->response->setOutput(json_encode(['ok' => false, 'error' => 'Customer not found or could not be deleted']));
+        }
+    }
+
     public function customer_group() {
         $this->response->addHeader('Content-Type: application/json');
 
@@ -276,31 +296,32 @@ class ControllerBposCustomer extends Controller {
         $this->response->addHeader('Content-Type: text/html; charset=utf-8');
         $this->load->language('bpos/customer');
         $id = isset($this->request->get['id']) ? (int)$this->request->get['id'] : 0;
-        if ($id <= 0) {
-            $this->response->setOutput('<div style="padding:20px;color:#e11;">Invalid Customer ID</div>');
-            return;
-        }
 
         $this->load->model('bpos/customer');
         $this->load->model('localisation/country');
         $this->load->model('localisation/zone');
         $customer = $this->model_bpos_customer->getCustomerDetail($id);
 
-        if (!$customer || empty($customer['ok'])) {
-            $this->response->setOutput('<div style="padding:20px;color:#e11;">Customer not found.</div>');
-            return;
-        }
 
         $data = [];
+        $data['groups'] = $this->model_bpos_customer->getCustomerGroups();
+        $data['currency_code'] = $this->config->get('config_currency');
+        if ($customer['customer']) {
         $data['c'] = $customer['customer'];
+        $data['fmtSpent'] = $this->currency->format($data['c']['spent'], $data['currency_code']);
+        } else {
+        $data['c'] = []; 
+        $data['c']['tier'] = $this->config->get('config_customer_group_id');
+        $data['fmtSpent'] = $this->currency->format(0, $data['currency_code']);   
+        }
+
         $data['countries'] = $this->model_localisation_country->getCountries();
         $data['zones'] = [];
         if (!empty($data['c']['country_id'])) {
             $data['zones'] = $this->model_localisation_zone->getZonesByCountryId($data['c']['country_id']);
         }
-        $data['groups'] = $this->model_bpos_customer->getCustomerGroups();
-        $data['currency_code'] = $this->config->get('config_currency');
-        $data['fmtSpent'] = $this->currency->format($data['c']['spent'], $data['currency_code']);
+       
+        
 
         $html = $this->load->view('bpos/common/customer_detail', $data);
         

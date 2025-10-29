@@ -191,9 +191,13 @@ class ModelBposCustomer extends Model {
         $customer_group_id = is_numeric($data['customer_group_id']) ? (int)$data['customer_group_id'] : (int)$this->config->get('config_customer_group_id');
 
         $q = $this->db->query("SELECT address_id FROM `" . DB_PREFIX . "customer` WHERE customer_id = '" . $id . "' LIMIT 1");
-        if (!$q->num_rows) return false;
-        $address_id = (int)$q->row['address_id'];
-
+        
+        if ($q->num_rows) {
+            $address_id = (int)$q->row['address_id'];
+        } else {
+            $address_id = 0;
+        }
+        
         $this->db->query("UPDATE `" . DB_PREFIX . "customer` SET
                 firstname = '" . $this->db->escape($firstname) . "',
                 lastname  = '" . $this->db->escape($lastname) . "',
@@ -214,7 +218,7 @@ class ModelBposCustomer extends Model {
                                     zone_id    = '" . (int)$data['zone_id'] . "'
                                 WHERE address_id = '" . (int)$address_id . "'
                                 ");
-            } else {
+            } else {    
                 $this->db->query("INSERT INTO `" . DB_PREFIX . "address` SET
                                     customer_id = '" . (int)$customer_id . "',
                                     firstname   = '" . $this->db->escape($firstname) . "',
@@ -251,5 +255,12 @@ class ModelBposCustomer extends Model {
         }
 
         return $groups;
+    }
+
+    public function deleteCustomer($customer_id) {
+        $customer_id = (int)$customer_id;
+        $this->db->query("DELETE FROM `" . DB_PREFIX . "address` WHERE customer_id = '" . $customer_id . "'");
+        $this->db->query("DELETE FROM `" . DB_PREFIX . "customer` WHERE customer_id = '" . $customer_id . "'");
+        return true;
     }
 }

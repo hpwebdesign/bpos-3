@@ -37,7 +37,7 @@ class ControllerBposInvoice extends Controller {
         $data['store_name']    = isset($store_config['config_name']) ? $store_config['config_name'] : $order_info['store_name'];
         $data['store_tagline'] = isset($store_config['config_meta_title']) ? $store_config['config_meta_title'] : '';
         $data['store_slogan']  = isset($store_config['config_meta_description']) ? $store_config['config_meta_description'] : '';
-        $data['store_address'] = isset($store_config['config_address']) ? nl2br($store_config['config_address']) : '';
+        $data['store_address'] = isset($store_config['config_address']) ? $store_config['config_address'] : '';
         $data['store_phone']   = isset($store_config['config_telephone']) ? $store_config['config_telephone'] : '';
         $data['store_email']   = isset($store_config['config_email']) ? $store_config['config_email'] : '';
         $data['store_website'] = $order_info['store_url'];

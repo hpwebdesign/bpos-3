@@ -868,16 +868,53 @@ function saveCustomer(id) {
 
 
 
-function removeCustomer(id){
-  if(window.confirm('Delete this customer?')){
-    state.data = state.data.filter(x=>x.id!==id);
-    closeDrawer();
-    toast('Customer deleted');
-    apply();
-  }
+function removeCustomer(id) {
+  Swal.fire({
+    title: 'Delete this customer?',
+    text: 'This action cannot be undone.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#999',
+    confirmButtonText: 'Yes, delete it'
+  }).then((result) => {
+    if (!result.isConfirmed) return;
+
+    $.ajax({
+      url: 'index.php?route=bpos/customer/delete',
+      type: 'POST',
+      data: { id: id },
+      dataType: 'json',
+      success: function(res) {
+        if (res && res.ok) {
+          state.data = state.data.filter(x => x.id !== id);
+          toast('Customer deleted successfully');
+          closeDrawer();
+         // apply();
+          ajaxUnsetCustomer()
+      .then(function(res){
+        if (res && res.ok){
+          if (typeof updateCheckoutPanel === 'function') updateCheckoutPanel();
+          if (window.notyf) notyf.success('Customer unset to guest');
+        } else {
+          if (window.notyf) notyf.error((res && res.error) || 'Failed to unset customer');
+        }
+      })
+      .catch(function(err){
+        if (window.notyf) notyf.error((err && err.message) || 'Failed to unset customer');
+      });
+        } else {
+          toast((res && res.error) || 'Failed to delete customer', 'error');
+        }
+      },
+      error: function(xhr) {
+        console.error(xhr);
+        toast('Network or server error while deleting customer', 'error');
+      }
+    });
+  });
 }
 
-// mock actions (delegated)
 $(document).on('click','#actStartOrder', function(){ saveCustomer($(this).data('id')); });
 $(document).on('click','#actSendReceipt', function(){ toast('Receipt sent to email'); });
 $(document).on('click','#actAddPoints', function(){ saveCustomer($(this).data('id'));});
