@@ -19,6 +19,7 @@ class ControllerBposInvoice extends Controller {
             return $this->response->redirect($this->url->link('bpos/home'));
         }
 
+        $this->load->language('bpos/invoice');
         $order_id = (int)$this->request->get['order_id'];
         $this->load->model('checkout/order');
         $this->load->model('tool/image');
@@ -39,6 +40,7 @@ class ControllerBposInvoice extends Controller {
         $data['store_address'] = isset($store_config['config_address']) ? nl2br($store_config['config_address']) : '';
         $data['store_phone']   = isset($store_config['config_telephone']) ? $store_config['config_telephone'] : '';
         $data['store_email']   = isset($store_config['config_email']) ? $store_config['config_email'] : '';
+        $data['store_website'] = $order_info['store_url'];
         $data['invoice_no'] = $order_info['invoice_prefix'] . $order_info['invoice_no'];
         $data['date_added'] = date('d/m/Y', strtotime($order_info['date_added']));
         $data['due_date']   = date('d/m/Y', strtotime($order_info['date_added'] . ' +3 days'));
@@ -46,6 +48,43 @@ class ControllerBposInvoice extends Controller {
         $data['customer_name']  = trim($order_info['firstname'] . ' ' . $order_info['lastname']);
         $data['customer_email'] = $order_info['email'];
         $data['customer_phone'] = $order_info['telephone'];
+        $parts = [];
+
+        if (!empty($data['customer_name'])) {
+            $parts[] = $data['customer_name'];
+        }
+
+        if (!empty($order_info['shipping_address_1'])) {
+            $parts[] = trim($order_info['shipping_address_1']);
+        }
+
+        if (!empty($order_info['shipping_address_2'])) {
+            $parts[] = trim($order_info['shipping_address_2']);
+        }
+
+        $city_line = [];
+        if (!empty($order_info['shipping_city'])) {
+            $city_line[] = trim($order_info['shipping_city']);
+        }
+        if (!empty($order_info['shipping_postcode'])) {
+            $city_line[] = trim($order_info['shipping_postcode']);
+        }
+        if ($city_line) {
+            $parts[] = implode(', ', $city_line);
+        }
+
+        $region_line = [];
+        if (!empty($order_info['shipping_zone'])) {
+            $region_line[] = trim($order_info['shipping_zone']);
+        }
+        if (!empty($order_info['shipping_country'])) {
+            $region_line[] = trim($order_info['shipping_country']);
+        }
+        if ($region_line) {
+            $parts[] = implode(', ', $region_line);
+        }
+
+        $data['shipping_address'] = implode("\n", $parts);
 
         if (!empty($store_config['config_logo']) && is_file(DIR_IMAGE . $store_config['config_logo'])) {
             $data['store_logo'] = $this->model_tool_image->resize($store_config['config_logo'], 120, 120);

@@ -1,4 +1,3 @@
-// Initialize Notyf (top-right) if available
 if (typeof window !== 'undefined' && typeof window.Notyf !== 'undefined') {
   window.notyf = window.notyf || new Notyf({ duration: 1000, position: { x: 'right', y: 'top' } });
 }
@@ -8,15 +7,6 @@ $(document).ready(function() {
 
     initCategoryCarousel();
     loadCustomerGroups();
-//toastr.options = {
-//  timeOut: 1000,
-//  extendedTimeOut: 0,
-//  showDuration: 150,
-//  hideDuration: 150,
-//  progressBar: true,
-//  newestOnTop: true,
-//  closeButton: false
-//};
 
     $('footer .tab').on('click', function() {
         $('footer .tab').removeClass('active');
@@ -50,7 +40,6 @@ $(document).ready(function() {
                 scrollTop: scrollBottom
             }, 500);
 
-            // Opsional: beri fokus
             target.attr('tabindex', -1).focus();
     });
 
@@ -58,7 +47,6 @@ $(document).ready(function() {
         $('#logoutModal').modal('show');
     });
 
-    // Print Bills
     $(document).on('click', '.print', function(e) {
         e.preventDefault();
 
@@ -96,7 +84,6 @@ $(document).ready(function() {
             type: 'post',
             dataType: 'json',
             success: function(json) {
-               // console.log(json);
                 $("body").busyLoad("hide");
 
                 if (json.error) {
@@ -111,7 +98,6 @@ $(document).ready(function() {
 
                 if (json.success) {
                     loadContent('bpos/checkout/order_confirm&order_id='+ json['order_id']);
-                    //window.location.href = 'index.php?route=bpos/checkout/order_confirm&order_id=' + json['order_id'];
                 }
             },
             error: function() {
@@ -136,7 +122,6 @@ $(document).ready(function() {
             data: { code: code },
             dataType: 'json',
             success: function(json) {
-               // console.log(json);
                 if (window.notyf) { notyf.success(json['success']); }
                 updateCheckoutPanel();
             }
@@ -145,7 +130,6 @@ $(document).ready(function() {
 
     $(document).on('click', '.shippingbtn', function() {
         let code = $(this).data('code');
-       // console.log(code);
         $('.shippingbtn').removeClass('active');
         $(this).addClass('active');
 
@@ -179,8 +163,6 @@ $(document).ready(function() {
         }
     });
 
-
-    // Category
     $(document).on('click', '.filters .btn', function (e) {
         e.preventDefault();
        const $btn = $(this);
@@ -193,19 +175,6 @@ $(document).ready(function() {
         currentCarouselPage = $owl.data('owl.carousel').relative($owl.find('.owl-item.active').first().index());
       }
         loadPage('index.php?route=bpos/home&category_id='+category_id);
-        // $('#products-list').html('<div class="text-center py-5">Loading...</div>');
-
-        // $.ajax({
-        //     url: 'index.php?route=bpos/home/products&category_id=' + encodeURIComponent(category_id),
-        //     type: 'get',
-        //     dataType: 'html',
-        //     success: function (html) {
-        //         $('#products-list').html(html);
-        //     },
-        //     error: function () {
-        //         $('#products-list').html('<div class="text-center py-5">Error loading products</div>');
-        //     }
-        // });
     });
 
 
@@ -232,25 +201,21 @@ $(document).ready(function() {
 
         updateCartQty(key, qty, prev);
 
-        // kasih delay sebelum fokus lagi ke input
         setTimeout(function() {
         let $target = $(`.qty-input[data-key="${key}"]`);
         $target.focus();
 
-        // pastikan elemen ini adalah input teks
         let val = $target.val();
         let el = $target.get(0);
         if (el && typeof el.setSelectionRange === 'function') {
-            el.setSelectionRange(val.length, val.length); // kursor di akhir teks
+            el.setSelectionRange(val.length, val.length); 
         }
-    }, 400); // delay 400ms, bisa disesuaikan
+    }, 400); 
     });
 
     function showPaymentConfirmModal(html) {
-    // Hapus modal lama jika ada
         $('#paymentConfirmModal').remove();
 
-        // Tambahkan modal baru ke body
         $('body').append(`
             <div class="modal fade" id="paymentConfirmModal" tabindex="-1" role="dialog" aria-labelledby="paymentConfirmModalLabel" aria-hidden="true">
               <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -265,7 +230,6 @@ $(document).ready(function() {
             </div>
         `);
 
-        // Tampilkan modal
         $('#paymentConfirmModal').modal('show');
     }
 
@@ -302,7 +266,6 @@ $(document).ready(function() {
         });
     }
 
-    // Clear cart
     $(document).on('click', '#clear-cart', function(e) {
     e.preventDefault();
 
@@ -336,13 +299,6 @@ $(document).ready(function() {
     });
 });
 
-    // Add to Cart
-
-    // $(document).on('click', '.product-item', function() {
-    //     let product_id = $(this).data('id');
-    //     posAddToCart(product_id);
-    // });
-
     $(document).on('click', '.product-item', function() {
         let product_id = $(this).data('id');
 
@@ -351,7 +307,6 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(json) {
                 if (json.has_option) {
-                    // Tampilkan popup form option
                     $.ajax({
                         url: 'index.php?route=bpos/product/options&product_id=' + product_id,
                         dataType: 'html',
@@ -361,7 +316,6 @@ $(document).ready(function() {
                         }
                     });
                 } else {
-                    // Langsung add to cart
                     $.ajax({
                         url: 'index.php?route=bpos/checkout/cart/add',
                         type: 'post',
@@ -388,7 +342,6 @@ $(document).ready(function() {
             data: form_data + '&quantity=1',
             dataType: 'json',
             success: function(json) {
-                // clear error lama
                 $('.text-danger').remove();
                 $('.form-group').removeClass('has-error');
 
@@ -409,7 +362,6 @@ $(document).ready(function() {
                         $('select[name="recurring_id"]').after('<div class="text-danger">' + json['error']['recurring'] + '</div>');
                     }
 
-                    // scroll ke modal body biar user lihat error
                     $('#productOptionModal .modal-body').animate({ scrollTop: 0 }, 'slow');
                 }
                 if (json['success']) {
@@ -423,8 +375,6 @@ $(document).ready(function() {
     });
 
 
-
-    // Fungsi Add to Cart
     function posAddToCart(product_id, quantity = 1) {
         $.ajax({
             url: 'index.php?route=bpos/checkout/cart/add',
@@ -437,7 +387,7 @@ $(document).ready(function() {
                 }
                 if (json['success']) {
                     if (window.notyf) { notyf.success(json['success']); }
-                    //alert(json['success']); // Bisa ganti pakai notifikasi lebih bagus
+     
                     updateCheckoutPanel();
                     var target = $('#checkout-summary');
                     var scrollBottom = target.offset().top + target.outerHeight() - $(window).height();
@@ -446,19 +396,18 @@ $(document).ready(function() {
                         scrollTop: scrollBottom
                     }, 500);
 
-                    // Opsional: beri fokus
+                
                     target.attr('tabindex', -1).focus();
 
                 }
             },
             error: function() {
                 if (window.notyf) { notyf.error('Error: Could not add to cart'); }
-                //alert('Error: Could not add to cart');
+              
             }
         });
     }
 
-    // Update checkout panel (kalau mau menampilkan isi keranjang di POS)
 
 
 });
@@ -523,7 +472,7 @@ function loadPage(route) {
                 $('#main-content').html(json.output);
                  $('html, body').animate({ scrollTop: 0 }, 'smooth');
                  initCategoryCarousel();
-                // window.scrollTo({ top: 0, behavior: 'smooth' });
+             
             } else {
                 $('#main-content').html('<p>No content</p>');
             }
@@ -550,12 +499,12 @@ function initCategoryCarousel() {
       margin: 4,
       nav: false,
       dots: true,
-      autoWidth: false,  // biar pakai sistem grid item, bukan lebar konten
+      autoWidth: false,  
       smartSpeed: 400,
       responsive: {
         0:    { items: 2 },
         600:  { items: 3 },
-        992:  { items: 4 },   // desktop hanya 4 item
+        992:  { items: 4 },  
         1400: { items: 4 }
       }
     });
@@ -692,7 +641,6 @@ function openDetail(id) {
     success: function(html) {
       $('#detail').html(html);
 
-      // setelah HTML injected, pasang handler
       bindCustomerLocationHandlers();
     },
     error: function(xhr) {
@@ -706,12 +654,10 @@ function openDetail(id) {
 }
 
 function bindCustomerLocationHandlers() {
-  // ketika country berubah, reload zone list
   $(document).off('change.bpos_country').on('change.bpos_country', '#f_country_id', function() {
     var countryId = $(this).val() || '';
     var $zone = $('#f_zone_id');
 
-    // kosongkan dulu / show loading
     $zone.html('<option value="">Loading...</option>');
 
     if (!countryId) {
@@ -752,7 +698,6 @@ function bindCustomerLocationHandlers() {
     });
   });
 
-  // trigger sekali di awal agar zone dropdown sync dengan country awal
   $('#f_country_id').trigger('change.bpos_country');
 }
 
@@ -824,18 +769,20 @@ function toast(msg, type='success'){
 }
 
 function saveCustomer(id) {
-  const name  = $('#f_name').val().trim();
-  const phone = $('#f_phone').val().trim();
+  const name    = $('#f_name').val().trim();
+  const phone   = $('#f_phone').val().trim();
   if (!name || !phone) {
     toast('Name and Telephone are required', 'error');
     return;
   }
 
-  const email   = $('#f_email').val().trim();
-  const address = $('#f_address').val().trim();
-  const notes   = $('#f_notes').val();
-  const tier = $('input[name="tier"]:checked').val();
-
+  const email       = $('#f_email').val().trim();
+  const address     = $('#f_address').val().trim();
+  const city        = $('#f_city').val().trim();
+  const country_id  = $('#f_country_id').val();
+  const zone_id     = $('#f_zone_id').val();
+  const notes       = $('#f_notes').val().trim();
+  const tier        = $('input[name="tier"]:checked').val();
 
   const payload = {
     id: id,
@@ -843,65 +790,79 @@ function saveCustomer(id) {
     phone: phone,
     email: email,
     address: address,
+    city: city,
+    country_id: country_id,
+    zone_id: zone_id,
     note: notes,
     customer_group_id: tier
   };
 
-  const doAfterLogin = (id) => {
-      const p = ajaxLoginCustomer({ id });
+  const doAfterLogin = (customerId) => {
+    const p = ajaxLoginCustomer({ id: customerId });
 
-      if (p && typeof p.then === 'function') {
-        p.then(res => {
-          if (res && res.ok) {
-            if (typeof updateCheckoutPanel === 'function') updateCheckoutPanel();
-            toast('Customer applied to current POS session');
-          } else {
-            toast((res && res.error) || 'Failed to apply customer', 'error');
-          }
-        })
-        .catch(err => {
-          toast((err && err.message) || 'Failed to apply customer', 'error');
-        })
-        .always(() => {
-          apply();
-          closeDrawer();
-        });
-      } else {
+    if (p && typeof p.then === 'function') {
+      p.then(res => {
+        if (res && res.ok) {
+          if (typeof updateCheckoutPanel === 'function') updateCheckoutPanel();
+          toast('Customer applied to current POS session');
+        } else {
+          toast((res && res.error) || 'Failed to apply customer', 'error');
+        }
+      })
+      .catch(err => {
+        toast((err && err.message) || 'Failed to apply customer', 'error');
+      })
+      .always(() => {
         apply();
         closeDrawer();
-      }
-    };
+      });
+    } else {
+      apply();
+      closeDrawer();
+    }
+  };
 
   if (id > 0) {
-    // ==== Edit ====
-    ajaxEditCustomer(payload)
-      .done(function(res) {
+    // EDIT
+    $.ajax({
+      url: 'index.php?route=bpos/customer/edit',
+      type: 'POST',
+      data: payload,
+      dataType: 'json',
+      success: function(res) {
         if (res && res.ok) {
           toast('Customer updated successfully');
-          doAfterLogin(id);
+          doAfterLogin(res.id || id);
         } else {
           toast((res && res.error) || 'Failed to update customer', 'error');
         }
-      })
-      .fail(function(xhr) {
+      },
+      error: function(xhr) {
+        console.error(xhr);
         toast('Network or server error while updating customer', 'error');
-      });
+      }
+    });
 
   } else {
-    // ==== Add ====
-    ajaxCreateCustomer(payload)
-      .done(function(res) {
+    // CREATE
+    $.ajax({
+      url: 'index.php?route=bpos/customer/create',
+      type: 'POST',
+      data: payload,
+      dataType: 'json',
+      success: function(res) {
         if (res && res.ok && res.id) {
-          id = res.id;
           toast('Customer created successfully');
           doAfterLogin(res.id);
         } else {
           toast((res && res.error) || 'Failed to create customer', 'error');
         }
-      })
-      .fail(function(xhr) {
+      },
+      error: function(xhr) {
+        console.error(xhr);
         toast('Network or server error while creating customer', 'error');
-      });
+      }
+    });
   }
 }
 
@@ -1058,7 +1019,6 @@ function removeCoupon(){
   return $.post(API.remove_coupon, {}, null, 'json');
 }
 function fetchCartSummary(){
-  // Return full summary object: { subtotal, discount:{percent,fixed,amount}, charge:{percent,fixed,amount}, total }
   return $.getJSON(API.cart_summary).then(function(res){
     return res || { subtotal:0, discount:{percent:0,fixed:0,amount:0}, charge:{percent:0,fixed:0,amount:0}, total:0 };
   });
@@ -1221,12 +1181,11 @@ function openSwal(type, onSubmit){
     cfg = {
       title: 'Customer',
       html: '<div class="swal-ajax-loading">Loading...</div>',
-      // willOpen: function(){  },
       didOpen: function(){
         ajaxLoadCustomers().then(function(){
-          // Swal.update({ html: buildCustomerHTML() });
+
           const html = buildCustomerHTML();
-            Swal.getHtmlContainer().innerHTML = html;  // ✅ tanpa update()
+            Swal.getHtmlContainer().innerHTML = html; 
           bindCustomerButtons();
           bindCustomerAutocomplete();
         }).catch(function(){
@@ -1633,7 +1592,6 @@ $(function () {
 });
 
 function handleBarcodeScan(code) {
- // console.log("Barcode scanned:", code);
 
   $.ajax({
     url: 'index.php?route=bpos/product/getByModel&model=' + encodeURIComponent(code),

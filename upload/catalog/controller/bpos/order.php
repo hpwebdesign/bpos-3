@@ -265,7 +265,7 @@ class ControllerBposOrder extends Controller {
         $this->load->model('checkout/order');
 
         $json = [];
-
+        $order_data = [];
         if (!$this->cart->hasProducts()) {
             $json['error'] = 'Cart is empty';
             $this->response->addHeader('Content-Type: application/json');
@@ -284,66 +284,125 @@ class ControllerBposOrder extends Controller {
             return;
         }
 
-        // Customer info from POS session (no login required)
-        if (!empty($this->session->data['bpos_customer']['id'])) {
-            $customer_id = (int)$this->session->data['bpos_customer']['id'];
-            $name = isset($this->session->data['bpos_customer']['name']) ? trim($this->session->data['bpos_customer']['name']) : '';
-            $parts = preg_split('/\s+/', $name, 2);
-            $firstname = isset($parts[0]) ? $parts[0] : 'POS';
-            $lastname  = isset($parts[1]) ? $parts[1] : '';
-            // Try to enrich contact from DB
-            $email=''; $telephone='';
-            $q = $this->db->query("SELECT email, telephone FROM `".DB_PREFIX."customer` WHERE customer_id='".(int)$customer_id."' LIMIT 1");
-            if ($q->num_rows) {
-                $email = $q->row['email'];
-                $telephone = $q->row['telephone'];
+          $this->load->model('account/customer');
+         if (!empty($this->session->data['bpos_customer']['id'])) {
+                $customer_id = (int)$this->session->data['bpos_customer']['id'];
+                $customer_info = $this->model_account_customer->getCustomer($customer_id);
+                $email = $customer_info['email'];
+                $order_data['customer_id'] = $this->customer->getId();
+                $order_data['customer_group_id'] = $customer_info['customer_group_id'];
+                $order_data['firstname'] = $customer_info['firstname'];
+                $order_data['lastname'] = $customer_info['lastname'];
+                $order_data['email'] = $customer_info['email'];
+                $order_data['telephone'] = $customer_info['telephone'];
+                $order_data['custom_field'] = json_decode($customer_info['custom_field'], true);
+            } else {
+                $host = $_SERVER['SERVER_NAME'];
+                $domain = preg_replace('/^www\./', '', $host);
+                $email = 'support@' . $domain;
+                $order_data['customer_id'] = 0;
+                $order_data['customer_group_id'] = $this->config->get('config_customer_group_id');
+                $order_data['firstname'] = 'POS';
+                $order_data['lastname'] = 'Customer';
+                $order_data['email'] = $email;
+                $order_data['telephone'] = '';
+                $order_data['custom_field'] = [];
             }
+        // if (!empty($this->session->data['bpos_customer']['id'])) {
+        //     $customer_id = (int)$this->session->data['bpos_customer']['id'];
+        //     $name = isset($this->session->data['bpos_customer']['name']) ? trim($this->session->data['bpos_customer']['name']) : '';
+        //     $parts = preg_split('/\s+/', $name, 2);
+        //     $firstname = isset($parts[0]) ? $parts[0] : 'POS';
+        //     $lastname  = isset($parts[1]) ? $parts[1] : '';
+        //     // Try to enrich contact from DB
+        //     $email=''; $telephone='';
+        //     $q = $this->db->query("SELECT email, telephone FROM `".DB_PREFIX."customer` WHERE customer_id='".(int)$customer_id."' LIMIT 1");
+        //     if ($q->num_rows) {
+        //         $email = $q->row['email'];
+        //         $telephone = $q->row['telephone'];
+        //     }
+        // } else {
+        //     $firstname   = 'POS';
+        //     $lastname    = 'Customer';
+        //     $host = $_SERVER['SERVER_NAME'];
+        //     $domain = preg_replace('/^www\./', '', $host);
+        //     $email = 'support@' . $domain;
+        //     $telephone   = '';
+        //     $customer_id = 0;
+        // }
+
+
+
+        if (!empty($this->session->data['payment_address'])) {
+            $payment_address = $this->session->data['payment_address'];
+
+            $order_data['payment_firstname']       = $payment_address['firstname'] ?? $firstname;
+            $order_data['payment_lastname']        = $payment_address['lastname'] ?? $lastname;
+            $order_data['payment_company']         = $payment_address['company'] ?? '';
+            $order_data['payment_address_1']       = $payment_address['address_1'] ?? '';
+            $order_data['payment_address_2']       = $payment_address['address_2'] ?? '';
+            $order_data['payment_city']            = $payment_address['city'] ?? '';
+            $order_data['payment_postcode']        = $payment_address['postcode'] ?? '';
+            $order_data['payment_zone']            = $payment_address['zone'] ?? '';
+            $order_data['payment_zone_id']         = $payment_address['zone_id'] ?? 0;
+            $order_data['payment_country']         = $payment_address['country'] ?? '';
+            $order_data['payment_country_id']      = $payment_address['country_id'] ?? 0;
+            $order_data['payment_address_format']  = $payment_address['address_format'] ?? '';
         } else {
-            $firstname   = 'POS';
-            $lastname    = 'Customer';
-            $email       = 'support@hpwebdesign.io';
-            $telephone   = '';
-            $customer_id = 0;
+            // fallback ke config store
+            $order_data['payment_firstname']       = $firstname;
+            $order_data['payment_lastname']        = $lastname;
+            $order_data['payment_company']         = '';
+            $order_data['payment_address_1']       = (string)$this->config->get('config_address');
+            $order_data['payment_address_2']       = '';
+            $order_data['payment_city']            = '';
+            $order_data['payment_postcode']        = '';
+            $order_data['payment_zone']            = '';
+            $order_data['payment_zone_id']         = (int)$this->config->get('config_zone_id');
+            $order_data['payment_country']         = '';
+            $order_data['payment_country_id']      = (int)$this->config->get('config_country_id');
+            $order_data['payment_address_format']  = '';
         }
 
-        $order_data = [];
+        $order_data['payment_method'] = isset($payment_method['title']) ? $payment_method['title'] : '';
+        $order_data['payment_code']   = isset($payment_method['code']) ? $payment_method['code'] : '';
 
-        $order_data['customer_id']             = $customer_id;
-        $order_data['customer_group_id']       = (int)$this->config->get('config_customer_group_id');
-        $order_data['firstname']               = $firstname;
-        $order_data['lastname']                = $lastname;
-        $order_data['email']                   = $email;
-        $order_data['telephone']               = $telephone;
+        // ==================================================
+        // 🔹 SHIPPING ADDRESS
+        // ==================================================
+        if (!empty($this->session->data['shipping_address'])) {
+            $shipping_address = $this->session->data['shipping_address'];
 
-        $order_data['payment_firstname']       = $firstname;
-        $order_data['payment_lastname']        = $lastname;
-        $order_data['payment_company']         = '';
-        $order_data['payment_address_1']       = (string)$this->config->get('config_address');
-        $order_data['payment_address_2']       = '';
-        $order_data['payment_city']            = '';
-        $order_data['payment_postcode']        = '';
-        $order_data['payment_zone']            = '';
-        $order_data['payment_zone_id']         = (int)$this->config->get('config_zone_id');
-        $order_data['payment_country']         = '';
-        $order_data['payment_country_id']      = (int)$this->config->get('config_country_id');
-        $order_data['payment_address_format']  = '';
-        $order_data['payment_method']          = isset($payment_method['title']) ? $payment_method['title'] : '';
-        $order_data['payment_code']            = isset($payment_method['code']) ? $payment_method['code'] : '';
+            $order_data['shipping_firstname']      = $shipping_address['firstname'] ?? $firstname;
+            $order_data['shipping_lastname']       = $shipping_address['lastname'] ?? $lastname;
+            $order_data['shipping_company']        = $shipping_address['company'] ?? '';
+            $order_data['shipping_address_1']      = $shipping_address['address_1'] ?? '';
+            $order_data['shipping_address_2']      = $shipping_address['address_2'] ?? '';
+            $order_data['shipping_city']           = $shipping_address['city'] ?? '';
+            $order_data['shipping_postcode']       = $shipping_address['postcode'] ?? '';
+            $order_data['shipping_zone']           = $shipping_address['zone'] ?? '';
+            $order_data['shipping_zone_id']        = $shipping_address['zone_id'] ?? 0;
+            $order_data['shipping_country']        = $shipping_address['country'] ?? '';
+            $order_data['shipping_country_id']     = $shipping_address['country_id'] ?? 0;
+            $order_data['shipping_address_format'] = $shipping_address['address_format'] ?? '';
+        } else {
+            // fallback ke config store
+            $order_data['shipping_firstname']      = $firstname;
+            $order_data['shipping_lastname']       = $lastname;
+            $order_data['shipping_company']        = '';
+            $order_data['shipping_address_1']      = (string)$this->config->get('config_address');
+            $order_data['shipping_address_2']      = '';
+            $order_data['shipping_city']           = '';
+            $order_data['shipping_postcode']       = '';
+            $order_data['shipping_zone']           = '';
+            $order_data['shipping_zone_id']        = (int)$this->config->get('config_zone_id');
+            $order_data['shipping_country']        = '';
+            $order_data['shipping_country_id']     = (int)$this->config->get('config_country_id');
+            $order_data['shipping_address_format'] = '';
+        }
 
-        $order_data['shipping_firstname']      = $firstname;
-        $order_data['shipping_lastname']       = $lastname;
-        $order_data['shipping_company']        = '';
-        $order_data['shipping_address_1']      = (string)$this->config->get('config_address');
-        $order_data['shipping_address_2']      = '';
-        $order_data['shipping_city']           = '';
-        $order_data['shipping_postcode']       = '';
-        $order_data['shipping_zone']           = '';
-        $order_data['shipping_zone_id']        = (int)$this->config->get('config_zone_id');
-        $order_data['shipping_country']        = '';
-        $order_data['shipping_country_id']     = (int)$this->config->get('config_country_id');
-        $order_data['shipping_address_format'] = '';
-        $order_data['shipping_method']         = isset($shipping_method['title']) ? $shipping_method['title'] : '';
-        $order_data['shipping_code']           = isset($shipping_method['code']) ? $shipping_method['code'] : '';
+        $order_data['shipping_method'] = isset($shipping_method['title']) ? $shipping_method['title'] : '';
+        $order_data['shipping_code']   = isset($shipping_method['code']) ? $shipping_method['code'] : '';
 
         $this->tax->setStoreAddress($this->config->get('config_country_id'), $this->config->get('config_zone_id'));
         $this->tax->setPaymentAddress($order_data['payment_country_id'], $order_data['payment_zone_id']);
@@ -433,21 +492,36 @@ class ControllerBposOrder extends Controller {
         $confirm_html = '';
 
         $gateway_methods = $this->config->get('bpos_payment_gateway'); // daftar gateway kamu
-          $json['gateway_methods'] = $gateway_methods;
-           $json['payment_code'] = $payment_code;
+        $json['gateway_methods'] = $gateway_methods;
+        $json['payment_code'] = $payment_code;
+
         foreach ($gateway_methods as $g) {
+
             if (strpos($payment_code, $g) !== false) {
                 $is_gateway = true;
                 break;
             }
         }
          $json['is_gateway'] = $is_gateway;
+
         if ($is_gateway) {
+
             $json['gateway'] = true;
             $this->session->data['bpos'] = 1;
             $json['confirm_html'] = $this->load->controller('extension/payment/' . $this->session->data['payment_method']['code']);
+
         } else {
-            $this->model_checkout_order->addOrderHistory($order_id, (int)$this->config->get('config_order_status_id'));
+
+            $this->load->language('extension/payment/'.$payment_code);
+            $comment  = '';
+
+            if ($this->config->get('payment_'.$payment_code.'_bank' . $this->config->get('config_language_id'))) {
+                $comment  = $this->language->get('text_instruction') . "\n\n";
+                $comment .= $this->config->get('payment_'.$payment_code.'_bank' . $this->config->get('config_language_id')) . "\n\n";
+                $comment .= $this->language->get('text_payment');
+            }
+
+            $this->model_checkout_order->addOrderHistory($order_id, (int)$this->config->get('config_order_status_id'),$comment);
             unset($this->session->data['bpos_customer']);
             unset($this->session->data['bpos']);
             unset($this->session->data['shipping_method']);

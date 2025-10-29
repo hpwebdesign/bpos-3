@@ -35,12 +35,15 @@ class ControllerBposCustomer extends Controller {
         $this->load->model('bpos/customer');
 
         $data = [
-            'name' => $this->clean(isset($this->request->post['name']) ? $this->request->post['name'] : ''),
-            'phone' => $this->clean(isset($this->request->post['phone']) ? $this->request->post['phone'] :''),
-            'email' => $this->clean(isset($this->request->post['email']) ? $this->request->post['email'] : ''),
-            'address' => $this->clean(isset($this->request->post['address']) ? $this->request->post['address'] : ''),
-            'note' => $this->clean(isset($this->request->post['note']) ? $this->request->post['note'] : ''),
-            'customer_group_id' => $this->request->post['customer_group_id']
+            'name'               => $this->clean(isset($this->request->post['name']) ? $this->request->post['name'] : ''),
+            'phone'              => $this->clean(isset($this->request->post['phone']) ? $this->request->post['phone'] : ''),
+            'email'              => $this->clean(isset($this->request->post['email']) ? $this->request->post['email'] : ''),
+            'address'            => $this->clean(isset($this->request->post['address']) ? $this->request->post['address'] : ''),
+            'city'               => $this->clean(isset($this->request->post['city']) ? $this->request->post['city'] : ''),
+            'country_id'         => isset($this->request->post['country_id']) ? (int)$this->request->post['country_id'] : 0,
+            'zone_id'            => isset($this->request->post['zone_id']) ? (int)$this->request->post['zone_id'] : 0,
+            'note'               => $this->clean(isset($this->request->post['note']) ? $this->request->post['note'] : ''),
+            'customer_group_id'  => isset($this->request->post['customer_group_id']) ? (int)$this->request->post['customer_group_id'] : 0
         ];
 
         if ($data['name'] === '' || $data['phone'] === '') {
@@ -54,12 +57,12 @@ class ControllerBposCustomer extends Controller {
             'ok' => true,
             'id' => $id,
             'customer' => [
-                'id' => $id,
-                'name' => $data['name'],
-                'phone' => $data['phone'],
-                'email' => $data['email'],
+                'id'      => $id,
+                'name'    => $data['name'],
+                'phone'   => $data['phone'],
+                'email'   => $data['email'],
                 'address' => $data['address'],
-                'tier' => $data['customer_group_id']
+                'tier'    => $data['customer_group_id']
             ]
         ]));
     }
@@ -73,13 +76,16 @@ class ControllerBposCustomer extends Controller {
         $this->load->model('bpos/customer');
 
         $data = [
-            'id' => isset($this->request->post['id']) ? (int)$this->request->post['id'] : 0,
-            'name' => $this->clean($this->request->post['name']),
-            'phone' => $this->clean($this->request->post['phone']),
-            'email' => $this->clean($this->request->post['email']),
-            'address' => $this->clean($this->request->post['address']),
-            'note' => $this->request->post['note'],
-            'customer_group_id' => (int)$this->request->post['customer_group_id']
+            'id'                 => isset($this->request->post['id']) ? (int)$this->request->post['id'] : 0,
+            'name'               => $this->clean(isset($this->request->post['name']) ? $this->request->post['name'] : ''),
+            'phone'              => $this->clean(isset($this->request->post['phone']) ? $this->request->post['phone'] : ''),
+            'email'              => $this->clean(isset($this->request->post['email']) ? $this->request->post['email'] : ''),
+            'address'            => $this->clean(isset($this->request->post['address']) ? $this->request->post['address'] : ''),
+            'city'               => $this->clean(isset($this->request->post['city']) ? $this->request->post['city'] : ''),
+            'country_id'         => isset($this->request->post['country_id']) ? (int)$this->request->post['country_id'] : 0,
+            'zone_id'            => isset($this->request->post['zone_id']) ? (int)$this->request->post['zone_id'] : 0,
+            'note'               => isset($this->request->post['note']) ? $this->request->post['note'] : '',
+            'customer_group_id'  => isset($this->request->post['customer_group_id']) ? (int)$this->request->post['customer_group_id'] : 0
         ];
 
         if ($data['id'] <= 0) {
@@ -102,51 +108,108 @@ class ControllerBposCustomer extends Controller {
             'ok' => true,
             'id' => $data['id'],
             'customer' => [
-                'id' => $data['id'],
-                'name' => $data['name'],
-                'phone' => $data['phone'],
-                'email' => $data['email'],
+                'id'      => $data['id'],
+                'name'    => $data['name'],
+                'phone'   => $data['phone'],
+                'email'   => $data['email'],
                 'address' => $data['address'],
-                'tier' => $data['customer_group_id'],
-                'notes' => $data['note']
+                'tier'    => $data['customer_group_id'],
+                'notes'   => $data['note']
             ]
         ]));
     }
 
-    // POST /index.php?route=bpos/customer/login
-    // Body: id
-    // Instead of authenticating OpenCart Customer, just store session 'bpos_customer'
-    // Returns: { ok:true, customer:{id,name} }
-    public function login(){
-        $this->jsonHeader();
-        $id = isset($this->request->post['id']) ? (int)$this->request->post['id'] : 0;
-        if ($id <= 0) { $this->response->setOutput(json_encode(array('error'=>'Invalid id'))); return; }
+    public function login() {
+    $this->jsonHeader();
 
-        $q = $this->db->query("SELECT customer_id, firstname, lastname, status FROM `".DB_PREFIX."customer` WHERE customer_id='".(int)$id."' LIMIT 1");
-        if (!$q->num_rows) { $this->response->setOutput(json_encode(array('error'=>'Customer not found'))); return; }
-
-        $row = $q->row;
-        if (!isset($row['status']) || (int)$row['status'] !== 1) {
-            $this->response->setOutput(json_encode(array('error'=>'Customer is not active/approved')));
-            return;
-        }
-        $name = trim($row['firstname'].' '.$row['lastname']);
-        if ($name==='') { $name='(No Name)'; }
-
-        $this->session->data['bpos_customer'] = array('id' => (int)$id, 'name' => $name);
-        unset($this->session->data['payment_method']);
-        unset($this->session->data['payment_methods']);
-        unset($this->session->data['shipping_method']);
-        unset($this->session->data['shipping_methods']);
-        unset($this->session->data['payment_address']);
-        unset($this->session->data['shipping_address']);
-
-        $this->response->setOutput(json_encode(array('ok'=>true,'customer'=>array('id'=>$id,'name'=>$name))));
+    $id = isset($this->request->post['id']) ? (int)$this->request->post['id'] : 0;
+    if ($id <= 0) {
+        return $this->response->setOutput(json_encode(['error' => 'Invalid id']));
     }
 
-    // POST /index.php?route=bpos/customer/clear
-    // Unset current customer session (switch to guest)
-    // Returns: { ok:true }
+    $q = $this->db->query("SELECT customer_id, firstname, lastname, status, address_id FROM `" . DB_PREFIX . "customer` WHERE customer_id = '" . (int)$id . "' LIMIT 1");
+    if (!$q->num_rows) {
+        return $this->response->setOutput(json_encode(['error' => 'Customer not found']));
+    }
+
+    $row = $q->row;
+
+    if ((int)$row['status'] !== 1) {
+        return $this->response->setOutput(json_encode(['error' => 'Customer is not active/approved']));
+    }
+
+    $name = trim($row['firstname'] . ' ' . $row['lastname']);
+    if ($name === '') {
+        $name = '(No Name)';
+    }
+
+    // Reset session related to checkout
+    unset($this->session->data['payment_method']);
+    unset($this->session->data['payment_methods']);
+    unset($this->session->data['shipping_method']);
+    unset($this->session->data['shipping_methods']);
+    unset($this->session->data['payment_address']);
+    unset($this->session->data['shipping_address']);
+
+    // Simpan customer ke session
+    $this->session->data['bpos_customer'] = [
+        'id'   => (int)$id,
+        'name' => $name
+    ];
+
+    // 🔹 Ambil default address jika ada
+    $address_id = (int)$row['address_id'];
+    if ($address_id > 0) {
+        $addr = $this->db->query("SELECT * FROM `" . DB_PREFIX . "address` WHERE address_id = '" . (int)$address_id . "' AND customer_id = '" . (int)$id . "' LIMIT 1");
+        if ($addr->num_rows) {
+            $address = $addr->row;
+
+            $address_data = [
+                'firstname'       => $address['firstname'],
+                'lastname'        => $address['lastname'],
+                'company'         => $address['company'],
+                'address_1'       => $address['address_1'],
+                'address_2'       => $address['address_2'],
+                'postcode'        => $address['postcode'],
+                'city'            => $address['city'],
+                'zone_id'         => $address['zone_id'],
+                'zone'            => '',
+                'zone_code'       => '',
+                'country_id'      => $address['country_id'],
+                'country'         => '',
+                'address_format'  => '',
+                'custom_field'    => isset($address['custom_field']) ? json_decode($address['custom_field'], true) : []
+            ];
+
+            // Ambil nama zone & country (optional)
+            $zone_query = $this->db->query("SELECT name, code FROM `" . DB_PREFIX . "zone` WHERE zone_id = '" . (int)$address['zone_id'] . "' LIMIT 1");
+            if ($zone_query->num_rows) {
+                $address_data['zone'] = $zone_query->row['name'];
+                $address_data['zone_code'] = $zone_query->row['code'];
+            }
+
+            $country_query = $this->db->query("SELECT name FROM `" . DB_PREFIX . "country` WHERE country_id = '" . (int)$address['country_id'] . "' LIMIT 1");
+            if ($country_query->num_rows) {
+                $address_data['country'] = $country_query->row['name'];
+            }
+
+            // Simpan ke session
+            $this->session->data['payment_address'] = $address_data;
+            $this->session->data['shipping_address'] = $address_data;
+        }
+    }
+
+    $this->response->setOutput(json_encode([
+        'ok' => true,
+        'customer' => [
+            'id'   => $id,
+            'name' => $name
+        ],
+        'has_address' => isset($this->session->data['payment_address'])
+    ]));
+}
+
+
     public function clear(){
         $this->jsonHeader();
         unset($this->session->data['bpos_customer']);

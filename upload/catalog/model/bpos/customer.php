@@ -159,15 +159,16 @@ class ModelBposCustomer extends Model {
         $customer_id = $this->db->getLastId();
 
         if (!empty($data['address'])) {
-            $this->db->query("INSERT INTO `" . DB_PREFIX . "address`
-                SET customer_id = '" . (int)$customer_id . "',
-                    firstname = '" . $this->db->escape($firstname) . "',
-                    lastname = '" . $this->db->escape($lastname) . "',
-                    address_1 = '" . $this->db->escape($data['address']) . "',
-                    city = '',
-                    postcode = '',
-                    country_id = '0',
-                    zone_id = '0'");
+            $this->db->query("INSERT INTO `" . DB_PREFIX . "address` SET
+                customer_id = '" . (int)$customer_id . "',
+                firstname   = '" . $this->db->escape($firstname) . "',
+                lastname    = '" . $this->db->escape($lastname) . "',
+                address_1   = '" . $this->db->escape($data['address']) . "',
+                city        = '" . $this->db->escape($data['city']) . "',
+                postcode    = '',
+                country_id  = '" . (int)$data['country_id'] . "',
+                zone_id     = '" . (int)$data['zone_id'] . "'
+            ");
 
             $address_id = $this->db->getLastId();
 
@@ -205,20 +206,25 @@ class ModelBposCustomer extends Model {
         if (!empty($data['address'])) {
             if ($address_id > 0) {
                 $this->db->query("UPDATE `" . DB_PREFIX . "address` SET
-                        firstname = '" . $this->db->escape($firstname) . "',
-                        lastname  = '" . $this->db->escape($lastname) . "',
-                        address_1 = '" . $this->db->escape($data['address']) . "'
-                    WHERE address_id = '" . (int)$address_id . "'");
+                                    firstname = '" . $this->db->escape($firstname) . "',
+                                    lastname  = '" . $this->db->escape($lastname) . "',
+                                    address_1 = '" . $this->db->escape($data['address']) . "',
+                                    city      = '" . $this->db->escape($data['city']) . "',
+                                    country_id = '" . (int)$data['country_id'] . "',
+                                    zone_id    = '" . (int)$data['zone_id'] . "'
+                                WHERE address_id = '" . (int)$address_id . "'
+                                ");
             } else {
                 $this->db->query("INSERT INTO `" . DB_PREFIX . "address` SET
-                        customer_id = '" . (int)$id . "',
-                        firstname   = '" . $this->db->escape($firstname) . "',
-                        lastname    = '" . $this->db->escape($lastname) . "',
-                        address_1   = '" . $this->db->escape($data['address']) . "',
-                        city        = '',
-                        postcode    = '',
-                        country_id  = '0',
-                        zone_id     = '0'");
+                                    customer_id = '" . (int)$customer_id . "',
+                                    firstname   = '" . $this->db->escape($firstname) . "',
+                                    lastname    = '" . $this->db->escape($lastname) . "',
+                                    address_1   = '" . $this->db->escape($data['address']) . "',
+                                    city        = '" . $this->db->escape($data['city']) . "',
+                                    postcode    = '',
+                                    country_id  = '" . (int)$data['country_id'] . "',
+                                    zone_id     = '" . (int)$data['zone_id'] . "'
+                                ");
                 $address_id = $this->db->getLastId();
 
                 $this->db->query("UPDATE `" . DB_PREFIX . "customer` SET address_id = '" . (int)$address_id . "'

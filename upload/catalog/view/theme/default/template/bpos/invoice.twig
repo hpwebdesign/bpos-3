@@ -12,13 +12,13 @@
 <div class="actions">
   <button id="btn-print" class="btn primary" title="Print">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
-    Print
+    {{ button_print  }}
   </button>
   <button id="btn-pdf" class="btn ghost" title="Save as PDF">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V7l-2 2"/><path d="M12 7l2 2"/><path d="M4 17v2h16v-2"/></svg>
-    Download PDF
+    {{ button_download_pdf }}
   </button>
-  <a href="{{ home }}" class="btn primary">Home</a>
+  <a href="{{ home }}" class="btn primary">{{ button_home }}</a>
 </div>
 
 <section class="page" id="invoice-page">
@@ -34,35 +34,37 @@
     </div>
 
     <div class="summary">
-      <h2 class="title">Invoice</h2>
+      <h2 class="title">{{ text_invoice }}</h2>
       <div class="kv">
-        <span>Reference</span><b data-ref>{{ invoice_no }}</b>
-        <span>Date</span><b>{{ date_added }}</b>
-        <span>Due Date</span><b>{{ due_date }}</b>
-        {% if tax_id %}
-          <span>Tax Identification Number</span><b>{{ tax_id }}</b>
-        {% endif %}
+        <span>{{ text_reference }}</span><b data-ref>{{ invoice_no }}</b>
+        <span>{{ text_date }}</span><b>{{ date_added }}</b>
+        <span>{{ text_due_date }}</span><b>{{ due_date }}</b>
       </div>
     </div>
   </div>
 
   <div class="blocks">
     <div class="block">
-      <h3>Our Information</h3>
+      <h3>{{ text_our_information }}</h3>
       <div class="line"></div>
       <div class="address">{{ store_address }}</div>
       <div class="contact">
         Phone: {{ store_phone }}<br>
-        Email: {{ store_email }}
+        Email: {{ store_email }}<br>
+        {% if store_website %}
+          Website: <a href="{{ store_website }}" target="_blank">{{ store_website }}</a>
+          {% endif %}
       </div>
     </div>
     <div class="block">
-      <h3>Billing For</h3>
+      <h3>{{ text_billing_for }}</h3>
       <div class="line"></div>
-      <div class="address">{{ customer_name }}</div>
+      <div class="address">{{ shipping_address }}</div>
       <div class="contact">
         Phone: {{ customer_phone }}<br>
+        {% if customer_email %}
         Email: {{ customer_email }}
+        {% endif %}
       </div>
     </div>
   </div>
@@ -71,11 +73,11 @@
     <table>
       <thead>
         <tr>
-          <th style="width:16%">Product</th>
-          <th>Description</th>
-          <th class="ta-center" style="width:12%">Qty</th>
-          <th class="ta-right nowrap" style="width:14%">Price ({{ currency_code }})</th>
-          <th class="ta-right nowrap" style="width:16%">Amount ({{ currency_code }})</th>
+            <th style="width:14%">{{ text_image }}</th>
+            <th>{{ text_product }}</th>
+            <th class="ta-center">{{ text_quantity }}</th>
+            <th class="ta-right nowrap">{{ text_price }} ({{ currency_code }})</th>
+            <th class="ta-right nowrap">{{ text_amount }} ({{ currency_code }})</th>
         </tr>
       </thead>
       <tbody>
@@ -100,7 +102,7 @@
 
   <div class="totals">
     <div class="note-box">
-      <strong>Notes</strong><br>
+     <strong>{{ text_notes }}</strong><br>
       {{ notes|raw }}
     </div>
     <div class="sum">
@@ -114,8 +116,8 @@
   </div>
 
   <div class="amount-due">
-    <div>Issued on <b>{{ date_added }}</b></div>
-    <div>Approved by <b>{{ approved_by }}</b></div>
+   <div>{{ text_issued_on }} <b>{{ date_added }}</b></div>
+    <div>{{ text_approved_by }} <b>{{ approved_by }}</b></div>
   </div>
 {# 
   <div class="terms no-split">
