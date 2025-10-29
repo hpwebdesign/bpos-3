@@ -965,19 +965,44 @@ function getCurrentCustomerName(){
   return t;
 }
 
-function formatIDR(n){
+function formatIDR(n) {
   var num = Number(n || 0);
   var el = document.getElementById('bpos-currency');
-  var code = (el && el.getAttribute('data-code')) || 'IDR';
-  try {
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: code }).format(num);
-  } catch (e) {
-    // Fallback to IDR formatting without decimals
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+
+  if (!el) return num;
+
+  var symbolLeft   = el.getAttribute('data-symbol-left') || '';
+  var symbolRight  = el.getAttribute('data-symbol-right') || '';
+  var decimalPlace = parseInt(el.getAttribute('data-decimal-place') || '0', 10);
+
+  // Fungsi numberFormat manual (mirip PHP number_format)
+  function numberFormat(number, decimals, decPoint, thousandsSep) {
+    number = Number(number) || 0;
+    decimals = isNaN(decimals) ? 0 : Math.abs(decimals);
+    decPoint = decPoint || ',';
+    thousandsSep = thousandsSep || '.';
+
+    var fixedNum = number.toFixed(decimals);
+    var parts = fixedNum.split('.');
+    var integerPart = parts[0];
+    var decimalPart = parts.length > 1 ? decPoint + parts[1] : '';
+
+    // Tambah pemisah ribuan (.)
+    integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSep);
+
+    return integerPart + decimalPart;
   }
+
+  // Format sesuai pengaturan decimalPlace
+  var formatted = numberFormat(num, decimalPlace, ',', '.');
+
+  // Tambahkan simbol kiri dan kanan
+  return symbolLeft + formatted + symbolRight;
 }
-function toNumber(v){
+
+function toNumber(v) {
   if (v === '' || v == null) return 0;
+  v = String(v).replace(/[^\d.-]/g, ''); // bersihkan semua karakter non-angka
   var n = Number(v);
   return isNaN(n) ? 0 : n;
 }
@@ -1240,7 +1265,8 @@ function openSwal(type, onSubmit){
       willOpen: function() { Swal.showLoading(); },
       didOpen: function() {
         fetchCartSummary().then(function(summary){
-          var subtotal = Number(summary && summary.subtotal || 0);
+          var subtotal = toNumber(summary && summary.subtotal || 0);
+          console.log(subtotal);
           var wrap = isDiscount ? '#swal_discount_preview' : '#swal_charge_preview';
           var $wrap = $(wrap);
           $wrap.find('[data-subtotal]').text(formatIDR(subtotal));
@@ -1257,7 +1283,7 @@ function openSwal(type, onSubmit){
           var recalc = debounce(function(){
             var pct = toNumber($(isDiscount ? '#swal_discount_pct' : '#swal_charge_pct').val());
             var fix = toNumber($(isDiscount ? '#swal_discount_fix' : '#swal_charge_fix').val());
-            var fromPct = Math.floor(subtotal * (pct/100));
+            var fromPct = Math.round(subtotal * (pct/100));
             var fromFix = fix;
             var delta = fromPct + fromFix;
             var newTotal = isDiscount ? Math.max(0, subtotal - delta) : subtotal + delta;
@@ -1419,6 +1445,10 @@ Swal.fire({
     }
   }
 });
+
+function toNumberSafe(val) {
+  return Number(String(val || '0').replace(/[^\d.-]/g, '')) || 0;
+}
 
   function bindCustomerButtons(){
     $('#swal_add_customer').on('click', function(){

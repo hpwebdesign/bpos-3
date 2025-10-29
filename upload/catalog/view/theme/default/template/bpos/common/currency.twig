@@ -5,6 +5,7 @@
     {% if currency.code == code %}
       data-symbol-left="{{ currency.symbol_left }}"
       data-symbol-right="{{ currency.symbol_right }}"
+      data-decimal-place="{{ currency.decimal_place }}"
     {% endif %}
   {% endfor %}
   style="display:none"></span>

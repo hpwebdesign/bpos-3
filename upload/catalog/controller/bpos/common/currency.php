@@ -17,6 +17,7 @@ class ControllerBposCommonCurrency extends Controller {
             if ($result['status']) {
                 $data['currencies'][] = array(
                     'title'        => $result['title'],
+                    'decimal_place'        => $result['decimal_place'],
                     'code'         => $result['code'],
                     'symbol_left'  => $result['symbol_left'],
                     'symbol_right' => $result['symbol_right']

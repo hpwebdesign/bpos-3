@@ -225,7 +225,7 @@ class ControllerBposCheckoutCart extends Controller {
         }
 
         $subtotal=$this->getSubtotal();
-        $from_pct=floor($subtotal*($percent/100.0));
+        $from_pct=round($subtotal*($percent/100.0));
         $amount=$from_pct + $fixed;
         if($amount>$subtotal){$amount=$subtotal;} // prevent negative totals
 
@@ -259,7 +259,7 @@ class ControllerBposCheckoutCart extends Controller {
         }
 
         $subtotal=$this->getSubtotal();
-        $from_pct=floor($subtotal*($percent/100.0));
+        $from_pct=round($subtotal*($percent/100.0));
         $amount=$from_pct + $fixed;
 
         $this->session->data['bpos_charge']=array(
