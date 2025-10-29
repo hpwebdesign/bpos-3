@@ -264,7 +264,7 @@ class ControllerBposOrder extends Controller {
 
     public function addOrder() {
         $this->load->model('checkout/order');
-
+        $this->load->model('bpos/order');
         $json = [];
         $order_data = [];
         if (!$this->cart->hasProducts()) {
