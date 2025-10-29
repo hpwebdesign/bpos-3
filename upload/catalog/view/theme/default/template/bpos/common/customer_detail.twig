@@ -1,0 +1,127 @@
+<div class="kv">
+  <div class="muted">{{ entry_name }}</div>
+  <div>
+    <input id="f_name" value="{{ c.name|e }}" class="inp">
+  </div>
+</div>
+
+<div class="kv">
+  <div class="muted">{{ entry_customer_group }}</div>
+  <div class="chips">
+    {% for g in groups %}
+      {% set badge_class = '' %}
+      {% if 'vip' in g.name|lower %}
+        {% set badge_class = 'vip' %}
+      {% elseif 'gold' in g.name|lower %}
+        {% set badge_class = 'gold' %}
+      {% endif %}
+      <label class="badge {{ badge_class }}">
+        <input type="radio" name="tier" value="{{ g.id }}"
+          {% if c.tier == g.id %}checked{% endif %}>
+        {{ g.name }}
+      </label>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="kv">
+  <div class="muted">{{ entry_telephone }}</div>
+  <div>
+    <input id="f_phone" value="{{ c.phone|e }}" class="inp">
+  </div>
+</div>
+
+<div class="kv">
+  <div class="muted">{{ entry_email }}</div>
+  <div>
+    <input id="f_email" value="{{ c.email|e }}" class="inp">
+  </div>
+</div>
+
+<div class="kv">
+  <div class="muted">{{ entry_address }}</div>
+  <div>
+    <input id="f_address" value="{{ c.address|e }}" class="inp" placeholder="Street address, house number">
+  </div>
+</div>
+
+<div class="kv">
+  <div class="muted">{{ entry_city }}</div>
+  <div>
+    <input id="f_city" value="{{ c.city|e }}" class="inp">
+  </div>
+</div>
+
+<div class="kv">
+  <div class="muted">{{ entry_country }}</div>
+  <div>
+    <select id="f_country_id" class="inp form-control">
+      <option value="">--- Please Select ---</option>
+      {% for country in countries %}
+        <option value="{{ country.country_id }}"
+          {% if c.country_id == country.country_id %}selected{% endif %}>
+          {{ country.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
+
+<div class="kv">
+  <div class="muted">{{ entry_zone }}</div>
+  <div>
+    <select id="f_zone_id" class="inp form-control" data-current-zone="{{ c.zone_id }}">
+      <option value="">--- Please Select ---</option>
+      {% if zones %}
+        {% for zone in zones %}
+          <option value="{{ zone.zone_id }}"
+            {% if c.zone_id == zone.zone_id %}selected{% endif %}>
+            {{ zone.name }}
+          </option>
+        {% endfor %}
+      {% endif %}
+    </select>
+  </div>
+</div>
+
+<div class="kv">
+  <div class="muted">{{ entry_joined }}</div>
+  <div>{{ c.joined ?: '-' }}</div>
+</div>
+
+<div class="kv">
+  <div class="muted">{{ entry_orders }}</div>
+  <div>{{ c.orders ?: 0 }}</div>
+</div>
+
+<div class="kv">
+  <div class="muted">{{ entry_total_spent }}</div>
+  <div class="money">{{ fmtSpent }}</div>
+</div>
+
+<div>
+  <div class="muted" style="margin-bottom:6px">{{ entry_notes }}</div>
+  <textarea id="f_notes" rows="2" class="inp">{{ c.notes|e }}</textarea>
+</div>
+
+<div class="orders">
+  <div class="muted" style="margin-bottom:6px">{{ entry_recent_orders }}</div>
+  {% if c.recent_orders and c.recent_orders|length > 0 %}
+    <ul style="margin:0 0 0 16px;padding:0">
+      {% for o in c.recent_orders %}
+        <li>
+          <strong>{{ o.invoice }}</strong> • {{ o.date }} •
+          {{ currency.format(o.total, currency_code) }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="muted">{{ text_no_recent_order }}</div>
+  {% endif %}
+</div>
+
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+  <button class="btn btn-sm btn-success ghost" id="actStartOrder" data-id="{{ c.id }}">{{ button_start_order }}</button>
+  <button class="btn btn-sm ghost" id="actSendReceipt" data-id="{{ c.id }}">{{ button_send_receipt }}</button>
+  <button class="btn btn-sm btn-primary ghost" id="actAddPoints" data-id="{{ c.id }}">{{ button_save }}</button>
+</div>

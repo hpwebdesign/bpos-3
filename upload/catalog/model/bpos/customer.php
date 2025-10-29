@@ -7,7 +7,8 @@ class ModelBposCustomer extends Model {
             'customer' => []
         ];
 
-        if ((int)$customer_id <= 0) {
+        $customer_id = (int)$customer_id;
+        if ($customer_id <= 0) {
             return $result;
         }
 
@@ -15,16 +16,16 @@ class ModelBposCustomer extends Model {
             SELECT 
                 c.customer_id AS id,
                 CONCAT(c.firstname, ' ', c.lastname) AS name,
+                c.firstname,
+                c.lastname,
                 c.email,
                 c.telephone AS phone,
                 c.address_id,
                 c.customer_group_id AS tier,
-                a.address_1 AS address,
                 c.date_added AS joined,
                 c.note AS notes
             FROM `" . DB_PREFIX . "customer` c
-            LEFT JOIN `" . DB_PREFIX . "address` a ON a.address_id = c.address_id
-            WHERE c.customer_id = '" . (int)$customer_id . "'
+            WHERE c.customer_id = '" . $customer_id . "'
             LIMIT 1
         ");
 
@@ -34,12 +35,60 @@ class ModelBposCustomer extends Model {
 
         $customer = $query->row;
 
+        $address = [
+            'address_id'  => 0,
+            'address_1'   => '',
+            'city'        => '',
+            'postcode'    => '',
+            'country_id'  => 0,
+            'zone_id'     => 0,
+            'country'     => '',
+            'zone'        => ''
+        ];
+
+        if (!empty($customer['address_id'])) {
+            $address_query = $this->db->query("
+                SELECT 
+                    a.address_id,
+                    a.firstname,
+                    a.lastname,
+                    a.company,
+                    a.address_1,
+                    a.address_2,
+                    a.city,
+                    a.postcode,
+                    a.country_id,
+                    a.zone_id,
+                    co.name AS country,
+                    z.name AS zone
+                FROM `" . DB_PREFIX . "address` a
+                LEFT JOIN `" . DB_PREFIX . "country` co ON a.country_id = co.country_id
+                LEFT JOIN `" . DB_PREFIX . "zone` z ON a.zone_id = z.zone_id
+                WHERE a.address_id = '" . (int)$customer['address_id'] . "'
+                LIMIT 1
+            ");
+            if ($address_query->num_rows) {
+                $address = $address_query->row;
+            }
+        }
+
+        $customer = array_merge($customer, [
+            'address_id' => $address['address_id'],
+            'address'    => $address['address_1'],
+            'city'       => $address['city'],
+            'postcode'   => $address['postcode'],
+            'country_id' => (int)$address['country_id'],
+            'zone_id'    => (int)$address['zone_id'],
+            'country'    => $address['country'],
+            'zone'       => $address['zone']
+        ]);
+
         $orderQuery = $this->db->query("
             SELECT 
                 COUNT(order_id) AS total_orders,
                 SUM(total) AS total_spent
             FROM `" . DB_PREFIX . "order`
-            WHERE customer_id = '" . (int)$customer_id . "'
+            WHERE customer_id = '" . $customer_id . "'
               AND order_status_id > 0
         ");
 
@@ -51,7 +100,7 @@ class ModelBposCustomer extends Model {
                 total,
                 date_added
             FROM `" . DB_PREFIX . "order`
-            WHERE customer_id = '" . (int)$customer_id . "'
+            WHERE customer_id = '" . $customer_id . "'
               AND order_status_id > 0
             ORDER BY date_added DESC
             LIMIT 5
@@ -62,7 +111,7 @@ class ModelBposCustomer extends Model {
             $orders[] = [
                 'id'      => (int)$row['order_id'],
                 'invoice' => ($row['invoice_no'] ? ($row['invoice_prefix'] . $row['invoice_no']) : '—'),
-                'total'   => $this->currency->format((float)$row['total'],$this->config->get('config_currency')),
+                'total'   => $this->currency->format((float)$row['total'], $this->config->get('config_currency')),
                 'date'    => date('Y-m-d', strtotime($row['date_added']))
             ];
         }
@@ -76,6 +125,7 @@ class ModelBposCustomer extends Model {
 
         return $result;
     }
+
 
     public function addCustomer($data) {
         $parts = preg_split('/\s+/', $data['name'], 2);
@@ -177,5 +227,23 @@ class ModelBposCustomer extends Model {
         }
 
         return true;
+    }
+
+    public function getCustomerGroups() {
+
+        $query = $this->db->query("SELECT customer_group_id AS id, name 
+                                   FROM " . DB_PREFIX . "customer_group_description 
+                                   WHERE language_id = '" . (int)$this->config->get('config_language_id') . "'
+                                   ORDER BY customer_group_id ASC");
+
+        $groups = [];
+        foreach ($query->rows as $row) {
+            $groups[] = [
+                'id'   => (int)$row['id'],
+                'name' => $row['name']
+            ];
+        }
+
+        return $groups;
     }
 }

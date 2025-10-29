@@ -50,6 +50,7 @@ class ControllerBposCheckoutOrderConfirm extends Controller {
             'payment_method' => $order_info['payment_method']
         );
         $data['link_wa'] = "https://wa.me/".$this->config->get('bpos_country_code').$this->config->get('bpos_whatsapp_number');
+        $data['link_invoice'] = $this->url->link('bpos/invoice', 'order_id='.$order_id, true);
         $data['products'] = $products;
         $data['totals']   = array();
         $data['language'] = $this->load->controller('bpos/language');

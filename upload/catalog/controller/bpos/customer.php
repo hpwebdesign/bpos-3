@@ -208,5 +208,67 @@ class ControllerBposCustomer extends Controller {
         $this->response->setOutput(json_encode($result));
     }
 
+    public function getCustomerHtml() {
+
+        $this->response->addHeader('Content-Type: text/html; charset=utf-8');
+        $this->load->language('bpos/customer');
+        $id = isset($this->request->get['id']) ? (int)$this->request->get['id'] : 0;
+        if ($id <= 0) {
+            $this->response->setOutput('<div style="padding:20px;color:#e11;">Invalid Customer ID</div>');
+            return;
+        }
+
+        $this->load->model('bpos/customer');
+        $this->load->model('localisation/country');
+        $this->load->model('localisation/zone');
+        $customer = $this->model_bpos_customer->getCustomerDetail($id);
+
+        if (!$customer || empty($customer['ok'])) {
+            $this->response->setOutput('<div style="padding:20px;color:#e11;">Customer not found.</div>');
+            return;
+        }
+
+        $data = [];
+        $data['c'] = $customer['customer'];
+        $data['countries'] = $this->model_localisation_country->getCountries();
+        $data['zones'] = [];
+        if (!empty($data['c']['country_id'])) {
+            $data['zones'] = $this->model_localisation_zone->getZonesByCountryId($data['c']['country_id']);
+        }
+        $data['groups'] = $this->model_bpos_customer->getCustomerGroups();
+        $data['currency_code'] = $this->config->get('config_currency');
+        $data['fmtSpent'] = $this->currency->format($data['c']['spent'], $data['currency_code']);
+
+        $html = $this->load->view('bpos/common/customer_detail', $data);
+        
+
+        $this->response->setOutput($html);
+    }
+
+    public function zone() {
+        $this->response->addHeader('Content-Type: application/json; charset=utf-8');
+
+        $country_id = isset($this->request->get['country_id']) ? (int)$this->request->get['country_id'] : 0;
+
+        $this->load->model('localisation/zone');
+
+        $zones = [];
+
+        if ($country_id > 0) {
+            $results = $this->model_localisation_zone->getZonesByCountryId($country_id);
+            foreach ($results as $z) {
+                $zones[] = [
+                    'zone_id' => (int)$z['zone_id'],
+                    'name'    => $z['name']
+                ];
+            }
+        }
+
+        $this->response->setOutput(json_encode([
+            'ok'    => true,
+            'zones' => $zones
+        ]));
+    }
+
 
 }

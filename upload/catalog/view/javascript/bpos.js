@@ -580,35 +580,10 @@ function loadCustomerGroups() {
     .catch(err => console.error('Customer group error:', err));
 }
 
-const seeded = [
-  {id:1, name:'Johnathan Doe', phone:'+62812-1111-2222', email:'john@example.com', address:'Jl. Melati No. 10, Jakarta', tier:'Gold', orders:12, last:'2025-10-15', spent:5200000, joined:'2024-03-12', notes:'Prefers COD; allergic to peanuts'},
-  {id:2, name:'Ayu Lestari', phone:'+62822-3333-4444', email:'ayu@example.com', address:'Gianyar, Bali', tier:'VIP', orders:31, last:'2025-10-18', spent:18200000, joined:'2023-12-01', notes:'Top spender; likes bundle promo'},
-  {id:3, name:'Budi Santoso', phone:'+62813-5555-6666', email:'budi@example.com', address:'Bandung', tier:'Silver', orders:6, last:'2025-09-30', spent:2100000, joined:'2024-10-03', notes:'Ask for gift wrap'},
-  {id:4, name:'Clara Wijaya', phone:'+62857-7777-8888', email:'clara@example.com', address:'Tangerang', tier:'New', orders:1, last:'2025-10-17', spent:180000, joined:'2025-10-12', notes:'New customer from IG'},
-  {id:5, name:'Dimas Pratama', phone:'+62895-9999-0000', email:'dimas@example.com', address:'Surabaya', tier:'VIP', orders:19, last:'2025-10-08', spent:9600000, joined:'2022-08-22', notes:'Often buys toys; member points active'},
-  {id:6, name:'Elisa Hartono', phone:'+62819-1212-3434', email:'elisa@example.com', address:'Semarang', tier:'Bronze', orders:3, last:'2025-08-28', spent:750000, joined:'2024-11-09', notes:'Prefers morning delivery'},
-  {id:7, name:'Farhan Akbar', phone:'+62818-1111-2222', email:'farhan@example.com', address:'Makassar', tier:'Gold', orders:14, last:'2025-10-12', spent:6300000, joined:'2023-06-19', notes:'Likes electronics'},
-  {id:8, name:'Grace Natalia', phone:'+62821-9999-1212', email:'grace@example.com', address:'Bekasi', tier:'New', orders:2, last:'2025-10-16', spent:420000, joined:'2025-10-10', notes:'Came from Shopee'},
-  {id:9, name:'Hana Kusuma', phone:'+62812-0000-1111', email:'hana@example.com', address:'Yogyakarta', tier:'VIP', orders:27, last:'2025-10-18', spent:13900000, joined:'2023-10-29', notes:'Ask for paperless receipt'},
-  {id:10, name:'Ivan Nugraha', phone:'+62855-1212-5656', email:'ivan@example.com', address:'Medan', tier:'Silver', orders:5, last:'2025-08-15', spent:1100000, joined:'2024-01-03', notes:'Slow payer; confirm first'},
-  ...Array.from({length:28}).map((_,i)=>({
-    id:100+i,
-    name:`Sample Customer ${i+1}`,
-    phone:`+6281${i%10}${i}${i}${i}${i}${i}${i}`,
-    email:`sample${i+1}@example.com`,
-    address:`Sample Address ${i+1}`,
-    tier:['New','Bronze','Silver','Gold','VIP'][i%5],
-    orders:Math.floor(Math.random()*32),
-    last:new Date(Date.now()-Math.random()*60*864e5).toISOString().slice(0,10),
-    spent:Math.floor(Math.random()*20000000),
-    joined:new Date(Date.now()-Math.random()*600*864e5).toISOString().slice(0,10),
-    notes:'—'
-  }))
-];
+const seeded = [];
 
 const state={ q:'', sort:'name', vipOnly:false, page:0, perPage:10, data:[...seeded] };
 
-// helpers
 const money = n => 'Rp ' + n.toLocaleString('id-ID');
 const daysAgo = (d)=> (Date.now()-new Date(d).getTime())/864e5;
 
@@ -708,34 +683,79 @@ function openDetail(id) {
   const $drawer = $('#drawer');
   $drawer.addClass('open').attr('aria-hidden', 'false');
 
-  // 🔹 Jika id > 0 → ambil data dari server
-  if (id > 0) {
-    $('#detail').html('<div style="padding:20px;text-align:center;">Loading customer...</div>');
+  $('#detail').html('<div class="loading-ajax">Loading customer...</div>');
 
-    $.getJSON('index.php?route=bpos/customer/getCustomerAjax&id=' + id)
-      .done(function(res) {
-        if (res && res.ok && res.customer) {
-          renderCustomerDetail(res.customer);
-        } else {
-          $('#detail').html('<div style="padding:20px;color:#e11;">Failed to load customer data.</div>');
-        }
-      })
-      .fail(function(xhr) {
-        console.error(xhr);
-        $('#detail').html('<div style="padding:20px;color:#e11;">Error loading customer data.</div>');
-      });
-  }
-  // 🔹 Jika id <= 0 → pakai data lokal
-  else {
-    const c = state.data.find(x => x.id === id);
-    if (!c) return;
-    renderCustomerDetail(c);
-  }
+  $.ajax({
+    url: 'index.php?route=bpos/customer/getCustomerHtml&id=' + id,
+    type: 'GET',
+    dataType: 'html',
+    success: function(html) {
+      $('#detail').html(html);
 
-  // Simpan ID aktif ke tombol kontrol
+      // setelah HTML injected, pasang handler
+      bindCustomerLocationHandlers();
+    },
+    error: function(xhr) {
+      console.error(xhr);
+      $('#detail').html('<div class="loading-ajax">Failed to load customer detail.</div>');
+    }
+  });
+
   $('#saveBtn').data('id', id);
   $('#deleteBtn').data('id', id);
 }
+
+function bindCustomerLocationHandlers() {
+  // ketika country berubah, reload zone list
+  $(document).off('change.bpos_country').on('change.bpos_country', '#f_country_id', function() {
+    var countryId = $(this).val() || '';
+    var $zone = $('#f_zone_id');
+
+    // kosongkan dulu / show loading
+    $zone.html('<option value="">Loading...</option>');
+
+    if (!countryId) {
+      $zone.html('<option value="">--- Please Select ---</option>');
+      return;
+    }
+
+    $.ajax({
+      url: 'index.php?route=bpos/customer/zone&country_id=' + countryId,
+      type: 'GET',
+      dataType: 'json',
+      success: function(res) {
+        if (!res || !res.ok) {
+          $zone.html('<option value="">--- Please Select ---</option>');
+          return;
+        }
+
+        var currentZoneId = $zone.attr('data-current-zone') || '';
+        var opts = '<option value="">--- Please Select ---</option>';
+
+        if (res.zones && res.zones.length) {
+          for (var i=0; i<res.zones.length; i++) {
+            var z = res.zones[i];
+            opts += '<option value="'+ z.zone_id +'"'
+              + (String(currentZoneId) === String(z.zone_id) ? ' selected' : '')
+              + '>'+ z.name +'</option>';
+          }
+        } else {
+          opts += '<option value="0" selected="selected"> --- None --- </option>';
+        }
+
+        $zone.html(opts);
+      },
+      error: function(xhr) {
+        console.error(xhr);
+        $zone.html('<option value="">--- Please Select ---</option>');
+      }
+    });
+  });
+
+  // trigger sekali di awal agar zone dropdown sync dengan country awal
+  $('#f_country_id').trigger('change.bpos_country');
+}
+
 
 function renderCustomerDetail(c) {
   const html = `
@@ -1071,9 +1091,9 @@ function buildCustomerHTML(){
 
     '</div>'+
     '<div class="form-group">'+
-      '<div style="font-size:14px;">Current Customer: <strong>'+ $('<div>').text(cur).html() +'</strong></div>'+
+      '<div>Current Customer: <strong>'+ $('<div>').text(cur).html() +'</strong></div>'+
     '</div>'+
-    '<label style="display:block;margin-bottom:6px;">Change Customer</label>'+
+    '<label class="label-customer">Change Customer</label>'+
     '<input type="text" id="swal_customer_input" class="form-control" placeholder="Type name to search" autocomplete="off" />'+
     '<input type="hidden" id="swal_customer_id" />'+
     '<div id="swal_customer_suggest">'+
@@ -1083,8 +1103,10 @@ function buildCustomerHTML(){
 }
 function buildDiscountHTML(){
   return ''+
+  '<p class="swal-desc">You can fill in one or both.</p>'+
   '<div class="swal-form">'+
-    '<div class="form-group" style="margin-bottom:10px;">'+
+    '<div class="swal-input">'+
+    '<div class="form-group">'+
       '<label>% Discount</label>'+
       '<input type="number" min="0" step="0.01" id="swal_discount_pct" class="form-control" placeholder="e.g. 10">'+
     '</div>'+
@@ -1092,20 +1114,23 @@ function buildDiscountHTML(){
       '<label>Fixed Discount</label>'+
       '<input type="number" min="0" step="1" id="swal_discount_fix" class="form-control" placeholder="e.g. 25000">'+
     '</div>'+
-    '<div id="swal_discount_preview" style="margin-top:8px;padding:8px;border:1px dashed #e5e7eb;border-radius:8px;font-size:12px;line-height:1.4;">'+
+    '</div>'+
+    '<div id="swal_discount_preview">'+
       '<div><strong>Subtotal:</strong> <span data-subtotal>-</span></div>'+
       '<div><strong>Discount %:</strong> <span data-from-pct>-</span></div>'+
       '<div><strong>Fixed Discount:</strong> <span data-from-fix>-</span></div>'+
       '<div><strong>Total diskon:</strong> <span data-total-disc>-</span></div>'+
       '<div><strong>New total:</strong> <span data-new-total>-</span></div>'+
     '</div>'+
-    '<p style="font-size:12px;color:#6b7280;margin-top:6px;">You can fill in one or both.</p>'+
+    
   '</div>';
 }
 function buildChargeHTML(){
   return ''+
+   '<p class="swal-desc">You can fill in one or both.</p>'+
   '<div class="swal-form">'+
-    '<div class="form-group" style="margin-bottom:10px;">'+
+   '<div class="swal-input">'+
+    '<div class="form-group">'+
       '<label>Charge %</label>'+
       '<input type="number" min="0" step="0.01" id="swal_charge_pct" class="form-control" placeholder="e.g. 5">'+
     '</div>'+
@@ -1113,14 +1138,15 @@ function buildChargeHTML(){
       '<label>Fixed Charge</label>'+
       '<input type="number" min="0" step="1" id="swal_charge_fix" class="form-control" placeholder="e.g. 5000">'+
     '</div>'+
-    '<div id="swal_charge_preview" style="margin-top:8px;padding:8px;border:1px dashed #e5e7eb;border-radius:8px;font-size:12px;line-height:1.4;">'+
+    '</div>'+
+    '<div id="swal_charge_preview">'+
       '<div><strong>Subtotal:</strong> <span data-subtotal>-</span></div>'+
       '<div><strong>Charge %:</strong> <span data-from-pct>-</span></div>'+
       '<div><strong>Fixed Charge:</strong> <span data-from-fix>-</span></div>'+
       '<div><strong>Total charge:</strong> <span data-total-charge>-</span></div>'+
       '<div><strong>New total:</strong> <span data-new-total>-</span></div>'+
     '</div>'+
-    '<p style="font-size:12px;color:#6b7280;margin-top:6px;">You can fill in one or both.</p>'+
+   
   '</div>';
 }
 
@@ -1128,18 +1154,18 @@ function buildCouponHTML(list){
   var items = (list||[]).map(function(c){
     var label = c.type === 'P' ? (c.discount + '%') : formatIDR(c.discount);
     var end = (c.date_end && c.date_end !== '0000-00-00') ? ('<small style="color:#6b7280">until '+c.date_end+'</small>') : '';
-    return '\n      <div class="swal-coupon-item" data-code="'+c.code+'" style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:6px;cursor:pointer;">\n        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">\n          <div>\n            <div style="font-weight:600">'+c.name+' <span style="color:#374151">('+c.code+')</span></div>\n            <div style="font-size:12px;color:#6b7280">'+label+' off '+end+'</div>\n          </div>\n          <div><span class="badge" style="background:#f3f4f6;color:#111827;">Select</span></div>\n        </div>\n      </div>';
+    return '\n      <div class="swal-coupon-item" data-code="'+c.code+'">\n        <div class="swal-coupon-content">\n          <div>\n            <div class="swal-coupon-name">'+c.name+' <span>('+c.code+')</span></div>\n            <div class="swal-coupon-label">'+label+' off '+end+'</div>\n          </div>\n          <div><span class="badge">Select</span></div>\n        </div>\n      </div>';
   }).join('');
-  if (!items) items = '<div class="text-muted" style="padding:8px 0">No active coupons</div>';
+  if (!items) items = '<div class="coupon-text-muted">No active coupons</div>';
   return ''+
     '<div class="swal-form">'+
-      '<div class="form-group" style="margin-bottom:10px;">'+
+    '<div class="swal-input">'+
+      '<div class="form-group">'+
         '<label>Coupon code</label>'+
-        '<div style="display:flex;gap:6px;">'+
-          '<input type="text" id="swal_coupon_code" class="form-control" placeholder="Enter coupon code" style="flex:1" />'+
+          '<input type="text" id="swal_coupon_code" class="form-control" placeholder="Enter coupon code" />'+
         '</div>'+
       '</div>'+
-      '<div id="swal_coupon_list" style="max-height:220px;overflow:auto">'+items+'</div>'+
+      '<div id="swal_coupon_list">'+items+'</div>'+
     '</div>';
 }
 
@@ -1194,7 +1220,7 @@ function openSwal(type, onSubmit){
   if (type === 'customer') {
     cfg = {
       title: 'Customer',
-      html: '<div style="text-align:center;padding:14px 0;">Loading...</div>',
+      html: '<div class="swal-ajax-loading">Loading...</div>',
       // willOpen: function(){  },
       didOpen: function(){
         ajaxLoadCustomers().then(function(){
@@ -1204,7 +1230,7 @@ function openSwal(type, onSubmit){
           bindCustomerButtons();
           bindCustomerAutocomplete();
         }).catch(function(){
-          Swal.getHtmlContainer().innerHTML = '<p style="color:#ef4444;">Failed to load customers</p>';
+          Swal.getHtmlContainer().innerHTML = '<p class="swal-error">Failed to load customers</p>';
         });
       },
       preConfirm: function(){
@@ -1225,7 +1251,7 @@ function openSwal(type, onSubmit){
   if (type === 'coupon') {
     cfg = {
       title: 'Coupon',
-      html: '<div style="text-align:center;padding:14px 0;">Loading...</div>',
+      html: '<div class="swal-ajax-loading">Loading...</div>',
       didOpen: function(){
         Promise.all([fetchCartSummary(), ajaxLoadCoupons()])
           .then(function(tuple){
@@ -1247,7 +1273,7 @@ function openSwal(type, onSubmit){
             // });
           })
           .catch(function(){
-            Swal.update({ html: '<p style="color:#ef4444;">Failed to load coupons</p>' });
+            Swal.update({ html: '<p class="swal-error">Failed to load coupons</p>' });
           });
       },
       preConfirm: function(){
@@ -1296,7 +1322,7 @@ function openSwal(type, onSubmit){
           recalc();
           Swal.hideLoading();
         }).catch(function(){
-          Swal.update({ footer: '<small style="color:#ef4444;">Failed to load subtotal</small>' });
+          Swal.update({ footer: '<small class="swal-error">Failed to load subtotal</small>' });
           Swal.hideLoading();
         });
       },
@@ -1497,8 +1523,8 @@ function toNumberSafe(val) {
     function render(items){
       if (!items || !items.length){ $box.hide().empty(); return; }
       var html = items.slice(0, 20).map(function(c){
-        return '<div class="swal-ac-item" data-id="'+c.id+'" data-name="'+escapeHtml(c.name)+'" style="padding:8px 10px;cursor:pointer;">'+
-                 escapeHtml(c.name)+' <small style="color:#6b7280">#'+c.id+'</small>'+
+        return '<div class="swal-ac-item" data-id="'+c.id+'" data-name="'+escapeHtml(c.name)+'">'+
+                 escapeHtml(c.name)+' <small>#'+c.id+'</small>'+
                '</div>';
       }).join('');
       $box.html(html).show();

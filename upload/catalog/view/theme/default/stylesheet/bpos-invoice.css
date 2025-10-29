@@ -1,0 +1,338 @@
+:root {
+    --ink: #0f172a;
+    --muted: #64748b;
+    --line: #e5e7eb;
+    --line-2: #d1d5db;
+    --brand: #0b5ea8;
+    --bg: #ffffff;
+    --table-head: #1f2937;
+}
+* {
+    box-sizing: border-box;
+}
+html, body {
+    height: 100%;
+}
+body {
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    margin: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+/* Floating action buttons */
+
+.actions {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+}
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.15s ease, background 0.2s ease;
+    text-decoration: none;
+    font-size: 13px;
+}
+.btn svg {
+    width: 18px;
+    height: 18px;
+}
+.btn:active {
+    transform: translateY(1px);
+}
+.btn.primary {
+    background: var(--brand);
+    color: #fff;
+}
+.btn.primary:hover {
+    background: #084c87;
+}
+.btn.ghost {
+    background: #fff;
+    color: var(--brand);
+    border: 1px solid #cfe2f6;
+}
+.btn.ghost:hover {
+    background: #f3f8fe;
+}
+/* Page */
+
+.header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: #e8f2fb;
+    display: grid;
+    place-items: center;
+    border: 1px solid #d9e6f7;
+}
+.logo svg {
+    width: 36px;
+    height: 36px;
+}
+.brand h1 {
+    margin: 0;
+    font-size: 22px;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+.brand small {
+    color: var(--muted);
+    display: block;
+    margin-top: 2px;
+}
+.summary {
+    text-align: right;
+}
+.summary .title {
+    color: var(--brand);
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+.kv {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 6px 16px;
+    font-size: 13px;
+}
+.kv b {
+    font-weight: 700;
+}
+.kv span {
+    color: var(--muted);
+}
+.blocks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-top: 28px;
+}
+.block h3 {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0 0 10px;
+}
+.line {
+    height: 2px;
+    background: var(--line);
+    margin: 8px 0 14px;
+}
+.muted {
+    color: var(--muted);
+}
+.address {
+    font-size: 13px;
+    line-height: 1.6;
+    white-space: pre-line;
+}
+.contact {
+    margin-top: 8px;
+    font-size: 13px;
+    line-height: 1.6;
+}
+.table-wrap {
+    margin-top: 26px;
+    border: 1px solid var(--line-2);
+    border-radius: 10px;
+    overflow: hidden;
+}
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+thead th {
+    background: var(--table-head);
+    color: #fff;
+    text-align: left;
+    padding: 12px 14px;
+    font-weight: 700;
+    font-size: 13px;
+    border-right: 1px solid #334155;
+}
+thead th:last-child {
+    border-right: 0;
+}
+tbody td {
+    background: #f8fafc;
+    border-top: 1px solid var(--line-2);
+    border-right: 1px solid var(--line-2);
+    padding: 12px 14px;
+    font-size: 13px;
+}
+tbody td:last-child {
+    border-right: 0;
+}
+tbody tr:nth-child(even) td {
+    background: #ffffff;
+}
+.ta-right {
+    text-align: right;
+}
+.ta-center {
+    text-align: center;
+}
+.nowrap {
+    white-space: nowrap;
+}
+.totals {
+    width: 100%;
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: 1fr 240px;
+    gap: 16px;
+    align-items: start;
+}
+.note-box {
+    font-size: 12.5px;
+    color: var(--muted);
+    padding: 12px 14px;
+    border: 1px solid var(--line-2);
+    border-radius: 10px;
+    background: #fafafa;
+    min-height: 84px;
+}
+.sum {
+    border: 1px solid var(--line-2);
+    border-radius: 10px;
+    overflow: hidden;
+}
+.sum .row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+    border-top: 1px solid var(--line-2);
+    background: #fff;
+}
+.sum .row:first-child {
+    border-top: 0;
+}
+.sum .row.total {
+    font-weight: 700;
+}
+.sum .row.highlight {
+    background: #f8fafc;
+    font-weight: 700;
+}
+.sum .label {
+    color: var(--muted);
+}
+.terms {
+    margin-top: 22px;
+    border-top: 2px solid var(--line);
+    padding-top: 12px;
+    font-size: 12.5px;
+    color: var(--muted);
+}
+.terms h4 {
+    margin: 0 0 8px 0;
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 13px;
+}
+.terms ol {
+    margin: 6px 0 0 18px;
+    padding: 0;
+}
+.terms li {
+    margin: 6px 0;
+    line-height: 1.5;
+}
+.amount-due {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border: 2px solid var(--line-2);
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    background: #fff;
+}
+@page {
+    size: A4;
+    margin: 14mm;
+}
+@media print {
+    .actions {
+        display: none;
+    }
+    .page {
+        padding: 0;
+        min-height: auto;
+    }
+    a[href]:after {
+        content: "";
+    }
+}
+@media (max-width: 860px) {
+    .page {
+        width: auto;
+        margin: 0;
+        padding: 20px;
+    }
+    .header {
+        grid-template-columns: 1fr;
+    }
+    .summary {
+        text-align: left;
+    }
+    .blocks {
+        grid-template-columns: 1fr;
+    }
+    .totals {
+        grid-template-columns: 1fr;
+    }
+}
+.no-split {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    padding-top: 15mm;
+}
+#invoice-page {
+    --pad-bottom: 15mm;
+}
+#invoice-page.pdf-mode {
+    box-shadow: none;
+}
+#invoice-page {
+    width: 210mm;
+    max-width: 210mm;
+    background: #fff;
+    padding: 20mm 15mm;
+    border: none;
+    box-shadow: none;
+    margin: 0 auto;
+}
+#invoice-page * img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}

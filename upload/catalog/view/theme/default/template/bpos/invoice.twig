@@ -1,34 +1,151 @@
-<div class="invoice p-4">
-    <h2>Invoice #{{ order_id }}</h2>
-    <p>{{ store_name }}<br>
-    Date: {{ date_added }}</p>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{{ title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="catalog/view/theme/default/stylesheet/bpos-invoice.css?v={{ random() }}">
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Product</th><th>Qty</th><th>Price</th><th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for product in products %}
-            <tr>
-                <td>{{ product.name }}</td>
-                <td>{{ product.quantity }}</td>
-                <td>{{ product.price }}</td>
-                <td>{{ product.total }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <div class="totals">
-        {% for total in totals %}
-            <div><strong>{{ total.title }}</strong>: {{ total.text }}</div>
-        {% endfor %}
-    </div>
-
-    <div class="mt-4">
-        <button onclick="window.print()" class="btn btn-primary">Print</button>
-        <a href="index.php?route=bpos/home" class="btn btn-secondary">Home</a>
-    </div>
+    </head>
+  <body>
+<div class="actions">
+  <button id="btn-print" class="btn primary" title="Print">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+    Print
+  </button>
+  <button id="btn-pdf" class="btn ghost" title="Save as PDF">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V7l-2 2"/><path d="M12 7l2 2"/><path d="M4 17v2h16v-2"/></svg>
+    Download PDF
+  </button>
+  <a href="{{ home }}" class="btn primary">Home</a>
 </div>
+
+<section class="page" id="invoice-page">
+  <div class="header">
+    <div class="brand">
+      <div class="logo">
+          <img src="{{ store_logo }}" alt="{{ store_name }}" style="max-height:80px;width:auto;">
+        </div>
+      {# <div>
+        <h1>{{ store_name }} <small style="font-weight:600;color:#0b5ea8">{{ store_tagline }}</small></h1>
+        <small>{{ store_slogan }}</small>
+      </div> #}
+    </div>
+
+    <div class="summary">
+      <h2 class="title">Invoice</h2>
+      <div class="kv">
+        <span>Reference</span><b data-ref>{{ invoice_no }}</b>
+        <span>Date</span><b>{{ date_added }}</b>
+        <span>Due Date</span><b>{{ due_date }}</b>
+        {% if tax_id %}
+          <span>Tax Identification Number</span><b>{{ tax_id }}</b>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="blocks">
+    <div class="block">
+      <h3>Our Information</h3>
+      <div class="line"></div>
+      <div class="address">{{ store_address }}</div>
+      <div class="contact">
+        Phone: {{ store_phone }}<br>
+        Email: {{ store_email }}
+      </div>
+    </div>
+    <div class="block">
+      <h3>Billing For</h3>
+      <div class="line"></div>
+      <div class="address">{{ customer_name }}</div>
+      <div class="contact">
+        Phone: {{ customer_phone }}<br>
+        Email: {{ customer_email }}
+      </div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:16%">Product</th>
+          <th>Description</th>
+          <th class="ta-center" style="width:12%">Qty</th>
+          <th class="ta-right nowrap" style="width:14%">Price ({{ currency_code }})</th>
+          <th class="ta-right nowrap" style="width:16%">Amount ({{ currency_code }})</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in products %}
+        <tr>
+            <td>
+                {% if product.image %}
+                  <img src="{{ product.image }}" alt="{{ product.name }}" style="max-width:60px;max-height:60px;object-fit:contain;border-radius:6px;">
+                {% else %}
+                  <img src="catalog/view/theme/default/image/no_image.png" alt="No Image" style="max-width:60px;opacity:0.5;">
+                {% endif %}
+            </td>
+          <td>{{ product.name }}</td>
+          <td class="ta-center">{{ product.quantity }}</td>
+          <td class="ta-right">{{ product.price }}</td>
+          <td class="ta-right">{{ product.total }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="totals">
+    <div class="note-box">
+      <strong>Notes</strong><br>
+      {{ notes|raw }}
+    </div>
+    <div class="sum">
+      {% for total in totals %}
+      <div class="row {% if loop.last %}highlight{% endif %}">
+        <span class="label">{{ total.title }}</span>
+        <b>{{ total.text }}</b>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="amount-due">
+    <div>Issued on <b>{{ date_added }}</b></div>
+    <div>Approved by <b>{{ approved_by }}</b></div>
+  </div>
+{# 
+  <div class="terms no-split">
+    <h4>Terms and Conditions</h4>
+    <ol>
+      {% for term in terms %}
+      <li>{{ term }}</li>
+      {% endfor %}
+    </ol>
+  </div> #}
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+  function downloadPDF() {
+    const root = document.getElementById('invoice-page');
+    root.classList.add('pdf-mode');
+    const opt = {
+      filename: '{{ invoice_no|replace({'/':'-'}) }}.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'], avoid: ['.no-split'] }
+    };
+    html2pdf().set(opt).from(root).save().then(()=>{
+      root.classList.remove('pdf-mode');
+    });
+  }
+  document.getElementById('btn-print').addEventListener('click', () => window.print());
+  document.getElementById('btn-pdf').addEventListener('click', downloadPDF);
+</script>
+  </body>
+</html>

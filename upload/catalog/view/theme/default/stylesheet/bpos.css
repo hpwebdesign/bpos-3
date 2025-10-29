@@ -1148,6 +1148,13 @@ body .notyf .notyf__toast--success {
     max-height: 220px;
     overflow: auto
 }
+.swal-ac-item {
+    padding: 8px 10px;
+    cursor: pointer;
+}
+.swal-ac-item small {
+    color: #6b7280;
+}
 #swal_add_customer {
     flex: 1;
 }
@@ -1393,4 +1400,134 @@ body .notyf .notyf__toast--success {
     padding: 10px;
     border: 1px solid #e6e8ef;
     border-radius: 10px;
+}
+.swal-input {
+    display: flex;
+    gap: 15px;
+    justify-content: space-between;
+}
+#swal_discount_preview {
+    max-width: 100%;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+#swal_discount_preview>div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px dashed #e2e8f0;
+    font-size: 14px;
+}
+#swal_discount_preview>div:last-child {
+    border-bottom: none;
+}
+#swal_discount_preview strong {
+    color: #1e293b;
+    font-weight: 600;
+}
+#swal_discount_preview span {
+    color: #0f172a;
+    font-weight: 500;
+}
+#swal_discount_preview>div:last-child span {
+    font-weight: 700;
+    color: #2563eb;
+    font-size: 15px;
+}
+#swal_charge_preview {
+    max-width: 100%;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+#swal_charge_preview>div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px dashed #e2e8f0;
+    font-size: 14px;
+}
+#swal_charge_preview>div:last-child {
+    border-bottom: none;
+}
+#swal_charge_preview strong {
+    color: #1e293b;
+    font-weight: 600;
+}
+#swal_charge_preview span {
+    color: #0f172a;
+    font-weight: 500;
+}
+#swal_charge_preview>div:last-child span {
+    font-weight: 700;
+    color: #2563eb;
+    font-size: 15px;
+}
+.swal-desc {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 6px;
+}
+.loading-ajax {
+    padding: 20px;
+    text-align: center;
+    color: #e11;
+}
+.swal-coupon-item {
+    padding: 8px 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    cursor: pointer;
+}
+.swal-coupon-item .badge {
+    background: #f3f4f6;
+    color: #111827;
+}
+.swal-coupon-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+.swal-coupon-name {
+    font-weight: 600;
+}
+.swal-coupon-name span {
+    color: #374151;
+}
+.swal-coupon-label {
+    font-size: 12px;
+    color: #6b7280;
+}
+.coupon-text-muted {
+    padding: 8px 0;
+}
+.swal-form .form-group {
+    margin-bottom: 10px;
+}
+.swal-form #swal_coupon_code {
+    flex: 1;
+}
+#swal_coupon_list {
+    max-height: 220px;
+    overflow: auto;
+}
+.label-customer {
+    display: block;
+    margin-bottom: 6px;
+}
+.swal-ajax-loading {
+    text-align: center;
+    padding: 14px 0;
+}
+.swal-error {
+    color: #ef4444;
 }
