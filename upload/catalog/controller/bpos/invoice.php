@@ -63,23 +63,29 @@ class ControllerBposInvoice extends Controller {
         }
 
         $city_line = [];
+
         if (!empty($order_info['shipping_city'])) {
             $city_line[] = trim($order_info['shipping_city']);
         }
+
         if (!empty($order_info['shipping_postcode'])) {
             $city_line[] = trim($order_info['shipping_postcode']);
         }
+
         if ($city_line) {
             $parts[] = implode(', ', $city_line);
         }
 
         $region_line = [];
+
         if (!empty($order_info['shipping_zone'])) {
             $region_line[] = trim($order_info['shipping_zone']);
         }
+
         if (!empty($order_info['shipping_country'])) {
             $region_line[] = trim($order_info['shipping_country']);
         }
+
         if ($region_line) {
             $parts[] = implode(', ', $region_line);
         }
@@ -95,10 +101,10 @@ class ControllerBposInvoice extends Controller {
         $data['currency_code'] = $order_info['currency_code'];
         $data['products'] = [];
         $products = $this->model_checkout_order->getOrderProducts($order_id);
-        
+
         foreach ($products as $product) {
             $product_info = $this->model_catalog_product->getProduct($product['product_id']);
-            
+
             if (!empty($product_info['image']) && is_file(DIR_IMAGE . $product_info['image'])) {
                 $image = $this->model_tool_image->resize($product_info['image'], 50, 50);
             } else {
@@ -133,11 +139,7 @@ class ControllerBposInvoice extends Controller {
         }
 
         $data['approved_by'] = 'Finance';
-        $data['terms'] = [
-            'Setiap pembelian ekstensi telah termasuk garansi & support teknis.',
-            'Modifikasi tambahan di luar task list akan dikenakan biaya tambahan.',
-            'Konsultasi & technical support via Email: support@hpwebdesign.id atau Telegram: t.me/hpwebdesign.'
-        ];
+        $data['terms'] = "";
         $data['home'] = $this->url->link('bpos/home','',true);
 
         $data['title'] = 'Invoice #' . $data['invoice_no'];

@@ -22,6 +22,7 @@ class ControllerBposOrder extends Controller {
         $filter_order_status_id = '';
 
         $this->load->model('localisation/order_status');
+
         $order_statuses = $this->model_localisation_order_status->getOrderStatuses();
 
         $view_data = [
@@ -486,7 +487,7 @@ class ControllerBposOrder extends Controller {
 
         $order_id = $this->model_checkout_order->addOrder($order_data);
         $this->session->data['order_id'] = $order_id;
-       
+
         $payment_code = isset($order_data['payment_code']) ? $order_data['payment_code'] : '';
         $is_gateway   = false;
         $confirm_html = '';
@@ -516,9 +517,7 @@ class ControllerBposOrder extends Controller {
             $comment  = '';
 
             if ($this->config->get('payment_'.$payment_code.'_bank' . $this->config->get('config_language_id'))) {
-                $comment  = $this->language->get('text_instruction') . "\n\n";
                 $comment .= $this->config->get('payment_'.$payment_code.'_bank' . $this->config->get('config_language_id')) . "\n\n";
-                $comment .= $this->language->get('text_payment');
             }
 
             $this->model_checkout_order->addOrderHistory($order_id, (int)$this->config->get('config_order_status_id'),$comment);
