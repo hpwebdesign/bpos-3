@@ -132,7 +132,7 @@ class ModelBposCustomer extends Model {
         $firstname = $parts[0];
         $lastname  = isset($parts[1]) ? $parts[1] : '';
 
-        $email = $data['email'] !== '' ? $data['email'] : 'bpos+' . time() . rand(100,999) . '@example.local';
+        $email = $data['email'] !== '' ? $data['email'] : '';
         $customer_group_id = is_numeric($data['customer_group_id']) ? (int)$data['customer_group_id'] : (int)$this->config->get('config_customer_group_id');
         $note = isset($data['note']) ? $data['note'] : '';
 
@@ -186,7 +186,7 @@ class ModelBposCustomer extends Model {
         $firstname = $parts[0];
         $lastname  = isset($parts[1]) ? $parts[1] : '';
 
-        $email = $data['email'] !== '' ? $data['email'] : 'bpos+' . time() . rand(100,999) . '@example.local';
+        $email = $data['email'] !== '' ? $data['email'] : '';
         $note = isset($data['note']) ? $data['note'] : '';
         $customer_group_id = is_numeric($data['customer_group_id']) ? (int)$data['customer_group_id'] : (int)$this->config->get('config_customer_group_id');
 
@@ -197,7 +197,7 @@ class ModelBposCustomer extends Model {
         } else {
             $address_id = 0;
         }
-        
+
         $this->db->query("UPDATE `" . DB_PREFIX . "customer` SET
                 firstname = '" . $this->db->escape($firstname) . "',
                 lastname  = '" . $this->db->escape($lastname) . "',

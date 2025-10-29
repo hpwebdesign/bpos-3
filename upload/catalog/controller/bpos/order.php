@@ -486,6 +486,7 @@ class ControllerBposOrder extends Controller {
         ];
 
         $order_id = $this->model_checkout_order->addOrder($order_data);
+        $this->model_bpos_order->createInvoiceNo($order_id);
         $this->session->data['order_id'] = $order_id;
 
         $payment_code = isset($order_data['payment_code']) ? $order_data['payment_code'] : '';
