@@ -1,6 +1,7 @@
 <?php
 // Heading
 $_['heading_title']        = 'Invoice';
+$_['text_invoice']        = 'Invoice';
 
 // Buttons
 $_['button_print']         = 'Print';

@@ -291,6 +291,13 @@ tbody tr:nth-child(even) td {
     a[href]:after {
         content: "";
     }
+    .header {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 24px !important;
+        align-items: start !important;
+        page-break-inside: avoid;
+    }
     .blocks {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
@@ -300,6 +307,30 @@ tbody tr:nth-child(even) td {
     }
     .block {
         break-inside: avoid;
+    }
+    .totals {
+        display: grid !important;
+        grid-template-columns: 1fr 240px !important;
+        gap: 16px !important;
+        align-items: start !important;
+        page-break-inside: avoid;
+    }
+    .note-box, .sum {
+        break-inside: avoid;
+    }
+    .no-split {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+    .sum, .note-box, .table-wrap {
+        border: 2px solid var(--line-2);
+    }
+    .sum .row {
+        border-top: 2px solid var(--line-2);
+    }
+    tbody td {
+        border-top: 2px solid var(--line-2);
+        border-right: 2px solid var(--line-2);
     }
 }
 @media (max-width: 860px) {
