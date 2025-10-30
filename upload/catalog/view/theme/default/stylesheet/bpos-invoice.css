@@ -291,6 +291,16 @@ tbody tr:nth-child(even) td {
     a[href]:after {
         content: "";
     }
+    .blocks {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 28px !important;
+        align-items: start !important;
+        page-break-inside: avoid;
+    }
+    .block {
+        break-inside: avoid;
+    }
 }
 @media (max-width: 860px) {
     .page {

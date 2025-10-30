@@ -48,9 +48,9 @@ class ModelBposOrder extends Model {
 				$reward += $product['reward'];
 			}
 			
-			$this->load->model('customer/customer');
+			$this->load->model('account/customer');
 
-			$affiliate_info = $this->model_customer_customer->getCustomer($order_query->row['affiliate_id']);
+			$affiliate_info = $this->model_account_customer->getCustomer($order_query->row['affiliate_id']);
 
 			if ($affiliate_info) {
 				$affiliate_firstname = $affiliate_info['firstname'];
@@ -505,21 +505,4 @@ class ModelBposOrder extends Model {
 		return $query->row['total'];
 	}
 
-	public function createInvoiceNo($order_id) {
-		$order_info = $this->getOrder($order_id);
-
-		if ($order_info && !$order_info['invoice_no']) {
-			$query = $this->db->query("SELECT MAX(invoice_no) AS invoice_no FROM `" . DB_PREFIX . "order` WHERE invoice_prefix = '" . $this->db->escape($order_info['invoice_prefix']) . "'");
-
-			if ($query->row['invoice_no']) {
-				$invoice_no = $query->row['invoice_no'] + 1;
-			} else {
-				$invoice_no = 1;
-			}
-
-			$this->db->query("UPDATE `" . DB_PREFIX . "order` SET invoice_no = '" . (int)$invoice_no . "', invoice_prefix = '" . $this->db->escape($order_info['invoice_prefix']) . "' WHERE order_id = '" . (int)$order_id . "'");
-
-			return $order_info['invoice_prefix'] . $invoice_no;
-		}
-	}
 }
