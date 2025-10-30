@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BPOS · Order Details</title>
+  <style>
+   :root {
+  --navy: #1f2b45;
+  --navy-600: #273556;
+  --sky: #eef3ff;
+  --ink: #1e2329;
+  --muted: #6b7280;
+  --line: #e6e8ef;
+  --fg: #0b1020;
+  --bg: #ffffff;
+  --chip: #f3f5f9;
+  --brand: #2f6bff;
+  --ok: #0bb57b;
+  --warn: #f4ae3a;
+  --bad: #ec5b55;
+  --radius: 16px;
+  --shadow: 0 8px 28px rgba(31, 43, 69, 0.08);
+  --card-pad: 14px;
+  --transition: 0.2s ease;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font: 14px/1.45 Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
+    Arial, sans-serif;
+  color: var(--fg);
+  background: linear-gradient(180deg, #f8faff, #fff);
+}
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Topbar / Demo */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.title h1 {
+  font-size: 18px;
+  margin: 0;
+  color: var(--navy);
+}
+.btn {
+  appearance: none;
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  background: var(--navy);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  transition: transform var(--transition), box-shadow var(--transition),
+    background var(--transition);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn.ghost {
+  background: #fff;
+  color: var(--navy);
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
+.btn.tiny {
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+.btn.bad {
+  color: #fff;
+  background: var(--bad);
+  border-color: transparent;
+}
+.btn.ok {
+  background: var(--ok);
+}
+.btn.warn {
+  background: var(--warn);
+}
+.btn[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.drawer .surface {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+.drawer .muted {
+  color: var(--muted);
+}
+.drawer .badge {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--chip);
+  border: 1px solid var(--line);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.drawer .badge.ok {
+  background: linear-gradient(180deg, #eafff7, #fff);
+  border-color: #cdeee1;
+  color: #0a9b68;
+}
+.drawer .badge.warn {
+  background: linear-gradient(180deg, #fff4dd, #fff);
+  border-color: #ffe0a6;
+  color: #b87a07;
+}
+.drawer .badge.bad {
+  background: linear-gradient(180deg, #ffe6e5, #fff);
+  border-color: #ffcbc9;
+  color: #d63e3b;
+}
+.badge.info {
+  background: linear-gradient(180deg, #eef3ff, #fff);
+  border-color: #dbe4ff;
+  color: #2f6bff;
+}
+
+/* Drawer */
+.drawer {
+  position: fixed;
+  inset: 0;
+  display: none;
+}
+.drawer.open {
+  display: block;
+}
+.drawer .backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(13, 18, 30, 0.35);
+  backdrop-filter: blur(2px);
+}
+.drawer .panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(720px, 96vw);
+  background: #fff;
+  border-left: 1px solid var(--line);
+  box-shadow: -8px 0 28px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+}
+.drawer .panel header {
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.drawer .panel header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--navy);
+}
+.drawer .panel .content {
+  padding: 16px;
+  overflow: auto;
+  display: grid;
+  gap: 12px;
+}
+.drawer .grid {
+  display: grid;
+  gap: 12px;
+}
+.drawer .cols-2 {
+  grid-template-columns: 1.1fr 0.9fr;
+}
+@media (max-width: 860px) {
+  .cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
+.drawer .card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--card-pad);
+  box-shadow: var(--shadow);
+}
+.drawer .kv {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 8px;
+  align-items: center;
+}
+.drawer .kv .value {
+  font-weight: 600;
+}
+.drawer .divider {
+  height: 1px;
+  background: var(--line);
+  margin: 8px 0;
+}
+.drawer .table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.drawer .table th {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  padding: 8px;
+}
+.drawer .table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.drawer .money {
+  font-variant-numeric: tabular-nums;
+}
+.drawer .right {
+  display: flex;
+  justify-content: flex-end;
+}
+.drawer .row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 6px 0;
+}
+.drawer .row b {
+  font-variant-numeric: tabular-nums;
+}
+.drawer .lg b {
+  font-size: 16px;
+}
+.drawer .xl {
+  font-size: 18px;
+}
+.drawer .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--chip);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--navy);
+}
+
+/* Timeline */
+.drawer .timeline {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.drawer .timeline .node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.drawer .timeline .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #cfd7ee;
+  border: 2px solid #cfd7ee;
+}
+.drawer .timeline .node.active .dot {
+  background: var(--brand);
+  border-color: var(--brand);
+}
+.drawer .timeline .bar {
+  width: 32px;
+  height: 2px;
+  background: #cfd7ee;
+}
+.drawer .timeline .node.active + .bar {
+  background: linear-gradient(90deg, var(--brand), #cfd7ee);
+}
+
+/* Footer Bar */
+.drawer .footerbar {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), #fff);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid var(--line);
+  padding: 10px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+/* Forms */
+.drawer .inp {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  outline: none;
+}
+.drawer .inp:focus {
+  border-color: #cbd5ff;
+  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.12);
+}
+
+/* Print areas */
+.print-area {
+  display: none;
+}
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+  .print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
+
+  </style>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div class="title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 10h8M8 14h5"/></svg>
+        <h1>Orders</h1>
+        <span class="badge info">BPOS</span>
+      </div>
+      <div>
+        <button class="btn" id="openSample">Open Order Details (Sample)</button>
+      </div>
+    </div>
+
+    <div class="surface">
+      <p class="muted">This page demonstrates a reusable <b>Order Details Drawer</b> for BPOS with print Invoice/Receipt, shipment/payment blocks, items table, totals, timeline, notes, and quick actions.</p>
+    </div>
+  </div>
+
+  <!-- Drawer -->
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="backdrop" data-close></div>
+    <div class="panel" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+      <header>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <h3 id="drawerTitle">Order #—</h3>
+          <span id="orderStatusBadge" class="badge info">—</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn tiny ghost" id="btnPrintInvoice">🧾 Print Invoice</button>
+          <button class="btn tiny ghost" id="btnPrintReceipt">🧾 Print Receipt</button>
+          <button class="btn tiny ghost" id="btnSendEmail">📤 Send Email</button>
+          <button class="btn tiny ghost" id="btnLabel">🏷️ Shipping Label</button>
+          <button class="btn tiny ghost bad" id="btnCancel">❌ Cancel</button>
+          <button class="btn tiny ghost" data-close>Close</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <!-- Timeline -->
+        <div class="card">
+          <div class="timeline" id="timeline">
+            <div class="node"><div class="dot"></div><div class="muted">Placed</div></div>
+            <div class="bar"></div>
+            <div class="node"><div class="dot"></div><div class="muted">Paid</div></div>
+            <div class="bar"></div>
+            <div class="node"><div class="dot"></div><div class="muted">Packed</div></div>
+            <div class="bar"></div>
+            <div class="node"><div class="dot"></div><div class="muted">Shipped</div></div>
+            <div class="bar"></div>
+            <div class="node"><div class="dot"></div><div class="muted">Delivered</div></div>
+          </div>
+        </div>
+
+        <div class="grid cols-2">
+          <!-- Left: Customer + Items -->
+          <div class="grid" style="gap:12px">
+            <div class="card">
+              <div class="kv"><div class="muted">Customer</div><div class="value" id="c_name">—</div></div>
+              <div class="kv"><div class="muted">Phone</div><div id="c_phone">—</div></div>
+              <div class="kv"><div class="muted">Email</div><div id="c_email">—</div></div>
+              <div class="kv"><div class="muted">Ship To</div><div id="c_address">—</div></div>
+              <div class="divider"></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn tiny ghost" id="btnViewCustomer">👤 View Customer</button>
+                <button class="btn tiny ghost" id="btnCopyAddress">📋 Copy Address</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <table class="table" id="itemsTable" aria-label="Order items">
+                <thead><tr><th>Product</th><th>Qty</th><th class="right">Price</th><th class="right">Total</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Right: Summary + Payment + Shipping + Notes -->
+          <div class="grid" style="gap:12px">
+            <div class="card">
+              <div class="kv"><div class="muted">Order ID</div><div class="value" id="o_id">—</div></div>
+              <div class="kv"><div class="muted">Date</div><div id="o_date">—</div></div>
+              <div class="kv"><div class="muted">Payment</div><div id="o_payment">—</div></div>
+              <div class="kv"><div class="muted">Status</div><div id="o_status">—</div></div>
+              <div class="kv"><div class="muted">Note</div><div id="o_note">—</div></div>
+              <div class="divider"></div>
+              <div class="row"><span>Subtotal</span><b id="t_sub">Rp 0</b></div>
+              <div class="row"><span>Discount</span><b id="t_disc">Rp 0</b></div>
+              <div class="row"><span>Tax</span><b id="t_tax">Rp 0</b></div>
+              <div class="row lg"><span>Total</span><b class="xl" id="t_total">Rp 0</b></div>
+            </div>
+
+            <div class="card">
+              <div class="kv"><div class="muted">Payment Method</div><div id="p_method">—</div></div>
+              <div class="kv"><div class="muted">Payment Ref</div><div id="p_ref">—</div></div>
+              <div class="divider"></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn tiny ok" id="btnMarkPaid">✔ Mark as Paid</button>
+                <button class="btn tiny warn" id="btnRefund">↩ Refund</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="kv"><div class="muted">Shipping Method</div><div id="s_method">—</div></div>
+              <div class="kv"><div class="muted">Tracking</div><div id="s_track">—</div></div>
+              <div class="kv"><div class="muted">ETA</div><div id="s_eta">—</div></div>
+              <div class="divider"></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn tiny" id="btnMarkShipped">📦 Mark as Shipped</button>
+                <button class="btn tiny ghost" id="btnCopyTracking">📋 Copy Tracking</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="muted" style="margin-bottom:6px">Admin Notes</div>
+              <textarea id="adminNotes" class="inp" rows="3" placeholder="Add internal notes (not visible to customer)"></textarea>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button class="btn tiny ghost" id="btnSaveNotes">💾 Save Notes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Bar -->
+        <div class="footerbar">
+          <button class="btn ghost tiny" id="btnFooterInvoice">🧾 Print Invoice</button>
+          <button class="btn ghost tiny" id="btnFooterReceipt">🧾 Print Receipt</button>
+          <button class="btn ok tiny" id="btnFooterPaid">✔ Mark Paid</button>
+          <button class="btn tiny" id="btnFooterShipped">📦 Mark Shipped</button>
+          <button class="btn warn tiny" id="btnFooterRefund">↩ Refund</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Printable Areas (hidden on screen) -->
+  <div id="print-invoice" class="print-area">
+    <div style="padding:20px;font-family:Inter,Arial">
+      <h2 style="margin:0 0 4px;color:#1f2b45">Invoice</h2>
+      <div style="color:#6b7280;margin-bottom:12px">BPOS · Barik</div>
+      <div style="display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap">
+        <div>
+          <div><b id="pi_id">—</b></div>
+          <div id="pi_date">—</div>
+          <div id="pi_status" style="margin-top:6px"></div>
+        </div>
+        <div>
+          <div><b>Bill To</b></div>
+          <div id="pi_name">—</div>
+          <div id="pi_addr">—</div>
+          <div id="pi_phone">—</div>
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;margin-top:12px">
+        <thead><tr><th align="left">Product</th><th align="right">Qty</th><th align="right">Price</th><th align="right">Total</th></tr></thead>
+        <tbody id="pi_items"></tbody>
+      </table>
+      <div style="height:1px;background:#e6e8ef;margin:8px 0"></div>
+      <div style="display:flex;justify-content:flex-end">
+        <div style="min-width:260px">
+          <div style="display:flex;justify-content:space-between"><span>Subtotal</span><b id="pi_sub">Rp 0</b></div>
+          <div style="display:flex;justify-content:space-between"><span>Discount</span><b id="pi_disc">Rp 0</b></div>
+          <div style="display:flex;justify-content:space-between"><span>Tax</span><b id="pi_tax">Rp 0</b></div>
+          <div style="display:flex;justify-content:space-between;font-size:16px;margin-top:6px"><span>Total</span><b id="pi_total">Rp 0</b></div>
+        </div>
+      </div>
+      <p style="color:#6b7280;margin-top:12px">Thank you for your purchase.</p>
+    </div>
+  </div>
+
+  <div id="print-receipt" class="print-area">
+    <div style="padding:16px;font-family:Inter,Arial">
+      <div style="text-align:center">
+        <div style="font-weight:700">BPOS · Barik</div>
+        <div class="muted">Sales Receipt</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin:8px 0">
+        <span id="pr_id">—</span><span id="pr_date">—</span>
+      </div>
+      <div id="pr_name">—</div>
+      <div style="height:1px;background:#e6e8ef;margin:8px 0"></div>
+      <table style="width:100%;border-collapse:collapse">
+        <tbody id="pr_items"></tbody>
+      </table>
+      <div style="height:1px;background:#e6e8ef;margin:8px 0"></div>
+      <div style="display:flex;justify-content:space-between"><span>Total</span><b id="pr_total">Rp 0</b></div>
+      <div style="text-align:center;color:#6b7280;margin-top:8px">*** Thank You ***</div>
+    </div>
+  </div>
+
+<script>
+const money = n => 'Rp ' + Number(n||0).toLocaleString('id-ID');
+function toast(msg, type='success'){
+  if(!window.notyf){ window.notyf = new Notyf({ duration: 1800, position:{x:'right', y:'bottom'} }); }
+  if(type==='error') window.notyf.error(msg); else window.notyf.success(msg);
+}
+
+const sampleOrder = {
+  id: 'INV-20251029-001',
+  date: '2025-10-29 10:15',
+  status: 'Paid',
+  customer: { name:'Ayu Lestari', phone:'+62822-3333-4444', email:'ayu@example.com', address:'Gianyar, Bali' },
+  items: [
+    {name:'Organic Granola 500g', qty:2, price:85000},
+    {name:'Almond Milk 1L', qty:1, price:54000},
+    {name:'Reusable Bag', qty:1, price:15000}
+  ],
+  discounts: 10000,
+  tax: 12000,
+  payment: { method:'QRIS', ref:'QR987654321' },
+  shipping: { method:'JNE REG', tracking:'JNE123456789', eta:'2025-10-31' },
+  note:'Deliver in the morning if possible.'
+};
+
+function sum(items){ return items.reduce((a,i)=> a + (i.qty*i.price), 0); }
+
+function setStatusBadge(el, status){
+  const map = { Paid:'ok', Pending:'warn', Cancelled:'bad', Refunded:'warn', Shipped:'info', Delivered:'info' };
+  el.className = 'badge ' + (map[status] || 'info');
+  el.textContent = status;
+}
+
+function setTimeline(status){
+  const stages = ['Placed','Paid','Packed','Shipped','Delivered'];
+  const idx = { 'Placed':0,'Pending':0,'Paid':1,'Packed':2,'Shipped':3,'Delivered':4,'Cancelled':0,'Refunded':1 }[status] ?? 0;
+  const nodes = document.querySelectorAll('#timeline .node');
+  nodes.forEach((n,i)=> n.classList.toggle('active', i <= idx));
+}
+
+function fillOrder(o){
+  // Header
+  $('#drawerTitle').text('Order #' + o.id);
+  setStatusBadge(document.getElementById('orderStatusBadge'), o.status);
+  setTimeline(o.status);
+
+  // Customer box
+  $('#c_name').text(o.customer.name);
+  $('#c_phone').text(o.customer.phone);
+  $('#c_email').text(o.customer.email);
+  $('#c_address').text(o.customer.address);
+
+  // Items
+  const $tb = $('#itemsTable tbody').empty();
+  o.items.forEach(it=>{
+    const line = it.qty*it.price;
+    $tb.append(`<tr>
+      <td>${it.name}</td>
+      <td>${it.qty}</td>
+      <td class="right money">${money(it.price)}</td>
+      <td class="right money">${money(line)}</td>
+    </tr>`);
+  });
+
+  // Totals
+  const sub = sum(o.items);
+  $('#o_id').text(o.id);
+  $('#o_date').text(o.date);
+  $('#o_payment').text(o.payment.method);
+  $('#o_status').text(o.status);
+  $('#o_note').text(o.note||'—');
+  $('#t_sub').text(money(sub));
+  $('#t_disc').text('- ' + money(o.discounts));
+  $('#t_tax').text(money(o.tax));
+  $('#t_total').text(money(sub - o.discounts + o.tax));
+
+  // Payment block
+  $('#p_method').text(o.payment.method);
+  $('#p_ref').text(o.payment.ref);
+
+  // Shipping block
+  $('#s_method').text(o.shipping.method);
+  $('#s_track').text(o.shipping.tracking);
+  $('#s_eta').text(o.shipping.eta);
+
+  // Print (Invoice)
+  $('#pi_id').text(o.id);
+  $('#pi_date').text(o.date);
+  $('#pi_status').text('Status: ' + o.status);
+  $('#pi_name').text(o.customer.name);
+  $('#pi_addr').text(o.customer.address);
+  $('#pi_phone').text(o.customer.phone);
+  const $pi = $('#pi_items').empty();
+  o.items.forEach(it=>{
+    const line = it.qty*it.price;
+    $pi.append(`<tr><td>${it.name}</td><td align="right">${it.qty}</td><td align="right">${money(it.price)}</td><td align="right">${money(line)}</td></tr>`);
+  });
+  $('#pi_sub').text(money(sub));
+  $('#pi_disc').text('- ' + money(o.discounts));
+  $('#pi_tax').text(money(o.tax));
+  $('#pi_total').text(money(sub - o.discounts + o.tax));
+
+  // Print (Receipt)
+  $('#pr_id').text(o.id);
+  $('#pr_date').text(o.date);
+  $('#pr_name').text(o.customer.name);
+  const $pr = $('#pr_items').empty();
+  o.items.forEach(it=>{
+    const line = it.qty*it.price;
+    $pr.append(`<tr><td>${it.name} × ${it.qty}</td><td align="right">${money(line)}</td></tr>`);
+  });
+  $('#pr_total').text(money(sub - o.discounts + o.tax));
+}
+
+function openDrawer(order){
+  $('#drawer').addClass('open').attr('aria-hidden','false');
+  fillOrder(order);
+}
+function closeDrawer(){ $('#drawer').removeClass('open').attr('aria-hidden','true'); }
+
+function printArea(areaId){
+  // Show the print area and trigger window.print(); CSS handles visibility
+  const el = document.getElementById(areaId);
+  if(!el){ toast('Printable area not found','error'); return; }
+  const prevTitle = document.title;
+  document.title = areaId === 'print-invoice' ? ('Invoice ' + $('#o_id').text()) : ('Receipt ' + $('#o_id').text());
+  window.print();
+  document.title = prevTitle;
+}
+
+$(function(){
+  // Open sample
+  $('#openSample').on('click', ()=> openDrawer(sampleOrder));
+
+  // Close
+  $(document).on('click','[data-close]', closeDrawer);
+  $('.backdrop').on('click', function(e){ if(e.target===this) closeDrawer(); });
+
+  // Actions
+  $('#btnPrintInvoice, #btnFooterInvoice').on('click', ()=> printArea('print-invoice'));
+  $('#btnPrintReceipt, #btnFooterReceipt').on('click', ()=> printArea('print-receipt'));
+  $('#btnSendEmail').on('click', ()=> toast('Invoice sent to ' + sampleOrder.customer.email));
+  $('#btnLabel').on('click', ()=> toast('Shipping label generated'));
+  $('#btnCancel').on('click', ()=> {
+    if(confirm('Cancel this order?')){
+      sampleOrder.status='Cancelled';
+      fillOrder(sampleOrder);
+      toast('Order cancelled','error');
+    }
+  });
+
+  // Payment & Shipping quick actions
+  const markPaid = ()=>{
+    sampleOrder.status='Paid';
+    fillOrder(sampleOrder);
+    toast('Order marked as Paid');
+  };
+  const markShipped = ()=>{
+    sampleOrder.status='Shipped';
+    fillOrder(sampleOrder);
+    toast('Order marked as Shipped');
+  };
+  const refund = ()=>{
+    if(confirm('Confirm refund?')){
+      sampleOrder.status='Refunded';
+      fillOrder(sampleOrder);
+      toast('Order refunded','warn');
+    }
+  };
+
+  $('#btnMarkPaid, #btnFooterPaid').on('click', markPaid);
+  $('#btnMarkShipped, #btnFooterShipped').on('click', markShipped);
+  $('#btnRefund, #btnFooterRefund').on('click', refund);
+
+  // Utilities
+  $('#btnCopyAddress').on('click', ()=> { navigator.clipboard.writeText(sampleOrder.customer.address); toast('Address copied'); });
+  $('#btnCopyTracking').on('click', ()=> { navigator.clipboard.writeText(sampleOrder.shipping.tracking); toast('Tracking copied'); });
+  $('#btnViewCustomer').on('click', ()=> toast('Open customer drawer for ' + sampleOrder.customer.name));
+
+  // Notes
+  $('#btnSaveNotes').on('click', ()=> toast('Notes saved'));
+});
+</script>
+</body>
+</html>

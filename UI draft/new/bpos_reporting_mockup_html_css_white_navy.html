@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BPOS • Reporting Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #f8fafc;
+      --panel: #ffffff;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --navy: #0b3b66;
+      --navy-600:#0d4475;
+      --navy-500:#13518a;
+      --blue: #2b7ce0;
+      --green: #0ea5a4;
+      --red:#ef4444;
+      --radius: 16px;
+      --radius-sm: 12px;
+      --shadow-sm: 0 8px 24px rgba(15,23,42,.06);
+      --shadow-xs: 0 4px 12px rgba(15,23,42,.06);
+      --pad: 18px;
+      --pad-lg: 22px;
+      --trans: .18s ease;
+      --chip:#eef2ff;
+      --chip-ink:#1e3a8a;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    }
+    .container{max-width:1200px;margin:0 auto;padding:20px 20px 80px}
+
+    /* Sticky filter header */
+    .filters{
+      position: sticky; top:0; z-index: 40; backdrop-filter: blur(6px);
+      background: color-mix(in oklab, var(--bg) 70%, white 30%);
+      border-bottom:1px solid var(--line);
+    }
+    .filters .wrap{max-width:1200px;margin:0 auto;padding:14px 20px;display:grid;gap:10px;grid-template-columns: 1fr;}
+    @media(min-width:860px){
+      .filters .wrap{grid-template-columns: repeat(12,1fr);align-items:center}
+    }
+    .brand{grid-column: span 12; display:flex;align-items:center;gap:10px}
+    .brand .logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--navy),#1b4f86);display:grid;place-items:center;color:#fff;font-weight:800}
+    .brand h1{font-size:16px;margin:0}
+
+    .control{display:flex;gap:8px;align-items:center}
+    .control label{color:var(--muted);font-weight:600;font-size:12px}
+    .select,.date{appearance:none;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:170px;box-shadow:var(--shadow-xs)}
+    .btn{border:1px solid var(--navy);background:var(--navy);color:#fff;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer;transition:transform var(--trans), box-shadow var(--trans), background var(--trans)}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(11,59,102,.18);}
+    .btn.secondary{background:#fff;color:var(--navy);border-color:var(--line)}
+
+    @media(min-width:860px){
+      .brand{grid-column: span 3}
+      .filter-row{grid-column: span 9;display:grid;grid-template-columns: repeat(6,1fr);gap:10px}
+      .filter-row .control{grid-column: span 2}
+      .actions{grid-column: span 12;display:flex;gap:10px;justify-content:flex-end}
+    }
+
+    /* Head actions tight on mobile */
+    @media(max-width:859px){
+      .filter-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+      .actions{display:flex;gap:10px}
+    }
+
+    /* Page intro */
+    .page-title{display:flex;align-items:center;gap:12px;margin:18px 0 12px}
+    .page-title h2{font-size:22px;margin:0}
+    .muted{color:var(--muted)}
+
+    /* Cards */
+    .grid{display:grid;gap:14px}
+    .cards{grid-template-columns: repeat(12,1fr)}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:var(--pad);transition:transform var(--trans), box-shadow var(--trans), border-color var(--trans)}
+    .card:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(15,23,42,.10);}
+    .kpis>.card{grid-column: span 12}
+    @media(min-width:720px){.kpis>.card{grid-column: span 3}}
+    .kpi{display:flex;align-items:center;gap:12px}
+    .kpi .ico{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--navy-600),var(--navy));display:grid;place-items:center;color:#fff;font-weight:800;box-shadow:0 8px 18px rgba(11,59,102,.25)}
+    .kpi .meta{flex:1}
+    .kpi .label{font-size:12px;color:var(--muted);font-weight:600}
+    .kpi .val{font-size:20px;font-weight:800}
+    .kpi .delta{font-size:12px}
+    .delta.up{color:#0ea672}
+    .delta.down{color:var(--red)}
+
+    /* Chart tabs (CSS-only) */
+    .tabs{margin-top:10px}
+    .tab-head{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+    .tab-head label{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--navy);cursor:pointer;font-weight:700;font-size:12px}
+    .tab-head label:hover{border-color:var(--navy)}
+    .tabs input{display:none}
+    .tab-content{display:none}
+    #t1:checked~.content #c1,
+    #t2:checked~.content #c2,
+    #t3:checked~.content #c3,
+    #t4:checked~.content #c4{display:block}
+    .chart{
+      height:280px;border:1px dashed var(--line);border-radius:14px;overflow:hidden;position:relative;background:
+        radial-gradient(1000px 200px at -10% 110%, #dbeafe 0, transparent 45%),
+        radial-gradient(900px 180px at 110% -10%, #e0f2fe 0, transparent 45%),
+        linear-gradient(180deg,#fff, #f8fbff);
+    }
+    .chart::after{content:"Chart placeholder";position:absolute;inset:auto 12px 12px auto;color:var(--muted);font-size:12px}
+    .legend{display:flex;gap:16px;margin-top:10px;color:var(--muted);font-size:12px}
+    .legend .dot{width:10px;height:10px;border-radius:999px;display:inline-block;margin-right:6px;background:var(--blue)}
+    .legend .dot.sec{background:var(--green)}
+
+    /* Table */
+    .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff}
+    table{border-collapse:separate;border-spacing:0;width:100%;min-width:860px}
+    thead th{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);text-align:left;font-size:12px;color:var(--muted);padding:12px 14px}
+    tbody td{padding:12px 14px;border-bottom:1px solid var(--line)}
+    tbody tr:hover{background:#f9fbff}
+    .tag{display:inline-flex;align-items:center;gap:6px;background:var(--chip);color:var(--chip-ink);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700}
+    .right{text-align:right}
+
+    /* Breakdown widgets */
+    .split{grid-template-columns:1fr}
+    @media(min-width:980px){.split{grid-template-columns: 1.2fr .8fr}}
+    .mini-grid{display:grid;gap:14px;grid-template-columns:1fr;}
+    @media(min-width:720px){.mini-grid{grid-template-columns:1fr 1fr}}
+    .bar-list li{display:flex;align-items:center;gap:10px;margin:8px 0}
+    .bar-list .name{flex:1}
+    .bar{height:10px;border-radius:999px;background:#eef2f7;overflow:hidden}
+    .bar i{display:block;height:100%;width:var(--w,40%);background:linear-gradient(90deg,var(--navy),#3b82f6)}
+
+    /* Footer insights */
+    .insights{display:grid;gap:10px}
+    .insights .note{background:#f1f5f9;border:1px solid var(--line);border-radius:12px;padding:12px}
+
+    /* Utility */
+    .row{display:flex;gap:10px;align-items:center}
+    .grow{flex:1}
+    .search{border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+
+    /* Page spacing */
+    .section{margin-top:20px}
+    .section .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .section .head h3{margin:0;font-size:16px}
+    .section .head .muted{font-size:12px}
+
+    /* Buttons small */
+    .btn.sm{padding:8px 10px;border-radius:10px;font-size:12px}
+  </style>
+</head>
+<body>
+  <!-- Sticky Filters -->
+  <header class="filters">
+    <div class="wrap">
+      <div class="brand">
+        <div class="logo">B</div>
+        <h1>BPOS Reporting</h1>
+      </div>
+      <div class="filter-row">
+        <div class="control">
+          <label>Date</label>
+          <select class="select">
+            <option>Today</option>
+            <option>Yesterday</option>
+            <option selected>This Month</option>
+            <option>Last Month</option>
+            <option>Last 30 days</option>
+            <option>Custom Range…</option>
+          </select>
+        </div>
+        <div class="control">
+          <label>Store</label>
+          <select class="select">
+            <option>All Stores</option>
+            <option>Store A</option>
+            <option>Store B</option>
+            <option>Warehouse</option>
+          </select>
+        </div>
+        <div class="control">
+          <label>Cashier</label>
+          <select class="select">
+            <option>All Cashiers</option>
+            <option>Sinta</option>
+            <option>Rudi</option>
+            <option>Andin</option>
+          </select>
+        </div>
+        <div class="control">
+          <label>Channel</label>
+          <select class="select">
+            <option>All Channels</option>
+            <option>POS</option>
+            <option>Online</option>
+            <option>Marketplace</option>
+          </select>
+        </div>
+        <div class="control">
+          <label>Tax</label>
+          <select class="select">
+            <option>Included</option>
+            <option>Excluded</option>
+          </select>
+        </div>
+        <div class="control">
+          <label>Compare</label>
+          <select class="select">
+            <option>No compare</option>
+            <option>Previous period</option>
+            <option>Previous year</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn secondary">Export CSV</button>
+        <button class="btn">Apply Filters</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="page-title">
+      <h2>Analytics Overview</h2>
+      <span class="muted">Multi-store • Multi-cashier</span>
+    </div>
+
+    <!-- KPI Cards -->
+    <section class="grid cards kpis">
+      <article class="card">
+        <div class="kpi">
+          <div class="ico">💰</div>
+          <div class="meta">
+            <div class="label">Total Sales</div>
+            <div class="val">Rp 128.450.000</div>
+            <div class="delta up">▲ +12.7% vs last period</div>
+          </div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="kpi">
+          <div class="ico">🛒</div>
+          <div class="meta">
+            <div class="label">Total Orders</div>
+            <div class="val">1.254</div>
+            <div class="delta up">▲ +6.2%</div>
+          </div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="kpi">
+          <div class="ico">👥</div>
+          <div class="meta">
+            <div class="label">Unique Customers</div>
+            <div class="val">928</div>
+            <div class="delta up">▲ +3.4%</div>
+          </div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="kpi">
+          <div class="ico">📦</div>
+          <div class="meta">
+            <div class="label">Avg. Order Value</div>
+            <div class="val">Rp 102.500</div>
+            <div class="delta down">▼ −1.1%</div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Charts with tabs -->
+    <section class="section">
+      <div class="head">
+        <h3>Sales Performance</h3>
+        <span class="muted">Interactive tabs (CSS-only)</span>
+      </div>
+      <div class="card">
+        <div class="tabs">
+          <div class="tab-head">
+            <input type="radio" name="tab" id="t1" checked>
+            <label for="t1">Sales Trend</label>
+            <input type="radio" name="tab" id="t2">
+            <label for="t2">By Store</label>
+            <input type="radio" name="tab" id="t3">
+            <label for="t3">By Cashier</label>
+            <input type="radio" name="tab" id="t4">
+            <label for="t4">By Channel</label>
+          </div>
+          <div class="content">
+            <div id="c1" class="tab-content">
+              <div class="chart"></div>
+              <div class="legend"><span><i class="dot"></i> Sales</span><span><i class="dot sec"></i> Orders</span></div>
+            </div>
+            <div id="c2" class="tab-content">
+              <div class="chart"></div>
+              <div class="legend"><span><i class="dot"></i> Store A</span><span><i class="dot sec"></i> Store B</span></div>
+            </div>
+            <div id="c3" class="tab-content">
+              <div class="chart"></div>
+              <div class="legend"><span><i class="dot"></i> Rudi</span><span><i class="dot sec"></i> Sinta</span></div>
+            </div>
+            <div id="c4" class="tab-content">
+              <div class="chart"></div>
+              <div class="legend"><span><i class="dot"></i> POS</span><span><i class="dot sec"></i> Online</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Detailed Table -->
+    <section class="section">
+      <div class="head">
+        <h3>Detailed Breakdown</h3>
+        <div class="row">
+          <input class="search" placeholder="Search store / cashier / channel…" />
+          <button class="btn sm secondary">Export Table</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Store</th>
+              <th>Cashier</th>
+              <th>Channel</th>
+              <th class="right">Orders</th>
+              <th class="right">Sales</th>
+              <th class="right">Refunds</th>
+              <th class="right">Net Sales</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>2025-10-01</td>
+              <td><span class="tag">Store A</span></td>
+              <td>Rudi</td>
+              <td>POS</td>
+              <td class="right">134</td>
+              <td class="right">Rp 12.450.000</td>
+              <td class="right">Rp 150.000</td>
+              <td class="right">Rp 12.300.000</td>
+            </tr>
+            <tr>
+              <td>2025-10-01</td>
+              <td><span class="tag">Store B</span></td>
+              <td>Sinta</td>
+              <td>Online</td>
+              <td class="right">88</td>
+              <td class="right">Rp 9.280.000</td>
+              <td class="right">Rp 0</td>
+              <td class="right">Rp 9.280.000</td>
+            </tr>
+            <tr>
+              <td>2025-10-02</td>
+              <td><span class="tag">Warehouse</span></td>
+              <td>Andin</td>
+              <td>Marketplace</td>
+              <td class="right">52</td>
+              <td class="right">Rp 4.420.000</td>
+              <td class="right">Rp 60.000</td>
+              <td class="right">Rp 4.360.000</td>
+            </tr>
+            <tr>
+              <td>2025-10-02</td>
+              <td><span class="tag">Store A</span></td>
+              <td>Rudi</td>
+              <td>POS</td>
+              <td class="right">121</td>
+              <td class="right">Rp 10.950.000</td>
+              <td class="right">Rp 0</td>
+              <td class="right">Rp 10.950.000</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Split section: top products + side widgets -->
+    <section class="section grid split">
+      <div>
+        <div class="head"><h3>Top 5 Products</h3><span class="muted">by Sales</span></div>
+        <article class="card">
+          <ul class="bar-list" style="list-style:none;padding:0;margin:0">
+            <li><span class="name">Arabic Coffee Beans 1kg</span><div class="bar" style="--w:88%"><i></i></div><b style="margin-left:10px">Rp 12.4jt</b></li>
+            <li><span class="name">Oat Milk 1L</span><div class="bar" style="--w:64%"><i></i></div><b style="margin-left:10px">Rp 9.1jt</b></li>
+            <li><span class="name">Organic Granola 500g</span><div class="bar" style="--w:48%"><i></i></div><b style="margin-left:10px">Rp 6.7jt</b></li>
+            <li><span class="name">Premium Tea Box</span><div class="bar" style="--w:36%"><i></i></div><b style="margin-left:10px">Rp 5.1jt</b></li>
+            <li><span class="name">Bottled Water 600ml</span><div class="bar" style="--w:22%"><i></i></div><b style="margin-left:10px">Rp 2.4jt</b></li>
+          </ul>
+        </article>
+      </div>
+      <div class="mini-grid">
+        <article class="card">
+          <div class="head"><h3>Top Cashiers</h3><span class="muted">by Net Sales</span></div>
+          <ol style="margin:0 0 6px 18px">
+            <li>Rudi — <b>Rp 34.2jt</b></li>
+            <li>Sinta — <b>Rp 28.7jt</b></li>
+            <li>Andin — <b>Rp 19.5jt</b></li>
+            <li>Dio — <b>Rp 12.9jt</b></li>
+          </ol>
+        </article>
+        <article class="card">
+          <div class="head"><h3>Payments Breakdown</h3><span class="muted">% of orders</span></div>
+          <ul style="list-style:none;margin:0;padding:0;color:var(--muted);font-size:13px">
+            <li class="row"><span class="grow">QRIS</span><b>52%</b></li>
+            <li class="row"><span class="grow">Cards</span><b>28%</b></li>
+            <li class="row"><span class="grow">Cash</span><b>15%</b></li>
+            <li class="row"><span class="grow">Others</span><b>5%</b></li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- Footer insights -->
+    <section class="section insights">
+      <div class="note">📈 <b>Store A</b> grew <b>+12%</b> compared to previous period.</div>
+      <div class="note">🕐 Peak hour is between <b>13:00–14:00</b> on weekdays.</div>
+      <div class="note">💳 <b>78%</b> of transactions use <b>QRIS</b>.</div>
+    </section>
+  </div>
+</body>
+</html>
