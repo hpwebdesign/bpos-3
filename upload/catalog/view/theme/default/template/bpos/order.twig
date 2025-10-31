@@ -1,233 +1,602 @@
-<div class="sub-heading">
-      <div class="page-title">Orders</div>
-    </div>
-
-<div class="container py-4 orders-board">
-  <div class="panel p-3 p-md-6">
-  <div class="col-6 col-md-12 col-lg-3 ms-lg-auto text-lg-end">
-        <a href="{{ add_order }}" class="btn btn-primary rounded-3">
-          <i class="bi bi-plus-lg me-1"></i> {{ button_add_order }}
-        </a>
-        <button type="button" id="delete-selected" class="btn btn-danger rounded-3">
-         <i class="bi bi-trash"></i> {{ button_delete }}
-      </button>
-      </div>
-
-    <div class="toolbar row g-2 align-items-center mb-3">
-
-      <div class="col-12 col-md-5 col-lg-4">
-          <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-search"></i></span>
-              <input type="text" class="form-control" placeholder="Search Customer" id="search-order" value="{{ filter_search ?? '' }}">
+  <link rel="stylesheet" href="catalog/view/theme/default/stylesheet/drawer.css?v={{ random() }}">
+  <link rel="stylesheet" href="catalog/view/theme/default/stylesheet/order.css?v={{ random() }}">
+ <div class="order-page">
+      <!-- Topbar -->
+      <div class="topbar">
+        <div class="wrap">
+          <div class="brand"><div class="logo"></div><h1>Order Management</h1></div>
+          <div class="chips" id="summaryChips">
+            <!-- summary injected -->
           </div>
-      </div>
-
-      <div class="col-12 col-md-4 col-lg-3">
-          <div class="d-flex align-items-center gap-2 chip-input">
-              <i class="bi bi-calendar2"></i>
-              <span class="chip">
-                  <input
-                      type="text"
-                      id="filter-daterange"
-                      class="form-control border-0 p-0"
-                      placeholder="Date Range"
-                      readonly
-                      value="{% if filter_date_start and filter_date_end %}{{ filter_date_start }} - {{ filter_date_end }}{% endif %}">
-                  <button class="btn-clear" type="button" data-clear="daterange" title="Clear">
-                      <i class="bi bi-x"></i>
-                  </button>
-              </span>
+          <div class="spacer"></div>
+          <div class="search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+            <input id="searchBox" type="text" placeholder="Search order ID / customer ( / )" />
           </div>
+          <button class="btn" id="btnNew">+ New Order</button>
+        </div>
       </div>
 
-      <div class="col-6 col-md-3 col-lg-2">
-          <select class="form-select" id="filter-status">
-              <option value="">Status</option>
-              {% for status in order_statuses %}
-                  <option value="{{ status.order_status_id }}" {% if filter_status_id == status.order_status_id %}selected{% endif %}>
-                      {{ status.name }}
-                  </option>
-              {% endfor %}
-          </select>
+      <!-- Filters -->
+      <div class="filters">
+        <div class="wrap">
+          <div class="f">
+            <label>Store</label>
+            <select id="fStore" title="Select one or more stores">
+              <!-- options injected -->
+            </select>
+          </div>
+          <div class="f">
+            <label>Date</label>
+            <select id="fDate">
+              <option value="today">Today</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="thisweek" selected>This Week</option>
+              <option value="thismonth">This Month</option>
+              <option value="custom">Custom…</option>
+            </select>
+            <input id="fFrom" type="date" class="hide">
+            <span class="tiny hide" id="tilde">–</span>
+            <input id="fTo" type="date" class="hide">
+          </div>
+          <div class="f">
+            <label>Status</label>
+            <select id="fStatus">
+                <option value="">All</option>
+                {% for status in order_statuses %}
+                  <option value="{{ status.order_status_id }}">{{ status.name }}</option>
+                {% endfor %}
+              </select>
+          </div>
+          <div class="f">
+            <label>Payment</label>
+            <select id="fPayment">
+              <option value="">All</option>
+              <option>QRIS</option>
+              <option>Cash</option>
+              <option>Transfer</option>
+              <option>COD</option>
+            </select>
+          </div>
+          <div class="f">
+            <label>Channel</label>
+            <select id="fChannel">
+              <option value="">All</option>
+              <option>POS</option>
+              <option>Online</option>
+              <option>Marketplace</option>
+            </select>
+          </div>
+          <div class="f">
+            <label>Cashier</label>
+            <select id="fCashier">
+              <option value="">All</option>
+              <option>Rina</option>
+              <option>Adi</option>
+              <option>Budi</option>
+            </select>
+          </div>
+<!--          <div class="pillbar" id="activePills"></div>-->
+        </div>
       </div>
 
-      <div class="col-6 col-md-2 col-lg-1">
-          <button id="btn-filter" class="btn btn-primary w-100">
-              <i class="bi bi-funnel"></i> Filter
-          </button>
-      </div>
-      <div class="col-6 col-md-2 col-lg-1 text-end flex-grow-1">
+      <div class="content">
+        <!-- Analytics top-metric -->
+        <div class="top-metric card">
+          <h4>Today Overview</h4>
 
-      <button class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Export Report</button>
-      <ul class="dropdown-menu dropdown-menu-end">
-        <li><a class="dropdown-item menu-item px-3" data-kt-ecommerce-export="excel" href="#">Export as Excel</a></li>
-        <li><a class="dropdown-item menu-item px-3" data-kt-ecommerce-export="pdf" href="#">Export as PDF</a></li>
-      </ul>
+            <span class="top-corner">Auto‑refresh <input id="autoRefresh" type="checkbox" checked="" aria-label="auto refresh every 30s"></span>
+
+          <div class="top-metric-inner">
+            <!-- Analytics top-metric -->
+            <div class="metric"><div class="muted tiny">Orders</div><b id="mOrders">3</b></div>
+            <div class="metric"><div class="muted tiny">Revenue</div><b id="mRevenue">Rp&nbsp;4.773.407</b></div>
+            <div class="metric"><div class="muted tiny">Store Revenue</div>
+              <div id="mTopStores" class="tiny"><div>Shopee: <b>Rp&nbsp;4.773.407</b></div></div>
+            </div>
+            <div class="metric">
+              <div class="muted tiny">Sales Trend (7d)</div>
+              <svg class="spark" id="spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="0,28 16.666666666666664,28 33.33333333333333,28 50,2 66.66666666666666,4.090790678521262 83.33333333333334,28 100,28" fill="none" stroke="#1e3a8a" stroke-width="2"></polyline><circle r="2" cx="100" cy="28" fill="#1e3a8a"></circle></svg>
+            </div>
+            <div class="grid">
+
+               <button class="btn ghost right" id="btnExport" title="Export filtered orders to CSV">Export CSV</button>
+              <button class="btn neutral right" id="btnRefresh">Refresh</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card table">
+          <table id="orderTable" aria-label="Orders table (use ↑↓ to navigate)">
+            <thead>
+              <tr>
+                <th style="width:44px"><input type="checkbox" id="checkAll" /></th>
+                <th>Order</th>
+                <th>Customer</th>
+                <th>Store</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Payment</th>
+                <th>Channel</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
       </div>
 
     </div>
 
-    <div class="table-responsive">
-        <table id="orders-table" class="table align-middle table-hover" style="width:100%;">
-          <thead>
-            <tr>
-              <th style="width:40px;"><input class="form-check-input" type="checkbox" id="checkAll"></th>
-              <th>{{ column_order_id }}</th>
-              <th>{{ column_customer }}</th>
-              <th>{{ column_status }}</th>
-              <th>{{ column_total }}</th>
-              <th>{{ column_date_added }}</th>
-              <th>{{ column_date_modified }}</th>
-              <th class="text-end">{{ column_actions }}</th>
-            </tr>
-          </thead>
-        </table>
-    </div>
+<div class="drawer" id="drawer" aria-hidden="true">
+    <div class="backdrop" data-close></div>
+    <div class="panel" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+      <header>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <h3 id="drawerTitle">Order #—</h3>
+          <span id="orderStatusBadge" class="badge info">—</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn tiny ghost" id="btnPrintInvoice">🧾 Print Invoice</button>
+          <button class="btn tiny ghost" id="btnPrintReceipt">🧾 Print Receipt</button>
+          <button class="btn tiny ghost" id="btnSendEmail">📤 Send Email</button>
+          <button class="btn tiny ghost" id="btnLabel">🏷️ Shipping Label</button>
+          <button class="btn tiny ghost bad" id="btnCancel">❌ Cancel</button>
+          <button class="btn tiny ghost" data-close>Close</button>
+        </div>
+      </header>
 
+      <div class="content">
+        <!-- Timeline -->
+        <div class="card">
+          <div class="timeline" id="timeline">
+            <div class="node"><div class="dot"></div><div class="muted">Placed</div></div>
+            <div class="bar"></div>
+            <div class="node"><div class="dot"></div><div class="muted">Paid</div></div>
+            <div class="bar"></div>
+            <div class="node"><div class="dot"></div><div class="muted">Packed</div></div>
+            <div class="bar"></div>
+            <div class="node"><div class="dot"></div><div class="muted">Shipped</div></div>
+            <div class="bar"></div>
+            <div class="node"><div class="dot"></div><div class="muted">Delivered</div></div>
+          </div>
+        </div>
+
+        <div class="grid cols-2">
+          <!-- Left: Customer + Items -->
+          <div class="grid" style="gap:12px">
+            <div class="card">
+              <div class="kv"><div class="muted">Customer</div><div class="value" id="c_name">—</div></div>
+              <div class="kv"><div class="muted">Phone</div><div id="c_phone">—</div></div>
+              <div class="kv"><div class="muted">Email</div><div id="c_email">—</div></div>
+              <div class="kv"><div class="muted">Ship To</div><div id="c_address">—</div></div>
+              <div class="divider"></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn tiny ghost" id="btnViewCustomer">👤 View Customer</button>
+                <button class="btn tiny ghost" id="btnCopyAddress">📋 Copy Address</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <table class="table" id="itemsTable" aria-label="Order items">
+                <thead><tr><th>Product</th><th>Qty</th><th class="right">Price</th><th class="right">Total</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Right: Summary + Payment + Shipping + Notes -->
+          <div class="grid" style="gap:12px">
+            <div class="card">
+              <div class="kv"><div class="muted">Order ID</div><div class="value" id="o_id">—</div></div>
+              <div class="kv"><div class="muted">Date</div><div id="o_date">—</div></div>
+              <div class="kv"><div class="muted">Payment</div><div id="o_payment">—</div></div>
+              <div class="kv"><div class="muted">Status</div><div id="o_status">—</div></div>
+              <div class="kv"><div class="muted">Note</div><div id="o_note">—</div></div>
+              <div class="divider"></div>
+              <div class="row"><span>Subtotal</span><b id="t_sub">Rp 0</b></div>
+              <div class="row"><span>Discount</span><b id="t_disc">Rp 0</b></div>
+              <div class="row"><span>Tax</span><b id="t_tax">Rp 0</b></div>
+              <div class="row lg"><span>Total</span><b class="xl" id="t_total">Rp 0</b></div>
+            </div>
+
+            <div class="card">
+              <div class="kv"><div class="muted">Payment Method</div><div id="p_method">—</div></div>
+              <div class="kv"><div class="muted">Payment Ref</div><div id="p_ref">—</div></div>
+              <div class="divider"></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn tiny ok" id="btnMarkPaid">✔ Mark as Paid</button>
+                <button class="btn tiny warn" id="btnRefund">↩ Refund</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="kv"><div class="muted">Shipping Method</div><div id="s_method">—</div></div>
+              <div class="kv"><div class="muted">Tracking</div><div id="s_track">—</div></div>
+              <div class="kv"><div class="muted">ETA</div><div id="s_eta">—</div></div>
+              <div class="divider"></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn tiny" id="btnMarkShipped">📦 Mark as Shipped</button>
+                <button class="btn tiny ghost" id="btnCopyTracking">📋 Copy Tracking</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="muted" style="margin-bottom:6px">Admin Notes</div>
+              <textarea id="adminNotes" class="inp" rows="3" placeholder="Add internal notes (not visible to customer)"></textarea>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button class="btn tiny ghost" id="btnSaveNotes">💾 Save Notes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Bar -->
+        <div class="footerbar">
+          <button class="btn ghost tiny" id="btnFooterInvoice">🧾 Print Invoice</button>
+          <button class="btn ghost tiny" id="btnFooterReceipt">🧾 Print Receipt</button>
+          <button class="btn ok tiny" id="btnFooterPaid">✔ Mark Paid</button>
+          <button class="btn tiny" id="btnFooterShipped">📦 Mark Shipped</button>
+          <button class="btn warn tiny" id="btnFooterRefund">↩ Refund</button>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
-<link rel="stylesheet" href="catalog/view/theme/default/stylesheet/bpos-table.css">
+
+
 <script>
-$(function(){
+$(function () {
+  // --- Load Orders from Server ------------------------------------------------------------
+  let ORDERS = [];
 
-    $('#filter-daterange').daterangepicker({
-      ranges: {
-        'Today': [moment(), moment()],
-        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-        'This Month': [moment().startOf('month'), moment().endOf('month')],
-        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-        'This Year': [moment().startOf('year'), moment().endOf('year')],
-    'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
-    },
-    "alwaysShowCalendars": true,
-    "startDate": moment('{{ filter_date_start }}'),
-    "endDate":  moment('{{ filter_date_end }}'),
-  "showCustomRangeLabel": false,
-    "opens": "center",
-  "autoApply": true,
-  "autoUpdateInput": false,
-        "locale": {
-            "format": 'YYYY-MM-DD',
-            "cancelLabel": 'Clear'
-        }
+  const state = {
+    stores: new Set(),
+    datePreset: 'thisweek',
+    from: null,
+    to: null,
+    status: '',
+    payment: '',
+    channel: '',
+    cashier: '',
+    q: '',
+  };
+
+  const saveKey = 'bpos.order.filters.v1';
+  const saved = localStorage.getItem(saveKey);
+  if (saved) {
+    try {
+      const s = JSON.parse(saved);
+      Object.assign(state, s, { stores: new Set(s.stores || []) });
+    } catch (e) {}
+  }
+
+  // --- Cache selectors -------------------------------------------------------
+  const $tbody = $('#tbody');
+  const $summaryChips = $('#summaryChips');
+  const $mOrders = $('#mOrders');
+  const $mRevenue = $('#mRevenue');
+  const $mTopStores = $('#mTopStores');
+  const $spark = $('#spark');
+  const $activePills = $('#activePills');
+
+  // --- Utility ---------------------------------------------------------------
+  const fmtIDR = v => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v);
+  const fmtDate = d => new Date(d).toLocaleString('id-ID', { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+
+  function persist() {
+    const plain = { ...state, stores: [...state.stores] };
+    localStorage.setItem(saveKey, JSON.stringify(plain));
+  }
+
+  function inRange(iso) {
+    const d = new Date(iso);
+    const preset = state.datePreset;
+    const start = new Date();
+    const end = new Date();
+    end.setHours(23, 59, 59, 999);
+
+    if (preset === 'today') start.setHours(0, 0, 0, 0);
+    else if (preset === 'yesterday') {
+      start.setDate(start.getDate() - 1);
+      start.setHours(0, 0, 0, 0);
+      end.setDate(end.getDate() - 1);
+    } else if (preset === 'thisweek') {
+      const day = start.getDay();
+      const diff = (day === 0 ? 6 : day - 1);
+      start.setDate(start.getDate() - diff);
+      start.setHours(0, 0, 0, 0);
+    } else if (preset === 'thismonth') {
+      start.setDate(1);
+      start.setHours(0, 0, 0, 0);
+    } else if (preset === 'custom') {
+      if (state.from && state.to) {
+        return d >= new Date(state.from) && d <= new Date(new Date(state.to).setHours(23, 59, 59, 999));
+      }
+      return true;
+    }
+    return d >= start && d <= end;
+  }
+
+  function matches(o) {
+    if (state.status && o.status !== state.status) return false;
+    if (!inRange(o.date)) return false;
+    if (state.q) {
+      const q = state.q.toLowerCase();
+      if (!(String(o.id).includes(q) || (o.customer || '').toLowerCase().includes(q))) return false;
+    }
+    return true;
+  }
+
+  // --- Render Table ----------------------------------------------------------
+  function renderTable() {
+    const rows = ORDERS.filter(matches);
+    const html = $.map(rows, function (o) {
+      const sClass = {
+        Paid: 's-paid',
+        Pending: 's-pending',
+        Shipped: 's-shipped',
+        Completed: 's-completed',
+        Cancelled: 's-cancelled'
+      }[o.status] || '';
+
+      return `
+        <tr data-id="${o.id}">
+          <td><input type="checkbox" aria-label="select ${o.id}"></td>
+          <td><b>${o.id}</b><div class="tiny">${o.items} items</div></td>
+          <td>${o.customer}</td>
+          <td>${o.store || '-'}</td>
+          <td class="tiny">${fmtDate(o.date)}</td>
+          <td><span class="status ${sClass}">${o.status}</span></td>
+          <td class="nowrap"><b>${fmtIDR(o.total)}</b></td>
+          <td>${o.payment || '-'}</td>
+          <td>${o.channel || '-'}</td>
+          <td class="actions">
+            <button class="icon-btn" data-act="view" title="View detail">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/>
+              </svg>
+            </button>
+          </td>
+        </tr>`;
+    }).join('');
+    $tbody.html(html);
+
+    const totalOrders = rows.length;
+    const revenue = rows.reduce((a, b) => a + Number(b.total || 0), 0);
+    $summaryChips.html(`<span class="chip"><b>${totalOrders}</b> Orders</span><span class="chip"><b>${fmtIDR(revenue)}</b> Revenue</span>`);
+    $mOrders.text(totalOrders);
+    $mRevenue.text(fmtIDR(revenue));
+  }
+
+  // --- Fetch data from server ------------------------------------------------
+  function loadOrders() {
+    $('#tbody').html('<tr><td colspan="10" class="center tiny">Loading orders...</td></tr>');
+    const params = {
+      filter_status_id: $('#fStatus').val() || '',
+      filter_payment: $('#fPayment').val() || '',
+      filter_date_start: $('#fFrom').val() || '',
+      filter_date_end: $('#fTo').val() || ''
+    };
+    $.ajax({
+      url: 'index.php?route=bpos/order/datatable',
+      data: params,
+      dataType: 'json',
+      success: function (res) {
+        ORDERS = (res.data || []).map(row => ({
+          id: $(row[1]).text().replace('#', ''),
+          customer: $(row[2]).text(),
+          status: $(row[3]).text(),
+          total: parseFloat($(row[4]).text().replace(/[^\d]/g, '')),
+          date: $(row[5]).text(),
+          payment: $(row[7]).text(),
+          channel: 'POS',
+          items: 1,
+          store: 'Main Store'
+        }));
+        renderTable();
+      },
+      error: function () {
+        $('#tbody').html('<tr><td colspan="10" class="center tiny text-red">Failed to load orders</td></tr>');
+      }
     });
+  }
 
-    $('#filter-daterange').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+  // --- Drawer open (load detail) --------------------------------------------
+  $(document).on('click', '[data-act="view"], #tbody td:not(.actions)', function () {
+    const id = $(this).closest('tr').data('id');
+    $.getJSON('index.php?route=bpos/order/view&order_id=' + id + '&format=json', function (order) {
+      openDrawer(order);
     });
+  });
 
-    $('#filter-daterange').on('cancel.daterangepicker', function(ev, picker) {
-        $(this).val('');
-    });
-
-    {% if filter_date_start and filter_date_end %}
-    let start = moment('{{ filter_date_start }}', 'YYYY-MM-DD');
-    let end   = moment('{{ filter_date_end }}', 'YYYY-MM-DD');
-    $('#filter-daterange').data('daterangepicker').setStartDate(start);
-    $('#filter-daterange').data('daterangepicker').setEndDate(end);
-    $('#filter-daterange').val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
-    {% endif %}
-
+  // --- Initial --------------------------------------------------------------
+  renderTable();
+  loadOrders();
 });
 
-$(document).ready(function () {
-    var table = $('#orders-table').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: {
-            url: 'index.php?route=bpos/order/datatable',
-            data: function(d){
-                d.filter_status_id  = $('#filter-status').val();
-                if($('#filter-daterange').val()){
-                    let dr = $('#filter-daterange').val().split(' - ');
-                    d.filter_date_start = dr[0];
-                    d.filter_date_end   = dr[1];
-                }
-            }
-        },
-        columns: [
-            { data: 0, orderable: false, searchable: false },
-            { data: 1 },
-            { data: 2 },
-            { data: 3 },
-            { data: 4 },
-            { data: 5 },
-            { data: 6 },
-            { data: 7, orderable: false, searchable: false }
-        ],
-        pageLength: 10,
-        dom:
-            "<'row'<'col-sm-12 d-flex justify-content-end'B>>" +
-            "<'row'<'col-sm-12'tr>>" +
-            "<'row'<'col-sm-12 col-md-5 d-flex align-items-center justify-content-center justify-content-md-start'i>" +
-            "<'col-sm-12 col-md-7 d-flex align-items-center justify-content-center justify-content-md-end'p>>",
-        buttons: [
-            { extend: 'copy', title: 'Export Data Order', className: 'd-none', exportOptions: { columns: ':not(:last-child)' } },
-            { extend: 'excel', title: 'Export Data Order', className: 'd-none', exportOptions: { columns: ':not(:last-child)' } },
-            { extend: 'csv', title: 'Export Data Order', className: 'd-none', exportOptions: { columns: ':not(:last-child)' } },
-            { extend: 'pdf', title: 'Export Data Order', className: 'd-none', exportOptions: { columns: ':not(:last-child)' } }
-        ],
-
-
-        pagingType: "simple_numbers",
-
-        language: {
-            paginate: {
-                previous: '<i class="previous"></i>',
-                next: '<i class="next"></i>'
-            },
-            search: "",
-            info: "Displays _START_ to _END_ of _TOTAL_ data",
-            infoEmpty: "No Data",
-            zeroRecords: "Data not found"
-        }
-    });
-
-    $('#btn-filter').on('click', function(){
-        table.ajax.reload();
-    });
-
-    $('#checkAll').on('change', function() {
-        $('.row-check').prop('checked', this.checked);
-    });
-
-    $('#delete-selected').on('click', function () {
-        let ids = $('.row-check:checked').map(function () { return $(this).val(); }).get();
-        if (ids.length === 0) {
-            alert('Please select at least one order.');
-            return;
-        }
-        if (!confirm('Are you sure you want to delete selected orders?')) {
-            return;
-        }
-        $.ajax({
-            url: 'index.php?route=bpos/order/deleteSelected',
-            type: 'POST',
-            data: { order_ids: ids },
-            dataType: 'json',
-            success: function (response) {
-                if (response.success) table.ajax.reload();
-                else if (response.error) alert(response.error);
-            }
-        });
-    });
-
-    $('[data-kt-ecommerce-export]').on('click', function (e) {
-        e.preventDefault();
-        var type = $(this).data('kt-ecommerce-export');
-
-        if (type === 'copy') {
-            table.button('.buttons-copy').trigger();
-        } else if (type === 'excel') {
-            table.button('.buttons-excel').trigger();
-        } else if (type === 'csv') {
-            table.button('.buttons-csv').trigger();
-        } else if (type === 'pdf') {
-            table.button('.buttons-pdf').trigger();
-        }
-    });
-});
 </script>
 
+<script>
+const money = n => 'Rp ' + Number(n||0).toLocaleString('id-ID');
+function toast(msg, type='success'){
+  if(!window.notyf){ window.notyf = new Notyf({ duration: 1800, position:{x:'right', y:'bottom'} }); }
+  if(type==='error') window.notyf.error(msg); else window.notyf.success(msg);
+}
+
+const sampleOrder = {
+  id: 'INV-20251029-001',
+  date: '2025-10-29 10:15',
+  status: 'Paid',
+  customer: { name:'Ayu Lestari', phone:'+62822-3333-4444', email:'ayu@example.com', address:'Gianyar, Bali' },
+  items: [
+    {name:'Organic Granola 500g', qty:2, price:85000},
+    {name:'Almond Milk 1L', qty:1, price:54000},
+    {name:'Reusable Bag', qty:1, price:15000}
+  ],
+  discounts: 10000,
+  tax: 12000,
+  payment: { method:'QRIS', ref:'QR987654321' },
+  shipping: { method:'JNE REG', tracking:'JNE123456789', eta:'2025-10-31' },
+  note:'Deliver in the morning if possible.'
+};
+
+function sum(items){ return items.reduce((a,i)=> a + (i.qty*i.price), 0); }
+
+function setStatusBadge(el, status){
+  const map = { Paid:'ok', Pending:'warn', Cancelled:'bad', Refunded:'warn', Shipped:'info', Delivered:'info' };
+  el.className = 'badge ' + (map[status] || 'info');
+  el.textContent = status;
+}
+
+function setTimeline(status){
+  const stages = ['Placed','Paid','Packed','Shipped','Delivered'];
+  const idx = { 'Placed':0,'Pending':0,'Paid':1,'Packed':2,'Shipped':3,'Delivered':4,'Cancelled':0,'Refunded':1 }[status] ?? 0;
+  const nodes = document.querySelectorAll('#timeline .node');
+  nodes.forEach((n,i)=> n.classList.toggle('active', i <= idx));
+}
+
+function fillOrder(o){
+  // Header
+  $('#drawerTitle').text('Order #' + o.id);
+  setStatusBadge(document.getElementById('orderStatusBadge'), o.status);
+  setTimeline(o.status);
+
+  // Customer box
+  $('#c_name').text(o.customer.name);
+  $('#c_phone').text(o.customer.phone);
+  $('#c_email').text(o.customer.email);
+  $('#c_address').text(o.customer.address);
+
+  // Items
+  const $tb = $('#itemsTable tbody').empty();
+  o.items.forEach(it=>{
+    const line = it.qty*it.price;
+    $tb.append(`<tr>
+      <td>${it.name}</td>
+      <td>${it.qty}</td>
+      <td class="right money">${money(it.price)}</td>
+      <td class="right money">${money(line)}</td>
+    </tr>`);
+  });
+
+  // Totals
+  const sub = sum(o.items);
+  $('#o_id').text(o.id);
+  $('#o_date').text(o.date);
+  $('#o_payment').text(o.payment.method);
+  $('#o_status').text(o.status);
+  $('#o_note').text(o.note||'—');
+  $('#t_sub').text(money(sub));
+  $('#t_disc').text('- ' + money(o.discounts));
+  $('#t_tax').text(money(o.tax));
+  $('#t_total').text(money(sub - o.discounts + o.tax));
+
+  // Payment block
+  $('#p_method').text(o.payment.method);
+  $('#p_ref').text(o.payment.ref);
+
+  // Shipping block
+  $('#s_method').text(o.shipping.method);
+  $('#s_track').text(o.shipping.tracking);
+  $('#s_eta').text(o.shipping.eta);
+
+  // Print (Invoice)
+  $('#pi_id').text(o.id);
+  $('#pi_date').text(o.date);
+  $('#pi_status').text('Status: ' + o.status);
+  $('#pi_name').text(o.customer.name);
+  $('#pi_addr').text(o.customer.address);
+  $('#pi_phone').text(o.customer.phone);
+  const $pi = $('#pi_items').empty();
+  o.items.forEach(it=>{
+    const line = it.qty*it.price;
+    $pi.append(`<tr><td>${it.name}</td><td align="right">${it.qty}</td><td align="right">${money(it.price)}</td><td align="right">${money(line)}</td></tr>`);
+  });
+  $('#pi_sub').text(money(sub));
+  $('#pi_disc').text('- ' + money(o.discounts));
+  $('#pi_tax').text(money(o.tax));
+  $('#pi_total').text(money(sub - o.discounts + o.tax));
+
+  // Print (Receipt)
+  $('#pr_id').text(o.id);
+  $('#pr_date').text(o.date);
+  $('#pr_name').text(o.customer.name);
+  const $pr = $('#pr_items').empty();
+  o.items.forEach(it=>{
+    const line = it.qty*it.price;
+    $pr.append(`<tr><td>${it.name} × ${it.qty}</td><td align="right">${money(line)}</td></tr>`);
+  });
+  $('#pr_total').text(money(sub - o.discounts + o.tax));
+}
+
+function openDrawer(order){
+  $('#drawer').addClass('open').attr('aria-hidden','false');
+  fillOrder(order);
+}
+function closeDrawer(){ $('#drawer').removeClass('open').attr('aria-hidden','true'); }
+
+function printArea(areaId){
+  // Show the print area and trigger window.print(); CSS handles visibility
+  const el = document.getElementById(areaId);
+  if(!el){ toast('Printable area not found','error'); return; }
+  const prevTitle = document.title;
+  document.title = areaId === 'print-invoice' ? ('Invoice ' + $('#o_id').text()) : ('Receipt ' + $('#o_id').text());
+  window.print();
+  document.title = prevTitle;
+}
+
+$(function(){
+  // Open sample
+  $('#btnNew').on('click', ()=> openDrawer(sampleOrder));
+
+  // Close
+  $(document).on('click','[data-close]', closeDrawer);
+  $('.backdrop').on('click', function(e){ if(e.target===this) closeDrawer(); });
+
+  // Actions
+  $('#btnPrintInvoice, #btnFooterInvoice').on('click', ()=> printArea('print-invoice'));
+  $('#btnPrintReceipt, #btnFooterReceipt').on('click', ()=> printArea('print-receipt'));
+  $('#btnSendEmail').on('click', ()=> toast('Invoice sent to ' + sampleOrder.customer.email));
+  $('#btnLabel').on('click', ()=> toast('Shipping label generated'));
+  $('#btnCancel').on('click', ()=> {
+    if(confirm('Cancel this order?')){
+      sampleOrder.status='Cancelled';
+      fillOrder(sampleOrder);
+      toast('Order cancelled','error');
+    }
+  });
+
+  // Payment & Shipping quick actions
+  const markPaid = ()=>{
+    sampleOrder.status='Paid';
+    fillOrder(sampleOrder);
+    toast('Order marked as Paid');
+  };
+  const markShipped = ()=>{
+    sampleOrder.status='Shipped';
+    fillOrder(sampleOrder);
+    toast('Order marked as Shipped');
+  };
+  const refund = ()=>{
+    if(confirm('Confirm refund?')){
+      sampleOrder.status='Refunded';
+      fillOrder(sampleOrder);
+      toast('Order refunded','warn');
+    }
+  };
+
+  $('#btnMarkPaid, #btnFooterPaid').on('click', markPaid);
+  $('#btnMarkShipped, #btnFooterShipped').on('click', markShipped);
+  $('#btnRefund, #btnFooterRefund').on('click', refund);
+
+  // Utilities
+  $('#btnCopyAddress').on('click', ()=> { navigator.clipboard.writeText(sampleOrder.customer.address); toast('Address copied'); });
+  $('#btnCopyTracking').on('click', ()=> { navigator.clipboard.writeText(sampleOrder.shipping.tracking); toast('Tracking copied'); });
+  $('#btnViewCustomer').on('click', ()=> toast('Open customer drawer for ' + sampleOrder.customer.name));
+
+  // Notes
+  $('#btnSaveNotes').on('click', ()=> toast('Notes saved'));
+});
+</script>

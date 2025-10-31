@@ -47,18 +47,6 @@ class ModelBposOrder extends Model {
 			foreach ($order_product_query->rows as $product) {
 				$reward += $product['reward'];
 			}
-			
-			$this->load->model('account/customer');
-
-			$affiliate_info = $this->model_account_customer->getCustomer($order_query->row['affiliate_id']);
-
-			if ($affiliate_info) {
-				$affiliate_firstname = $affiliate_info['firstname'];
-				$affiliate_lastname = $affiliate_info['lastname'];
-			} else {
-				$affiliate_firstname = '';
-				$affiliate_lastname = '';
-			}
 
 			$this->load->model('localisation/language');
 
@@ -126,9 +114,6 @@ class ModelBposOrder extends Model {
 				'reward'                  => $reward,
 				'order_status_id'         => $order_query->row['order_status_id'],
 				'order_status'            => $order_query->row['order_status'],
-				'affiliate_id'            => $order_query->row['affiliate_id'],
-				'affiliate_firstname'     => $affiliate_firstname,
-				'affiliate_lastname'      => $affiliate_lastname,
 				'commission'              => $order_query->row['commission'],
 				'language_id'             => $order_query->row['language_id'],
 				'language_code'           => $language_code,

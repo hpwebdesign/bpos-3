@@ -1,0 +1,233 @@
+<div class="sub-heading">
+      <div class="page-title">Orders</div>
+    </div>
+
+<div class="container py-4 orders-board">
+  <div class="panel p-3 p-md-6">
+  <div class="col-6 col-md-12 col-lg-3 ms-lg-auto text-lg-end">
+        <a href="{{ add_order }}" class="btn btn-primary rounded-3">
+          <i class="bi bi-plus-lg me-1"></i> {{ button_add_order }}
+        </a>
+        <button type="button" id="delete-selected" class="btn btn-danger rounded-3">
+         <i class="bi bi-trash"></i> {{ button_delete }}
+      </button>
+      </div>
+
+    <div class="toolbar row g-2 align-items-center mb-3">
+
+      <div class="col-12 col-md-5 col-lg-4">
+          <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input type="text" class="form-control" placeholder="Search Customer" id="search-order" value="{{ filter_search ?? '' }}">
+          </div>
+      </div>
+
+      <div class="col-12 col-md-4 col-lg-3">
+          <div class="d-flex align-items-center gap-2 chip-input">
+              <i class="bi bi-calendar2"></i>
+              <span class="chip">
+                  <input
+                      type="text"
+                      id="filter-daterange"
+                      class="form-control border-0 p-0"
+                      placeholder="Date Range"
+                      readonly
+                      value="{% if filter_date_start and filter_date_end %}{{ filter_date_start }} - {{ filter_date_end }}{% endif %}">
+                  <button class="btn-clear" type="button" data-clear="daterange" title="Clear">
+                      <i class="bi bi-x"></i>
+                  </button>
+              </span>
+          </div>
+      </div>
+
+      <div class="col-6 col-md-3 col-lg-2">
+          <select class="form-select" id="filter-status">
+              <option value="">Status</option>
+              {% for status in order_statuses %}
+                  <option value="{{ status.order_status_id }}" {% if filter_status_id == status.order_status_id %}selected{% endif %}>
+                      {{ status.name }}
+                  </option>
+              {% endfor %}
+          </select>
+      </div>
+
+      <div class="col-6 col-md-2 col-lg-1">
+          <button id="btn-filter" class="btn btn-primary w-100">
+              <i class="bi bi-funnel"></i> Filter
+          </button>
+      </div>
+      <div class="col-6 col-md-2 col-lg-1 text-end flex-grow-1">
+
+      <button class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Export Report</button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li><a class="dropdown-item menu-item px-3" data-kt-ecommerce-export="excel" href="#">Export as Excel</a></li>
+        <li><a class="dropdown-item menu-item px-3" data-kt-ecommerce-export="pdf" href="#">Export as PDF</a></li>
+      </ul>
+      </div>
+
+    </div>
+
+    <div class="table-responsive">
+        <table id="orders-table" class="table align-middle table-hover" style="width:100%;">
+          <thead>
+            <tr>
+              <th style="width:40px;"><input class="form-check-input" type="checkbox" id="checkAll"></th>
+              <th>{{ column_order_id }}</th>
+              <th>{{ column_customer }}</th>
+              <th>{{ column_status }}</th>
+              <th>{{ column_total }}</th>
+              <th>{{ column_date_added }}</th>
+              <th>{{ column_date_modified }}</th>
+              <th class="text-end">{{ column_actions }}</th>
+            </tr>
+          </thead>
+        </table>
+    </div>
+
+  </div>
+</div>
+<link rel="stylesheet" href="catalog/view/theme/default/stylesheet/bpos-table.css">
+<script>
+$(function(){
+
+    $('#filter-daterange').daterangepicker({
+      ranges: {
+        'Today': [moment(), moment()],
+        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+        'This Year': [moment().startOf('year'), moment().endOf('year')],
+    'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
+    },
+    "alwaysShowCalendars": true,
+    "startDate": moment('{{ filter_date_start }}'),
+    "endDate":  moment('{{ filter_date_end }}'),
+  "showCustomRangeLabel": false,
+    "opens": "center",
+  "autoApply": true,
+  "autoUpdateInput": false,
+        "locale": {
+            "format": 'YYYY-MM-DD',
+            "cancelLabel": 'Clear'
+        }
+    });
+
+    $('#filter-daterange').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+    });
+
+    $('#filter-daterange').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+    });
+
+    {% if filter_date_start and filter_date_end %}
+    let start = moment('{{ filter_date_start }}', 'YYYY-MM-DD');
+    let end   = moment('{{ filter_date_end }}', 'YYYY-MM-DD');
+    $('#filter-daterange').data('daterangepicker').setStartDate(start);
+    $('#filter-daterange').data('daterangepicker').setEndDate(end);
+    $('#filter-daterange').val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+    {% endif %}
+
+});
+
+$(document).ready(function () {
+    var table = $('#orders-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: 'index.php?route=bpos/order/datatable',
+            data: function(d){
+                d.filter_status_id  = $('#filter-status').val();
+                if($('#filter-daterange').val()){
+                    let dr = $('#filter-daterange').val().split(' - ');
+                    d.filter_date_start = dr[0];
+                    d.filter_date_end   = dr[1];
+                }
+            }
+        },
+        columns: [
+            { data: 0, orderable: false, searchable: false },
+            { data: 1 },
+            { data: 2 },
+            { data: 3 },
+            { data: 4 },
+            { data: 5 },
+            { data: 6 },
+            { data: 7, orderable: false, searchable: false }
+        ],
+        pageLength: 10,
+        dom:
+            "<'row'<'col-sm-12 d-flex justify-content-end'B>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5 d-flex align-items-center justify-content-center justify-content-md-start'i>" +
+            "<'col-sm-12 col-md-7 d-flex align-items-center justify-content-center justify-content-md-end'p>>",
+        buttons: [
+            { extend: 'copy', title: 'Export Data Order', className: 'd-none', exportOptions: { columns: ':not(:last-child)' } },
+            { extend: 'excel', title: 'Export Data Order', className: 'd-none', exportOptions: { columns: ':not(:last-child)' } },
+            { extend: 'csv', title: 'Export Data Order', className: 'd-none', exportOptions: { columns: ':not(:last-child)' } },
+            { extend: 'pdf', title: 'Export Data Order', className: 'd-none', exportOptions: { columns: ':not(:last-child)' } }
+        ],
+
+
+        pagingType: "simple_numbers",
+
+        language: {
+            paginate: {
+                previous: '<i class="previous"></i>',
+                next: '<i class="next"></i>'
+            },
+            search: "",
+            info: "Displays _START_ to _END_ of _TOTAL_ data",
+            infoEmpty: "No Data",
+            zeroRecords: "Data not found"
+        }
+    });
+
+    $('#btn-filter').on('click', function(){
+        table.ajax.reload();
+    });
+
+    $('#checkAll').on('change', function() {
+        $('.row-check').prop('checked', this.checked);
+    });
+
+    $('#delete-selected').on('click', function () {
+        let ids = $('.row-check:checked').map(function () { return $(this).val(); }).get();
+        if (ids.length === 0) {
+            alert('Please select at least one order.');
+            return;
+        }
+        if (!confirm('Are you sure you want to delete selected orders?')) {
+            return;
+        }
+        $.ajax({
+            url: 'index.php?route=bpos/order/deleteSelected',
+            type: 'POST',
+            data: { order_ids: ids },
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) table.ajax.reload();
+                else if (response.error) alert(response.error);
+            }
+        });
+    });
+
+    $('[data-kt-ecommerce-export]').on('click', function (e) {
+        e.preventDefault();
+        var type = $(this).data('kt-ecommerce-export');
+
+        if (type === 'copy') {
+            table.button('.buttons-copy').trigger();
+        } else if (type === 'excel') {
+            table.button('.buttons-excel').trigger();
+        } else if (type === 'csv') {
+            table.button('.buttons-csv').trigger();
+        } else if (type === 'pdf') {
+            table.button('.buttons-pdf').trigger();
+        }
+    });
+});
+</script>
+
