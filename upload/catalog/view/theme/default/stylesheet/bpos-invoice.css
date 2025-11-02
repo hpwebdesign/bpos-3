@@ -355,10 +355,10 @@ tbody tr:nth-child(even) td {
 .no-split {
     break-inside: avoid;
     page-break-inside: avoid;
-    padding-top: 15mm;
+    padding-top: 10mm;
 }
 #invoice-page {
-    --pad-bottom: 15mm;
+    --pad-bottom: 10mm;
 }
 #invoice-page.pdf-mode {
     box-shadow: none;
@@ -367,7 +367,7 @@ tbody tr:nth-child(even) td {
     width: 210mm;
     max-width: 210mm;
     background: #fff;
-    padding: 20mm 15mm;
+    padding: 10mm;
     border: none;
     box-shadow: none;
     margin: 0 auto;
@@ -385,4 +385,10 @@ tbody tr:nth-child(even) td {
 
 thead th:first-child {
     width: 1%;
+}
+
+
+#invoice-page a {
+    color: #000;
+    text-decoration: none;
 }

@@ -52,7 +52,7 @@
         Phone: {{ store_phone }}<br>
         Email: {{ store_email }}<br>
         {% if store_website %}
-          Website: <a href="{{ store_website }}" target="_blank">{{ store_website }}</a>
+          Website: {{ store_website }}
           {% endif %}
       </div>
     </div>
@@ -76,8 +76,8 @@
             <th style="width:1%">{{ text_image }}</th>
             <th>{{ text_product }}</th>
             <th class="ta-center">{{ text_quantity }}</th>
-            <th class="ta-right nowrap">{{ text_price }} ({{ currency_code }})</th>
-            <th class="ta-right nowrap">{{ text_amount }} ({{ currency_code }})</th>
+            <th class="ta-right nowrap">{{ text_price }}</th>
+            <th class="ta-right nowrap">{{ text_amount }}</th>
         </tr>
       </thead>
       <tbody>
