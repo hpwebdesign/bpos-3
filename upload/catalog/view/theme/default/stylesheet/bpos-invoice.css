@@ -170,7 +170,7 @@ thead th {
     background: var(--table-head);
     color: #fff;
     text-align: left;
-    padding: 12px 14px;
+    padding: 10px;
     font-weight: 700;
     font-size: 13px;
     border-right: 1px solid #334155;
@@ -182,7 +182,7 @@ tbody td {
     background: #f8fafc;
     border-top: 1px solid var(--line-2);
     border-right: 1px solid var(--line-2);
-    padding: 12px 14px;
+    padding: 5px 10px;
     font-size: 13px;
 }
 tbody td:last-child {
@@ -376,4 +376,13 @@ tbody tr:nth-child(even) td {
     display: block;
     max-width: 100%;
     height: auto;
+}
+
+#invoice-page td img {
+    height: 30px !important;
+    width: auto;
+}
+
+thead th:first-child {
+    width: 1%;
 }

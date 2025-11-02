@@ -6,7 +6,7 @@
     <title>{{ title }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="catalog/view/theme/default/stylesheet/bpos-invoice.css?v={{ random() }}">
-    
+
     </head>
   <body>
 <div class="actions">
@@ -73,7 +73,7 @@
     <table>
       <thead>
         <tr>
-            <th style="width:14%">{{ text_image }}</th>
+            <th style="width:1%">{{ text_image }}</th>
             <th>{{ text_product }}</th>
             <th class="ta-center">{{ text_quantity }}</th>
             <th class="ta-right nowrap">{{ text_price }} ({{ currency_code }})</th>
@@ -85,9 +85,7 @@
         <tr>
             <td>
                 {% if product.image %}
-                  <img src="{{ product.image }}" alt="{{ product.name }}" style="max-width:60px;max-height:60px;object-fit:contain;border-radius:6px;">
-                {% else %}
-                  <img src="catalog/view/theme/default/image/no_image.png" alt="No Image" style="max-width:60px;opacity:0.5;">
+                  <img src="{{ product.image }}">
                 {% endif %}
             </td>
           <td>{{ product.name }}</td>
@@ -119,7 +117,7 @@
    <div>{{ text_issued_on }} <b>{{ date_added }}</b></div>
     <div>{{ text_approved_by }} <b>{{ approved_by }}</b></div>
   </div>
-{# 
+{#
   <div class="terms no-split">
     <h4>Terms and Conditions</h4>
     <ol>
