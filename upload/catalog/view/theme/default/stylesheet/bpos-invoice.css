@@ -278,7 +278,7 @@ tbody tr:nth-child(even) td {
 }
 @page {
     size: A4;
-    margin: 14mm;
+    margin: 10mm;
 }
 @media print {
     .actions {
@@ -385,10 +385,4 @@ tbody tr:nth-child(even) td {
 
 thead th:first-child {
     width: 1%;
-}
-
-
-#invoice-page a {
-    color: #000;
-    text-decoration: none;
 }
