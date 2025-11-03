@@ -278,9 +278,94 @@ tbody tr:nth-child(even) td {
 }
 @page {
     size: A4;
-    margin: 10mm;
+}
+@media (max-width: 860px) {
+    .page {
+        width: auto;
+        margin: 0;
+        padding: 20px;
+    }
+    .header {
+        grid-template-columns: 1fr;
+    }
+    .summary {
+        text-align: left;
+    }
+    .blocks {
+        grid-template-columns: 1fr;
+    }
+    .totals {
+        grid-template-columns: 1fr;
+    }
+}
+.no-split {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    padding-top: 10mm;
+}
+#invoice-page {
+    --pad-bottom: 10mm;
+}
+#invoice-page.pdf-mode {
+    box-shadow: none;
+}
+#invoice-page {
+    width: 210mm;
+    max-width: 210mm;
+    background: #fff;
+    padding: 0 10mm;
+    border: none;
+    box-shadow: none;
+    margin: 0 auto;
+}
+#invoice-page * img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+#invoice-page td img {
+    height: 30px !important;
+    width: auto;
+}
+thead th:first-child {
+    width: 1%;
+}
+#invoice-page a {
+    color: #000;
+    text-decoration: none;
+}
+thead {
+    display: table-header-group !important;
+}
+tfoot {
+    display: table-footer-group !important;
 }
 @media print {
+    @page {
+        size: A4;
+        margin: 12.5mm 10mm !important;
+    }
+    table {
+        page-break-inside: auto;
+    }
+    /* Buat versi lebih presisi — hanya tambahkan border bawah pada baris terakhir halaman */
+    tbody tr {
+        position: relative;
+        border-bottom: 2px solid var(--line-2);
+    }
+    /* Hilangkan border bawah di baris terakhir tabel agar tidak dobel */
+    tr, td, th {
+        page-break-inside: avoid !important;
+    }
+    /* Tambahkan border bawah untuk baris terakhir di setiap halaman */
+    tbody tr::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-bottom: 2px solid var(--line-2);
+    }
     .actions {
         display: none;
     }
@@ -332,62 +417,13 @@ tbody tr:nth-child(even) td {
         border-top: 2px solid var(--line-2);
         border-right: 2px solid var(--line-2);
     }
-}
-@media (max-width: 860px) {
-    .page {
-        width: auto;
-        margin: 0;
-        padding: 20px;
+    #invoice-page {
+        width: 210mm;
+        max-width: 210mm;
+        background: #fff;
+        padding: 10mm;
+        border: none;
+        box-shadow: none;
+        margin: 0 auto;
     }
-    .header {
-        grid-template-columns: 1fr;
-    }
-    .summary {
-        text-align: left;
-    }
-    .blocks {
-        grid-template-columns: 1fr;
-    }
-    .totals {
-        grid-template-columns: 1fr;
-    }
-}
-.no-split {
-    break-inside: avoid;
-    page-break-inside: avoid;
-    padding-top: 10mm;
-}
-#invoice-page {
-    --pad-bottom: 10mm;
-}
-#invoice-page.pdf-mode {
-    box-shadow: none;
-}
-#invoice-page {
-    width: 210mm;
-    max-width: 210mm;
-    background: #fff;
-    padding: 10mm;
-    border: none;
-    box-shadow: none;
-    margin: 0 auto;
-}
-#invoice-page * img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-}
-
-#invoice-page td img {
-    height: 30px !important;
-    width: auto;
-}
-
-thead th:first-child {
-    width: 1%;
-}
-
-#invoice-page a {
-    color: #000;
-    text-decoration: none;
 }
