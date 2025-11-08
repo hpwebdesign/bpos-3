@@ -1,5 +1,82 @@
 <?php
 class ControllerBposCustomer extends Controller {
+
+    public function index() {
+
+        $this->load->language('bpos/bpos');
+        $this->load->model('bpos/customer');
+        $this->load->model('account/customer_group');
+
+        $customer_groups = $this->model_account_customer_group->getCustomerGroups();
+
+        $filter_search = '';
+        $filter_vip    = '';
+        $filter_sort   = 'name';
+
+        $view_data = [
+            'filter_search' => $filter_search,
+            'filter_vip'    => $filter_vip,
+            'filter_sort'   => $filter_sort,
+            'customer_groups' => $customer_groups,
+            'add_customer'  => $this->url->link('bpos/customer/add', '', true)
+        ];
+
+        $data['title']      = 'Customers - POS System';
+        $data['language']   = $this->load->controller('bpos/language');
+        $data['currency']   = $this->load->controller('bpos/currency');
+        $data['store']      = $this->load->controller('bpos/store');
+        $data['logout']     = $this->url->link('bpos/login/logout', '', true);
+        $data['total_cart'] = $this->cart->hasProducts();
+        $data['content']    = $this->load->view('bpos/customer', $view_data);
+
+        if (isset($this->request->get['format']) && $this->request->get['format'] == 'json') {
+            $this->response->addHeader('Content-Type: application/json');
+            $this->response->setOutput(json_encode(['output' => $data['content']]));
+        } else {
+            $this->response->setOutput($this->load->view('bpos/layout', $data));
+        }
+    }
+
+    public function customer_list() {
+        $this->load->model('bpos/customer');
+
+        $filter = [
+            'search' => $this->request->get['search'] ?? '',
+            'sort'   => $this->request->get['sort'] ?? 'name',
+            'order'  => $this->request->get['order'] ?? 'ASC',
+            'start'  => (max(0, (int)($this->request->get['start'] ?? 0))),
+            'group'  => "cg.name",
+            'limit'  => (int)($this->request->get['limit'] ?? 50)
+        ];
+
+        $results = $this->model_bpos_customer->getCustomers($filter);
+        $total   = $this->model_bpos_customer->getTotalCustomers($filter);
+
+        $json = [
+            'total' => $total,
+            'data'  => []
+        ];
+
+        foreach ($results as $r) {
+            $json['data'][] = [
+                'customer_id' => (int)$r['customer_id'],
+                'name'        => trim($r['firstname'] . ' ' . $r['lastname']),
+                'email'       => $r['email'],
+                'telephone'   => $r['telephone'],
+                'address'     => $r['address_1'] ?? '',
+                'tier'        => $r['customer_group_name'] ?? 'New',
+                'customer_group_id'        => $r['customer_group_id'] ?? 0,
+                'orders'      => (int)$r['orders'],
+                'last'        => $r['last_order'] ?? '',
+                'spent'       => (float)$r['total_spent'],
+                'joined'      => substr($r['date_added'], 0, 10),
+                'notes'       => $r['custom_field'] ?? '',
+            ];
+        }
+
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode($json));
+    }
     // Safety header for JSON responses
     private function jsonHeader(){
         $this->response->addHeader('Content-Type: application/json');

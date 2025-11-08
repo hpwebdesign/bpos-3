@@ -7,7 +7,7 @@ $(document).ready(function() {
 
     initCategoryCarousel();
     loadCustomerGroups();
-
+      populateCustomerGroups();
     $('footer .tab').on('click', function() {
         $('footer .tab').removeClass('active');
         $(this).addClass('active');
@@ -16,6 +16,7 @@ $(document).ready(function() {
         if ($(this).hasClass('home')) route = 'bpos/home';
         if ($(this).hasClass('invoices')) route = 'bpos/invoice';
         if ($(this).hasClass('orders')) route = 'bpos/order';
+         if ($(this).hasClass('customers')) route = 'bpos/customer';
         if ($(this).hasClass('statistics')) route = 'bpos/statistic';
         if ($(this).hasClass('reports')) route = 'bpos/report';
         if ($(this).hasClass('cart')) {
@@ -529,9 +530,22 @@ function loadCustomerGroups() {
     .catch(err => console.error('Customer group error:', err));
 }
 
+function populateCustomerGroups(){
+  const $sel = $('#filterGroup');
+  if (!$sel.length) {
+    // elemen belum ada, jangan ngapa-ngapain
+    return;
+  }
+
+  $sel.empty().append('<option value="">All Groups</option>');
+  CUSTOMER_GROUPS.forEach(g=>{
+    $sel.append(`<option value="${g.id}">${g.name}</option>`);
+  });
+}
+
 const seeded = [];
 
-const state={ q:'', sort:'name', vipOnly:false, page:0, perPage:10, data:[...seeded] };
+const state = { q:'', sort:'name', group_id:'', page:0, perPage:10, data:[...seeded] };
 
 const money = n => 'Rp ' + n.toLocaleString('id-ID');
 const daysAgo = (d)=> (Date.now()-new Date(d).getTime())/864e5;
@@ -583,10 +597,10 @@ function computeStats(list){
 function apply(){
   const q = state.q.trim().toLowerCase();
   let list = state.data.filter(c => (
-    !state.vipOnly || c.tier==='VIP'
-  ) && (
-    !q || [c.name,c.phone,c.email,(c.address||'')].some(v=>String(v).toLowerCase().includes(q))
-  ));
+      !state.group_id || String(c.customer_group_id) === String(state.group_id)
+    ) && (
+      !q || [c.name,c.phone,c.email,(c.address||'')].some(v=>String(v).toLowerCase().includes(q))
+    ));
 
   switch(state.sort){
     case 'latest': list.sort((a,b)=> new Date(b.last)-new Date(a.last)); break;
@@ -712,7 +726,7 @@ function renderCustomerDetail(c) {
       ${
         CUSTOMER_GROUPS.map(g => `
           <label class="badge ${g.name.toLowerCase().includes('vip') ? 'vip' : g.name.toLowerCase().includes('gold') ? 'gold' : ''}">
-            <input type="radio" name="tier" value="${g.id}" ${Number(c.tier) === Number(g.id) ? 'checked' : ''}>
+            <input type="radio" name="tier" value="${g.id}" ${Number(c.customer_group_id) === Number(g.id) ? 'checked' : ''}>
             ${g.name}
           </label>
         `).join('')
@@ -867,7 +881,6 @@ function saveCustomer(id) {
 }
 
 
-
 function removeCustomer(id) {
   Swal.fire({
     title: 'Delete this customer?',
@@ -922,22 +935,61 @@ $(document).on('click','#actAddPoints', function(){ saveCustomer($(this).data('i
 // events (jQuery)
 
   // search/sort/filter
-  $('#q').on('input', function(){ state.q=$(this).val(); state.page=0; apply(); });
-  $('#sort').on('change', function(){ state.sort=$(this).val(); state.page=0; apply(); });
+  $(document).on('input', '#q', function () {
+  state.q = $(this).val();
+  state.page = 0;
+  apply();
+});
+
+$(document).on('change', '#sort', function () {
+  state.sort = $(this).val();
+  state.page = 0;
+  apply();
+});
+
+$(document).on('change', '#filterGroup', function () {
+  state.group_id = $(this).val();
+  state.page = 0;
+  apply();
+});
+
   $('#filterVip').on('click', function(){ state.vipOnly=!state.vipOnly; $(this).toggleClass('ghost').toggleClass('btn'); state.page=0; apply(); });
 
   // pager
-  $('#prev').on('click', function(){ if(state.page>0){ state.page--; apply(); }});
-  $('#next').on('click', function(){ state.page++; apply(); });
+  $(document).on('click', '#prev', function(){
+      if (state.page > 0) {
+        state.page--;
+        apply();
+      }
+    });
 
-  // add customer
-  $('#addBtn').on('click', function(){
-    const id = Math.max.apply(null, state.data.map(x=>x.id))+1;
-    const newItem = {id, name:'', phone:'', email:'', address:'', tier:'New', orders:0, last:new Date().toISOString().slice(0,10), spent:0, joined:new Date().toISOString().slice(0,10), notes:''};
-    state.data.unshift(newItem);
-    state.page=0; apply(); openDetail(id);
-    setTimeout(()=> $('#f_name').focus(), 50);
-  });
+    $(document).on('click', '#next', function(){
+      state.page++;
+      apply();
+    });
+
+    // ADD CUSTOMER
+    $(document).on('click', '#addBtn', function(){
+      const id = Math.max(0, ...state.data.map(x=>x.id)) + 1;
+      const newItem = {
+        id,
+        name: '',
+        phone: '',
+        email: '',
+        address: '',
+        customer_group_id: '',
+        orders: 0,
+        last: new Date().toISOString().slice(0,10),
+        spent: 0,
+        joined: new Date().toISOString().slice(0,10),
+        notes: ''
+      };
+      state.data.unshift(newItem);
+      state.page = 0;
+      apply();
+      openDetail(0);
+      setTimeout(()=> $('#f_name').focus(), 50);
+    });
 
   // global drawer actions
   $(document).on('click','[data-close]', closeDrawer);
@@ -948,6 +1000,8 @@ $(document).on('click','#actAddPoints', function(){ saveCustomer($(this).data('i
   $(document).on('click','.btn-view, .btn-edit', function(){ openDetail(Number($(this).data('id'))); });
 
   // init
+ 
+
   apply();
 
 /* =========================

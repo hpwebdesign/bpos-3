@@ -1,0 +1,273 @@
+:root {
+    --navy: #1f2b45;
+    /* Barik navy */
+    --navy-600: #273556;
+    --sky: #eef3ff;
+    --ink: #1e2329;
+    --muted: #6b7280;
+    --line: #e6e8ef;
+    --fg: #0b1020;
+    --bg: #ffffff;
+    --chip: #f3f5f9;
+    --brand: #2f6bff;
+    --ok: #0bb57b;
+    --warn: #f4ae3a;
+    --bad: #ec5b55;
+    --radius: 16px;
+    --shadow: 0 8px 28px rgba(31, 43, 69, .08);
+}
+/* Topbar */
+
+.customers {
+    display: block !important;
+}
+.customers .topbar-customer {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px
+}
+.customers .title {
+    display: flex;
+    align-items: center;
+    gap: 10px
+}
+.customers .title h1 {
+    font-size: 18px;
+    margin: 0;
+    color: var(--navy)
+}
+.customers .stats {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap
+}
+.customers .stat {
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 8px 10px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px
+}
+.customers .stat b {
+    font-size: 13px
+}
+/* Controls */
+
+.customers .controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap
+}
+.customers .input {
+    position: relative
+}
+.customers .input input {
+    width: 280px;
+    max-width: 60vw;
+    padding: 10px 12px 10px 36px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+    outline: none
+}
+.customers .input svg {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: .6
+}
+.customers .btn {
+    appearance: none;
+    border: 0;
+    border-radius: 12px;
+    padding: 10px 14px;
+    background: var(--navy);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    display: inline-flex;
+    gap: 8px;
+    align-items: center
+}
+.customers .btn:active {
+    transform: translateY(1px)
+}
+.customers .btn.ghost {
+    background: #fff;
+    color: var(--navy);
+    border: 1px solid var(--line);
+    box-shadow: none
+}
+.customers .btn.tiny {
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 12px
+}
+.customers .select {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: #fff
+}
+/* Surface */
+
+.customers .surface {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-top: 12px
+}
+/* Table */
+
+.customers table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0
+}
+.customers thead th {
+    position: sticky;
+    top: 0;
+    background: #fbfcff;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    font-weight: 600;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 12px
+}
+.customers tbody td {
+    padding: 14px 12px;
+    border-bottom: 1px solid var(--line)
+}
+.customers tbody tr:hover {
+    background: #fbfdff
+}
+.customers .name {
+    display: flex;
+    align-items: center;
+    gap: 10px
+}
+.customers .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #cfe2ff, #e9efff);
+    display: grid;
+    place-items: center;
+    color: var(--navy);
+    font-weight: 700
+}
+.customers .muted {
+    color: var(--muted)
+}
+.customers .badge {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: var(--chip);
+    border: 1px solid var(--line);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #000;
+}
+.customers .badge.vip {
+    background: rgba(47, 107, 255, .08);
+    border-color: #cfe0ff;
+    color: var(--brand)
+}
+.customers .badge.gold {
+    background: linear-gradient(180deg, #fff7d6, #fff);
+    border-color: #ffe9a6;
+    color: #c48f00
+}
+.customers .money {
+    font-variant-numeric: tabular-nums
+}
+.customers .actions {
+    display: flex;
+    gap: 8px
+}
+/* Footer / Pager */
+
+.customers .table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-top: 1px solid var(--line)
+}
+.customers .pager {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap
+}
+.customers .page-btn {
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--navy);
+    cursor: pointer
+}
+.customers .page-btn.active {
+    background: var(--navy);
+    color: #fff;
+    border-color: var(--navy)
+}
+.customers .page-btn[disabled] {
+    opacity: .5;
+    cursor: not-allowed
+}
+/* Card mode (mobile) */
+
+@media (max-width: 860px) {
+    .customers thead {
+        display: none
+    }
+    .customers table, tbody, tr, td {
+        display: block;
+        width: 100%
+    }
+    .customers tbody tr {
+        border-bottom: 1px solid var(--line)
+    }
+    .customers tbody td {
+        border: 0;
+        padding: 8px 12px
+    }
+    .customers tbody td[data-label] {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px
+    }
+    .customers .input input {
+        width: 220px
+    }
+}
+.customers .kv {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 8px;
+    align-items: center
+}
+.customers .chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap
+}
+.customers .orders {
+    border: 1px dashed var(--line);
+    border-radius: 12px;
+    padding: 10px
+}

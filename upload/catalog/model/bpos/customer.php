@@ -263,4 +263,84 @@ class ModelBposCustomer extends Model {
         $this->db->query("DELETE FROM `" . DB_PREFIX . "customer` WHERE customer_id = '" . $customer_id . "'");
         return true;
     }
+
+    public function getCustomers($data = []) {
+        $sql = "SELECT 
+                    c.customer_id,
+                    c.firstname,
+                    c.lastname,
+                    c.email,
+                    c.telephone,
+                    c.date_added,
+                    c.customer_group_id,
+                    cg.name AS customer_group_name,
+                    (SELECT COUNT(*) 
+                        FROM `" . DB_PREFIX . "order` o 
+                        WHERE o.customer_id = c.customer_id
+                    ) AS orders,
+                    (SELECT MAX(o.date_added) 
+                        FROM `" . DB_PREFIX . "order` o 
+                        WHERE o.customer_id = c.customer_id
+                    ) AS last_order,
+                    (SELECT SUM(o.total) 
+                        FROM `" . DB_PREFIX . "order` o 
+                        WHERE o.customer_id = c.customer_id 
+                        AND o.order_status_id > 0
+                    ) AS total_spent
+                FROM `" . DB_PREFIX . "customer` c
+                LEFT JOIN `" . DB_PREFIX . "customer_group_description` cg 
+                    ON (cg.customer_group_id = c.customer_group_id 
+                        AND cg.language_id = '" . (int)$this->config->get('config_language_id') . "')
+                WHERE 1";
+
+        // --- Filter pencarian umum ---
+        if (!empty($data['search'])) {
+            $search = $this->db->escape($data['search']);
+            $sql .= " AND (c.firstname LIKE '%" . $search . "%'
+                       OR c.lastname LIKE '%" . $search . "%'
+                       OR c.email LIKE '%" . $search . "%'
+                       OR c.telephone LIKE '%" . $search . "%')";
+        }
+
+        // --- Filter berdasarkan group ---
+        if (!empty($data['customer_group_id'])) {
+            $sql .= " AND c.customer_group_id = '" . (int)$data['customer_group_id'] . "'";
+        }
+
+        // --- Sorting ---
+        $sort_data = [
+            'name'   => "c.firstname",
+            'latest' => "last_order",
+            'orders' => "orders",
+            'spent'  => "total_spent"
+        ];
+
+        $sort = $sort_data[$data['sort']] ?? 'c.firstname';
+        $sql .= " ORDER BY " . $sort . " " . ($data['order'] ?? 'ASC');
+
+        // --- Limit ---
+        if (isset($data['start']) || isset($data['limit'])) {
+            $start = (int)($data['start'] ?? 0);
+            $limit = (int)($data['limit'] ?? 20);
+            if ($start < 0) $start = 0;
+            if ($limit < 1) $limit = 20;
+            $sql .= " LIMIT " . $start . "," . $limit;
+        }
+
+        return $this->db->query($sql)->rows;
+    }
+
+
+    public function getTotalCustomers($data = []) {
+        $sql = "SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "customer` c WHERE 1";
+        if (!empty($data['search'])) {
+            $search = $this->db->escape($data['search']);
+            $sql .= " AND (c.firstname LIKE '%" . $search . "%'
+                       OR c.lastname LIKE '%" . $search . "%'
+                       OR c.email LIKE '%" . $search . "%'
+                       OR c.telephone LIKE '%" . $search . "%')";
+        }
+        $res = $this->db->query($sql);
+        return (int)$res->row['total'];
+    }
 }
