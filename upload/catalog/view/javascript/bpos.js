@@ -16,7 +16,8 @@ $(document).ready(function() {
         if ($(this).hasClass('home')) route = 'bpos/home';
         if ($(this).hasClass('invoices')) route = 'bpos/invoice';
         if ($(this).hasClass('orders')) route = 'bpos/order';
-         if ($(this).hasClass('customers')) route = 'bpos/customer';
+        if ($(this).hasClass('customers')) route = 'bpos/customer';
+        if ($(this).hasClass('settings')) route = 'bpos/setting';
         if ($(this).hasClass('statistics')) route = 'bpos/statistic';
         if ($(this).hasClass('reports')) route = 'bpos/report';
         if ($(this).hasClass('cart')) {
@@ -518,7 +519,27 @@ function initCategoryCarousel() {
   }
 }
 
-
+function initCustomer() {
+     $.getJSON('index.php?route=bpos/customer/customer_list', res=>{
+    if(res.data){
+      state.data = res.data.map(c=>({
+        id:c.customer_id,
+        name:c.name,
+        phone:c.telephone,
+        email:c.email,
+        address:c.address,
+        tier:c.tier,
+        customer_group_id:c.customer_group_id,
+        orders:c.orders,
+        last:c.last,
+        spent:c.spent,
+        joined:c.joined,
+        notes:c.notes||''
+      }));
+      apply();
+    }
+  });
+}
 
 function loadCustomerGroups() {
   return $.getJSON('index.php?route=bpos/customer/customer_group')
@@ -656,6 +677,11 @@ function openDetail(id) {
       $('#detail').html(html);
 
       bindCustomerLocationHandlers();
+      if (id == 0) {
+        $('#deleteBtn').hide();
+      } else {
+        $('#deleteBtn').show();
+      }
     },
     error: function(xhr) {
       console.error(xhr);
@@ -827,10 +853,12 @@ function saveCustomer(id) {
         toast((err && err.message) || 'Failed to apply customer', 'error');
       })
       .always(() => {
+        initCustomer()
         apply();
         closeDrawer();
       });
     } else {
+      initCustomer();
       apply();
       closeDrawer();
     }
@@ -903,7 +931,8 @@ function removeCustomer(id) {
           state.data = state.data.filter(x => x.id !== id);
           toast('Customer deleted successfully');
           closeDrawer();
-         // apply();
+          initCustomer();
+           apply();
           ajaxUnsetCustomer()
       .then(function(res){
         if (res && res.ok){
@@ -971,21 +1000,21 @@ $(document).on('change', '#filterGroup', function () {
     // ADD CUSTOMER
     $(document).on('click', '#addBtn', function(){
       const id = Math.max(0, ...state.data.map(x=>x.id)) + 1;
-      const newItem = {
-        id,
-        name: '',
-        phone: '',
-        email: '',
-        address: '',
-        customer_group_id: '',
-        orders: 0,
-        last: new Date().toISOString().slice(0,10),
-        spent: 0,
-        joined: new Date().toISOString().slice(0,10),
-        notes: ''
-      };
-      state.data.unshift(newItem);
-      state.page = 0;
+      // const newItem = {
+      //   id,
+      //   name: '',
+      //   phone: '',
+      //   email: '',
+      //   address: '',
+      //   customer_group_id: '',
+      //   orders: 0,
+      //   last: new Date().toISOString().slice(0,10),
+      //   spent: 0,
+      //   joined: new Date().toISOString().slice(0,10),
+      //   notes: ''
+      // };
+      // state.data.unshift(newItem);
+      // state.page = 0;
       apply();
       openDetail(0);
       setTimeout(()=> $('#f_name').focus(), 50);

@@ -1,0 +1,803 @@
+<div class="container settings">
+  <div class="card">
+    <div class="header" style="padding:16px 16px 0 16px">
+      <div class="title">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 7h14l-1 12H6L5 7Z" stroke="#1b5fb3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9 7V5a3 3 0 0 1 6 0v2" stroke="#1b5fb3" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <h1>{{ heading_title }}</h1>
+        <span class="badge dot" id="status-badge">Online</span>
+      </div>
+      <div class="actions">
+        <button class="btn ghost" id="btn-docs">📖 Documentation</button>
+        <button class="btn ghost" id="btn-ticket">🎫 Support Ticket</button>
+        <button class="btn" id="btn-test">🔄 Test Connection</button>
+      </div>
+    </div>
+
+    <nav class="tabs" role="tablist" aria-label="BPOS Settings Tabs">
+      <button role="tab" aria-selected="true" data-tab="general">{{ text_general }}</button>
+      <button role="tab" aria-selected="false" data-tab="store">{{ text_store }}</button>
+      <button role="tab" aria-selected="false" data-tab="device">{{ text_device }}</button>
+      <button role="tab" aria-selected="false" data-tab="cashier">{{ text_cashier }}</button>
+      <button role="tab" aria-selected="false" data-tab="users">{{ text_users }}</button>
+      <button role="tab" aria-selected="false" data-tab="sales">{{ text_sales }}</button>
+      <button role="tab" aria-selected="false" data-tab="advanced">{{ text_advanced }}</button>
+      <button role="tab" aria-selected="false" data-tab="help">{{ text_help }}</button>
+    </nav>
+
+    {# panels diambil dari file html, bisa dipotong sesuai kebutuhan #}
+    <section class="panel" id="panel-general">
+      <div class="grid">
+        <div class="field" data-field="pos_name">
+          <label for="pos_name">POS Display Name</label>
+          <input id="pos_name" type="text" name="bpos_pos_name"
+            placeholder="e.g., Cashier — Main Store"
+            value="{{ settings.bpos_pos_name ?? '' }}">
+          <div class="hint">Shown at the top bar of POS.</div>
+        </div>
+
+        <div class="field" data-field="pos_path">
+          <label for="pos_path">POS URL Path</label>
+          <input id="pos_path" type="text" name="bpos_pos_path"
+            placeholder="/pos"
+            value="{{ settings.bpos_pos_path ?? '/pos' }}">
+          <div class="hint">Public route to access POS (e.g., <span class="kbd">/pos</span>).</div>
+        </div>
+
+        <div class="field" data-field="currency">
+          <label for="currency">Default Currency</label>
+          <select
+            id="currency"
+            name="bpos_currency"
+            data-value="{{ current_currency }}"
+          >
+            {% for cur in currencies %}
+              <option value="{{ cur.code }}"
+                {{ cur.code == current_currency ? 'selected' }}
+              >
+                {{ cur.code }} — {{ cur.title }}
+              </option>
+            {% endfor %}
+          </select>
+          <div class="hint">
+            Based on OpenCart currencies ({{ currencies|length }})
+          </div>
+        </div>
+
+        <div class="field" data-field="timezone">
+          <label for="timezone">Timezone</label>
+          <select id="timezone" name="bpos_timezone">
+            <option value="Asia/Jakarta" {{ settings.bpos_timezone == 'Asia/Jakarta' ? 'selected' }}>Asia/Jakarta (UTC+7)</option>
+            <option value="Asia/Singapore" {{ settings.bpos_timezone == 'Asia/Singapore' ? 'selected' }}>Asia/Singapore (UTC+8)</option>
+            <option value="Pacific/Auckland" {{ settings.bpos_timezone == 'Pacific/Auckland' ? 'selected' }}>Pacific/Auckland (UTC+13/+12)</option>
+          </select>
+        </div>
+
+        <div class="field" data-field="date_format">
+          <label for="date_format">Date Format</label>
+          <select id="date_format" name="bpos_date_format">
+            <option value="YYYY-MM-DD" {{ settings.bpos_date_format == 'YYYY-MM-DD' ? 'selected' }}>YYYY-MM-DD</option>
+            <option value="DD/MM/YYYY" {{ settings.bpos_date_format == 'DD/MM/YYYY' ? 'selected' }}>DD/MM/YYYY</option>
+            <option value="MM/DD/YYYY" {{ settings.bpos_date_format == 'MM/DD/YYYY' ? 'selected' }}>MM/DD/YYYY</option>
+          </select>
+        </div>
+
+        <div class="field" data-field="darkmode">
+          <label>Theme</label>
+          <div class="row">
+            <div class="toggle {{ settings.bpos_darkmode ? 'on' : '' }}" data-bind="bpos_darkmode"><i></i></div>
+            <span>Enable Dark Mode</span>
+          </div>
+        </div>
+
+        <div class="field" data-field="offline">
+          <label>Offline Mode</label>
+          <div class="row">
+            <div class="toggle {{ settings.bpos_offline ? 'on' : '' }}" data-bind="bpos_offline"><i></i></div>
+            <span>Allow POS to work without internet temporarily.</span>
+          </div>
+        </div>
+
+        <div class="field" data-field="dashboard_view">
+          <label for="dashboard_view">Default Dashboard View</label>
+          <select id="dashboard_view" name="bpos_dashboard_view">
+            <option value="today" {{ settings.bpos_dashboard_view == 'today' ? 'selected' }}>Today</option>
+            <option value="week" {{ settings.bpos_dashboard_view == 'week' ? 'selected' }}>This Week</option>
+            <option value="month" {{ settings.bpos_dashboard_view == 'month' ? 'selected' }}>This Month</option>
+            <option value="custom" {{ settings.bpos_dashboard_view == 'custom' ? 'selected' }}>Custom</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-store" hidden>
+  <div class="grid">
+    <div class="field" data-field="store_id">
+      <label for="store_id">Store Selection</label>
+      <select id="store_id" name="bpos_store_id" data-value="{{ current_store_id }}">
+        {% for store in stores %}
+          <option value="{{ store.store_id }}"
+            {{ store.store_id == current_store_id ? 'selected' }}
+          >
+            {{ store.name }}
+          </option>
+        {% endfor %}
+      </select>
+      <div class="hint">Multi-store supported.</div>
+    </div>
+
+    <div class="field">
+      <label>Languages Enabled</label>
+      <div class="lang-pills" role="tablist" aria-label="Language">
+        {% for lang in languages %}
+          <button class="pill {{ loop.first ? 'active' : '' }}"
+                  aria-selected="{{ loop.first ? 'true' : 'false' }}"
+                  data-lang="{{ lang.code }}">
+            {{ lang.code|upper }}
+          </button>
+        {% endfor %}
+      </div>
+
+      <div class="hr"></div>
+
+      {% for lang in languages %}
+        <div class="lang-group {{ loop.first ? 'active' : '' }}" data-group="{{ lang.code }}">
+          <div class="field" data-field="title_{{ lang.code }}">
+            <label for="title_{{ lang.code }}">POS Title ({{ lang.code|upper }})</label>
+            <input type="text"
+                   id="title_{{ lang.code }}"
+                   name="bpos_title_{{ lang.code }}"
+                   placeholder="Barik POS"
+                   value="{{ settings['bpos_title_' ~ lang.code] ?? '' }}">
+          </div>
+          <div class="field" data-field="header_{{ lang.code }}">
+            <label for="header_{{ lang.code }}">Receipt Header ({{ lang.code|upper }})</label>
+            <textarea id="header_{{ lang.code }}"
+                      name="bpos_header_{{ lang.code }}">{{ settings['bpos_header_' ~ lang.code] ?? '' }}</textarea>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="field" data-field="tax_included">
+      <label>Tax Inclusion</label>
+      <div class="row">
+        <div class="toggle {{ settings.bpos_tax_included ? 'on' : '' }}" data-bind="bpos_tax_included"><i></i></div>
+        <span>Prices include tax</span>
+      </div>
+    </div>
+
+    <div class="field" data-field="rounding">
+      <label>Price Rounding</label>
+      <div class="split">
+        <div class="row">
+          <div class="toggle {{ settings.bpos_rounding ? 'on' : '' }}" data-bind="bpos_rounding"><i></i></div>
+          <span>Enable rounding</span>
+        </div>
+        <input id="round_precision"
+               type="number"
+               name="bpos_round_precision"
+               min="0"
+               max="100"
+               value="{{ settings.bpos_round_precision ?? 0 }}"
+               placeholder="Precision">
+      </div>
+    </div>
+  </div>
+</section>
+  
+  <section class="panel" id="panel-device" hidden>
+  <div class="grid">
+    <div class="field" data-field="device_id">
+      <label for="device_id">Device ID</label>
+      <select id="device_id" name="bpos_device_id" data-value="{{ settings.bpos_device_id ?? '' }}">
+        <option value="">Auto (this browser)</option>
+        {% for dev in oc.devices %}
+          <option value="{{ dev.code }}"
+            {{ dev.code == (settings.bpos_device_id ?? '') ? 'selected' }}>
+            {{ dev.name }}
+          </option>
+        {% endfor %}
+      </select>
+      <div class="hint">Devices are tied to cashier sessions.</div>
+    </div>
+
+    <div class="field" data-field="scanner">
+      <label>Barcode Scanner</label>
+      <div class="row">
+        <div class="toggle {{ settings.bpos_scanner ? 'on' : '' }}" data-bind="bpos_scanner"><i></i></div>
+        <span>Enable scanner input focus</span>
+      </div>
+    </div>
+
+    <div class="field" data-field="printer">
+      <label for="printer">Receipt Printer</label>
+      <select id="printer" name="bpos_printer" data-value="{{ settings.bpos_printer ?? 'none' }}">
+        <option value="none" {{ (settings.bpos_printer ?? '') == 'none' ? 'selected' }}>— Not Connected —</option>
+        <option value="thermal-58" {{ (settings.bpos_printer ?? '') == 'thermal-58' ? 'selected' }}>Thermal 58mm</option>
+        <option value="thermal-80" {{ (settings.bpos_printer ?? '') == 'thermal-80' ? 'selected' }}>Thermal 80mm</option>
+        <option value="a4" {{ (settings.bpos_printer ?? '') == 'a4' ? 'selected' }}>A4 Printer</option>
+      </select>
+
+      <div class="hint">
+        Auto Print on Checkout
+        <span class="row">
+          <div class="toggle {{ settings.bpos_autoprint ? 'on' : '' }}" data-bind="bpos_autoprint"><i></i></div>
+        </span>
+      </div>
+    </div>
+
+    <div class="field" data-field="print_logo">
+      <label for="print_logo">Print Logo</label>
+      <input id="print_logo" name="bpos_print_logo" type="text"
+             placeholder="Paste image URL (data URL supported)"
+             value="{{ settings.bpos_print_logo ?? '' }}">
+      <div class="hint">Keep it monochrome for thermal printers.</div>
+    </div>
+
+    <div class="field" data-field="receipt_footer">
+      <label for="receipt_footer">Receipt Footer</label>
+      <textarea id="receipt_footer"
+                name="bpos_receipt_footer">{{ settings.bpos_receipt_footer ?? 'Return policy • Contact • Socials' }}</textarea>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="panel-cashier" hidden>
+  <div class="grid">
+    <div class="field" data-field="role_default">
+      <label for="role_default">Default Role</label>
+      <select id="role_default" name="bpos_role_default" data-value="{{ current_role_id }}">
+      {% for group in user_groups %}
+        <option value="{{ group.user_group_id }}"
+          {{ group.user_group_id == current_role_id ? 'selected' }}>
+          {{ group.name }}
+        </option>
+      {% endfor %}
+    </select>
+      <div class="hint">Default role for new cashier login.</div>
+    </div>
+
+    <div class="field" data-field="session_timeout">
+      <label for="session_timeout">Session Timeout (minutes)</label>
+      <input id="session_timeout" type="number"
+             name="bpos_session_timeout"
+             value="{{ settings.bpos_session_timeout ?? 30 }}"
+             min="1">
+    </div>
+
+    <div class="field" data-field="permissions">
+      <label>Permissions</label>
+      <div class="note">
+        <label><input type="checkbox" name="bpos_perm_neworder" {{ settings.bpos_perm_neworder ? 'checked' }}> New Order</label><br>
+        <label><input type="checkbox" name="bpos_perm_refund" {{ settings.bpos_perm_refund ? 'checked' }}> Refund</label><br>
+        <label><input type="checkbox" name="bpos_perm_editprice" {{ settings.bpos_perm_editprice ? 'checked' }}> Edit Item Price</label><br>
+        <label><input type="checkbox" name="bpos_perm_viewcost" {{ settings.bpos_perm_viewcost ? 'checked' }}> View Cost</label><br>
+        <label><input type="checkbox" name="bpos_perm_exportsales" {{ settings.bpos_perm_exportsales ? 'checked' }}> Export Sales</label>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="panel-users" hidden>
+        <div class="field">
+          <label class="section-title">POS Users</label>
+          <div class="toolbar">
+            <div class="search">
+              <input id="user-search" type="text" placeholder="Search username or role">
+              <button class="btn small" id="user-search-clear">Clear</button>
+            </div>
+            <div class="right">
+              <span class="badge-sm muted" id="user-count">0 users</span>
+              <button class="btn primary" id="btn-add-user">+ New User</button>
+            </div>
+          </div>
+          <table class="table" id="user-table" aria-label="POS users">
+            <thead>
+              <tr>
+                <th style="width:34%">Username</th>
+                <th style="width:18%">Role</th>
+                <th style="width:18%">Status</th>
+                <th style="width:30%">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+          <div class="hint">Users are stored locally for demo. Integrate with OC controller to persist.</div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-sales" hidden>
+  <div class="grid">
+    <!-- Auto Sync Sales -->
+    <div class="field" data-field="autosync">
+      <label>Auto Sync Sales</label>
+      <div class="row">
+        <div class="toggle {{ settings.bpos_autosync ? 'on' : '' }}" data-bind="bpos_autosync"><i></i></div>
+        <span>Sync to server periodically</span>
+      </div>
+    </div>
+
+    <!-- Sync Interval -->
+    <div class="field" data-field="sync_interval">
+      <label for="sync_interval">Sync Interval</label>
+      <select id="sync_interval" name="bpos_sync_interval" data-value="{{ settings.bpos_sync_interval ?? '5m' }}">
+        <option value="5m" {{ (settings.bpos_sync_interval ?? '') == '5m' ? 'selected' }}>Every 5 minutes</option>
+        <option value="10m" {{ (settings.bpos_sync_interval ?? '') == '10m' ? 'selected' }}>Every 10 minutes</option>
+        <option value="30m" {{ (settings.bpos_sync_interval ?? '') == '30m' ? 'selected' }}>Every 30 minutes</option>
+      </select>
+    </div>
+
+    <!-- Online Status Tracking -->
+    <div class="field" data-field="online_status">
+      <label>Online Status Tracking</label>
+      <div class="row">
+        <div class="toggle {{ settings.bpos_online_status ? 'on' : '' }}" data-bind="bpos_online_status"><i></i></div>
+        <span>Show cashier online/idle</span>
+      </div>
+    </div>
+
+    <!-- Stock Deduction -->
+    <div class="field" data-field="stock_deduct">
+      <label>Stock Deduction</label>
+      <div class="row">
+        <div class="toggle {{ settings.bpos_stock_deduct ? 'on' : '' }}" data-bind="bpos_stock_deduct"><i></i></div>
+        <span>Deduct stock on checkout</span>
+      </div>
+    </div>
+
+    <!-- Export Sales -->
+    <div class="field" data-field="export_fmt">
+      <label>Export Sales</label>
+      <div class="row" style="gap:8px">
+        <select id="export_fmt" name="bpos_export_fmt" data-value="{{ settings.bpos_export_fmt ?? 'csv' }}">
+          <option value="csv" {{ (settings.bpos_export_fmt ?? '') == 'csv' ? 'selected' }}>CSV</option>
+          <option value="xlsx" {{ (settings.bpos_export_fmt ?? '') == 'xlsx' ? 'selected' }}>XLSX</option>
+        </select>
+        <button type="button" class="btn" id="btnExportSales">Export</button>
+      </div>
+    </div>
+
+    <!-- Sync Log -->
+    <div class="field" data-field="sync_log">
+      <label>Last Sync Log</label>
+      <div class="status {{ settings.bpos_last_sync_ok ? '' : 'off' }}">
+        <i></i>
+        <span id="sync-log">
+          {{ settings.bpos_last_sync_log ?? 'No sync yet' }}
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="panel-advanced" hidden>
+  <div class="grid">
+
+    <!-- API Endpoint -->
+    <div class="field" data-field="api_url">
+      <label for="api_url">API Endpoint</label>
+      <input id="api_url" 
+             name="bpos_api_url" 
+             type="text" 
+             placeholder="https://example.com/api/bpos" 
+             value="{{ settings.bpos_api_url ?? '' }}" 
+             data-value="{{ settings.bpos_api_url ?? '' }}">
+      <div class="hint">Endpoint used by POS for sync operations.</div>
+    </div>
+
+    <!-- API Key -->
+    <div class="field" data-field="api_key">
+      <label for="api_key">API Key</label>
+      <input id="api_key" 
+             name="bpos_api_key" 
+             type="password" 
+             placeholder="••••••••••" 
+             value="{{ settings.bpos_api_key ?? '' }}" 
+             data-value="{{ settings.bpos_api_key ?? '' }}">
+      <div class="hint">Required to authenticate API requests.</div>
+    </div>
+
+    <!-- Cache control -->
+    <div class="field">
+      <label>Cache</label>
+      <div class="row" style="gap:8px">
+        <button type="button" class="btn" id="btn-clear-cache">Clear Cache</button>
+        <button type="button" class="btn" id="btn-reset-ls">Reset Local Storage</button>
+      </div>
+      <div class="hint">Use if POS behaves unexpectedly or after an update.</div>
+    </div>
+
+    <!-- Diagnostics -->
+    <div class="field">
+      <label>Diagnostics</label>
+      <div class="row" style="gap:8px;flex-wrap:wrap">
+        <button type="button" class="btn" id="btn-test-conn">Test Connection</button>
+        <span id="diag-result" class="muted" style="margin-left:6px"></span>
+      </div>
+      <div class="hint" id="diag-hint">Run a quick ping to your API endpoint.</div>
+    </div>
+
+  </div>
+</section>
+
+<section class="panel" id="panel-help" hidden>
+  <div class="grid">
+
+    <!-- Quick Start -->
+    <div class="field">
+      <label class="section-title">Quick Start</label>
+      <div class="note">
+        1) Set <b>Store</b>, <b>Language</b>, and <b>Currency</b>.<br>
+        2) Enable <b>Barcode Scanner</b> and <b>Printer</b> if needed.<br>
+        3) Configure <b>Cashier & Permission</b>.<br>
+        4) Open your POS at <span class="kbd">/pos</span> and start selling 🎉
+      </div>
+    </div>
+
+    <!-- Troubleshooting -->
+    <div class="field">
+      <label class="section-title">Troubleshooting</label>
+      <div class="note">
+        If printing fails on a thermal printer, switch <b>Print Type</b> or reduce logo density.<br>
+        Use <b>Reset Local Storage</b> if UI behaves oddly after updates.
+      </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="field">
+      <label class="section-title">Contact</label>
+      <div class="row" style="gap:8px;flex-wrap:wrap">
+        <button type="button" class="btn ghost" id="help-docs">📖 Documentation</button>
+        <button type="button" class="btn ghost" id="help-ticket">🎫 Open Ticket</button>
+      </div>
+      <div class="hint">Need more help? Check the documentation or contact support.</div>
+    </div>
+
+  </div>
+</section>
+
+
+
+    <div class="savebar">
+      <div class="left">Changes are not saved</div>
+      <div class="right">
+        <button class="btn" id="discard">Discard</button>
+        <button class="btn primary" id="save">Save Settings</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+   <div class="modal" id="user-modal" aria-hidden="true" role="dialog" aria-labelledby="user-modal-title">
+    <div class="sheet-setting">
+      <header>
+        <strong id="user-modal-title">New User</strong>
+        <button class="btn small" id="user-modal-close">✕</button>
+      </header>
+      <div class="body">
+        <div class="grid">
+          <div class="field">
+            <label for="u-username">Username</label>
+            <input id="u-username" type="text" placeholder="e.g., cashier01">
+          </div>
+          <div class="field">
+            <label for="u-pin">PIN</label>
+            <input id="u-pin" type="password" placeholder="4–6 digits">
+          </div>
+          <div class="field">
+            <label for="u-role">Role</label>
+            <select id="u-role">
+              {% for group in user_groups %}
+        <option value="{{ group.user_group_id }}">
+          {{ group.name }}
+        </option>
+      {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="u-active">Active</label>
+            <div class="row"><div id="u-active" class="toggle on"><i></i></div><span>Enable login</span></div>
+          </div>
+        </div>
+      </div>
+      <footer>
+        <button class="btn" id="user-modal-cancel">Cancel</button>
+        <button class="btn primary" id="user-modal-save">Save User</button>
+      </footer>
+    </div>
+  </div>
+</div>
+
+ 
+  <link rel="stylesheet" href="catalog/view/theme/default/stylesheet/bpos_setting.css">
+<script>
+(function(){
+  const REQUIRED_FIELDS = ['pos_name','pos_path'];
+  const toast = document.getElementById('toast');
+  const savebarLeft = document.querySelector('.savebar .left');
+  const showToast = (msg, ok=true)=>{
+    toast.textContent = msg;
+    toast.style.background = ok ? '#10b981' : '#ef4444';
+    toast.classList.add('show');
+    setTimeout(()=>toast.classList.remove('show'), 1600);
+  };
+  const dirty = ()=> savebarLeft.textContent = 'Unsaved changes';
+  const val = id => document.getElementById(id)?.value || '';
+
+  // === Tabs ===
+  const tabButtons = document.querySelectorAll('.tabs [role="tab"]');
+  const panels = {};
+  document.querySelectorAll('section.panel[id^="panel-"]').forEach(p => panels[p.id.replace('panel-', '')] = p);
+  tabButtons.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      tabButtons.forEach(b=>b.setAttribute('aria-selected','false'));
+      btn.setAttribute('aria-selected','true');
+      const key = btn.dataset.tab;
+      Object.keys(panels).forEach(k => panels[k].hidden = (k !== key));
+    });
+  });
+
+  // === Toggle handling ===
+  document.querySelectorAll('.toggle').forEach(t=>{
+    t.addEventListener('click', ()=>{ t.classList.toggle('on'); dirty(); });
+  });
+
+  // === Input changes mark dirty ===
+  document.querySelectorAll('input,select,textarea').forEach(el=>{
+    el.addEventListener('input', dirty);
+    el.addEventListener('change', dirty);
+  });
+
+  // === Validation helpers ===
+  function markInvalid(ids){
+    let focused = false;
+    ids.forEach(id=>{
+      const wrap = document.querySelector('.field[data-field="'+id+'"]');
+      if(wrap){
+        wrap.classList.add('invalid');
+        if(!focused){
+          const input = wrap.querySelector('input,select,textarea');
+          if(input){ input.focus(); focused = true; }
+        }
+      }
+    });
+  }
+
+  // === Load settings defaults (from data-value or saved) ===
+  try{
+    const saved = JSON.parse(localStorage.getItem('bpos_settings_array')||'null');
+    if(saved && Array.isArray(saved)){
+      saved.forEach(([k,v])=>{
+        const el = document.getElementById(k);
+        if(el!=null && typeof v!=='undefined'){ el.value = v; }
+        const tg = document.querySelector('.toggle[data-bind="'+k+'"]');
+        if(tg){ tg.classList.toggle('on', !!v); }
+      });
+    }else{
+      document.querySelectorAll('[data-value]').forEach(el=>{
+        const dv = el.getAttribute('data-value');
+        if(el.tagName==='TEXTAREA'){ if(el.value.trim()==='') el.value = dv || ''; }
+        else{ if(el.value==='' && dv!=null) el.value = dv; }
+      });
+    }
+  }catch(e){ console.warn(e); }
+
+  // ======== USERS ========
+  const U_KEY = 'bpos_users';
+  const tableBody = document.querySelector('#user-table tbody');
+  const countBadge = document.getElementById('user-count');
+  const searchBox = document.getElementById('user-search');
+  const searchClear = document.getElementById('user-search-clear');
+  const modal = document.getElementById('user-modal');
+  const modalTitle = document.getElementById('user-modal-title');
+  const mUser = { id:null, mode:'create' };
+
+  function uid(){ return 'U' + Math.random().toString(36).slice(2,8).toUpperCase(); }
+  function nowISO(){ return new Date().toISOString(); }
+
+  let users = [];
+
+  async function fetchUsers(){
+    try {
+      const res = await fetch('index.php?route=bpos/setting/users');
+      const text = await res.text();
+      try {
+        const json = JSON.parse(text);
+        if(json.success && Array.isArray(json.data)){
+          users = json.data.map(u => ({
+            id: u.user_id,
+            username: u.username,
+            user_group_id: u.user_group_id,
+            active: u.status == 1,
+            createdAt: u.date_added
+          }));
+          renderUsers();
+        } else {
+          console.warn('Unexpected JSON:', json);
+          showToast('Failed to load users', false);
+        }
+      } catch(err) {
+        console.error('JSON parse failed:', text);
+        showToast('Invalid JSON response', false);
+      }
+    } catch(e) {
+      console.error(e);
+      showToast('Error fetching users', false);
+    }
+  }
+
+  function renderUsers(){
+    const q = (searchBox.value||'').trim().toLowerCase();
+    const rows = users.filter(u=>{
+      if(!q) return true;
+      return (u.username||'').toLowerCase().includes(q);
+    });
+    countBadge.textContent = rows.length + (rows.length===1 ? ' user' : ' users');
+    tableBody.innerHTML = rows.map(u=>`
+      <tr data-id="${u.id}">
+        <td><strong>${u.username}</strong>
+          <div class="hint">Created ${new Date(u.createdAt).toLocaleString()}</div></td>
+        <td>${u.user_group_id}</td>
+        <td>${u.active ? '<span class="badge-sm ok">Active</span>' : '<span class="badge-sm off">Disabled</span>'}</td>
+        <td>
+          <div class="right">
+            <button class="btn small" data-act="toggle">${u.active?'Disable':'Enable'}</button>
+            <button class="btn small" data-act="reset">Reset PIN</button>
+            <button class="btn small" data-act="edit">Edit</button>
+            <button class="btn small danger" data-act="delete">Delete</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  function openModal(mode, user){
+    mUser.mode = mode;
+    mUser.id = user ? user.id : null;
+    modalTitle.textContent = mode==='create' ? 'New User' : 'Edit User';
+    document.getElementById('u-username').value = user ? user.username : '';
+    document.getElementById('u-pin').value = '';
+    document.getElementById('u-role').value = user ? user.user_group_id : '';
+    document.getElementById('u-active').classList.toggle('on', user ? !!user.active : true);
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden','false');
+  }
+  function closeModal(){
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden','true');
+  }
+
+  document.getElementById('btn-add-user').addEventListener('click', ()=>openModal('create'));
+  document.getElementById('user-modal-close').addEventListener('click', closeModal);
+  document.getElementById('user-modal-cancel').addEventListener('click', closeModal);
+  document.getElementById('u-active').addEventListener('click', e=>e.currentTarget.classList.toggle('on'));
+
+  document.getElementById('user-modal-save').addEventListener('click', ()=>{
+    const username = document.getElementById('u-username').value.trim();
+    const pin = document.getElementById('u-pin').value.trim(); // gunakan field pin
+    const role = document.getElementById('u-role').value;
+    const active = document.getElementById('u-active').classList.contains('on');
+
+    if(!username){ showToast('Username is required', false); return; }
+    if(mUser.mode==='create' && (!pin || pin.length < 4 || pin.length > 6)){
+      showToast('PIN must be 4–6 digits', false); return;
+    }
+
+    const payload = {
+      username,
+      pin, // <── kirim ke backend
+      user_group_id: role,
+      status: active ? 1 : 0
+    };
+
+    if(mUser.mode==='create'){
+      fetch('index.php?route=bpos/setting/addUser', {
+        method: 'POST',
+        headers: {'Content-Type':'application/x-www-form-urlencoded'},
+        body: new URLSearchParams(payload)
+      }).then(r=>r.json()).then(res=>{
+        if(res.success) showToast('User created'); else showToast(res.message, false);
+        renderUsers();
+      });
+    } else {
+      payload.user_id = mUser.id;
+      fetch('index.php?route=bpos/setting/editUser', {
+        method: 'POST',
+        headers: {'Content-Type':'application/x-www-form-urlencoded'},
+        body: new URLSearchParams(payload)
+      }).then(r=>r.json()).then(res=>{
+        if(res.success) showToast('User updated'); else showToast(res.message, false);
+        renderUsers();
+      });
+    }
+    closeModal();
+  });
+
+  // Table actions
+  tableBody.addEventListener('click', async (e)=>{
+    const btn = e.target.closest('button[data-act]'); if(!btn) return;
+    const tr = btn.closest('tr'); const id = tr.getAttribute('data-id');
+    const act = btn.getAttribute('data-act');
+    const idx = users.findIndex(x=>x.id == id); if(idx<0) return;
+
+    if(act==='toggle'){
+      const newStatus = users[idx].active ? 0 : 1;
+      const res = await fetch(`index.php?route=bpos/setting/setUserStatus&format=json`, {
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body: `user_id=${id}&status=${newStatus}`
+      });
+      const json = await res.json();
+      if(json.success){ showToast('Status updated'); fetchUsers(); }
+      else showToast('Failed', false);
+    } else if(act==='reset'){
+      showToast('PIN reset link sent');
+    } else if(act==='edit'){
+      openModal('edit', users[idx]);
+    } else if(act==='delete'){
+      if(confirm('Delete this user?')){
+        const res = await fetch(`index.php?route=bpos/setting/deleteUser&format=json`, {
+          method:'POST',
+          headers:{'Content-Type':'application/x-www-form-urlencoded'},
+          body: `user_id=${id}`
+        });
+        const json = await res.json();
+        if(json.success){ showToast('User deleted'); fetchUsers(); }
+        else showToast('Failed to delete', false);
+      }
+    }
+  });
+
+  // Search
+  searchBox.addEventListener('input', renderUsers);
+  searchClear.addEventListener('click', ()=>{ searchBox.value=''; renderUsers(); });
+
+  // === Save all settings ===
+  document.getElementById('save').addEventListener('click', async ()=>{
+    const missing = REQUIRED_FIELDS.filter(k=>!String(val(k)||'').trim());
+    if(missing.length){ showToast('Please fill required fields: ' + missing.join(', '), false); markInvalid(missing); return; }
+
+    const fields = [
+      'pos_name','pos_path','currency','timezone','date_format','dashboard_view','store_id',
+      'title_en','header_en','title_id','header_id','round_precision','device_id','printer',
+      'print_logo','receipt_footer','role_default','session_timeout','sync_interval','export_fmt',
+      'api_url','api_key'
+    ];
+    const toggles = [
+      'darkmode','offline','tax_included','rounding','scanner','autoprint',
+      'autosync','online_status','stock_deduct'
+    ];
+
+    const payload = {};
+    fields.forEach(k=>{ const el=document.getElementById(k); if(el) payload[k]=el.value; });
+    toggles.forEach(k=>{ const tg=document.querySelector('.toggle[data-bind="'+k+'"]'); payload[k] = tg && tg.classList.contains('on') ? 1 : 0; });
+
+    try {
+      const res = await fetch('index.php?route=bpos/setting/save&format=json', {
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body: new URLSearchParams(payload).toString()
+      });
+      const json = await res.json();
+      if(json.success){
+        savebarLeft.textContent='All changes saved';
+        showToast('Settings saved');
+      } else {
+        showToast(json.message || 'Failed to save settings', false);
+      }
+    } catch(e){
+      console.error(e);
+      showToast('Error saving settings', false);
+    }
+  });
+
+  // discard
+  document.getElementById('discard').addEventListener('click', ()=>{ location.reload(); });
+
+  // init
+  fetchUsers();
+})();
+</script>
+

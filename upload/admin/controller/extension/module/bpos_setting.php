@@ -261,6 +261,7 @@ class ControllerExtensionModuleBposSetting extends Controller {
 
 	private function validateTable() {
 		$queries[] = $this->db->query("SHOW COLUMNS FROM `" . DB_PREFIX . "customer` LIKE 'note';");
+		$queries[] = $this->db->query("SHOW COLUMNS FROM `" . DB_PREFIX . "user` LIKE 'pin';");
 		$error = 0;
 
 		foreach ($queries as $query) {
@@ -275,6 +276,10 @@ class ControllerExtensionModuleBposSetting extends Controller {
 		if(!$check_username->num_rows){
 			$this->db->query("ALTER TABLE `" . DB_PREFIX . "customer` ADD `note` TEXT DEFAULT NULL AFTER `lastname`;");
 		}
+		$check_username = $this->db->query("SHOW COLUMNS FROM `" . DB_PREFIX . "user` LIKE 'pin'");
+		if(!$check_username->num_rows){
+			$this->db->query("ALTER TABLE `" . DB_PREFIX . "user` ADD `pin` VARCHAR(16) DEFAULT NULL AFTER `password`;");
+		}
 		$data['success'] = true;
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($data));
@@ -285,6 +290,10 @@ class ControllerExtensionModuleBposSetting extends Controller {
 		$check_username = $this->db->query("SHOW COLUMNS FROM `" . DB_PREFIX . "customer` LIKE 'note'");
 		if(!$check_username->num_rows){
 			$this->db->query("ALTER TABLE `" . DB_PREFIX . "customer` ADD `note` TEXT DEFAULT NULL AFTER `lastname`;");
+		}
+		$check_username = $this->db->query("SHOW COLUMNS FROM `" . DB_PREFIX . "user` LIKE 'pin'");
+		if(!$check_username->num_rows){
+			$this->db->query("ALTER TABLE `" . DB_PREFIX . "user` ADD `pin` VARCHAR(16) DEFAULT NULL AFTER `password`;");
 		}
 		$this->response->redirect($this->url->link('extension/module/bpos_setting', 'user_token=' . $this->session->data['user_token'] . "&install=true", true));
 	}

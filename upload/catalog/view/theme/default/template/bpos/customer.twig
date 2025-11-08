@@ -61,24 +61,6 @@
 <link rel="stylesheet" href="catalog/view/theme/default/stylesheet/bpos_customer.css">
 <script>
 $(function(){
-  $.getJSON('index.php?route=bpos/customer/customer_list', res=>{
-    if(res.data){
-      state.data = res.data.map(c=>({
-        id:c.customer_id,
-        name:c.name,
-        phone:c.telephone,
-        email:c.email,
-        address:c.address,
-        tier:c.tier,
-        customer_group_id:c.customer_group_id,
-        orders:c.orders,
-        last:c.last,
-        spent:c.spent,
-        joined:c.joined,
-        notes:c.notes||''
-      }));
-      apply();
-    }
-  });
+ initCustomer();
 });
 </script>
