@@ -261,7 +261,7 @@ class ControllerExtensionModuleBposSetting extends Controller {
 
 	private function validateTable() {
 		$queries[] = $this->db->query("SHOW COLUMNS FROM `" . DB_PREFIX . "customer` LIKE 'note';");
-		$queries[] = $this->db->query("SHOW COLUMNS FROM `" . DB_PREFIX . "user` LIKE 'pin';");
+		$queries[] = $this->db->query( "SHOW TABLES LIKE '" . DB_PREFIX . "user_bpos'" );
 		$error = 0;
 
 		foreach ($queries as $query) {
@@ -276,9 +276,18 @@ class ControllerExtensionModuleBposSetting extends Controller {
 		if(!$check_username->num_rows){
 			$this->db->query("ALTER TABLE `" . DB_PREFIX . "customer` ADD `note` TEXT DEFAULT NULL AFTER `lastname`;");
 		}
-		$check_username = $this->db->query("SHOW COLUMNS FROM `" . DB_PREFIX . "user` LIKE 'pin'");
+		$check_username = $this->db->query( "SHOW TABLES LIKE '" . DB_PREFIX . "user_bpos'" );
 		if(!$check_username->num_rows){
-			$this->db->query("ALTER TABLE `" . DB_PREFIX . "user` ADD `pin` VARCHAR(16) DEFAULT NULL AFTER `password`;");
+			$this->db->query("CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "user_bpos` (
+		 `user_bpos_id` INT(11) NOT NULL AUTO_INCREMENT,
+		  `username` VARCHAR(64) NOT NULL,
+		  `pin` VARCHAR(10) NOT NULL,
+		  `role` ENUM('admin','staff') NOT NULL DEFAULT 'staff',
+		  `status` TINYINT(1) NOT NULL DEFAULT 1,
+		  `date_added` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		  PRIMARY KEY (`user_bpos_id`),
+		  UNIQUE KEY `username` (`username`)
+		  )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
 		}
 		$data['success'] = true;
 		$this->response->addHeader('Content-Type: application/json');
@@ -291,9 +300,18 @@ class ControllerExtensionModuleBposSetting extends Controller {
 		if(!$check_username->num_rows){
 			$this->db->query("ALTER TABLE `" . DB_PREFIX . "customer` ADD `note` TEXT DEFAULT NULL AFTER `lastname`;");
 		}
-		$check_username = $this->db->query("SHOW COLUMNS FROM `" . DB_PREFIX . "user` LIKE 'pin'");
+		$check_username = $this->db->query( "SHOW TABLES LIKE '" . DB_PREFIX . "user_bpos'" );
 		if(!$check_username->num_rows){
-			$this->db->query("ALTER TABLE `" . DB_PREFIX . "user` ADD `pin` VARCHAR(16) DEFAULT NULL AFTER `password`;");
+			$this->db->query("CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "user_bpos` (
+			 `user_bpos_id` INT(11) NOT NULL AUTO_INCREMENT,
+			  `username` VARCHAR(64) NOT NULL,
+			  `pin` VARCHAR(10) NOT NULL,
+			  `role` ENUM('admin','staff') NOT NULL DEFAULT 'staff',
+			  `status` TINYINT(1) NOT NULL DEFAULT 1,
+			  `date_added` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			  PRIMARY KEY (`user_bpos_id`),
+			  UNIQUE KEY `username` (`username`)
+			  )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
 		}
 		$this->response->redirect($this->url->link('extension/module/bpos_setting', 'user_token=' . $this->session->data['user_token'] . "&install=true", true));
 	}

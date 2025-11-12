@@ -123,15 +123,13 @@ class ControllerBposSetting extends Controller {
 
     // ======== USERS ========
    public function users() {
-    $this->load->model('bpos/setting');
+        $this->load->model('bpos/setting');
         $json = [
             'success' => true,
             'data'    => $this->model_bpos_setting->getUsers()
         ];
-
-        $this->response->addHeader('Content-Type: application/json; charset=utf-8');
+        $this->response->addHeader('Content-Type: application/json');
         $this->response->setOutput(json_encode($json));
-        return; // <── penting biar tidak render layout OpenCart
     }
 
     public function addUser() {
@@ -140,15 +138,16 @@ class ControllerBposSetting extends Controller {
 
         if ($this->request->server['REQUEST_METHOD'] == 'POST') {
             $username = trim($this->request->post['username'] ?? '');
-            $pin = trim($this->request->post['pin'] ?? ''); // <── pakai field pin
-            $user_group_id = (int)($this->request->post['user_group_id'] ?? 0);
+            $pin = trim($this->request->post['pin'] ?? '');
+            $role = strtolower(trim($this->request->post['role'] ?? 'staff'));
             $status = (int)($this->request->post['status'] ?? 1);
 
-            // Validasi
             if (!$username || strlen($pin) < 4 || strlen($pin) > 6) {
                 $json = ['success' => false, 'message' => 'Invalid username or PIN (4–6 digits required)'];
+            } elseif ($this->model_bpos_setting->userExists($username)) {
+                $json = ['success' => false, 'message' => 'Username already exists'];
             } else {
-                $this->model_bpos_setting->addUser($username, $pin, $user_group_id, $status);
+                $this->model_bpos_setting->addUser($username, $pin, $role, $status);
                 $json = ['success' => true, 'message' => 'User created successfully'];
             }
         } else {
@@ -164,14 +163,18 @@ class ControllerBposSetting extends Controller {
         $json = [];
 
         if ($this->request->server['REQUEST_METHOD'] == 'POST') {
-            $user_id = (int)$this->request->post['user_id'];
+            $id = (int)$this->request->post['user_id'];
             $username = trim($this->request->post['username'] ?? '');
-            $pin = trim($this->request->post['pin'] ?? ''); // <── pakai field pin
-            $user_group_id = (int)($this->request->post['user_group_id'] ?? 0);
+            $pin = trim($this->request->post['pin'] ?? '');
+            $role = strtolower(trim($this->request->post['role'] ?? 'staff'));
             $status = (int)($this->request->post['status'] ?? 1);
 
-            $this->model_bpos_setting->editUser($user_id, $username, $pin, $user_group_id, $status);
-            $json = ['success' => true, 'message' => 'User updated successfully'];
+            if ($this->model_bpos_setting->userExists($username, $id)) {
+                $json = ['success' => false, 'message' => 'Username already exists'];
+            } else {
+                $this->model_bpos_setting->editUser($id, $username, $pin, $role, $status);
+                $json = ['success' => true, 'message' => 'User updated successfully'];
+            }
         } else {
             $json = ['success' => false, 'message' => 'Invalid request'];
         }

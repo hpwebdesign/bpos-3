@@ -304,6 +304,7 @@
     border: 1px solid var(--border);
     cursor: pointer;
     background: #fff;
+    color: 000;
     font-weight: 600;
     transition: transform .18s ease, box-shadow .18s ease, background .2s ease, color .2s ease;
 }
@@ -472,7 +473,7 @@
     width: 100%;
     max-width: 520px;
     transform: translateY(8px) scale(.98);
-    opacity: 0;
+    opacity: 1;
     animation: popIn .26s ease forwards;
 }
 .sheet-setting header {

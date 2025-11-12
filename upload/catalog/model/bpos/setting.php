@@ -24,41 +24,49 @@ class ModelBposSetting extends Model {
 
     // ===== USERS =====
     public function getUsers() {
-        $sql = "SELECT user_id, username, user_group_id, pin, status, date_added 
-                FROM " . DB_PREFIX . "user 
-                ORDER BY user_id ASC";
-        return $this->db->query($sql)->rows;
+    $sql = "SELECT * FROM " . DB_PREFIX . "user_bpos ORDER BY user_bpos_id ASC";
+    return $this->db->query($sql)->rows;
     }
 
-    public function addUser($username, $pin, $user_group_id, $status) {
-        $this->db->query("INSERT INTO " . DB_PREFIX . "user 
+    public function addUser($username, $pin, $role, $status) {
+        $this->db->query("INSERT INTO " . DB_PREFIX . "user_bpos 
             SET username = '" . $this->db->escape($username) . "', 
-                user_group_id = '" . (int)$user_group_id . "', 
                 pin = '" . $this->db->escape($pin) . "', 
+                role = '" . $this->db->escape($role) . "', 
                 status = '" . (int)$status . "', 
                 date_added = NOW()");
     }
 
-    public function editUser($user_id, $username, $pin, $user_group_id, $status) {
-        $sql = "UPDATE " . DB_PREFIX . "user 
+    public function editUser($id, $username, $pin, $role, $status) {
+        $sql = "UPDATE " . DB_PREFIX . "user_bpos 
                 SET username = '" . $this->db->escape($username) . "',
-                    user_group_id = '" . (int)$user_group_id . "',
+                    role = '" . $this->db->escape($role) . "',
                     status = '" . (int)$status . "'";
         if ($pin) {
             $sql .= ", pin = '" . $this->db->escape($pin) . "'";
         }
-        $sql .= " WHERE user_id = '" . (int)$user_id . "'";
+        $sql .= " WHERE user_bpos_id = '" . (int)$id . "'";
         $this->db->query($sql);
     }
 
-    public function deleteUser($user_id) {
-        $this->db->query("DELETE FROM " . DB_PREFIX . "user WHERE user_id = '" . (int)$user_id . "'");
+    public function userExists($username, $exclude_id = 0) {
+        $sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "user_bpos 
+                WHERE username = '" . $this->db->escape($username) . "'";
+        if ($exclude_id) {
+            $sql .= " AND user_bpos_id != '" . (int)$exclude_id . "'";
+        }
+        $query = $this->db->query($sql);
+        return (int)$query->row['total'] > 0;
     }
 
-    public function setUserStatus($user_id, $status) {
-        $this->db->query("UPDATE " . DB_PREFIX . "user 
+    public function deleteUser($id) {
+        $this->db->query("DELETE FROM " . DB_PREFIX . "user_bpos WHERE user_bpos_id = '" . (int)$id . "'");
+    }
+
+    public function setUserStatus($id, $status) {
+        $this->db->query("UPDATE " . DB_PREFIX . "user_bpos 
                           SET status = '" . (int)$status . "' 
-                          WHERE user_id = '" . (int)$user_id . "'");
+                          WHERE user_bpos_id = '" . (int)$id . "'");
     }
 
 }
