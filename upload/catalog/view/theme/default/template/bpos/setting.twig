@@ -6,7 +6,7 @@
           <path d="M5 7h14l-1 12H6L5 7Z" stroke="#1b5fb3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M9 7V5a3 3 0 0 1 6 0v2" stroke="#1b5fb3" stroke-width="1.6" stroke-linecap="round"/>
         </svg>
-        <h1>{{ heading_title }}</h1>
+        <h1>Settings - {{ title }}</h1>
         <span class="badge dot" id="status-badge">Online</span>
       </div>
       <div class="actions">
@@ -29,111 +29,101 @@
 
     {# panels diambil dari file html, bisa dipotong sesuai kebutuhan #}
     <section class="panel" id="panel-general">
-      <div class="grid">
-        <div class="field" data-field="pos_name">
-          <label for="pos_name">POS Display Name</label>
-          <input id="pos_name" type="text" name="bpos_pos_name"
-            placeholder="e.g., Cashier — Main Store"
-            value="{{ settings.bpos_pos_name ?? '' }}">
-          <div class="hint">Shown at the top bar of POS.</div>
-        </div>
-
-        <div class="field" data-field="pos_path">
-          <label for="pos_path">POS URL Path</label>
-          <input id="pos_path" type="text" name="bpos_pos_path"
-            placeholder="/pos"
-            value="{{ settings.bpos_pos_path ?? '/pos' }}">
-          <div class="hint">Public route to access POS (e.g., <span class="kbd">/pos</span>).</div>
-        </div>
-
-        <div class="field" data-field="currency">
-          <label for="currency">Default Currency</label>
-          <select
-            id="currency"
-            name="bpos_currency"
-            data-value="{{ current_currency }}"
-          >
-            {% for cur in currencies %}
-              <option value="{{ cur.code }}"
-                {{ cur.code == current_currency ? 'selected' }}
-              >
-                {{ cur.code }} — {{ cur.title }}
-              </option>
-            {% endfor %}
-          </select>
-          <div class="hint">
-            Based on OpenCart currencies ({{ currencies|length }})
-          </div>
-        </div>
-
-        <div class="field" data-field="timezone">
-          <label for="timezone">Timezone</label>
-          <select id="timezone" name="bpos_timezone">
-            <option value="Asia/Jakarta" {{ settings.bpos_timezone == 'Asia/Jakarta' ? 'selected' }}>Asia/Jakarta (UTC+7)</option>
-            <option value="Asia/Singapore" {{ settings.bpos_timezone == 'Asia/Singapore' ? 'selected' }}>Asia/Singapore (UTC+8)</option>
-            <option value="Pacific/Auckland" {{ settings.bpos_timezone == 'Pacific/Auckland' ? 'selected' }}>Pacific/Auckland (UTC+13/+12)</option>
-          </select>
-        </div>
-
-        <div class="field" data-field="date_format">
-          <label for="date_format">Date Format</label>
-          <select id="date_format" name="bpos_date_format">
-            <option value="YYYY-MM-DD" {{ settings.bpos_date_format == 'YYYY-MM-DD' ? 'selected' }}>YYYY-MM-DD</option>
-            <option value="DD/MM/YYYY" {{ settings.bpos_date_format == 'DD/MM/YYYY' ? 'selected' }}>DD/MM/YYYY</option>
-            <option value="MM/DD/YYYY" {{ settings.bpos_date_format == 'MM/DD/YYYY' ? 'selected' }}>MM/DD/YYYY</option>
-          </select>
-        </div>
-
-        <div class="field" data-field="darkmode">
-          <label>Theme</label>
-          <div class="row">
-            <div class="toggle {{ settings.bpos_darkmode ? 'on' : '' }}" data-bind="bpos_darkmode"><i></i></div>
-            <span>Enable Dark Mode</span>
-          </div>
-        </div>
-
-        <div class="field" data-field="offline">
-          <label>Offline Mode</label>
-          <div class="row">
-            <div class="toggle {{ settings.bpos_offline ? 'on' : '' }}" data-bind="bpos_offline"><i></i></div>
-            <span>Allow POS to work without internet temporarily.</span>
-          </div>
-        </div>
-
-        <div class="field" data-field="dashboard_view">
-          <label for="dashboard_view">Default Dashboard View</label>
-          <select id="dashboard_view" name="bpos_dashboard_view">
-            <option value="today" {{ settings.bpos_dashboard_view == 'today' ? 'selected' }}>Today</option>
-            <option value="week" {{ settings.bpos_dashboard_view == 'week' ? 'selected' }}>This Week</option>
-            <option value="month" {{ settings.bpos_dashboard_view == 'month' ? 'selected' }}>This Month</option>
-            <option value="custom" {{ settings.bpos_dashboard_view == 'custom' ? 'selected' }}>Custom</option>
-          </select>
-        </div>
-      </div>
-    </section>
-
-    <section class="panel" id="panel-store" hidden>
   <div class="grid">
-    <div class="field" data-field="store_id">
-      <label for="store_id">Store Selection</label>
-      <select id="store_id" name="bpos_store_id" data-value="{{ current_store_id }}">
+
+    <div class="field">
+      <label for="pos_name">POS Display Name</label>
+      <input id="pos_name" name="pos_name" type="text"
+             value="{{ settings.setting_bpos_pos_name ?? '' }}">
+    </div>
+
+    <div class="field">
+      <label for="pos_path">POS URL Path</label>
+      <input id="pos_path" name="pos_path" type="text"
+             value="{{ settings.setting_bpos_pos_path ?? '/pos' }}">
+    </div>
+
+    <div class="field">
+      <label for="currency">Default Currency</label>
+      <select id="currency" name="currency">
+        {% for cur in currencies %}
+          <option value="{{ cur.code }}"
+            {{ cur.code == settings.setting_bpos_currency ? 'selected' }}>
+            {{ cur.code }} — {{ cur.title }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="timezone">Timezone</label>
+      <select id="timezone" name="timezone">
+        <option value="Asia/Jakarta" {{ settings.setting_bpos_timezone=='Asia/Jakarta'?'selected':'' }}>Asia/Jakarta</option>
+        <option value="Asia/Singapore" {{ settings.setting_bpos_timezone=='Asia/Singapore'?'selected':'' }}>Asia/Singapore</option>
+        <option value="Pacific/Auckland" {{ settings.setting_bpos_timezone=='Pacific/Auckland'?'selected':'' }}>Pacific/Auckland</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Date Format</label>
+      <select id="date_format" name="date_format">
+        <option value="YYYY-MM-DD" {{ settings.setting_bpos_date_format=='YYYY-MM-DD'?'selected':'' }}>YYYY-MM-DD</option>
+        <option value="DD/MM/YYYY" {{ settings.setting_bpos_date_format=='DD/MM/YYYY'?'selected':'' }}>DD/MM/YYYY</option>
+        <option value="MM/DD/YYYY" {{ settings.setting_bpos_date_format=='MM/DD/YYYY'?'selected':'' }}>MM/DD/YYYY</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Theme</label>
+      <div class="row">
+        <div class="toggle {{ settings.setting_bpos_darkmode?'on':'' }}" data-bind="darkmode"><i></i></div>
+        <span>Enable Dark Mode</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Offline Mode</label>
+      <div class="row">
+        <div class="toggle {{ settings.setting_bpos_offline?'on':'' }}" data-bind="offline"><i></i></div>
+        <span>Allow offline mode</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Dashboard View</label>
+      <select id="dashboard_view" name="dashboard_view">
+        <option value="today" {{ settings.setting_bpos_dashboard_view=='today'?'selected':'' }}>Today</option>
+        <option value="week" {{ settings.setting_bpos_dashboard_view=='week'?'selected':'' }}>This Week</option>
+        <option value="month" {{ settings.setting_bpos_dashboard_view=='month'?'selected':'' }}>This Month</option>
+        <option value="custom" {{ settings.setting_bpos_dashboard_view=='custom'?'selected':'' }}>Custom</option>
+      </select>
+    </div>
+
+  </div>
+</section>
+
+   <section class="panel" id="panel-store" hidden>
+  <div class="grid">
+
+    <div class="field">
+      <label>Store Selection</label>
+      <select id="store_id" name="store_id">
         {% for store in stores %}
           <option value="{{ store.store_id }}"
-            {{ store.store_id == current_store_id ? 'selected' }}
-          >
+            {{ store.store_id == settings.setting_bpos_store_id ? 'selected' }}>
             {{ store.name }}
           </option>
         {% endfor %}
       </select>
-      <div class="hint">Multi-store supported.</div>
     </div>
 
     <div class="field">
-      <label>Languages Enabled</label>
-      <div class="lang-pills" role="tablist" aria-label="Language">
+      <label>Languages</label>
+
+      <div class="lang-pills">
         {% for lang in languages %}
-          <button class="pill {{ loop.first ? 'active' : '' }}"
-                  aria-selected="{{ loop.first ? 'true' : 'false' }}"
+          <button class="pill {{ loop.first?'active':'' }}"
+                  aria-selected="{{ loop.first?'true':'false' }}"
                   data-lang="{{ lang.code }}">
             {{ lang.code|upper }}
           </button>
@@ -143,141 +133,123 @@
       <div class="hr"></div>
 
       {% for lang in languages %}
-        <div class="lang-group {{ loop.first ? 'active' : '' }}" data-group="{{ lang.code }}">
-          <div class="field" data-field="title_{{ lang.code }}">
-            <label for="title_{{ lang.code }}">POS Title ({{ lang.code|upper }})</label>
-            <input type="text"
-                   id="title_{{ lang.code }}"
-                   name="bpos_title_{{ lang.code }}"
-                   placeholder="Barik POS"
-                   value="{{ settings['bpos_title_' ~ lang.code] ?? '' }}">
+        <div class="lang-group {{ loop.first?'active':'' }}" data-group="{{ lang.code }}">
+
+          <div class="field">
+            <label>POS Title ({{ lang.code|upper }})</label>
+            <input type="text" name="title_{{ lang.language_id }}"
+                   value="{{ settings['setting_bpos_title_' ~ lang.language_id] ?? '' }}">
           </div>
-          <div class="field" data-field="header_{{ lang.code }}">
-            <label for="header_{{ lang.code }}">Receipt Header ({{ lang.code|upper }})</label>
-            <textarea id="header_{{ lang.code }}"
-                      name="bpos_header_{{ lang.code }}">{{ settings['bpos_header_' ~ lang.code] ?? '' }}</textarea>
+
+          <div class="field">
+            <label>Receipt Header ({{ lang.code|upper }})</label>
+            <textarea name="header_{{ lang.language_id }}">{{ settings['setting_bpos_header_' ~ lang.language_id] ?? '' }}</textarea>
           </div>
+
         </div>
       {% endfor %}
     </div>
 
-    <div class="field" data-field="tax_included">
-      <label>Tax Inclusion</label>
+    <div class="field">
+      <label>Tax Included</label>
       <div class="row">
-        <div class="toggle {{ settings.bpos_tax_included ? 'on' : '' }}" data-bind="bpos_tax_included"><i></i></div>
+        <div class="toggle {{ settings.setting_bpos_tax_included?'on':'' }}" data-bind="tax_included"><i></i></div>
         <span>Prices include tax</span>
       </div>
     </div>
 
-    <div class="field" data-field="rounding">
-      <label>Price Rounding</label>
+    <div class="field">
+      <label>Rounding</label>
       <div class="split">
         <div class="row">
-          <div class="toggle {{ settings.bpos_rounding ? 'on' : '' }}" data-bind="bpos_rounding"><i></i></div>
+          <div class="toggle {{ settings.setting_bpos_rounding?'on':'' }}" data-bind="rounding"><i></i></div>
           <span>Enable rounding</span>
         </div>
-        <input id="round_precision"
-               type="number"
-               name="bpos_round_precision"
-               min="0"
-               max="100"
-               value="{{ settings.bpos_round_precision ?? 0 }}"
-               placeholder="Precision">
+        <input id="round_precision" name="round_precision" type="number"
+               value="{{ settings.setting_bpos_round_precision ?? 0 }}">
       </div>
     </div>
+
   </div>
 </section>
   
   <section class="panel" id="panel-device" hidden>
   <div class="grid">
-    <div class="field" data-field="device_id">
-      <label for="device_id">Device ID</label>
-      <select id="device_id" name="bpos_device_id" data-value="{{ settings.bpos_device_id ?? '' }}">
-        <option value="">Auto (this browser)</option>
+
+    <div class="field">
+      <label>Device ID</label>
+      <select id="device_id" name="device_id">
+        <option value="">Auto (Browser)</option>
         {% for dev in oc.devices %}
           <option value="{{ dev.code }}"
-            {{ dev.code == (settings.bpos_device_id ?? '') ? 'selected' }}>
+            {{ dev.code == settings.setting_bpos_device_id ? 'selected' }}>
             {{ dev.name }}
           </option>
         {% endfor %}
       </select>
-      <div class="hint">Devices are tied to cashier sessions.</div>
     </div>
 
-    <div class="field" data-field="scanner">
+    <div class="field">
       <label>Barcode Scanner</label>
       <div class="row">
-        <div class="toggle {{ settings.bpos_scanner ? 'on' : '' }}" data-bind="bpos_scanner"><i></i></div>
-        <span>Enable scanner input focus</span>
+        <div class="toggle {{ settings.setting_bpos_scanner?'on':'' }}" data-bind="scanner"><i></i></div>
+        <span>Enable barcode input</span>
       </div>
     </div>
 
-    <div class="field" data-field="printer">
-      <label for="printer">Receipt Printer</label>
-      <select id="printer" name="bpos_printer" data-value="{{ settings.bpos_printer ?? 'none' }}">
-        <option value="none" {{ (settings.bpos_printer ?? '') == 'none' ? 'selected' }}>— Not Connected —</option>
-        <option value="thermal-58" {{ (settings.bpos_printer ?? '') == 'thermal-58' ? 'selected' }}>Thermal 58mm</option>
-        <option value="thermal-80" {{ (settings.bpos_printer ?? '') == 'thermal-80' ? 'selected' }}>Thermal 80mm</option>
-        <option value="a4" {{ (settings.bpos_printer ?? '') == 'a4' ? 'selected' }}>A4 Printer</option>
+    <div class="field">
+      <label>Receipt Printer</label>
+      <select id="printer" name="printer">
+        <option value="none" {{ settings.setting_bpos_printer=='none'?'selected':'' }}>— Not Connected —</option>
+        <option value="thermal-58" {{ settings.setting_bpos_printer=='thermal-58'?'selected':'' }}>Thermal 58mm</option>
+        <option value="thermal-80" {{ settings.setting_bpos_printer=='thermal-80'?'selected':'' }}>Thermal 80mm</option>
+        <option value="a4" {{ settings.setting_bpos_printer=='a4'?'selected':'' }}>A4 Printer</option>
       </select>
 
       <div class="hint">
-        Auto Print on Checkout
+        Auto Print
         <span class="row">
-          <div class="toggle {{ settings.bpos_autoprint ? 'on' : '' }}" data-bind="bpos_autoprint"><i></i></div>
+          <div class="toggle {{ settings.setting_bpos_autoprint?'on':'' }}" data-bind="autoprint"><i></i></div>
         </span>
       </div>
     </div>
 
-    <div class="field" data-field="print_logo">
-      <label for="print_logo">Print Logo</label>
-      <input id="print_logo" name="bpos_print_logo" type="text"
-             placeholder="Paste image URL (data URL supported)"
-             value="{{ settings.bpos_print_logo ?? '' }}">
-      <div class="hint">Keep it monochrome for thermal printers.</div>
+    <div class="field">
+      <label>Print Logo</label>
+      <input type="text" id="print_logo" name="print_logo"
+             value="{{ settings.setting_bpos_print_logo ?? '' }}">
     </div>
 
-    <div class="field" data-field="receipt_footer">
-      <label for="receipt_footer">Receipt Footer</label>
-      <textarea id="receipt_footer"
-                name="bpos_receipt_footer">{{ settings.bpos_receipt_footer ?? 'Return policy • Contact • Socials' }}</textarea>
+    <div class="field">
+      <label>Receipt Footer</label>
+      <textarea id="receipt_footer" name="receipt_footer">{{ settings.setting_bpos_receipt_footer ?? '' }}</textarea>
     </div>
+
   </div>
 </section>
 
 <section class="panel" id="panel-cashier" hidden>
   <div class="grid">
-    <div class="field" data-field="role_default">
-      <label for="role_default">Default Role</label>
-      <select id="role_default" name="bpos_role_default" data-value="{{ current_role_id }}">
-     
-        <option value="admin"
-          {{ current_role_id == 'admin' ? 'selected' }}>
-          Admin
-        </option>
-        <option value="staff"
-          {{ current_role_id == 'staff' ? 'selected' }}>
-          Staff
-        </option>
 
-    </select>
-      <div class="hint">Default role for new cashier login.</div>
+    <div class="field">
+      <label>Default Role</label>
+      <select id="role_default" name="role_default">
+        <option value="admin" {{ settings.setting_bpos_role_default=='admin'?'selected':'' }}>Admin</option>
+        <option value="staff" {{ settings.setting_bpos_role_default=='staff'?'selected':'' }}>Staff</option>
+      </select>
     </div>
 
-    <div class="field" data-field="session_timeout">
-      <label for="session_timeout">Session Timeout (minutes)</label>
-      <input id="session_timeout" type="number"
-             name="bpos_session_timeout"
-             value="{{ settings.bpos_session_timeout ?? 30 }}"
-             min="1">
+    <div class="field">
+      <label>Session Timeout</label>
+      <input id="session_timeout" name="session_timeout" type="number"
+             value="{{ settings.setting_bpos_session_timeout ?? 30 }}">
     </div>
 
-    <div class="field" data-field="permissions">
+    <div class="field">
       <label>Permissions</label>
-      <div class="note" id="perm-box">
-        <!-- checkbox list generated by JS -->
-      </div>
+      <div class="note" id="perm-box"></div>
     </div>
+
   </div>
 </section>
 
@@ -312,113 +284,92 @@
 
       <section class="panel" id="panel-sales" hidden>
   <div class="grid">
-    <!-- Auto Sync Sales -->
-    <div class="field" data-field="autosync">
+
+    <div class="field">
       <label>Auto Sync Sales</label>
       <div class="row">
-        <div class="toggle {{ settings.bpos_autosync ? 'on' : '' }}" data-bind="bpos_autosync"><i></i></div>
-        <span>Sync to server periodically</span>
+        <div class="toggle {{ settings.setting_bpos_autosync?'on':'' }}" data-bind="autosync"><i></i></div>
+        <span>Sync periodically</span>
       </div>
     </div>
 
-    <!-- Sync Interval -->
-    <div class="field" data-field="sync_interval">
-      <label for="sync_interval">Sync Interval</label>
-      <select id="sync_interval" name="bpos_sync_interval" data-value="{{ settings.bpos_sync_interval ?? '5m' }}">
-        <option value="5m" {{ (settings.bpos_sync_interval ?? '') == '5m' ? 'selected' }}>Every 5 minutes</option>
-        <option value="10m" {{ (settings.bpos_sync_interval ?? '') == '10m' ? 'selected' }}>Every 10 minutes</option>
-        <option value="30m" {{ (settings.bpos_sync_interval ?? '') == '30m' ? 'selected' }}>Every 30 minutes</option>
+    <div class="field">
+      <label>Sync Interval</label>
+      <select id="sync_interval" name="sync_interval">
+        <option value="5m" {{ settings.setting_bpos_sync_interval=='5m'?'selected':'' }}>5 minutes</option>
+        <option value="10m" {{ settings.setting_bpos_sync_interval=='10m'?'selected':'' }}>10 minutes</option>
+        <option value="30m" {{ settings.setting_bpos_sync_interval=='30m'?'selected':'' }}>30 minutes</option>
       </select>
     </div>
 
-    <!-- Online Status Tracking -->
-    <div class="field" data-field="online_status">
-      <label>Online Status Tracking</label>
+    <div class="field">
+      <label>Online Status</label>
       <div class="row">
-        <div class="toggle {{ settings.bpos_online_status ? 'on' : '' }}" data-bind="bpos_online_status"><i></i></div>
+        <div class="toggle {{ settings.setting_bpos_online_status?'on':'' }}" data-bind="online_status"><i></i></div>
         <span>Show cashier online/idle</span>
       </div>
     </div>
 
-    <!-- Stock Deduction -->
-    <div class="field" data-field="stock_deduct">
+    <div class="field">
       <label>Stock Deduction</label>
       <div class="row">
-        <div class="toggle {{ settings.bpos_stock_deduct ? 'on' : '' }}" data-bind="bpos_stock_deduct"><i></i></div>
+        <div class="toggle {{ settings.setting_bpos_stock_deduct?'on':'' }}" data-bind="stock_deduct"><i></i></div>
         <span>Deduct stock on checkout</span>
       </div>
     </div>
 
-    <!-- Export Sales -->
-    <div class="field" data-field="export_fmt">
+    <div class="field">
       <label>Export Sales</label>
-      <div class="row" style="gap:8px">
-        <select id="export_fmt" name="bpos_export_fmt" data-value="{{ settings.bpos_export_fmt ?? 'csv' }}">
-          <option value="csv" {{ (settings.bpos_export_fmt ?? '') == 'csv' ? 'selected' }}>CSV</option>
-          <option value="xlsx" {{ (settings.bpos_export_fmt ?? '') == 'xlsx' ? 'selected' }}>XLSX</option>
+      <div class="row">
+        <select id="export_fmt" name="export_fmt">
+          <option value="csv" {{ settings.setting_bpos_export_fmt=='csv'?'selected':'' }}>CSV</option>
+          <option value="xlsx" {{ settings.setting_bpos_export_fmt=='xlsx'?'selected':'' }}>XLSX</option>
         </select>
-        <button type="button" class="btn" id="btnExportSales">Export</button>
+        <button class="btn" id="btnExportSales">Export</button>
       </div>
     </div>
 
-    <!-- Sync Log -->
-    <div class="field" data-field="sync_log">
+    <div class="field">
       <label>Last Sync Log</label>
-      <div class="status {{ settings.bpos_last_sync_ok ? '' : 'off' }}">
+      <div class="status">
         <i></i>
-        <span id="sync-log">
-          {{ settings.bpos_last_sync_log ?? 'No sync yet' }}
-        </span>
+        <span id="sync-log">{{ settings.setting_bpos_last_sync_log ?? 'No sync yet' }}</span>
       </div>
     </div>
+
   </div>
 </section>
 
 <section class="panel" id="panel-advanced" hidden>
   <div class="grid">
 
-    <!-- API Endpoint -->
-    <div class="field" data-field="api_url">
-      <label for="api_url">API Endpoint</label>
-      <input id="api_url" 
-             name="bpos_api_url" 
-             type="text" 
-             placeholder="https://example.com/api/bpos" 
-             value="{{ settings.bpos_api_url ?? '' }}" 
-             data-value="{{ settings.bpos_api_url ?? '' }}">
-      <div class="hint">Endpoint used by POS for sync operations.</div>
+    <div class="field">
+      <label for="api_url">API URL</label>
+      <input type="text" id="api_url" name="api_url"
+             value="{{ settings.setting_bpos_api_url ?? '' }}">
     </div>
 
-    <!-- API Key -->
-    <div class="field" data-field="api_key">
+    <div class="field">
       <label for="api_key">API Key</label>
-      <input id="api_key" 
-             name="bpos_api_key" 
-             type="password" 
-             placeholder="••••••••••" 
-             value="{{ settings.bpos_api_key ?? '' }}" 
-             data-value="{{ settings.bpos_api_key ?? '' }}">
-      <div class="hint">Required to authenticate API requests.</div>
+      <input id="api_key" name="api_key" type="password"
+             value="{{ settings.setting_bpos_api_key ?? '' }}">
     </div>
 
-    <!-- Cache control -->
     <div class="field">
       <label>Cache</label>
-      <div class="row" style="gap:8px">
-        <button type="button" class="btn" id="btn-clear-cache">Clear Cache</button>
-        <button type="button" class="btn" id="btn-reset-ls">Reset Local Storage</button>
+      <div class="row">
+        <button class="btn" id="btn-clear-cache">Clear Cache</button>
+        <button class="btn" id="btn-reset-ls">Reset Local Storage</button>
       </div>
-      <div class="hint">Use if POS behaves unexpectedly or after an update.</div>
     </div>
 
-    <!-- Diagnostics -->
     <div class="field">
       <label>Diagnostics</label>
-      <div class="row" style="gap:8px;flex-wrap:wrap">
-        <button type="button" class="btn" id="btn-test-conn">Test Connection</button>
-        <span id="diag-result" class="muted" style="margin-left:6px"></span>
+      <div class="row">
+        <button class="btn" id="btn-test-conn">Test Connection</button>
+        <span id="diag-result" class="muted"></span>
       </div>
-      <div class="hint" id="diag-hint">Run a quick ping to your API endpoint.</div>
+      <div class="hint">Ping API endpoint.</div>
     </div>
 
   </div>
@@ -806,47 +757,45 @@
 
   // === Save all settings ===
   document.getElementById('save').addEventListener('click', async ()=>{
-    const missing = REQUIRED_FIELDS.filter(k=>!String(val(k)||'').trim());
-    if(missing.length){ showToast('Please fill required fields: ' + missing.join(', '), false); markInvalid(missing); return; }
 
-    const fields = [
-      'pos_name','pos_path','currency','timezone','date_format','dashboard_view','store_id',
-      'title_en','header_en','title_id','header_id','round_precision','device_id','printer',
-      'print_logo','receipt_footer','role_default','session_timeout','sync_interval','export_fmt',
-      'api_url','api_key'
-    ];
-    const toggles = [
-      'darkmode','offline','tax_included','rounding','scanner','autoprint',
-      'autosync','online_status','stock_deduct'
-    ];
+  const payload = {};
 
-    const payload = {};
-
-    fields.forEach(k=>{ const el=document.getElementById(k); if(el) payload[k]=el.value; });
-    toggles.forEach(k=>{ const tg=document.querySelector('.toggle[data-bind="'+k+'"]'); payload[k] = tg && tg.classList.contains('on') ? 1 : 0; });
-    for (let role of ['admin', 'staff']) {
-      for (let key in perms[role]) {
-        payload[`bpos_perm_${role}_${key}`] = perms[role][key];
-      }
-    }
-    try {
-      const res = await fetch('index.php?route=bpos/setting/save&format=json', {
-        method:'POST',
-        headers:{'Content-Type':'application/x-www-form-urlencoded'},
-        body: new URLSearchParams(payload).toString()
-      });
-      const json = await res.json();
-      if(json.success){
-        savebarLeft.textContent='All changes saved';
-        showToast('Settings saved');
-      } else {
-        showToast(json.message || 'Failed to save settings', false);
-      }
-    } catch(e){
-      console.error(e);
-      showToast('Error saving settings', false);
-    }
+  document.querySelectorAll('input[name], select[name], textarea[name]').forEach(el => {
+    payload[ el.getAttribute('name') ] = el.value;
   });
+
+  document.querySelectorAll('.toggle[data-bind]').forEach(tg=>{
+    const key = tg.getAttribute('data-bind');
+    payload[key] = tg.classList.contains('on') ? 1 : 0;
+  });
+
+  for (let role of ['admin', 'staff']) {
+    for (let key in perms[role]) {
+      payload[`perm_${role}_${key}`] = perms[role][key];
+    }
+  }
+
+  console.log(payload); // Debug
+
+  try {
+    const res = await fetch('index.php?route=bpos/setting/save&format=json', {
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body: new URLSearchParams(payload).toString()
+    });
+    const json = await res.json();
+    if(json.success){
+      if(window.notyf){ notyf.success('Settings saved'); }
+    }else{
+      if(window.notyf){ notyf.error(json.message || 'Failed to save'); }
+    }
+  } catch(e){
+    console.error(e);
+    if(window.notyf){ notyf.error('Save error'); }
+  }
+});
+
+
 
   // discard
   document.getElementById('discard').addEventListener('click', ()=>{ location.reload(); });
@@ -859,18 +808,18 @@ const roleSelect = document.getElementById('role_default');
 // default structure (admin & staff)
 let perms = {
   admin: {
-    neworder: {{ settings.bpos_perm_admin_neworder ? 1 : 0 }},
-    refund: {{ settings.bpos_perm_admin_refund ? 1 : 0 }},
-    editprice: {{ settings.bpos_perm_admin_editprice ? 1 : 0 }},
-    viewcost: {{ settings.bpos_perm_admin_viewcost ? 1 : 0 }},
-    exportsales: {{ settings.bpos_perm_admin_exportsales ? 1 : 0 }}
+    neworder: {{ settings.setting_bpos_perm_admin_neworder ? 1 : 0 }},
+    refund: {{ settings.setting_bpos_perm_admin_refund ? 1 : 0 }},
+    editprice: {{ settings.setting_bpos_perm_admin_editprice ? 1 : 0 }},
+    viewcost: {{ settings.setting_bpos_perm_admin_viewcost ? 1 : 0 }},
+    exportsales: {{ settings.setting_bpos_perm_admin_exportsales ? 1 : 0 }}
   },
   staff: {
-    neworder: {{ settings.bpos_perm_staff_neworder ? 1 : 0 }},
-    refund: {{ settings.bpos_perm_staff_refund ? 1 : 0 }},
-    editprice: {{ settings.bpos_perm_staff_editprice ? 1 : 0 }},
-    viewcost: {{ settings.bpos_perm_staff_viewcost ? 1 : 0 }},
-    exportsales: {{ settings.bpos_perm_staff_exportsales ? 1 : 0 }}
+    neworder: {{ settings.setting_bpos_perm_staff_neworder ? 1 : 0 }},
+    refund: {{ settings.setting_bpos_perm_staff_refund ? 1 : 0 }},
+    editprice: {{ settings.setting_bpos_perm_staff_editprice ? 1 : 0 }},
+    viewcost: {{ settings.setting_bpos_perm_staff_viewcost ? 1 : 0 }},
+    exportsales: {{ settings.setting_bpos_perm_staff_exportsales ? 1 : 0 }}
   }
 };
 

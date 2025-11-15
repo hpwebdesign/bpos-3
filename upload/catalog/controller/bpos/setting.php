@@ -24,8 +24,8 @@ class ControllerBposSetting extends Controller {
             ];
         }
 
-        $current_currency = !empty($settings['bpos_currency'])
-            ? $settings['bpos_currency']
+        $current_currency = !empty($settings['setting_bpos_currency'])
+            ? $settings['setting_bpos_currency']
             : $this->config->get('config_currency');
 
         $view_data = [
@@ -53,6 +53,7 @@ class ControllerBposSetting extends Controller {
         foreach ($languages_raw as $lang) {
             if (!$lang['status']) continue;
             $languages[] = [
+                'language_id' => $lang['language_id'],
                 'code' => $lang['code'],
                 'name' => $lang['name'],
                 'image' => $lang['image']
@@ -77,16 +78,16 @@ class ControllerBposSetting extends Controller {
             ];
         }
 
-        $current_role_id = $settings['bpos_role_default'] ?? 0;
+        $current_role_id = isset($settings['setting_bpos_role_default']) ? $settings['setting_bpos_role_default'] : 'admin';
         $view_data['user_groups'] = $user_groups;
         $view_data['current_role_id'] = $current_role_id;
-        $view_data['current_printer'] = $settings['bpos_printer'] ?? 'none';
-        $view_data['autoprint'] = !empty($settings['bpos_autoprint']);
+        $view_data['current_printer'] = isset($settings['setting_bpos_printer']) ? $settings['setting_bpos_printer'] : 'none';
+        $view_data['autoprint'] = !empty($settings['setting_bpos_autoprint']);
         $view_data['devices'] = [
         ['code' => 'POS-01', 'name' => 'POS Terminal 1'],
         ['code' => 'POS-02', 'name' => 'POS Terminal 2']
         ];
-        $data['title']      = 'Settings - POS System';
+        $data['title']      = $this->config->get('setting_bpos_title_'.$this->config->get('config_language_id')) ? $this->config->get('setting_bpos_title_'.$this->config->get('config_language_id')) : 'POS System';
         $data['language']   = $this->load->controller('bpos/language');
         $data['currency']   = $this->load->controller('bpos/currency');
         $data['store']      = $this->load->controller('bpos/store');
@@ -105,11 +106,12 @@ class ControllerBposSetting extends Controller {
     public function save() {
         $this->load->model('bpos/setting');
         $json = [];
-
+        $data = [];
         if ($this->request->server['REQUEST_METHOD'] == 'POST') {
             foreach ($this->request->post as $key => $value) {
-                $this->model_bpos_setting->editSettingValue('bpos', 'bpos_' . $key, $value);
+                $data['setting_bpos_' . $key] = $value;
             }
+            $this->model_bpos_setting->editSetting('setting_bpos', $data,$this->config->get('config_store_id'));
             $json['success'] = true;
             $json['message'] = 'Settings saved successfully';
         } else {

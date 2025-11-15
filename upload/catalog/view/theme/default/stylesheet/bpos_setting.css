@@ -304,7 +304,7 @@
     border: 1px solid var(--border);
     cursor: pointer;
     background: #fff;
-    color: 000;
+    color: #000;
     font-weight: 600;
     transition: transform .18s ease, box-shadow .18s ease, background .2s ease, color .2s ease;
 }
