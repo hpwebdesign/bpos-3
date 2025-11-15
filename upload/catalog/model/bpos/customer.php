@@ -2,10 +2,22 @@
 class ModelBposCustomer extends Model {
 
     public function getCustomerDetail($customer_id) {
+
+         $address = [
+            'address_id'  => 0,
+            'address_1'   => '',
+            'city'        => '',
+            'postcode'    => '',
+            'country_id'  => $this->config->get('config_country_id'),
+            'zone_id'     => $this->config->get('config_zone_id'),
+            'country'     => '',
+            'zone'        => ''
+        ];
         $result = [
             'ok' => false,
-            'customer' => []
+            'customer' => $address
         ];
+
 
         $customer_id = (int)$customer_id;
         if ($customer_id <= 0) {
@@ -35,16 +47,7 @@ class ModelBposCustomer extends Model {
 
         $customer = $query->row;
 
-        $address = [
-            'address_id'  => 0,
-            'address_1'   => '',
-            'city'        => '',
-            'postcode'    => '',
-            'country_id'  => 0,
-            'zone_id'     => 0,
-            'country'     => '',
-            'zone'        => ''
-        ];
+       
 
         if (!empty($customer['address_id'])) {
             $address_query = $this->db->query("
@@ -77,8 +80,8 @@ class ModelBposCustomer extends Model {
             'address'    => $address['address_1'],
             'city'       => $address['city'],
             'postcode'   => $address['postcode'],
-            'country_id' => (int)$address['country_id'],
-            'zone_id'    => (int)$address['zone_id'],
+            'country_id' => (int)$address['country_id'] ? $address['country_id'] : $this->config->get('config_country_id'),
+            'zone_id'    => (int)$address['zone_id'] ? $address['zone_id'] : $this->config->get('config_zone_id'),
             'country'    => $address['country'],
             'zone'       => $address['zone']
         ]);

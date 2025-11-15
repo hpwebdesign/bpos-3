@@ -575,7 +575,7 @@ const seeded = [];
 
 const state = { q:'', sort:'name', group_id:'', page:0, perPage:10, data:[...seeded] };
 
-const money = n => 'Rp ' + n.toLocaleString('id-ID');
+const money = n => n;
 const daysAgo = (d)=> (Date.now()-new Date(d).getTime())/864e5;
 
 function tierBadge(t){

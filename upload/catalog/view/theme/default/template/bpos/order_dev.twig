@@ -1,8 +1,7 @@
-  <link rel="stylesheet" href="catalog/view/theme/default/stylesheet/bpos/drawer.css?v={{ random() }}">
-  <link rel="stylesheet" href="catalog/view/theme/default/stylesheet/bpos/order.css?v={{ random() }}">
+
  <div class="order-page">
       <!-- Topbar -->
-      <div class="topbar">
+      <div class="topbar-order">
         <div class="wrap">
           <div class="brand"><div class="logo"></div><h1>Order Management</h1></div>
           <div class="chips" id="summaryChips">
@@ -100,7 +99,7 @@
             </div>
             <div class="grid">
 
-               <button class="btn ghost right" id="btnExport" title="Export filtered orders to CSV">Export CSV</button>
+               <button class="btn ghost right" id="btnExport" title="Export filtered orders to CSV">Export EXCEL</button>
               <button class="btn neutral right" id="btnRefresh">Refresh</button>
             </div>
           </div>
@@ -139,11 +138,11 @@
           <span id="orderStatusBadge" class="badge info">—</span>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn tiny ghost" id="btnPrintInvoice">🧾 Print Invoice</button>
-          <button class="btn tiny ghost" id="btnPrintReceipt">🧾 Print Receipt</button>
-          <button class="btn tiny ghost" id="btnSendEmail">📤 Send Email</button>
-          <button class="btn tiny ghost" id="btnLabel">🏷️ Shipping Label</button>
-          <button class="btn tiny ghost bad" id="btnCancel">❌ Cancel</button>
+          <button class="btn tiny ghost" id="btnPrintInvoice" data-order="0">🧾 Print Invoice</button>
+          <button class="btn tiny ghost" id="btnPrintReceipt" data-order="0">🧾 Print Receipt</button>
+         {#  <button class="btn tiny ghost" id="btnSendEmail">📤 Send Email</button>
+          <button class="btn tiny ghost" id="btnLabel">🏷️ Shipping Label</button> #}
+          {# <button class="btn tiny ghost bad" id="btnCancel">❌ Cancel</button> #}
           <button class="btn tiny ghost" data-close>Close</button>
         </div>
       </header>
@@ -207,8 +206,8 @@
               <div class="kv"><div class="muted">Payment Ref</div><div id="p_ref">—</div></div>
               <div class="divider"></div>
               <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <button class="btn tiny ok" id="btnMarkPaid">✔ Mark as Paid</button>
-                <button class="btn tiny warn" id="btnRefund">↩ Refund</button>
+               {#  <button class="btn tiny ok" id="btnMarkPaid">✔ Mark as Paid</button>
+                <button class="btn tiny warn" id="btnRefund">↩ Refund</button> #}
               </div>
             </div>
 
@@ -218,8 +217,8 @@
               <div class="kv"><div class="muted">ETA</div><div id="s_eta">—</div></div>
               <div class="divider"></div>
               <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <button class="btn tiny" id="btnMarkShipped">📦 Mark as Shipped</button>
-                <button class="btn tiny ghost" id="btnCopyTracking">📋 Copy Tracking</button>
+              {#   <button class="btn tiny" id="btnMarkShipped">📦 Mark as Shipped</button>
+                <button class="btn tiny ghost" id="btnCopyTracking">📋 Copy Tracking</button> #}
               </div>
             </div>
 
@@ -227,7 +226,7 @@
               <div class="muted" style="margin-bottom:6px">Admin Notes</div>
               <textarea id="adminNotes" class="inp" rows="3" placeholder="Add internal notes (not visible to customer)"></textarea>
               <div style="display:flex;gap:8px;margin-top:8px">
-                <button class="btn tiny ghost" id="btnSaveNotes">💾 Save Notes</button>
+                {# <button class="btn tiny ghost" id="btnSaveNotes">💾 Save Notes</button> #}
               </div>
             </div>
           </div>
@@ -235,142 +234,388 @@
 
         <!-- Footer Bar -->
         <div class="footerbar">
-          <button class="btn ghost tiny" id="btnFooterInvoice">🧾 Print Invoice</button>
-          <button class="btn ghost tiny" id="btnFooterReceipt">🧾 Print Receipt</button>
-          <button class="btn ok tiny" id="btnFooterPaid">✔ Mark Paid</button>
+          <button class="btn ghost tiny" data-order="0" id="btnFooterInvoice">🧾 Print Invoice</button>
+          <button class="btn ghost tiny" data-order="0" id="btnFooterReceipt">🧾 Print Receipt</button>
+         {#  <button class="btn ok tiny" id="btnFooterPaid">✔ Mark Paid</button>
           <button class="btn tiny" id="btnFooterShipped">📦 Mark Shipped</button>
-          <button class="btn warn tiny" id="btnFooterRefund">↩ Refund</button>
+          <button class="btn warn tiny" id="btnFooterRefund">↩ Refund</button> #}
         </div>
       </div>
     </div>
   </div>
 
-
-<script>
+  <link rel="stylesheet" href="catalog/view/theme/default/stylesheet/bpos/drawer.css?v={{ random() }}">
+  <link rel="stylesheet" href="catalog/view/theme/default/stylesheet/bpos/order.css?v={{ random() }}">
+  <script>
 $(function () {
-  // --- Load Orders from Server ------------------------------------------------------------
-  let ORDERS = [];
+  // --- Mock Data ------------------------------------------------------------
+  const STORES = [
+    {code:'all', name:'All Stores', channel:'Online'},
+    {code:'hej', name:'HejOrganic.id', channel:'Online'},
+    {code:'puserba-jkt', name:'Puserba – Outlet Jakarta', channel:'POS'},
+    {code:'puserba-bdg', name:'Puserba – Outlet Bandung', channel:'POS'},
+//    {code:'shopee', name:'Shopee', channel:'Marketplace'},
+//    {code:'tokopedia', name:'Tokopedia', channel:'Marketplace'}
+  ];
 
+  const STATUS = ['Paid','Pending','Shipped','Completed','Cancelled'];
+  const PAYMENT = ['QRIS','Cash','Transfer','COD'];
+  const CASHIERS = ['Rina','Adi','Budi'];
+
+  const rnd = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+  const pick = arr => arr[rnd(0,arr.length-1)];
+  const today = new Date();
+  const fmtIDR = v=> new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(v);
+  const fmtDate = d=> new Date(d).toLocaleString('id-ID',{year:'numeric',month:'short',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+
+  // Generate 150 sample orders within last 30 days
+    let ORDERS = [];
+
+  // --- State ---------------------------------------------------------------
   const state = {
-    stores: new Set(),
-    datePreset: 'thisweek',
-    from: null,
-    to: null,
-    status: '',
-    payment: '',
-    channel: '',
-    cashier: '',
-    q: '',
+    stores:new Set(),
+    datePreset:'thisweek',
+    from:null,
+    to:null,
+    status:'',
+    payment:'',
+    channel:'',
+    cashier:'',
+    q:'',
   };
 
+  // Restore state from localStorage
   const saveKey = 'bpos.order.filters.v1';
   const saved = localStorage.getItem(saveKey);
-  if (saved) {
-    try {
+  if(saved){
+    try{
       const s = JSON.parse(saved);
-      Object.assign(state, s, { stores: new Set(s.stores || []) });
-    } catch (e) {}
+      Object.assign(state, s, {stores:new Set(s.stores||[])});
+    }catch(e){}
   }
 
-  // --- Cache selectors -------------------------------------------------------
-  const $tbody = $('#tbody');
-  const $summaryChips = $('#summaryChips');
-  const $mOrders = $('#mOrders');
-  const $mRevenue = $('#mRevenue');
-  const $mTopStores = $('#mTopStores');
-  const $spark = $('#spark');
-  const $activePills = $('#activePills');
+  // --- Cache jQuery selectors ----------------------------------------------
+  const $fStore   = $('#fStore');
+  const $fDate    = $('#fDate');
+  const $fFrom    = $('#fFrom');
+  const $fTo      = $('#fTo');
+  const $fStatus  = $('#fStatus');
+  const $fPayment = $('#fPayment');
+  const $fChannel = $('#fChannel');
+  const $fCashier = $('#fCashier');
+  const $search   = $('#searchBox');
 
-  // --- Utility ---------------------------------------------------------------
-  const fmtIDR = v => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v);
-  const fmtDate = d => new Date(d).toLocaleString('id-ID', { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+  const $tbody         = $('#tbody');
+  const $summaryChips  = $('#summaryChips');
+  const $mOrders       = $('#mOrders');
+  const $mRevenue      = $('#mRevenue');
+  const $mTopStores    = $('#mTopStores');
+  const $spark         = $('#spark');
+  const $activePills   = $('#activePills');
+  const $btnExport     = $('#btnExport');
+  const $btnRefresh    = $('#btnRefresh');
+  const $autoRefresh   = $('#autoRefresh');
 
-  function persist() {
-    const plain = { ...state, stores: [...state.stores] };
-    localStorage.setItem(saveKey, JSON.stringify(plain));
+  // --- Init UI -------------------------------------------------------------
+  // Populate store options
+  $.each(STORES, function(_, s){
+    $('<option/>', {value:s.code, text:s.name}).appendTo($fStore);
+  });
+  // Preselect from state (multiselect)
+  if(state.stores.size){
+    $fStore.val([...state.stores]);
   }
 
+  $fDate.val(state.datePreset || 'thisweek');
+  $fStatus.val(state.status);
+  $fPayment.val(state.payment);
+  $fChannel.val(state.channel);
+  $fCashier.val(state.cashier);
+  $search.val(state.q || '');
+  if(state.from) $fFrom.val(state.from);
+  if(state.to) $fTo.val(state.to);
+
+  // Date inputs when custom
+  function toggleCustomDates() {
+    const isCustom = $fDate.val()==='custom';
+    $fFrom.toggleClass('hide', !isCustom);
+    $fTo.toggleClass('hide', !isCustom);
+    $('#tilde').toggleClass('hide', !isCustom);
+  }
+  toggleCustomDates();
+
+  // --- Filtering -----------------------------------------------------------
   function inRange(iso) {
     const d = new Date(iso);
     const preset = state.datePreset;
     const start = new Date();
     const end = new Date();
-    end.setHours(23, 59, 59, 999);
+    end.setHours(23,59,59,999);
 
-    if (preset === 'today') start.setHours(0, 0, 0, 0);
-    else if (preset === 'yesterday') {
-      start.setDate(start.getDate() - 1);
-      start.setHours(0, 0, 0, 0);
-      end.setDate(end.getDate() - 1);
-    } else if (preset === 'thisweek') {
-      const day = start.getDay();
-      const diff = (day === 0 ? 6 : day - 1);
-      start.setDate(start.getDate() - diff);
-      start.setHours(0, 0, 0, 0);
-    } else if (preset === 'thismonth') {
-      start.setDate(1);
-      start.setHours(0, 0, 0, 0);
-    } else if (preset === 'custom') {
-      if (state.from && state.to) {
-        return d >= new Date(state.from) && d <= new Date(new Date(state.to).setHours(23, 59, 59, 999));
+    if(preset==='today'){
+      start.setHours(0,0,0,0);
+    } else if(preset==='yesterday'){
+      start.setDate(start.getDate()-1); start.setHours(0,0,0,0);
+      end.setDate(end.getDate()-1);
+    } else if(preset==='thisweek'){
+      const day = start.getDay(); // 0 Sun
+      const diff = (day===0?6:day-1); // Monday start
+      start.setDate(start.getDate()-diff); start.setHours(0,0,0,0);
+    } else if(preset==='thismonth'){
+      start.setDate(1); start.setHours(0,0,0,0);
+    } else if(preset==='custom'){
+      if(state.from && state.to){
+        return d >= new Date(state.from) && d <= new Date(new Date(state.to).setHours(23,59,59,999));
       }
       return true;
     }
-    return d >= start && d <= end;
+    return d>=start && d<=end;
   }
 
-  function matches(o) {
-    if (state.status && o.status !== state.status) return false;
-    if (!inRange(o.date)) return false;
-    if (state.q) {
-      const q = state.q.toLowerCase();
-      if (!(String(o.id).includes(q) || (o.customer || '').toLowerCase().includes(q))) return false;
+  function matches(o){
+    if(state.stores.size && !state.stores.has(o.storeCode)) return false;
+    if(state.status && o.status!==state.status) return false;
+    if(state.payment && o.payment!==state.payment) return false;
+    if(state.channel && o.channel!==state.channel) return false;
+    if(state.cashier && o.cashier!==state.cashier) return false;
+    if(!inRange(o.date)) return false;
+    if(state.q){
+      const q=state.q.toLowerCase();
+      if(!(o.id.toLowerCase().includes(q) || (o.customer||'').toLowerCase().includes(q))) return false;
     }
     return true;
   }
 
-  // --- Render Table ----------------------------------------------------------
-  function renderTable() {
+  // --- Render --------------------------------------------------------------
+  function renderTable(){
     const rows = ORDERS.filter(matches);
-    const html = $.map(rows, function (o) {
+    const html = $.map(rows, function(o){
       const sClass = {
-        Paid: 's-paid',
-        Pending: 's-pending',
-        Shipped: 's-shipped',
-        Completed: 's-completed',
-        Cancelled: 's-cancelled'
-      }[o.status] || '';
-
+        'Paid':'s-paid','Pending':'s-pending','Shipped':'s-shipped','Completed':'s-completed','Cancelled':'s-cancelled'
+      }[o.status]||'';
       return `
         <tr data-id="${o.id}">
           <td><input type="checkbox" aria-label="select ${o.id}"></td>
           <td><b>${o.id}</b><div class="tiny">${o.items} items</div></td>
           <td>${o.customer}</td>
-          <td>${o.store || '-'}</td>
+          <td>${o.store}</td>
           <td class="tiny">${fmtDate(o.date)}</td>
           <td><span class="status ${sClass}">${o.status}</span></td>
           <td class="nowrap"><b>${fmtIDR(o.total)}</b></td>
-          <td>${o.payment || '-'}</td>
-          <td>${o.channel || '-'}</td>
+          <td>${o.payment}</td>
+          <td>${o.channel}</td>
           <td class="actions">
             <button class="icon-btn" data-act="view" title="View detail">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"></circle><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/>
-              </svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/></svg>
+            </button>
+            <button class="icon-btn" data-act="menu" title="More">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
             </button>
           </td>
         </tr>`;
     }).join('');
     $tbody.html(html);
 
+    // Summary chips
     const totalOrders = rows.length;
-    const revenue = rows.reduce((a, b) => a + Number(b.total || 0), 0);
-    $summaryChips.html(`<span class="chip"><b>${totalOrders}</b> Orders</span><span class="chip"><b>${fmtIDR(revenue)}</b> Revenue</span>`);
+    const revenue = rows.reduce((a,b)=>a+b.total,0);
+    $summaryChips.html(`
+      <span class="chip"><b>${totalOrders}</b> Orders</span>
+      <span class="chip"><b>${fmtIDR(revenue)}</b> Revenue</span>
+    `);
+
+    // Metrics
     $mOrders.text(totalOrders);
     $mRevenue.text(fmtIDR(revenue));
+
+    // Top stores
+    const byStore = new Map();
+    rows.forEach(r=>byStore.set(r.store,(byStore.get(r.store)||0)+r.total));
+    const top = [...byStore.entries()].sort((a,b)=>b[1]-a[1]).slice(0,3);
+    $mTopStores.html(top.length ? top.map(([name,val])=>`<div>${name}: <b>${fmtIDR(val)}</b></div>`).join('') : '<span class="tiny">—</span>');
+
+    // Sparkline
+    drawSpark(rows);
   }
 
-  // --- Fetch data from server ------------------------------------------------
+  function drawSpark(rows){
+    const days=7; const now=new Date();
+    const buckets = Array.from({length:days},(_,i)=>{const d=new Date(); d.setDate(now.getDate()-(days-1-i)); d.setHours(0,0,0,0); return {d, v:0};});
+    rows.forEach(r=>{
+      const rd = new Date(r.date); rd.setHours(0,0,0,0);
+      const idx = buckets.findIndex(b=>b.d.getTime()===rd.getTime());
+      if(idx>-1) buckets[idx].v += r.total;
+    });
+    const max = Math.max(1,...buckets.map(b=>b.v));
+    const pts = buckets.map((b,i)=>{
+      const x = (i/(days-1))*100;
+      const y = 30 - (b.v/max)*26 - 2; // padding
+      return `${x},${y}`;
+    }).join(' ');
+    $spark.html(`<polyline points="${pts}" fill="none" stroke="#1e3a8a" stroke-width="2"/><circle r="2" cx="100" cy="${30 - (buckets[days-1].v/Math.max(1,max))*26 - 2}" fill="#1e3a8a"/>`);
+  }
+
+  function renderPills(){
+    const pills = [];
+    if(state.stores.size) pills.push({type:'store',   label:'Store',  value:[...state.stores].map(c=>STORES.find(s=>s.code===c)?.name||c).join(', ')});
+    if(state.status)       pills.push({type:'status',  label:'Status', value:state.status});
+    if(state.payment)      pills.push({type:'payment', label:'Payment',value:state.payment});
+    if(state.channel)      pills.push({type:'channel', label:'Channel',value:state.channel});
+    if(state.cashier)      pills.push({type:'cashier', label:'Cashier',value:state.cashier});
+    if(state.datePreset!=='thisweek'){
+      pills.push({type:'date', label:'Date', value: state.datePreset==='custom' ? ((state.from||'?')+' to '+(state.to||'?')) : state.datePreset});
+    }
+    if(state.q)            pills.push({type:'search', label:'Search', value:state.q});
+
+    const html = pills.map((p,i)=>`<span class="pill" data-type="${p.type}">
+      <b>${p.label}:</b> ${p.value} <button aria-label="remove ${p.label}">×</button>
+    </span>`).join('');
+    $activePills.html(html);
+  }
+
+  function persist(){
+    const plain = {...state, stores:[...state.stores]};
+    localStorage.setItem(saveKey, JSON.stringify(plain));
+  }
+
+  // --- Bindings ------------------------------------------------------------
+  $fStore.on('change', function(){
+    const vals = $(this).find('option:selected').map(function(){return this.value;}).get();
+    state.stores = new Set(vals);
+    persist(); renderPills(); renderTable();
+  });
+
+  $fDate.on('change', function(){
+    state.datePreset = $(this).val();
+    toggleCustomDates(); persist(); renderPills(); renderTable();
+  });
+
+  $fFrom.on('change', function(){ state.from = $(this).val(); persist(); renderPills(); renderTable(); });
+  $fTo.on('change',   function(){ state.to   = $(this).val(); persist(); renderPills(); renderTable(); });
+
+  $fStatus.on('change',  function(){ state.status  = $(this).val(); persist(); renderPills(); renderTable(); });
+  $fPayment.on('change', function(){ state.payment = $(this).val(); persist(); renderPills(); renderTable(); });
+  $fChannel.on('change', function(){ state.channel = $(this).val(); persist(); renderPills(); renderTable(); });
+  $fCashier.on('change', function(){ state.cashier = $(this).val(); persist(); renderPills(); renderTable(); });
+
+  $search.on('input', function(){
+    state.q = $(this).val().trim();
+    persist(); renderPills(); renderTable();
+  });
+
+  // Active pills remove (delegated)
+  $activePills.on('click', '.pill button', function(){
+    const type = $(this).closest('.pill').data('type');
+    switch(type){
+      case 'store':
+        state.stores.clear();
+        $fStore.val([]); // clear multiselect
+        break;
+      case 'status':
+        state.status = '';
+        $fStatus.val('');
+        break;
+      case 'payment':
+        state.payment = '';
+        $fPayment.val('');
+        break;
+      case 'channel':
+        state.channel = '';
+        $fChannel.val('');
+        break;
+      case 'cashier':
+        state.cashier = '';
+        $fCashier.val('');
+        break;
+      case 'date':
+        state.datePreset = 'thisweek';
+        $fDate.val('thisweek');
+        toggleCustomDates();
+        break;
+      case 'search':
+        state.q = '';
+        $search.val('');
+        break;
+    }
+    persist(); renderPills(); renderTable();
+  });
+
+  // Export Excel
+$btnExport.on('click', function () {
+    const rows = ORDERS.filter(matches);
+
+    let html = `
+      <table border="1">
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Store</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Total</th>
+          <th>Payment</th>
+          <th>Channel</th>
+        </tr>
+    `;
+
+    rows.forEach(o => {
+        html += `
+          <tr>
+            <td>${o.id}</td>
+            <td>${o.customer}</td>
+            <td>${o.store}</td>
+            <td>${fmtDate(o.date)}</td>
+            <td>${o.status}</td>
+            <td>${o.total}</td>
+            <td>${o.payment}</td>
+            <td>${o.channel}</td>
+          </tr>
+        `;
+    });
+
+    html += `</table>`;
+
+    const blob = new Blob([html], { 
+        type: "application/vnd.ms-excel"
+    });
+
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = "orders.xls";
+    a.click();
+    URL.revokeObjectURL(a.href);
+});
+
+
+  // Table actions (delegated)
+  $(document).on('click', '[data-act="view"], #tbody td:not(.actions)', function () {
+    const id = $(this).closest('tr').data('id');
+    $.getJSON('index.php?route=bpos/order/view&order_id=' + id + '&format=json', function (order) {
+      openDrawer(order);
+    });
+  });
+
+  // Refresh (simulated)
+  function refresh(){ renderTable(); }
+  $btnRefresh.on('click', refresh);
+
+  let timer = setInterval(function(){
+    if($autoRefresh.is(':checked')) refresh();
+  }, 30000);
+
+  $autoRefresh.on('change', function(){
+    if($(this).is(':checked')) refresh();
+  });
+  function cellText(col) {
+  if (col == null) return '';
+  col = String(col);
+  // kalau mengandung tag HTML, parse sebagai HTML
+  if (col.indexOf('<') !== -1 && col.indexOf('>') !== -1) {
+    return $('<div>').html(col).text();
+  }
+  // kalau cuma teks biasa, langsung pakai
+  return col;
+}
   function loadOrders() {
     $('#tbody').html('<tr><td colspan="10" class="center tiny">Loading orders...</td></tr>');
     const params = {
@@ -380,19 +625,19 @@ $(function () {
       filter_date_end: $('#fTo').val() || ''
     };
     $.ajax({
-      url: 'index.php?route=bpos/order/datatable',
+      url: 'index.php?route=bpos/order/getlist',
       data: params,
       dataType: 'json',
       success: function (res) {
         ORDERS = (res.data || []).map(row => ({
-          id: $(row[1]).text().replace('#', ''),
-          customer: $(row[2]).text(),
-          status: $(row[3]).text(),
-          total: parseFloat($(row[4]).text().replace(/[^\d]/g, '')),
-          date: $(row[5]).text(),
-          payment: $(row[7]).text(),
+          id: cellText(row[1]).replace('#', ''),
+          customer: cellText(row[2]),
+          status: cellText(row[3]),
+          total: parseFloat(cellText(row[4])) || 0,
+          date: cellText(row[5]),
+          items: Number(row[6] || 0),        // <---- FIX ITEMS
+          payment: cellText(row[7]),
           channel: 'POS',
-          items: 1,
           store: 'Main Store'
         }));
         renderTable();
@@ -403,27 +648,14 @@ $(function () {
     });
   }
 
-  // --- Drawer open (load detail) --------------------------------------------
-  $(document).on('click', '[data-act="view"], #tbody td:not(.actions)', function () {
-    const id = $(this).closest('tr').data('id');
-    $.getJSON('index.php?route=bpos/order/view&order_id=' + id + '&format=json', function (order) {
-      openDrawer(order);
-    });
-  });
-
-  // --- Initial --------------------------------------------------------------
+  // Initial render
+  renderPills();
   renderTable();
   loadOrders();
 });
-
 </script>
 
 <script>
-const money = n => 'Rp ' + Number(n||0).toLocaleString('id-ID');
-function toast(msg, type='success'){
-  if(!window.notyf){ window.notyf = new Notyf({ duration: 1800, position:{x:'right', y:'bottom'} }); }
-  if(type==='error') window.notyf.error(msg); else window.notyf.success(msg);
-}
 
 const sampleOrder = {
   id: 'INV-20251029-001',
@@ -462,6 +694,13 @@ function fillOrder(o){
   $('#drawerTitle').text('Order #' + o.id);
   setStatusBadge(document.getElementById('orderStatusBadge'), o.status);
   setTimeline(o.status);
+
+  // Set all button order-id
+
+  $('#btnPrintInvoice').data('order', o.id);
+  $('#btnPrintReceipt').data('order', o.id);
+  $('#btnFooterInvoice').data('order', o.id);
+  $('#btnFooterReceipt').data('order', o.id);
 
   // Customer box
   $('#c_name').text(o.customer.name);
@@ -549,15 +788,22 @@ function printArea(areaId){
 
 $(function(){
   // Open sample
-  $('#btnNew').on('click', ()=> openDrawer(sampleOrder));
+  $('#btnNew').on('click', ()=> loadContent('bpos/home'));
 
   // Close
   $(document).on('click','[data-close]', closeDrawer);
   $('.backdrop').on('click', function(e){ if(e.target===this) closeDrawer(); });
 
   // Actions
-  $('#btnPrintInvoice, #btnFooterInvoice').on('click', ()=> printArea('print-invoice'));
-  $('#btnPrintReceipt, #btnFooterReceipt').on('click', ()=> printArea('print-receipt'));
+  $('#btnPrintInvoice, #btnFooterInvoice').on('click', function(){
+    const orderId = $(this).data('order');
+    console.log('Print invoice for order:', orderId);
+    window.location.href = 'index.php?route=bpos/invoice&order_id='+orderId;
+  });
+  $('#btnPrintReceipt, #btnFooterReceipt').on('click', function(){
+    const orderId = $(this).data('order');
+    window.location.href = 'index.php?route=bpos/invoice&order_id='+orderId;
+  });
   $('#btnSendEmail').on('click', ()=> toast('Invoice sent to ' + sampleOrder.customer.email));
   $('#btnLabel').on('click', ()=> toast('Shipping label generated'));
   $('#btnCancel').on('click', ()=> {
@@ -600,3 +846,4 @@ $(function(){
   $('#btnSaveNotes').on('click', ()=> toast('Notes saved'));
 });
 </script>
+

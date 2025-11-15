@@ -1,37 +1,68 @@
 <?php
 require_once(DIR_APPLICATION . 'controller/bpos/bpos_base.php');
 class ControllerBposOrder extends ControllerBposBposBase {
-    public function index() {
+   public function index() {
         $this->checkPermission('order');
         $this->load->language('account/order');
-        $this->load->model('bpos/order');
         $this->load->language('bpos/bpos');
+        $this->load->model('bpos/order');
+        $this->load->model('localisation/order_status');
+
         $filter_search          = '';
         $filter_date_start      = date('Y-m').'-01';
         $filter_date_end        = date('Y-m-d');
         $filter_order_status_id = '';
 
-        $this->load->model('localisation/order_status');
-
         $order_statuses = $this->model_localisation_order_status->getOrderStatuses();
+        $method_data = [];
 
+        $results = $this->config->get('bpos_payment_methods'); // array dari setting kamu
+        if (!$results) {
+            // fallback: ambil semua extension aktif di folder extension/payment
+            $results = $this->model_setting_extension->getInstalled('payment');
+        }
+
+        foreach ($results as $code) {
+            if ($this->config->get('payment_' . $code . '_status')) {
+                $this->load->model('extension/payment/' . $code);
+
+                // Coba ambil nama metode (tanpa perlu getMethod() karena kita tidak dalam sesi checkout)
+                if (property_exists($this, 'model_extension_payment_' . $code)) {
+                    $lang = $this->load->language('extension/payment/' . $code);
+                    $title = isset($lang['heading_title']) ? $lang['heading_title'] : ucfirst($code);
+
+                    $method_data[] = [
+                        'code'  => $code,
+                        'title' => $title
+                    ];
+                }
+            }
+        }
+        // Statistik dashboard atas
+        $today = date('Y-m-d');
         $view_data = [
             'order_statuses'   => $order_statuses,
+            'payments'   => $method_data,
             'filter_status_id' => $filter_order_status_id,
             'filter_search'    => $filter_search,
             'filter_date_start'=> $filter_date_start,
             'filter_date_end'  => $filter_date_end,
-            'add_order'        => $this->url->link('bpos/home')
+            'add_order'        => $this->url->link('bpos/home'),
+            'total_orders'     => $this->model_bpos_order->getTotalOrders(),
+            'total_today'      => $this->model_bpos_order->getTotalOrders(['filter_date_added' => $today]),
+            'total_sales'      => $this->currency->format($this->model_bpos_order->getTotalSales(), $this->config->get('config_currency')),
+            'total_complete'   => $this->model_bpos_order->getTotalOrdersByCompleteStatus(),
+            'total_processing' => $this->model_bpos_order->getTotalOrdersByProcessingStatus()
         ];
 
-        $data['title']      = $this->config->get('bpos_title_'.$this->config->get('config_language_id')) ? 'Orders - '.$this->config->get('bpos_title_'.$this->config->get('config_language_id')) : 'Orders - POS System';
-        $data['language'] = $this->load->controller('bpos/language');
-        $data['currency'] = $this->load->controller('bpos/currency');
-        $data['store'] = $this->load->controller('bpos/store');
+
+        $data['title']      = 'Orders - POS System';
+        $data['language']   = $this->load->controller('bpos/language');
+        $data['currency']   = $this->load->controller('bpos/currency');
+        $data['store']      = $this->load->controller('bpos/store');
         $data['logout']     = $this->url->link('bpos/login/logout', '', true);
         $data['total_cart'] = $this->cart->hasProducts();
         $data['content']    = $this->load->view('bpos/order', $view_data);
-
         if (isset($this->request->get['format']) && $this->request->get['format'] == 'json') {
             $this->response->addHeader('Content-Type: application/json');
             $this->response->setOutput(json_encode(['output' => $data['content']]));
@@ -39,6 +70,79 @@ class ControllerBposOrder extends ControllerBposBposBase {
             $this->response->setOutput($this->load->view('bpos/layout', $data));
         }
     }
+
+     public function getlist() {
+        $this->load->model('checkout/order');
+
+        $status_id   = $this->request->get['filter_status_id'] ?? '';
+        $payment     = $this->request->get['filter_payment'] ?? '';
+        $date_start  = $this->request->get['filter_date_start'] ?? '';
+        $date_end    = $this->request->get['filter_date_end'] ?? '';
+
+        // ===== Build SQL =====
+        $sql = "SELECT o.order_id, o.firstname, o.lastname, o.total, o.date_added, 
+                       o.payment_method, o.order_status_id, os.name AS status,
+                       (
+                           SELECT SUM(quantity) 
+                           FROM `" . DB_PREFIX . "order_product` op 
+                           WHERE op.order_id = o.order_id
+                       ) AS items
+                FROM `" . DB_PREFIX . "order` o
+                LEFT JOIN `" . DB_PREFIX . "order_status` os 
+                       ON (o.order_status_id = os.order_status_id 
+                       AND os.language_id = '" . (int)$this->config->get('config_language_id') . "')
+                WHERE o.order_status_id > 0";   // <--- FIX: hanya order valid
+                
+
+        // Filter status
+        if ($status_id !== '') {
+            $sql .= " AND o.order_status_id = '" . (int)$status_id . "'";
+        }
+
+        // Filter payment method
+        if ($payment !== '') {
+            $sql .= " AND o.payment_method LIKE '%" . $this->db->escape($payment) . "%'";
+        }
+
+        // Filter date range
+        if ($date_start) {
+            $sql .= " AND DATE(o.date_added) >= '" . $this->db->escape($date_start) . "'";
+        }
+        if ($date_end) {
+            $sql .= " AND DATE(o.date_added) <= '" . $this->db->escape($date_end) . "'";
+        }
+
+        $sql .= " ORDER BY o.order_id DESC LIMIT 200";
+
+        $query = $this->db->query($sql);
+
+        $data = [];
+
+        foreach ($query->rows as $row) {
+            $order_id = $row['order_id'];
+            $customer = trim($row['firstname'] . ' ' . $row['lastname']);
+
+            $data[] = [
+                '', // checkbox (kolom 0)
+                '<b>#' . $order_id . '</b>',                         // kolom 1 id
+                htmlspecialchars($customer),                         // kolom 2 customer
+                '<span class="status">' . $row['status'] . '</span>',// kolom 3 status
+                $row['total'],                                       // kolom 4 total (angka mentah)
+                date('Y-m-d H:i', strtotime($row['date_added'])),    // kolom 5 date
+                (int)$row['items'],                                  // kolom 6 items count
+                htmlspecialchars($row['payment_method']),            // kolom 7 payment
+                '', // kolom 8
+                ''  // kolom 9: actions
+            ];
+        }
+
+        // OUTPUT JSON
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode([
+            'data' => $data
+        ]));
+    }
+
 
     public function datatable() {
         $this->load->language('account/order');
@@ -108,144 +212,95 @@ class ControllerBposOrder extends ControllerBposBposBase {
     }
 
     public function view() {
-
-        if (!isset($this->request->get['order_id'])) {
+        $order_id = (int)($this->request->get['order_id'] ?? 0);
+        if (!$order_id) {
             $this->response->redirect($this->url->link('bpos/order', '', true));
         }
 
-        $order_id = (int)$this->request->get['order_id'];
-
-        $this->load->language('account/order');
-        $this->load->model('checkout/order');
-        $this->load->model('account/order');
-        $this->load->model('catalog/product');
-        $this->load->model('tool/image');
-
-        $order_info = $this->model_checkout_order->getOrder($order_id);
+        $this->load->model('bpos/order');
+        $order_info = $this->model_bpos_order->getOrder($order_id);
 
         if (!$order_info) {
             $this->response->redirect($this->url->link('bpos/order', '', true));
         }
 
-        // ---------------------------
-        // Order details
-        // ---------------------------
-        $data['order_id']        = $order_id;
-        $data['date_added']      = date($this->language->get('date_format_short'), strtotime($order_info['date_added']));
-        $data['payment_method']  = $order_info['payment_method'];
-        $data['shipping_method'] = $order_info['shipping_method'];
-        $data['ip']              = $order_info['ip'];
-        $data['forwarded_ip']    = $order_info['forwarded_ip'];
-        $data['user_agent']      = $order_info['user_agent'];
-        $data['accept_language'] = $order_info['accept_language'];
-
-        // ---------------------------
-        // Products
-        // ---------------------------
-        $data['products'] = [];
-        $products = $this->model_checkout_order->getOrderProducts($order_id);
-
-        foreach ($products as $product) {
-            $option_data = [];
-            $options = $this->model_checkout_order->getOrderOptions($order_id, $product['order_product_id']);
-
-            foreach ($options as $option) {
-                $option_data[] = [
-                    'name'  => $option['name'],
-                    'value' => $option['value']
-                ];
-            }
-            $product_info = $this->model_catalog_product->getProduct($product['product_id']);
-            $thumb = '';
-            if (!empty($product_info['image'])) {
-                $thumb = $this->model_tool_image->resize($product_info['image'], 50, 50);
-            }
-
-            $data['products'][] = [
-                'name'     => $product['name'],
-                'model'    => $product['model'],
-                'option'   => $option_data,
-                'quantity' => $product['quantity'],
-                'price'    => $this->currency->format(
-                    $product['price'] + ($this->config->get('config_tax') ? $product['tax'] : 0),
-                    $order_info['currency_code'],
-                    $order_info['currency_value']
-                ),
-                'total'    => $this->currency->format(
-                    $product['total'] + ($this->config->get('config_tax') ? ($product['tax'] * $product['quantity']) : 0),
-                    $order_info['currency_code'],
-                    $order_info['currency_value']
-                ),
-                'thumb'    => $thumb
-            ];
-        }
-
-        // ---------------------------
-        // Totals
-        // ---------------------------
-        $data['totals'] = [];
-        $totals = $this->model_account_order->getOrderTotals($order_id);
-        foreach ($totals as $total) {
-            $data['totals'][] = [
-                'title' => $total['title'],
-                'text'  => $this->currency->format($total['value'], $order_info['currency_code'], $order_info['currency_value'])
-            ];
-        }
-
-        // ---------------------------
-        // Histories
-        // ---------------------------
-        $data['histories'] = [];
-        $histories = $this->model_account_order->getOrderHistories($order_id);
-        foreach ($histories as $history) {
-            $data['histories'][] = [
-                'date_added' => date($this->language->get('date_format_short'), strtotime($history['date_added'])),
-                'status'     => $history['status'],
-                'comment'    => nl2br($history['comment']),
-                'notify'     => $history['notify']
-            ];
-        }
-
-        $data['back_url'] = $this->url->link('bpos/order', '', true);
-        $data['home'] = $this->url->link('bpos/home', '', true);
-
-        // ---------------------------
-        // Render content
-        // ---------------------------
-        $data['logout'] = $this->url->link('bpos/login/logout', '', true);
-        $data['total_cart'] = $this->cart->hasProducts();
-        $data['content'] = $this->load->view('bpos/order_view', $data);
-
+        // JSON response untuk drawer (format template)
         if (isset($this->request->get['format']) && $this->request->get['format'] == 'json') {
+            $products = $this->model_bpos_order->getOrderProducts($order_id);
+            $totals   = $this->model_bpos_order->getOrderTotals($order_id);
+            $histories= $this->model_bpos_order->getOrderHistories($order_id);
+
+            $json = [
+                'id'   => $order_info['order_id'],
+                'order_id'   => $order_info['order_id'],
+                'invoice_no' => $order_info['invoice_prefix'].$order_info['invoice_no'],
+                'date'       => date('Y-m-d H:i', strtotime($order_info['date_added'])),
+                'status'     => $order_info['order_status'],
+                'customer'   => [
+                    'name'  => trim($order_info['firstname'].' '.$order_info['lastname']),
+                    'email' => $order_info['email'],
+                    'phone' => $order_info['telephone'],
+                    'address'=> trim($order_info['shipping_address_1'].' '.$order_info['shipping_city'].' '.$order_info['shipping_zone'])
+                ],
+                'items' => array_map(function($p){
+                    return [
+                        'name' => $p['name'],
+                        'qty'  => (int)$p['quantity'],
+                        'price'=> (float)$p['price'],
+                        'total'=> (float)$p['total']
+                    ];
+                }, $products),
+                'totals' => array_map(function($t){
+                    return [
+                        'title' => $t['title'],
+                        'value' => (float)$t['value']
+                    ];
+                }, $totals),
+                'payment'=> [
+                    'method' => $order_info['payment_method'],
+                    'code'   => $order_info['payment_code']
+                ],
+                'shipping'=> [
+                    'method' => $order_info['shipping_method'],
+                    'code'   => $order_info['shipping_code']
+                ],
+                'comment' => $order_info['comment'],
+                'histories' => $histories
+            ];
+
             $this->response->addHeader('Content-Type: application/json');
-            $this->response->setOutput(json_encode(['output' => $data['content']]));
-        } else {
-            $data['title'] = 'Order Details - POS System';
-            $this->response->setOutput($this->load->view('bpos/layout', $data));
+            $this->response->setOutput(json_encode($json));
+            return;
         }
+
+        // Default render (jika bukan AJAX)
+        $data['content'] = $this->load->view('bpos/order_view', ['order' => $order_info]);
+        $data['logout']  = $this->url->link('bpos/login/logout', '', true);
+        $data['total_cart'] = $this->cart->hasProducts();
+        $data['title']   = 'Order Detail - POS System';
+        $this->response->setOutput($this->load->view('bpos/layout', $data));
     }
 
     public function delete() {
+        $this->load->model('checkout/order');
         if (isset($this->request->get['order_id'])) {
-            $this->load->model('checkout/order');
-            $this->model_checkout_order->deleteOrder($this->request->get['order_id']);
+            $this->model_checkout_order->deleteOrder((int)$this->request->get['order_id']);
         }
-        $this->response->redirect($this->url->link('bpos/order'));
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode(['success' => true]));
     }
+
     public function deleteSelected() {
-        $this->load->language('bpos/order');
+        $this->load->model('checkout/order');
         $json = [];
 
         if (isset($this->request->post['order_ids']) && is_array($this->request->post['order_ids'])) {
-            $this->load->model('checkout/order');
-
             foreach ($this->request->post['order_ids'] as $order_id) {
                 $this->model_checkout_order->deleteOrder((int)$order_id);
             }
-
-            $json['success'] = 'Selected orders have been deleted successfully!';
-        } else if (isset($this->request->get['order_id'])) {} else {
-            $json['error'] = 'No orders selected for deletion.';
+            $json['success'] = 'Selected orders deleted successfully.';
+        } else {
+            $json['error'] = 'No orders selected.';
         }
 
         $this->response->addHeader('Content-Type: application/json');
