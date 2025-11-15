@@ -36,7 +36,7 @@ class ControllerBposReport extends ControllerBposBposBase {
         $data['text_no_sales'] = $this->language->get('text_no_sales');
         $data['text_view']     = $this->language->get('text_view');
         $data['button_filter'] = $this->language->get('button_filter');
-        $data['title'] = $this->config->get('setting_bpos_title_'.$this->config->get('config_language_id')) ? 'Reports - '.$this->config->get('setting_bpos_title_'.$this->config->get('config_language_id')) :'Reports - POS System';
+        $data['title'] = $this->config->get('bpos_title_'.$this->config->get('config_language_id')) ? 'Reports - '.$this->config->get('bpos_title_'.$this->config->get('config_language_id')) :'Reports - POS System';
         $data['logout'] = $this->url->link('bpos/login/logout', '', true);
         $data['total_cart'] = $this->cart->hasProducts();
         $data['content'] = $this->load->view('bpos/report', $data);

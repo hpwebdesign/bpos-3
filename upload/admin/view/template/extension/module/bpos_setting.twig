@@ -1,339 +1,959 @@
 {{ header }}
-<style type="text/css">
-	h6 {
-		line-height: 1.3em;
-	}
-
-	.panel-body {
-		position: relative;
-	}
-
-	div.note-editor.note-frame.panel.panel-default{
-		margin-bottom: 0px;
-	}
-
-	#button-save {
-		position: absolute;
-		right: 10px;
-		top: 9px;
-	}
-
-	.help {
-		color: #888;
-		font-weight: normal;
-		font-size: 11px;
-		display: block;
-		margin-top: 3px;
-		margin-bottom: 10px;
-		font-style: italic;
-	}
-
-	.marker-down {
-		width: 0px;
-		height: 0px;
-		border-left: 5px solid transparent;
-		border-right: 5px solid transparent;
-		border-top: 5px solid #2f2f2f;
-		position: absolute;
-		z-index: 999;
-		right: -7px;
-		top: 16px;
-	}
-
-	.shortcode-name {
-		padding: 2px 4px;
-		font-size: 90%;
-		color: #fff;
-		background-color: #333;
-		border-radius: 2px;
-		box-shadow: inset 0 -1px 0 rgb(0 0 0 / 25%);
-		display: table;
-		font-weight: bold;
-	}
-
-	#affiliate {
-		margin: 10px 0 15px 0;
-	}
-
-	@media only screen and (max-width: 600px) {
-		.panel-left {
-			min-width: unset !important;
-			width: 80px;
-		}
-
-		.panel-wrapper .panel-left .setting-header {
-			padding: 0;
-		}
-
-		.setting-header {
-			opacity: 0;
-			padding: 0;
-		}
-
-		.img-thumbnail img{
-			width:100%;
-		}
-	}
-</style>
 
 {{ column_left }}
-
 <div id="content">
-	<div class="page-header">
-		<div class="container-fluid">
-			<h1>{{ heading_title }}</h1>
-			<ul class="breadcrumb">
-				{% for breadcrumb in breadcrumbs %}
-				<li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
-				{% endfor %}
-			</ul>
 
-			<div class="pull-right">
-				<a target="_blank" class="btn btn-info btn-sm" href="{{ ticket_link }}"><i class="fa fa-life-ring"></i> {{text_raise_ticket}}</a>
+<div class="container settings">
+  <div class="card">
+    <div class="header" style="padding:16px 16px 0 16px">
+      <div class="title">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 7h14l-1 12H6L5 7Z" stroke="#1b5fb3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9 7V5a3 3 0 0 1 6 0v2" stroke="#1b5fb3" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <h1>{{ heading_title }}</h1>
+        <nav class="bpos-breadcrumb">
+		  <ol>
+		    {% for breadcrumb in breadcrumbs %}
+		      <li>
+		        <a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a>
+		      </li>
+		    {% endfor %}
+		  </ol>
+		</nav>
 
-				<a target="_blank" class="btn btn-danger btn-sm" href="{{ doc_link }}"><i class="fa fa-book"></i> {{text_documentation}}</a>
-			</div>
+
+      </div>
+      <div class="actions">
+      <a target="_blank" class="btn ghost" id="btn-ticket"  href="{{ ticket_link }}"><i class="fa fa-life-ring"></i> {{text_raise_ticket}}</a>
+      <a target="_blank" class="btn ghost btn-sm" id="btn-docs" href="{{ doc_link }}"><i class="fa fa-book"></i> {{text_documentation}}</a>
+        <button type="button" class="btn primary save">{{ button_save }}</button>
+      </div>
+    </div>
+
+    <nav class="tabs" role="tablist" aria-label="BPOS Settings Tabs">
+      <button role="tab" aria-selected="true" data-tab="general">{{ text_general }}</button>
+      <button role="tab" aria-selected="false" data-tab="store">{{ text_store }}</button>
+      <button role="tab" aria-selected="false" data-tab="device">{{ text_device }}</button>
+      <button role="tab" aria-selected="false" data-tab="cashier">{{ text_cashier }}</button>
+      <button role="tab" aria-selected="false" data-tab="users">{{ text_users }}</button>
+      <button role="tab" aria-selected="false" data-tab="sales">{{ text_sales }}</button>
+      <button role="tab" aria-selected="false" data-tab="advanced">{{ text_advanced }}</button>
+      <button role="tab" aria-selected="false" data-tab="help">{{ text_help }}</button>
+    </nav>
+
+    {# panels diambil dari file html, bisa dipotong sesuai kebutuhan #}
+    <section class="panel" id="panel-general">
+  <div class="grid">
+  <div class="field">
+    <label for="setting_status">Module Status</label>
+    <div class="row">
+      <div class="toggle {{ settings.bpos_status ? 'on' : '' }}"
+           data-bind="status"><i></i></div>
+      <span>Enable / Disable module</span>
+    </div>
+  </div>
+
+  <!-- WhatsApp Number -->
+  <div class="field">
+    <label for="whatsapp_number">WhatsApp Number</label>
+    <div class="row" style="gap:8px; align-items:center;">
+     <div class="input-group">
+			<span class="input-group-addon" id="country-code">62</span>
+			<input id="whatsapp_number" name="whatsapp_number" type="text"
+             value="{{ settings.bpos_whatsapp_number ?? '' }}"
+             placeholder="812xxxxxx">
 		</div>
-	</div>
+    </div>
+    <input type="hidden" name="country_code" value="{{ settings.bpos_country_code ?? '62' }}">
+  </div>
 
-	<div class="container-fluid">
-		{% if error_warning %}
-		<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_permission }}
-			<button type="button" class="close" data-dismiss="alert">&times;</button>
-		</div>
-		{% endif %}
+  <!-- Shipping Methods -->
+  <div class="field">
+    <label>Shipping Methods</label>
+    <div class="well-sm">
+      {% for method in delivery_methods %}
+        <label class="checkbox" style="display:block; margin-bottom:6px;">
+          <input type="checkbox"
+                 name="shipping_methods[]"
+                 value="{{ method.code }}"
+                 {{ method.code in settings.bpos_shipping_methods ? 'checked' }}>
+          {{ method.title }}
+        </label>
+      {% endfor %}
+    </div>
+  </div>
 
-		{% if success %}
-		<div class="alert alert-success"><i class="fa fa-check-circle"></i> {{ success }}
-			<button type="button" class="close" data-dismiss="alert">&times;</button>
-		</div>
-		{% endif %}
+  <!-- Payment Methods -->
+  <div class="field">
+    <label>Payment Methods</label>
+    <div class="well-sm">
+      {% for method in pay_methods %}
+        <label class="checkbox" style="display:block; margin-bottom:6px;">
+          <input type="checkbox"
+                 name="payment_methods[]"
+                 value="{{ method.code }}"
+                 {{ method.code in settings.bpos_payment_methods ? 'checked' }}>
+          {{ method.title }}
+        </label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Payment Gateway -->
+  <div class="field">
+    <label>Payment Gateway</label>
+    <div class="well-sm">
+      {% for method in pay_methods %}
+        <label class="checkbox" style="display:block; margin-bottom:6px;">
+          <input type="checkbox"
+                 name="payment_gateway[]"
+                 value="{{ method.code }}"
+                 {{ method.code in settings.bpos_payment_gateway ? 'checked' }}>
+          {{ method.title }}
+        </label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Default Shipping Method -->
+  <div class="field">
+    <label for="default_shipping_method">Default Shipping Method</label>
+    <select id="default_shipping_method"
+            name="default_shipping_method">
+      {% for method in delivery_methods %}
+        <option value="{{ method.code }}"
+          {{ method.code == settings.bpos_default_shipping_method ? 'selected' }}>
+          {{ method.title }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Default Payment Method -->
+  <div class="field">
+    <label for="default_payment_method">Default Payment Method</label>
+    <select id="default_payment_method"
+            name="default_payment_method">
+      {% for method in pay_methods %}
+        <option value="{{ method.code }}"
+          {{ method.code == settings.bpos_default_payment_method ? 'selected' }}>
+          {{ method.title }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Complete Order Status -->
+  <div class="field">
+    <label for="complete_order_status">Complete Order Status</label>
+    <select id="complete_order_status"
+            name="complete_order_status">
+      {% for os in order_statuses %}
+        <option value="{{ os.order_status_id }}"
+          {{ os.order_status_id == settings.bpos_complete_order_status ? 'selected' }}>
+          {{ os.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+    <div class="field">
+      <label for="pos_name">POS Display Name</label>
+      <input id="pos_name" name="pos_name" type="text"
+             value="{{ settings.bpos_pos_name ?? '' }}">
+    </div>
+
+    <div class="field">
+      <label for="pos_path">POS URL Path</label>
+      <input id="pos_path" name="pos_path" type="text"
+             value="{{ settings.bpos_pos_path ?? '/pos' }}">
+    </div>
+
+    <div class="field">
+      <label for="currency">Default Currency</label>
+      <select id="currency" name="currency">
+        {% for cur in currencies %}
+          <option value="{{ cur.code }}"
+            {{ cur.code == settings.bpos_currency ? 'selected' }}>
+            {{ cur.code }} — {{ cur.title }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="timezone">Timezone</label>
+      <select id="timezone" name="timezone">
+        <option value="Asia/Jakarta" {{ settings.bpos_timezone=='Asia/Jakarta'?'selected':'' }}>Asia/Jakarta</option>
+        <option value="Asia/Singapore" {{ settings.bpos_timezone=='Asia/Singapore'?'selected':'' }}>Asia/Singapore</option>
+        <option value="Pacific/Auckland" {{ settings.bpos_timezone=='Pacific/Auckland'?'selected':'' }}>Pacific/Auckland</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Date Format</label>
+      <select id="date_format" name="date_format">
+        <option value="YYYY-MM-DD" {{ settings.bpos_date_format=='YYYY-MM-DD'?'selected':'' }}>YYYY-MM-DD</option>
+        <option value="DD/MM/YYYY" {{ settings.bpos_date_format=='DD/MM/YYYY'?'selected':'' }}>DD/MM/YYYY</option>
+        <option value="MM/DD/YYYY" {{ settings.bpos_date_format=='MM/DD/YYYY'?'selected':'' }}>MM/DD/YYYY</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Theme</label>
+      <div class="row">
+        <div class="toggle {{ settings.bpos_darkmode?'on':'' }}" data-bind="darkmode"><i></i></div>
+        <span>Enable Dark Mode</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Offline Mode</label>
+      <div class="row">
+        <div class="toggle {{ settings.bpos_offline?'on':'' }}" data-bind="offline"><i></i></div>
+        <span>Allow offline mode</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Dashboard View</label>
+      <select id="dashboard_view" name="dashboard_view">
+        <option value="today" {{ settings.bpos_dashboard_view=='today'?'selected':'' }}>Today</option>
+        <option value="week" {{ settings.bpos_dashboard_view=='week'?'selected':'' }}>This Week</option>
+        <option value="month" {{ settings.bpos_dashboard_view=='month'?'selected':'' }}>This Month</option>
+        <option value="custom" {{ settings.bpos_dashboard_view=='custom'?'selected':'' }}>Custom</option>
+      </select>
+    </div>
+
+  </div>
+</section>
+
+   <section class="panel" id="panel-store" hidden>
+  <div class="grid">
+
+    <div class="field">
+      <label>Store Selection</label>
+      <select id="store_id" name="store_id">
+        {% for store in stores %}
+          <option value="{{ store.store_id }}"
+            {{ store.store_id == settings.bpos_store_id ? 'selected' }}>
+            {{ store.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Languages</label>
+
+      <div class="lang-pills">
+        {% for lang in languages %}
+          <button class="pill {{ loop.first?'active':'' }}"
+                  aria-selected="{{ loop.first?'true':'false' }}"
+                  data-lang="{{ lang.code }}">
+            {{ lang.code|upper }}
+          </button>
+        {% endfor %}
+      </div>
+
+      <div class="hr"></div>
+
+      {% for lang in languages %}
+        <div class="lang-group {{ loop.first?'active':'' }}" data-group="{{ lang.code }}">
+
+          <div class="field">
+            <label>POS Title ({{ lang.code|upper }})</label>
+            <input type="text" name="title_{{ lang.language_id }}"
+                   value="{{ settings['bpos_title_' ~ lang.language_id] ?? '' }}">
+          </div>
+
+          <div class="field">
+            <label>Receipt Header ({{ lang.code|upper }})</label>
+            <textarea name="header_{{ lang.language_id }}">{{ settings['bpos_header_' ~ lang.language_id] ?? '' }}</textarea>
+          </div>
+
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="field">
+      <label>Tax Included</label>
+      <div class="row">
+        <div class="toggle {{ settings.bpos_tax_included?'on':'' }}" data-bind="tax_included"><i></i></div>
+        <span>Prices include tax</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Rounding</label>
+      <div class="split">
+        <div class="row">
+          <div class="toggle {{ settings.bpos_rounding?'on':'' }}" data-bind="rounding"><i></i></div>
+          <span>Enable rounding</span>
+        </div>
+        <input id="round_precision" name="round_precision" type="number"
+               value="{{ settings.bpos_round_precision ?? 0 }}">
+      </div>
+    </div>
+
+  </div>
+</section>
+  
+  <section class="panel" id="panel-device" hidden>
+  <div class="grid">
+
+    <div class="field">
+      <label>Device ID</label>
+      <select id="device_id" name="device_id">
+        <option value="">Auto (Browser)</option>
+        {% for dev in oc.devices %}
+          <option value="{{ dev.code }}"
+            {{ dev.code == settings.bpos_device_id ? 'selected' }}>
+            {{ dev.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Barcode Scanner</label>
+      <div class="row">
+        <div class="toggle {{ settings.bpos_scanner?'on':'' }}" data-bind="scanner"><i></i></div>
+        <span>Enable barcode input</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Receipt Printer</label>
+      <select id="printer" name="printer">
+        <option value="none" {{ settings.bpos_printer=='none'?'selected':'' }}>— Not Connected —</option>
+        <option value="thermal-58" {{ settings.bpos_printer=='thermal-58'?'selected':'' }}>Thermal 58mm</option>
+        <option value="thermal-80" {{ settings.bpos_printer=='thermal-80'?'selected':'' }}>Thermal 80mm</option>
+        <option value="a4" {{ settings.bpos_printer=='a4'?'selected':'' }}>A4 Printer</option>
+      </select>
+
+      <div class="hint">
+        Auto Print
+        <span class="row">
+          <div class="toggle {{ settings.bpos_autoprint?'on':'' }}" data-bind="autoprint"><i></i></div>
+        </span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Print Logo</label>
+      <input type="text" id="print_logo" name="print_logo"
+             value="{{ settings.bpos_print_logo ?? '' }}">
+    </div>
+
+    <div class="field">
+      <label>Receipt Footer</label>
+      <textarea id="receipt_footer" name="receipt_footer">{{ settings.bpos_receipt_footer ?? '' }}</textarea>
+    </div>
+
+  </div>
+</section>
+
+<section class="panel" id="panel-cashier" hidden>
+  <div class="grid">
+
+    <div class="field">
+      <label>Default Role</label>
+      <select id="role_default" name="role_default">
+        <option value="admin" {{ settings.bpos_role_default=='admin'?'selected':'' }}>Admin</option>
+        <option value="staff" {{ settings.bpos_role_default=='staff'?'selected':'' }}>Staff</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Session Timeout (Hours)</label>
+      <input id="session_timeout" name="session_timeout" type="number"
+             value="{{ settings.bpos_session_timeout ?? 1 }}">
+    </div>
+
+    <div class="field">
+      <label>Permissions</label>
+      <div class="note" id="perm-box"></div>
+    </div>
+
+  </div>
+</section>
+
+<section class="panel" id="panel-users" hidden>
+        <div class="field">
+          <label class="section-title">POS Users</label>
+          <div class="toolbar">
+            <div class="search">
+              <input id="user-search" type="text" placeholder="Search username or role">
+              <button class="btn small" id="user-search-clear">Clear</button>
+            </div>
+            <div class="right">
+              <span class="badge-sm muted" id="user-count">0 users</span>
+              <button class="btn primary" id="btn-add-user">+ New User</button>
+            </div>
+          </div>
+          <table class="table" id="user-table" aria-label="POS users">
+            <thead>
+              <tr>
+                <th style="width:34%">Username</th>
+                <th style="width:18%">Role</th>
+                <th style="width:18%">Status</th>
+                <th style="width:30%">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+          <div class="hint">Users are stored locally for demo. Integrate with OC controller to persist.</div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-sales" hidden>
+  <div class="grid">
+
+    <div class="field">
+      <label>Auto Sync Sales</label>
+      <div class="row">
+        <div class="toggle {{ settings.bpos_autosync?'on':'' }}" data-bind="autosync"><i></i></div>
+        <span>Sync periodically</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Sync Interval</label>
+      <select id="sync_interval" name="sync_interval">
+        <option value="5m" {{ settings.bpos_sync_interval=='5m'?'selected':'' }}>5 minutes</option>
+        <option value="10m" {{ settings.bpos_sync_interval=='10m'?'selected':'' }}>10 minutes</option>
+        <option value="30m" {{ settings.bpos_sync_interval=='30m'?'selected':'' }}>30 minutes</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Online Status</label>
+      <div class="row">
+        <div class="toggle {{ settings.bpos_online_status?'on':'' }}" data-bind="online_status"><i></i></div>
+        <span>Show cashier online/idle</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Stock Deduction</label>
+      <div class="row">
+        <div class="toggle {{ settings.bpos_stock_deduct?'on':'' }}" data-bind="stock_deduct"><i></i></div>
+        <span>Deduct stock on checkout</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Export Sales</label>
+      <div class="row">
+        <select id="export_fmt" name="export_fmt">
+          <option value="csv" {{ settings.bpos_export_fmt=='csv'?'selected':'' }}>CSV</option>
+          <option value="xlsx" {{ settings.bpos_export_fmt=='xlsx'?'selected':'' }}>XLSX</option>
+        </select>
+        <button class="btn" id="btnExportSales">Export</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Last Sync Log</label>
+      <div class="status">
+        <i></i>
+        <span id="sync-log">{{ settings.bpos_last_sync_log ?? 'No sync yet' }}</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="panel" id="panel-advanced" hidden>
+  <div class="grid">
+
+    <div class="field">
+      <label for="api_url">API URL</label>
+      <input type="text" id="api_url" name="api_url"
+             value="{{ settings.bpos_api_url ?? '' }}">
+    </div>
+
+    <div class="field">
+      <label for="api_key">API Key</label>
+      <input id="api_key" name="api_key" type="password"
+             value="{{ settings.bpos_api_key ?? '' }}">
+    </div>
+
+    <div class="field">
+      <label>Cache</label>
+      <div class="row">
+        <button class="btn" id="btn-clear-cache">Clear Cache</button>
+        <button class="btn" id="btn-reset-ls">Reset Local Storage</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Diagnostics</label>
+      <div class="row">
+        <button class="btn" id="btn-test-conn">Test Connection</button>
+        <span id="diag-result" class="muted"></span>
+      </div>
+      <div class="hint">Ping API endpoint.</div>
+    </div>
+
+  </div>
+</section>
+
+<section class="panel" id="panel-help" hidden>
+  <div class="grid">
+
+    <!-- Quick Start -->
+    <div class="field">
+      <label class="section-title">Quick Start</label>
+      <div class="note">
+        1) Set <b>Store</b>, <b>Language</b>, and <b>Currency</b>.<br>
+        2) Enable <b>Barcode Scanner</b> and <b>Printer</b> if needed.<br>
+        3) Configure <b>Cashier & Permission</b>.<br>
+        4) Open your POS at <span class="kbd">/pos</span> and start selling 🎉
+      </div>
+    </div>
+
+    <!-- Troubleshooting -->
+    <div class="field">
+      <label class="section-title">Troubleshooting</label>
+      <div class="note">
+        If printing fails on a thermal printer, switch <b>Print Type</b> or reduce logo density.<br>
+        Use <b>Reset Local Storage</b> if UI behaves oddly after updates.
+      </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="field">
+      <label class="section-title">Contact</label>
+      <div class="row" style="gap:8px;flex-wrap:wrap">
+        <button type="button" class="btn ghost" id="help-docs">📖 Documentation</button>
+        <button type="button" class="btn ghost" id="help-ticket">🎫 Open Ticket</button>
+      </div>
+      <div class="hint">Need more help? Check the documentation or contact support.</div>
+    </div>
+
+  </div>
+</section>
 
 
-		<form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-basel" class="form-horizontal">
 
-			<div class="panel-wrapper">
-
-				<div class="panel-left">
-					<div class="setting-header">v {{ version }}</div>
-					<ul class="menu list-unstyled">
-						<li class="active">
-							<a data-toggle="tab" href="#tab-general">
-								<i class="fa fa-cog fa-fw"></i>
-								<span class="hidden-xs">{{ tab_general }}</span></a>
-						</li>
-						<!--
-<li>
-<a data-toggle="tab" href="#tab-translation">
-<i class="fa fa-language"></i>
-<span class="hidden-xs">{{ tab_translation }}</span></a>
-</li>
-<li>
-<a data-toggle="tab" href="#tab-advance">
-<i class="fa fa-gears fw"></i>
-<span class="hidden-xs">{{ tab_advance }}</span></a>
-</li>
--->
-						<li>
-							<a data-toggle="tab" href="#tab-help">
-								<i class="fa fa-question-circle"></i>
-								<span class="hidden-xs">{{ tab_help }}</span></a>
-						</li>
-
-					</ul>
-				</div><!-- .panel-left ends -->
-
-				<div class="panel-right">
-					<div class="store-header">
-						<div class="pull-right">
-							<button type="submit" form="form-basel" data-toggle="tooltip" title="{{ button_save }}"
-									class="btn btn-primary">{{ button_save }}
-							</button>
-						</div>
-					</div>
-
-
-					<div class="main-content">
-						<div class="tab-content">
-
-							<div class="tab-pane active" id="tab-general">
-								<div class="form-group">
-									<label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
-									<div class="col-sm-9">
-										<input {% if status %} checked {% endif %}
-											   data-off-label="{{ text_disabled }}"
-											   data-on-label="{{ text_enabled }}" type="checkbox" name="status" value="1" data-control="checkbox">
-									</div>
-								</div>
-
-								<div class="form-group">
-									<label class="col-sm-2 control-label" for="color_scheme">{{ entry_whatsapp_number  }}</label>
-									<div class="col-sm-9" style="max-width: 300px">
-										<div class="input-group colorpicker-component">
-											<span class="input-group-addon" id="country-code">62</span>
-											<input id="whatsapp-number" type="text" name="whatsapp_number" value="{{ whatsapp_number }}" class="form-control">
-										</div>
-
-										<input type="hidden" name="country_code" value="{{ country_code }}">
-									</div>
-								</div>
-
-								<div class="form-group">
-					                  <label class="col-sm-2 control-label" for="input-shipping-methods">{{ entry_shipping_methods }}</label>
-					                  <div class="col-sm-10">
-					                    <div class="well well-sm" style="height: 150px; overflow: auto;"> {% for shipping_method in delivery_methods %}
-					                      <div class="checkbox">
-					                        <label> {% if shipping_method.code in shipping_methods %}
-					                          <input type="checkbox" name="shipping_methods[]" value="{{ shipping_method.code }}" checked="checked" />
-					                          {{ shipping_method.title }}
-					                          {% else %}
-					                          <input type="checkbox" name="shipping_methods[]" value="{{ shipping_method.code }}" />
-					                           {{ shipping_method.title }}
-					                          {% endif %} </label>
-					                      </div>
-					                      {% endfor %} </div>
-					                     </div>
-					                </div>
-
-					            <div class="form-group">
-					                  <label class="col-sm-2 control-label" for="input-payment-methods">{{ entry_payment_methods }}</label>
-						                  <div class="col-sm-10">
-						                    <div class="well well-sm" style="height: 150px; overflow: auto;"> {% for payment_method in pay_methods %}
-						                      <div class="checkbox">
-						                        <label> {% if payment_method.code in payment_methods %}
-						                          <input type="checkbox" name="payment_methods[]" value="{{ payment_method.code }}" checked="checked" />
-						                          {{ payment_method.title }}
-						                          {% else %}
-						                          <input type="checkbox" name="payment_methods[]" value="{{ payment_method.code }}" />
-						                           {{ payment_method.title }}
-						                          {% endif %} </label>
-						                      </div>
-						                      {% endfor %} </div>
-						                     </div>
-					             </div>
-
-					             <div class="form-group">
-					                  <label class="col-sm-2 control-label" for="input-payment-methods">{{ entry_payment_gateway }}</label>
-						                  <div class="col-sm-10">
-						                    <div class="well well-sm" style="height: 150px; overflow: auto;"> {% for payment_method in pay_methods %}
-						                      <div class="checkbox">
-						                        <label> {% if payment_method.code in payment_gateway %}
-						                          <input type="checkbox" name="payment_gateway[]" value="{{ payment_method.code }}" checked="checked" />
-						                          {{ payment_method.title }}
-						                          {% else %}
-						                          <input type="checkbox" name="payment_gateway[]" value="{{ payment_method.code }}" />
-						                           {{ payment_method.title }}
-						                          {% endif %} </label>
-						                      </div>
-						                      {% endfor %} </div>
-						                     </div>
-					             </div>
-
-					             <div class="form-group">
-					                  <label class="col-sm-2 control-label" for="input-default-shipping-method">{{ entry_default_shipping_method }}</label>
-					                  <div class="col-sm-10">
-					                    <select name="default_shipping_method" id="input-default-shipping-method" class="form-control">
-					                      
-					                      {% for shipping_method in delivery_methods %}
-					                      {% if shipping_method.code == default_shipping_method %}
-					                      
-					                      <option value="{{ shipping_method.code }}" selected="selected">{{ shipping_method.title }}</option>
-					                      
-					                      {% else %}
-					                      
-					                       <option value="{{ shipping_method.code }}">{{ shipping_method.title }}</option>
-					                      
-					                      {% endif %}
-					                      {% endfor %}
-					                    
-					                    </select>
-					                  </div>
-					                </div>
-
-					                 <div class="form-group">
-					                  <label class="col-sm-2 control-label" for="input-default-payment-method">{{ entry_default_payment_method }}</label>
-					                  <div class="col-sm-10">
-					                    <select name="default_payment_method" id="input-default-payment-method" class="form-control">
-					                      
-					                      {% for payment_method in pay_methods %}
-					                      {% if payment_method.code == default_payment_method %}
-					                      
-					                      <option value="{{ payment_method.code }}" selected="selected">{{ payment_method.title }}</option>
-					                      
-					                      {% else %}
-					                      
-					                       <option value="{{ payment_method.code }}">{{ payment_method.title }}</option>
-					                      
-					                      {% endif %}
-					                      {% endfor %}
-					                    
-					                    </select>
-					                  </div>
-					                </div>
-
-
-					                <div class="form-group">
-					                  <label class="col-sm-2 control-label" for="input-complete-order-status">{{ entry_complete_order_status }}</label>
-					                  <div class="col-sm-10">
-					                    <select name="complete_order_status" id="input-complete-order-status" class="form-control">
-					                      
-					                      {% for order_status in order_statuses %}
-					                      {% if order_status.order_status_id == complete_order_status %}
-					                      
-					                      <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
-					                      
-					                      {% else %}
-					                      
-					                      <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
-					                      
-					                      {% endif %}
-					                      {% endfor %}
-					                    
-					                    </select>
-					                  </div>
-					                </div>
-
-
-							</div>
-
-							<div class="tab-pane" id="tab-help">
-								<div id="license"></div>
-								<div id="support"></div>
-								<script type="text/javascript">
-									$('#support').load('index.php?route=common/hp_validate/support&user_token={{ user_token }}');
-									$('#license').load('index.php?route=common/hp_validate/license&user_token={{ user_token }}&code={{ extension_code }}&version={{ version }}');
-								</script>
-							</div>
-
-
-
-						</div>
-
-
-
-					</div> <!-- .main-content ends -->
-
-				</div> <!-- panel-right ends -->
-
-			</div>
-		</form>
-	</div> <!-- content ends -->
-
+    <div class="savebar">
+      <div class="left">Changes are not saved</div>
+      <div class="right">
+        <button class="btn" id="discard">Discard</button>
+        <button class="btn primary save" id="save">Save Settings</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+   <div class="modal" id="user-modal" aria-hidden="true" role="dialog" aria-labelledby="user-modal-title">
+    <div class="sheet-setting">
+      <header>
+        <strong id="user-modal-title">New User</strong>
+        <button class="btn small" id="user-modal-close">✕</button>
+      </header>
+      <div class="body">
+        <div class="grid">
+          <div class="field">
+            <label for="u-username">Username</label>
+            <input id="u-username" type="text" placeholder="e.g., cashier01">
+          </div>
+          <div class="field">
+            <label for="u-pin">PIN</label>
+            <input id="u-pin" type="password" placeholder="4–6 digits">
+          </div>
+          <div class="field">
+            <label for="u-role">Role</label>
+            <select id="u-role">
+        <option value="admin">
+          Admin
+        </option>
+        <option value="staff">
+          Staff
+        </option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="u-active">Active</label>
+            <div class="row"><div id="u-active" class="toggle on"><i></i></div><span>Enable login</span></div>
+          </div>
+        </div>
+      </div>
+      <footer>
+        <button class="btn" id="user-modal-cancel">Cancel</button>
+        <button class="btn primary user-modal-save" id="user-modal-save">{{ button_save }}</button>
+      </footer>
+    </div>
+  </div>
 </div>
 
-<script>
-$(document).ready(function(){
-	var code = $('#country-code').text().trim();
+ 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+   <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 
-	$('input[name="country_code"]').val(code);
+</div>
+<script>
+$(function(){
+
+  /** ============================================
+   *  NOTYF
+   * ============================================ */
+  if (!window.notyf) {
+    window.notyf = new Notyf({
+      duration: 1800,
+      position: { x: 'right', y: 'top' }
+    });
+  }
+  const showToast = (msg, ok=true)=>{
+    ok ? notyf.success(msg) : notyf.error(msg);
+  };
+
+  const REQUIRED_FIELDS = ['pos_name','pos_path'];
+  const savebarLeft = $('.savebar .left');
+
+
+  /** ============================================
+   *  Dirty State
+   * ============================================ */
+  const dirty = ()=> savebarLeft.text('Unsaved changes');
+  const val = id => $('#'+id).val() || '';
+
+  $('input,select,textarea').on('input change', dirty);
+
+
+  /** ============================================
+   *  Language Pills
+   * ============================================ */
+  $(document).on('click','.pill',function(){
+    const lang = $(this).data('lang');
+    $('.pill').removeClass('active').attr('aria-selected','false');
+    $(this).addClass('active').attr('aria-selected','true');
+
+    $('.lang-group').removeClass('active');
+    $(`.lang-group[data-group="${lang}"]`).addClass('active');
+  });
+
+
+  /** ============================================
+   *  Tabs
+   * ============================================ */
+  $('.tabs [role="tab"]').on('click',function(){
+    const key = $(this).data('tab');
+    $('.tabs [role="tab"]').attr('aria-selected','false');
+    $(this).attr('aria-selected','true');
+
+    $('section.panel[id^="panel-"]').hide();
+    $('#panel-'+key).show();
+  });
+
+
+  /** ============================================
+   *  Toggle
+   * ============================================ */
+  $(document).on('click','.toggle',function(){
+    $(this).toggleClass('on');
+    dirty();
+  });
+
+
+  /** ============================================
+   *  Load defaults (data-value)
+   * ============================================ */
+  $('[data-value]').each(function(){
+    const dv = $(this).data('value');
+    if($(this).is('textarea')){
+      if($(this).val().trim()==='') $(this).val(dv);
+    } else {
+      if(!$(this).val() && dv !== undefined) $(this).val(dv);
+    }
+  });
+
+
+  /** ============================================
+   *  USERS — Load
+   * ============================================ */
+  let users = [];
+
+  async function fetchUsers(){
+    try {
+      const res = await fetch(`index.php?route=extension/module/bpos_setting/users&user_token={{ user_token }}`);
+      const txt = await res.text();
+      const json = JSON.parse(txt);
+
+      if(json.success){
+        users = json.data.map(u=>({
+          id: u.user_bpos_id,
+          username: u.username,
+          role: u.role,
+          active: u.status == 1,
+          createdAt: u.date_added
+        }));
+        renderUsers();
+      } else {
+        showToast('Failed to load users', false);
+      }
+    } catch(e){
+      console.log(e);
+      showToast('Error fetching users', false);
+    }
+  }
+
+  function renderUsers(){
+    const q = $('#user-search').val().trim().toLowerCase();
+    const rows = users.filter(u => !q || u.username.toLowerCase().includes(q));
+
+    $('#user-count').text(rows.length + (rows.length===1 ? ' user' : ' users'));
+
+    $('#user-table tbody').html(
+      rows.map(u => `
+        <tr data-id="${u.id}">
+          <td><strong>${u.username}</strong>
+            <div class="hint">Created ${new Date(u.createdAt).toLocaleString()}</div></td>
+          <td><span class="badge-sm ${u.role==='admin'?'warn':'muted'}">${u.role}</span></td>
+          <td>${u.active ? '<span class="badge-sm ok">Active</span>' : '<span class="badge-sm off">Disabled</span>'}</td>
+          <td>
+            <div class="right">
+              <button class="btn small" data-act="toggle">${u.active?'Disable':'Enable'}</button>
+              <button class="btn small" data-act="reset">Reset PIN</button>
+              <button class="btn small" data-act="edit">Edit</button>
+              <button class="btn small danger" data-act="delete">Delete</button>
+            </div>
+          </td>
+        </tr>`).join('')
+    );
+  }
+
+  /** Open Modal */
+  function openModal(mode,user){
+    $('#user-modal-title').text(mode==='create'?'New User':'Edit User');
+    $('#u-username').val(user?user.username:'');
+    $('#u-pin').val('');
+    $('#u-role').val(user?user.role:'staff');
+    $('#u-active').toggleClass('on',user?user.active:true);
+
+    $('#user-modal').fadeIn(150).attr('aria-hidden','false');
+    window.mUser = {
+      mode,
+      id: user ? user.id : null
+    };
+  }
+
+  function closeModal(){
+    $('#user-modal').fadeOut(150).attr('aria-hidden','true');
+  }
+
+  $('#btn-add-user').on('click',()=>openModal('create'));
+  $('#user-modal-close,#user-modal-cancel').on('click', closeModal);
+
+
+  /** Toggle inside modal */
+  $('#u-active').on('click',function(){ $(this).toggleClass('on'); });
+
+
+  /** Save user */
+  $('.user-modal-save').on('click', async function(){
+    const username = $('#u-username').val().trim();
+    const pin = $('#u-pin').val().trim();
+    const role = $('#u-role').val();
+    const active = $('#u-active').hasClass('on') ? 1 : 0;
+
+    if(!username) return showToast("Username required", false);
+    if(window.mUser.mode==='create' && (pin.length<4 || pin.length>6))
+      return showToast("PIN 4–6 digits", false);
+
+    const payload = { username, pin, role, status: active };
+    if(window.mUser.mode==='edit') payload.user_id = window.mUser.id;
+
+    const route = window.mUser.mode==='create'
+      ? 'extension/module/bpos_setting/addUser'
+      : 'extension/module/bpos_setting/editUser';
+
+    try {
+      const res = await fetch(`index.php?route=${route}&user_token={{ user_token }}`, {
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body: new URLSearchParams(payload).toString()
+      });
+      const json = await res.json();
+
+      if(json.success){
+        showToast(json.message);
+        await fetchUsers();
+        closeModal();
+      } else showToast(json.message,false);
+
+    } catch(e){
+      console.error(e);
+      showToast('Save error',false);
+    }
+  });
+
+
+  /** User table actions */
+  $('#user-table').on('click','button[data-act]',async function(){
+    const act = $(this).data('act');
+    const id = $(this).closest('tr').data('id');
+    const idx = users.findIndex(u=>u.id==id);
+    if(idx<0) return;
+
+    if(act==='edit'){
+      return openModal('edit',users[idx]);
+    }
+    if(act==='reset'){
+      return showToast('PIN reset link sent');
+    }
+    if(act==='toggle'){
+      const newStatus = users[idx].active ? 0 : 1;
+      const res = await fetch(
+        `index.php?route=extension/module/bpos_setting/setUserStatus&user_token={{ user_token }}`,
+        {
+          method:'POST',
+          headers:{'Content-Type':'application/x-www-form-urlencoded'},
+          body:`user_id=${id}&status=${newStatus}`
+        }
+      );
+      const json = await res.json();
+      if(json.success){ showToast('Status updated'); fetchUsers(); }
+      else showToast('Failed',false);
+    }
+    if(act==='delete'){
+      if(!confirm('Delete this user?')) return;
+      const res = await fetch(
+        `index.php?route=extension/module/bpos_setting/deleteUser&user_token={{ user_token }}`,
+        {
+          method:'POST',
+          headers:{'Content-Type':'application/x-www-form-urlencoded'},
+          body:`user_id=${id}`
+        }
+      );
+      const json = await res.json();
+      if(json.success){ showToast('User deleted'); fetchUsers(); }
+      else showToast('Failed',false);
+    }
+  });
+
+
+  /** Search */
+  $('#user-search').on('input', renderUsers);
+  $('#user-search-clear').on('click',()=>{ $('#user-search').val(''); renderUsers(); });
+
+
+  /** ============================================
+   *  Permissions (Admin/Staff)
+   * ============================================ */
+  const PERM_LABELS = {
+    home:'Create Order',
+    order:'Orders Page',
+    report:'Reports Page',
+    customer:'Customers Page',
+    setting:'Settings'
+  };
+
+  let perms = {
+    admin:{
+      home: {{ settings.bpos_perm_admin_home ? 1 : 0 }},
+      order: {{ settings.bpos_perm_admin_order ? 1 : 0 }},
+      report: {{ settings.bpos_perm_admin_report ? 1 : 0 }},
+      customer: {{ settings.bpos_perm_admin_customer ? 1 : 0 }},
+      setting: {{ settings.bpos_perm_admin_setting ? 1 : 0 }}
+    },
+    staff:{
+      home: {{ settings.bpos_perm_staff_home ? 1 : 0 }},
+      order: {{ settings.bpos_perm_staff_order ? 1 : 0 }},
+      report: {{ settings.bpos_perm_staff_report ? 1 : 0 }},
+      customer: {{ settings.bpos_perm_staff_customer ? 1 : 0 }},
+      setting: {{ settings.bpos_perm_staff_setting ? 1 : 0 }}
+    }
+  };
+
+  function renderPerms(role){
+    let html = '';
+    $.each(perms[role],(key,val)=>{
+      html += `
+        <label>
+          <input type="checkbox" data-role="${role}" data-key="${key}" ${val?'checked':''}>
+          ${PERM_LABELS[key]}
+        </label><br>`;
+    });
+    $('#perm-box').html(html);
+  }
+  renderPerms($('#role_default').val());
+
+  $('#role_default').on('change',function(){
+    renderPerms($(this).val());
+  });
+
+  $('#perm-box').on('change','input[type=checkbox]',function(){
+    const role = $(this).data('role');
+    const key = $(this).data('key');
+    perms[role][key] = $(this).is(':checked') ? 1 : 0;
+  });
+
+
+  /** ============================================
+   *  Save All Settings
+   * ============================================ */
+  $('.save').on('click', async function(){
+
+    const missing = REQUIRED_FIELDS.filter(k=>!val(k).trim());
+    if(missing.length){
+      showToast('Missing fields: '+missing.join(', '),false);
+      return;
+    }
+
+    const payload = {};
+
+    $('[name]').each(function(){
+      payload[$(this).attr('name')] = $(this).val();
+    });
+
+    $('.toggle[data-bind]').each(function(){
+      payload[$(this).data('bind')] = $(this).hasClass('on') ? 1 : 0;
+    });
+
+    for(let role of ['admin','staff']){
+      for(let k in perms[role]){
+        payload[`perm_${role}_${k}`] = perms[role][k];
+      }
+    }
+
+    try {
+      const res = await fetch(`index.php?route=extension/module/bpos_setting/save&user_token={{ user_token }}`, {
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body: new URLSearchParams(payload).toString()
+      });
+      const json = await res.json();
+
+      if(json.success) showToast('Settings saved');
+      else showToast(json.message || 'Failed',false);
+
+    } catch(e){
+      console.log(e);
+      showToast('Save error',false);
+    }
+  });
+
+
+  /** Discard */
+  $('#discard').on('click',()=>location.reload());
+
+
+  /** INIT */
+  fetchUsers();
+
 });
 </script>
+
 
 
 <script>
 	$("#upgrade-database").click(function () {
 		$("#upgrade-database").button('loading');
-		$.get('index.php?route=extension/module/hpcls/patch&user_token={{ user_token }}', function (data) {
+		$.get('index.php?route=extension/module/bpos_setting/patch&user_token={{ user_token }}', function (data) {
 			if (data['success']) {
 				$("#upgrade-database").button('reset');
 				$("<div class='alert alert-success slideUp'><i class='fa fa-check-circle'></i> {{ text_success_installed }}<button type='button' class='close' data-dismiss='alert'>&times;</button></div>").insertBefore(".panel.panel-default");
@@ -345,7 +965,7 @@ $(document).ready(function(){
 
 	$(document).ready(function () {
 
-		$.get("https://hpwebdesign.{{extension_type}}/index.php?route=common/extension/version&code={{ extension_code }}&oc=3.0.x.x", function (data, status) {
+		$.get("https://bariklabs.com/index.php?route=common/extension/version&code={{ extension_code }}&oc=3.0.x.x", function (data, status) {
 			const version = "{{ version }}".replace(/\D/g, '');
 			const latest_version = data.replace(/\D/g, '');
 			if (version < latest_version) {
@@ -355,13 +975,6 @@ $(document).ready(function(){
 	</div>`);
 			}
 		});
-
-		$('#language a:first').tab('show');
-
-		if ($.fn.checkboxpicker) {
-			$('[data-control=checkbox]').checkboxpicker({onClass: 'btn-info'});
-			$('.btn-group .btn').addClass('btn-sm');
-		}
 
 	});
 

@@ -7,7 +7,7 @@ class ControllerBposBposBase extends Controller {
         $this->user_bpos = new User_BPOS($this->registry);
 
         $this->load->model('bpos/setting');
-        $settings = $this->model_bpos_setting->getSetting('setting_bpos',$this->config->get('config_store_id'));
+        $settings = $this->model_bpos_setting->getSetting('bpos',$this->config->get('config_store_id'));
 
         if (!$this->config->get('bpos_status')) {
             $this->response->redirect($this->url->link('common/home', '', true));
@@ -21,7 +21,7 @@ class ControllerBposBposBase extends Controller {
             $this->session->data['bpos_last_activity'] = time();
         } else {
             // Timeout 1 jam (3600 detik), bisa diubah
-            $timeout = $this->config->get('setting_bpos_session_timeout') ? (int)$this->config->get('setting_bpos_session_timeout') * 3600 : 3600; 
+            $timeout = $this->config->get('bpos_session_timeout') ? (int)$this->config->get('bpos_session_timeout') * 3600 : 3600; 
             if (time() - $this->session->data['bpos_last_activity'] > $timeout) {
                 // Logout dua-duanya
                 $this->user->logout();
@@ -58,11 +58,11 @@ class ControllerBposBposBase extends Controller {
             $role = $this->user_bpos->getRole(); // 'admin' atau 'staff'
 
             $this->perms = [
-                'home'     => (int)$settings["setting_bpos_perm_{$role}_home"],
-                'order'    => (int)$settings["setting_bpos_perm_{$role}_order"],
-                'report'   => (int)$settings["setting_bpos_perm_{$role}_report"],
-                'customer' => (int)$settings["setting_bpos_perm_{$role}_customer"],
-                'setting'  => (int)$settings["setting_bpos_perm_{$role}_setting"]
+                'home'     => (int)$settings["bpos_perm_{$role}_home"],
+                'order'    => (int)$settings["bpos_perm_{$role}_order"],
+                'report'   => (int)$settings["bpos_perm_{$role}_report"],
+                'customer' => (int)$settings["bpos_perm_{$role}_customer"],
+                'setting'  => (int)$settings["bpos_perm_{$role}_setting"]
             ];
         }
 

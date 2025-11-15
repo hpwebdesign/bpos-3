@@ -70,7 +70,7 @@ class ControllerBposHome extends ControllerBposBposBase  {
                 'output' => $this->load->view('bpos/home', $data)
             ]));
         } else {
-            $data['title']      = $this->config->get('setting_bpos_title_'.$this->config->get('config_language_id')) ? 'Home - '.$this->config->get('setting_bpos_title_'.$this->config->get('config_language_id')) : 'Home - POS System';
+            $data['title']      = $this->config->get('bpos_title_'.$this->config->get('config_language_id')) ? 'Home - '.$this->config->get('bpos_title_'.$this->config->get('config_language_id')) : 'Home - POS System';
             $data['content'] = $this->load->view('bpos/home', $data);
             $data['server']  = HTTPS_SERVER;
             $this->response->setOutput($this->load->view('bpos/common/layout', $data));

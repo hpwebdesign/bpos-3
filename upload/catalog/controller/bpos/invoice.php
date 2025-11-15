@@ -28,8 +28,8 @@ class ControllerBposInvoice extends Controller {
         $data['store_email']   = isset($store_config['config_email']) ? $store_config['config_email'] : '';
         $data['store_website'] = $order_info['store_url'];
         $data['invoice_no'] = $order_info['invoice_prefix'] . $order_info['invoice_no'];
-        $data['date_added'] = $this->config->get('setting_bpos_date_format') ? date($this->config->get('setting_bpos_date_format'),strtotime($order_info['date_added'])) : date('d/m/Y', strtotime($order_info['date_added']));
-        $data['due_date']   = $this->config->get('setting_bpos_date_format') ? date($this->config->get('setting_bpos_date_format'),strtotime($order_info['date_added']. ' +3 days')) : date('d/m/Y', strtotime($order_info['date_added'] . ' +3 days'));
+        $data['date_added'] = $this->config->get('bpos_date_format') ? date($this->config->get('bpos_date_format'),strtotime($order_info['date_added'])) : date('d/m/Y', strtotime($order_info['date_added']));
+        $data['due_date']   = $this->config->get('bpos_date_format') ? date($this->config->get('bpos_date_format'),strtotime($order_info['date_added']. ' +3 days')) : date('d/m/Y', strtotime($order_info['date_added'] . ' +3 days'));
         $data['tax_id']     = 0;
         $data['customer_name']  = trim($order_info['firstname'] . ' ' . $order_info['lastname']);
         $data['customer_email'] = $order_info['email'];
@@ -124,7 +124,7 @@ class ControllerBposInvoice extends Controller {
             $data['notes'] = '';
         }
 
-        $data['receipt_header']      = $this->config->get('setting_bpos_header_'.$this->config->get('config_language_id')) ? 'Orders - '.$this->config->get('setting_bpos_header_'.$this->config->get('config_language_id')) : 'Receipt';
+        $data['receipt_header']      = $this->config->get('bpos_header_'.$this->config->get('config_language_id')) ? 'Orders - '.$this->config->get('bpos_header_'.$this->config->get('config_language_id')) : 'Receipt';
 
         $data['approved_by'] = 'Finance';
         $data['terms'] = "";

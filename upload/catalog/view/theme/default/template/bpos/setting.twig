@@ -30,6 +30,116 @@
     {# panels diambil dari file html, bisa dipotong sesuai kebutuhan #}
     <section class="panel" id="panel-general">
   <div class="grid">
+  <div class="field">
+    <label for="setting_status">Module Status</label>
+    <div class="row">
+      <div class="toggle {{ settings.setting_bpos_status ? 'on' : '' }}"
+           data-bind="status"><i></i></div>
+      <span>Enable / Disable module</span>
+    </div>
+  </div>
+
+  <!-- WhatsApp Number -->
+  <div class="field">
+    <label for="whatsapp_number">WhatsApp Number</label>
+    <div class="row" style="gap:8px; align-items:center;">
+      <span class="kbd" id="country-code">62</span>
+      <input id="whatsapp_number" name="whatsapp_number" type="text"
+             value="{{ settings.setting_bpos_whatsapp_number ?? '' }}"
+             placeholder="812xxxxxx">
+    </div>
+    <input type="hidden" name="country_code" value="{{ settings.setting_bpos_country_code ?? '62' }}">
+  </div>
+
+  <!-- Shipping Methods -->
+  <div class="field">
+    <label>Shipping Methods</label>
+    <div class="well-sm" style="max-height:160px; overflow:auto; padding:10px; background:#fafafa; border:1px solid #ddd;">
+      {% for method in delivery_methods %}
+        <label class="checkbox" style="display:block; margin-bottom:6px;">
+          <input type="checkbox"
+                 name="shipping_methods[]"
+                 value="{{ method.code }}"
+                 {{ method.code in settings.setting_bpos_shipping_methods ? 'checked' }}>
+          {{ method.title }}
+        </label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Payment Methods -->
+  <div class="field">
+    <label>Payment Methods</label>
+    <div class="well-sm" style="max-height:160px; overflow:auto; padding:10px; background:#fafafa; border:1px solid #ddd;">
+      {% for method in pay_methods %}
+        <label class="checkbox" style="display:block; margin-bottom:6px;">
+          <input type="checkbox"
+                 name="payment_methods[]"
+                 value="{{ method.code }}"
+                 {{ method.code in settings.setting_bpos_payment_methods ? 'checked' }}>
+          {{ method.title }}
+        </label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Payment Gateway -->
+  <div class="field">
+    <label>Payment Gateway</label>
+    <div class="well-sm" style="max-height:160px; overflow:auto; padding:10px; background:#fafafa; border:1px solid #ddd;">
+      {% for method in pay_methods %}
+        <label class="checkbox" style="display:block; margin-bottom:6px;">
+          <input type="checkbox"
+                 name="payment_gateway[]"
+                 value="{{ method.code }}"
+                 {{ method.code in settings.setting_bpos_payment_gateway ? 'checked' }}>
+          {{ method.title }}
+        </label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Default Shipping Method -->
+  <div class="field">
+    <label for="default_shipping_method">Default Shipping Method</label>
+    <select id="default_shipping_method"
+            name="default_shipping_method">
+      {% for method in delivery_methods %}
+        <option value="{{ method.code }}"
+          {{ method.code == settings.setting_bpos_default_shipping_method ? 'selected' }}>
+          {{ method.title }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Default Payment Method -->
+  <div class="field">
+    <label for="default_payment_method">Default Payment Method</label>
+    <select id="default_payment_method"
+            name="default_payment_method">
+      {% for method in pay_methods %}
+        <option value="{{ method.code }}"
+          {{ method.code == settings.setting_bpos_default_payment_method ? 'selected' }}>
+          {{ method.title }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Complete Order Status -->
+  <div class="field">
+    <label for="complete_order_status">Complete Order Status</label>
+    <select id="complete_order_status"
+            name="complete_order_status">
+      {% for os in order_statuses %}
+        <option value="{{ os.order_status_id }}"
+          {{ os.order_status_id == settings.setting_bpos_complete_order_status ? 'selected' }}>
+          {{ os.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
 
     <div class="field">
       <label for="pos_name">POS Display Name</label>

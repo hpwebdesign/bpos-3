@@ -65,23 +65,9 @@ class ControllerExtensionModuleBposSetting extends Controller {
 		$this->load->language('extension/module/bpos_setting');
 
 		$this->document->setTitle($this->language->get('heading_title2'));
-		$data['heading_title'] 	= $this->language->get('heading_title2');
+		
 
-		$this->document->addScript('view/javascript/bootstrap/js/bootstrap-checkbox.min.js');
-		$this->document->addStyle('view/javascript/desktop_theme.css');
-
-		$data['breadcrumbs'] = [];
-
-		$data['breadcrumbs'][] = [
-			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/home', 'user_token=' . $this->session->data['user_token'], true),
-		];
-
-		$data['breadcrumbs'][] = [
-			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('extension/module/bpos_setting', 'user_token=' . $this->session->data['user_token'], true),
-		];
-
+		$this->document->addStyle('view/javascript/bpos_setting.css');
 
 		$data['action'] = $this->url->link('extension/module/bpos_setting', 'user_token=' . $this->session->data['user_token'], true);
 
@@ -126,49 +112,41 @@ class ControllerExtensionModuleBposSetting extends Controller {
 			],
 		];
 
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
+				// BPOS SETTING
+		$this->load->model('setting/setting');
 
-			$this->load->model('setting/setting');
+        $settings = $this->model_setting_setting->getSetting($this->extension_code);
 
-			$bpos_status = isset($this->request->post['status']) && $this->request->post['status'] ? 1 : 0;
+        // === ambil currencies dari oc_currency ===
+        $this->load->model('localisation/currency');
+        $currencies_raw = $this->model_localisation_currency->getCurrencies();
 
+        $currencies = [];
+        foreach ($currencies_raw as $code => $row) {
+            if (empty($row['status'])) {
+                continue;
+            }
 
-			$code = $this->extension_code;
+            $currencies[] = [
+                'code'         => $code,
+                'title'        => $row['title'],
+                'symbol_left'  => $row['symbol_left'],
+                'symbol_right' => $row['symbol_right']
+            ];
+        }
 
-			$setting = [];
+        $current_currency = !empty($settings['bpos_currency'])
+            ? $settings['bpos_currency']
+            : $this->config->get('config_currency');
 
-			foreach ($inputs as $input) {
-				$setting[$code . "_" . $input['name']] = isset($this->request->post[$input['name']]) ? $this->request->post[$input['name']] : $input['default'];
-			}
+        $data = [
+            'settings'         => $settings,
+            'currencies'       => $currencies,
+            'current_currency' => $current_currency,
+            'save_url'         => $this->url->link('extension/module/bpos_setting/save', 'user_token='.$this->session->data['user_token'], true)
+        ];
 
-
-			// Default Store
-			$this->model_setting_setting->editSetting($code, $setting);
-
-			$this->model_setting_setting->editSetting('module_bpos_setting', ['module_bpos_setting_status' => $bpos_status]);
-
-			$this->load->model('setting/store');
-
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$this->response->redirect($this->url->link('extension/module/bpos_setting', 'user_token=' . $this->session->data['user_token'], true));
-		}
-
-		if (isset($this->error['warning'])) {
-			$data['error_warning'] = $this->error['warning'];
-		} else {
-			$data['error_warning'] = '';
-		}
-
-		if (isset($this->session->data['success'])) {
-			$data['success'] = $this->session->data['success'];
-
-			unset($this->session->data['success']);
-		} else {
-			$data['success'] = '';
-		}
-
-		foreach ($inputs as $input) {
+        foreach ($inputs as $input) {
 			$key = $this->extension_code . "_" . $input['name'];
 
 			if (isset($this->request->post[$key])) {
@@ -241,19 +219,202 @@ class ControllerExtensionModuleBposSetting extends Controller {
 			}
 		}
 
+
+		$data['breadcrumbs'] = [];
+
+		$data['breadcrumbs'][] = [
+			'text' => $this->language->get('text_home'),
+			'href' => $this->url->link('common/home', 'user_token=' . $this->session->data['user_token'], true),
+		];
+
+		$data['breadcrumbs'][] = [
+			'text' => $this->language->get('heading_title2'),
+			'href' => $this->url->link('extension/module/bpos_setting', 'user_token=' . $this->session->data['user_token'], true),
+		];
+
+        // === Stores ===
+        $this->load->model('setting/store');
+        $stores_raw = $this->model_setting_store->getStores();
+        $stores = [['store_id' => 0, 'name' => 'Default Store']];
+        foreach ($stores_raw as $store) {
+            $stores[] = [
+                'store_id' => (int)$store['store_id'],
+                'name'     => html_entity_decode($store['name'], ENT_QUOTES, 'UTF-8')
+            ];
+        }
+
+        // === Languages ===
+        $this->load->model('localisation/language');
+        $languages_raw = $this->model_localisation_language->getLanguages();
+        $languages = [];
+        foreach ($languages_raw as $lang) {
+            if (!$lang['status']) continue;
+            $languages[] = [
+                'language_id' => $lang['language_id'],
+                'code' => $lang['code'],
+                'name' => $lang['name'],
+                'image' => $lang['image']
+            ];
+        }
+
+        // setting aktif
+        $current_store_id = $settings['bpos_store_id'] ?? 0;
+        $current_languages = array_column($languages, 'code');
+
+        $data['stores'] = $stores;
+        $data['languages'] = $languages;
+        $data['current_store_id'] = $current_store_id;
+        $data['current_languages'] = $current_languages;
+        $current_role_id = isset($settings['bpos_role_default']) ? $settings['bpos_role_default'] : 'admin';
+        $data['current_role_id'] = $current_role_id;
+        $data['current_printer'] = isset($settings['bpos_printer']) ? $settings['bpos_printer'] : 'none';
+        $data['autoprint'] = !empty($settings['bpos_autoprint']);
+        $data['devices'] = [
+        ['code' => 'POS-01', 'name' => 'POS Terminal 1'],
+        ['code' => 'POS-02', 'name' => 'POS Terminal 2']
+        ];
+
 		$data['uninstall'] = $this->url->link('extension/module/bpos_setting/uninstallPage', 'user_token=' . $this->session->data['user_token'], true);
 
 		$data['user_token'] = $this->session->data['user_token'];
 		$this->load->model('localisation/order_status');
 
 		$data['order_statuses'] = $this->model_localisation_order_status->getOrderStatuses();
-		
+		$data['heading_title'] 	= $this->language->get('heading_title2');
 		$data['header'] 				= $this->load->controller('common/header');
 		$data['column_left'] 			= $this->load->controller('common/column_left');
 		$data['footer'] 				= $this->load->controller('common/footer');
 
 		$this->response->setOutput($this->load->view('extension/module/bpos_setting', $data));
 	}
+
+	public function save() {
+        $this->language->load('extension/module/bpos_setting');
+        $json = [];
+        $data = [];
+        if ($this->request->server['REQUEST_METHOD'] == 'POST' && $this->validate()) {
+            $this->load->model('setting/setting');
+
+			$bpos_status = isset($this->request->post['status']) && $this->request->post['status'] ? 1 : 0;
+
+
+			$code = $this->extension_code;
+
+			$setting = [];
+
+			
+			foreach ($this->request->post as $key => $value) {
+                $setting[$code . "_" . $key] = $value;
+            }
+
+
+			// Default Store
+			$this->model_setting_setting->editSetting($code, $setting);
+
+			$this->model_setting_setting->editSetting('module_bpos_setting', ['module_bpos_setting_status' => $bpos_status]);
+            $json['success'] = true;
+            $json['message'] = $this->language->get('text_success');
+        } else {
+            $json['success'] = false;
+            $json['message'] = isset($this->error['warning']) ? $this->error['warning'] : $this->language->get('error_permission');
+        }
+
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode($json));
+    }
+
+    public function users() {
+        $this->load->model('extension/module/bpos');
+        $json = [
+            'success' => true,
+            'data'    => $this->model_extension_module_bpos->getUsers()
+        ];
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode($json));
+    }
+
+    public function addUser() {
+        $this->load->model('extension/module/bpos');
+        $json = [];
+
+        if ($this->request->server['REQUEST_METHOD'] == 'POST') {
+            $username = trim($this->request->post['username'] ?? '');
+            $pin = trim($this->request->post['pin'] ?? '');
+            $role = strtolower(trim($this->request->post['role'] ?? 'staff'));
+            $status = (int)($this->request->post['status'] ?? 1);
+
+            if (!$username || strlen($pin) < 4 || strlen($pin) > 6) {
+                $json = ['success' => false, 'message' => 'Invalid username or PIN (4–6 digits required)'];
+            } elseif ($this->model_extension_module_bpos->userExists($username)) {
+                $json = ['success' => false, 'message' => 'Username already exists'];
+            } else {
+                $this->model_extension_module_bpos->addUser($username, $pin, $role, $status);
+                $json = ['success' => true, 'message' => 'User created successfully'];
+            }
+        } else {
+            $json = ['success' => false, 'message' => 'Invalid request'];
+        }
+
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode($json));
+    }
+
+    public function editUser() {
+        $this->load->model('extension/module/bpos');
+        $json = [];
+
+        if ($this->request->server['REQUEST_METHOD'] == 'POST') {
+            $id = (int)$this->request->post['user_id'];
+            $username = trim($this->request->post['username'] ?? '');
+            $pin = trim($this->request->post['pin'] ?? '');
+            $role = strtolower(trim($this->request->post['role'] ?? 'staff'));
+            $status = (int)($this->request->post['status'] ?? 1);
+
+            if ($this->model_extension_module_bpos->userExists($username, $id)) {
+                $json = ['success' => false, 'message' => 'Username already exists'];
+            } else {
+                $this->model_extension_module_bpos->editUser($id, $username, $pin, $role, $status);
+                $json = ['success' => true, 'message' => 'User updated successfully'];
+            }
+        } else {
+            $json = ['success' => false, 'message' => 'Invalid request'];
+        }
+
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode($json));
+    }
+
+    public function deleteUser() {
+        $this->load->model('extension/module/bpos');
+        $json = [];
+
+        if (!empty($this->request->post['user_id'])) {
+            $this->model_extension_module_bpos->deleteUser((int)$this->request->post['user_id']);
+            $json = ['success' => true, 'message' => 'User deleted'];
+        } else {
+            $json = ['success' => false, 'message' => 'Missing user_id'];
+        }
+
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode($json));
+    }
+
+    public function setUserStatus() {
+        $this->load->model('extension/module/bpos');
+        $json = [];
+
+        if (!empty($this->request->post['user_id'])) {
+            $user_id = (int)$this->request->post['user_id'];
+            $status = (int)$this->request->post['status'];
+            $this->model_extension_module_bpos->setUserStatus($user_id, $status);
+            $json = ['success' => true, 'message' => 'Status updated'];
+        } else {
+            $json = ['success' => false, 'message' => 'Missing user_id'];
+        }
+
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode($json));
+    }
 
 	public function checkDatabase() {
 		return $this->validateTable() ? true : false;

@@ -22,7 +22,7 @@ class ControllerBposCustomer extends ControllerBposBposBase {
             'add_customer'  => $this->url->link('bpos/customer/add', '', true)
         ];
 
-        $data['title']      = $this->config->get('setting_bpos_title_'.$this->config->get('config_language_id')) ? 'Customers - '.$this->config->get('setting_bpos_title_'.$this->config->get('config_language_id')) : 'Customers - POS System';
+        $data['title']      = $this->config->get('bpos_title_'.$this->config->get('config_language_id')) ? 'Customers - '.$this->config->get('bpos_title_'.$this->config->get('config_language_id')) : 'Customers - POS System';
         $data['language']   = $this->load->controller('bpos/language');
         $data['currency']   = $this->load->controller('bpos/currency');
         $data['store']      = $this->load->controller('bpos/store');
@@ -70,7 +70,7 @@ class ControllerBposCustomer extends ControllerBposBposBase {
                 'orders'      => (int)$r['orders'],
                 'last'        => $r['last_order'] ?? '',
                 'spent'       => (float)$r['total_spent'],
-                'joined'      => $this->config->get('setting_bpos_date_format') ? date($this->config->get('setting_bpos_date_format'),strtotime(substr($r['date_added'], 0, 10))) : substr($r['date_added'], 0, 10),
+                'joined'      => $this->config->get('bpos_date_format') ? date($this->config->get('bpos_date_format'),strtotime(substr($r['date_added'], 0, 10))) : substr($r['date_added'], 0, 10),
                 'notes'       => $r['custom_field'] ?? '',
             ];
         }
