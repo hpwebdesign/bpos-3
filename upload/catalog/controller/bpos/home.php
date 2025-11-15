@@ -1,23 +1,8 @@
 <?php
-class ControllerBposHome extends Controller {
-    public function __construct($registry) {
-        parent::__construct($registry);
-        if (!$this->config->get('bpos_status')) {
-            $this->response->redirect($this->url->link('common/home', '', true));
-        }
-        // Load library user dari admin
-        $this->user = new Cart\User($this->registry);
-
-        // Cek login
-        if (!$this->user->isLogged()) {
-            $this->response->redirect($this->url->link('bpos/login', '', true));
-        }
-    }
-
+require_once(DIR_APPLICATION . 'controller/bpos/bpos_base.php');
+class ControllerBposHome extends ControllerBposBposBase  {
     public function index() {
-        if (!$this->user->isLogged()) {
-            $this->response->redirect($this->url->link('bpos/login', '', true));
-        }
+        $this->checkPermission('home');
         $this->load->language('bpos/bpos');
         $this->load->model('catalog/category');
         $this->load->model('catalog/product');
@@ -85,7 +70,7 @@ class ControllerBposHome extends Controller {
                 'output' => $this->load->view('bpos/home', $data)
             ]));
         } else {
-            $data['title'] = 'Home - POS System';
+            $data['title']      = $this->config->get('setting_bpos_title_'.$this->config->get('config_language_id')) ? 'Home - '.$this->config->get('setting_bpos_title_'.$this->config->get('config_language_id')) : 'Home - POS System';
             $data['content'] = $this->load->view('bpos/home', $data);
             $data['server']  = HTTPS_SERVER;
             $this->response->setOutput($this->load->view('bpos/common/layout', $data));

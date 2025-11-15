@@ -442,14 +442,21 @@ function loadContent(route) {
                 }, 2000);
             },
             success: function(json) {
-                if (json['output']) {
-                    $('#main-content').html(json['output']);
-                    if (route == 'bpos/home') {
-                         initCategoryCarousel();
-                    }
-                } else {
-                    $('#main-content').html('<p>No content</p>');
+
+                if (json.unauthorized) {
+                    $('#main-content').html(json.html);
+                    return;
                 }
+
+                if (json.output) {
+                    $('#main-content').html(json.output);
+                    if (route == 'bpos/home') {
+                        initCategoryCarousel();
+                    }
+                    return;
+                }
+
+                $('#main-content').html('<p>No content</p>');
             },
             error: function() {
                 $('#main-content').html('<p>Error loading content</p>');

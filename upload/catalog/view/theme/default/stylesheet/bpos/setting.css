@@ -462,7 +462,7 @@
     align-items: center;
     justify-content: center;
     padding: 16px;
-    z-index: 60;
+    z-index: 9999;
     animation: fadeIn .18s ease;
 }
 .modal .sheet-setting {

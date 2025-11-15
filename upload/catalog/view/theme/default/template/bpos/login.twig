@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Barik POS — Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="catalog/view/theme/default/stylesheet/login-bpos.css?v={{ random() }}">
+  <link rel="stylesheet" href="catalog/view/theme/default/stylesheet/bpos/login.css?v={{ random() }}">
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
 <body>
@@ -53,9 +53,13 @@
         <button type="submit" class="btn">{{ text_signin }}</button>
       </form>
 
-      <form id="panel-pin" role="tabpanel" aria-labelledby="tab-pin" class="pin-wrap" autocomplete="off">
+      <form id="panel-pin" action="{{ action }}" method="post" role="tabpanel" aria-labelledby="tab-pin" class="pin-wrap" autocomplete="off">
+        <div class="field">
+          <label class="label" for="username">Username</label>
+          <input class="input" id="username" name="username" type="text" autocomplete="username" required autofocus>
+        </div>
         <label class="label" for="pinInput">Enter your 6-digit PIN</label>
-        <input id="pinInput" name="pin" type="password" inputmode="numeric" pattern="\\d*" maxlength="6" class="sr-only" aria-hidden="false">
+        <input id="pinInput" name="pin" type="password" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" class="sr-only" aria-hidden="false">
         <div class="pin-input" aria-live="polite" aria-label="PIN dots">
           <div class="pin-dot" data-i="0"></div>
           <div class="pin-dot" data-i="1"></div>

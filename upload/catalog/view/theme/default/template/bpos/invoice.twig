@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>{{ title }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="catalog/view/theme/default/stylesheet/bpos-invoice.css?v={{ random() }}">
+    <link rel="stylesheet" href="catalog/view/theme/default/stylesheet/bpos/invoice.css?v={{ random() }}">
     </head>
   <body>
 <div class="actions">
@@ -33,7 +33,7 @@
     </div>
 
     <div class="summary">
-      <h2 class="title"><span></span>{{ text_invoice }}</h2>
+      <h2 class="title"><span></span>{{ receipt_header }}</h2>
       <div class="kv">
         <span>{{ text_reference }}</span><b data-ref>{{ invoice_no }}</b>
         <span>{{ text_date }}</span><b>{{ date_added }}</b>

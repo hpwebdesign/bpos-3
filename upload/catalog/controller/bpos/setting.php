@@ -1,6 +1,8 @@
 <?php
-class ControllerBposSetting extends Controller {
+require_once(DIR_APPLICATION . 'controller/bpos/bpos_base.php');
+class ControllerBposSetting extends ControllerBposBposBase {
     public function index() {
+        $this->checkPermission('setting');
         $this->load->language('bpos/setting');
         $this->load->model('bpos/setting');
 

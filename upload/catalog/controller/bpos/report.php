@@ -1,17 +1,8 @@
 <?php
-class ControllerBposReport extends Controller {
-    public function __construct($registry) {
-        parent::__construct($registry);
-        if (!$this->config->get('bpos_status')) {
-            $this->response->redirect($this->url->link('common/home', '', true));
-        }
-        $this->user = new Cart\User($this->registry);
-
-        if (!$this->user->isLogged()) {
-            $this->response->redirect($this->url->link('bpos/login', '', true));
-        }
-    }
+require_once(DIR_APPLICATION . 'controller/bpos/bpos_base.php');
+class ControllerBposReport extends ControllerBposBposBase {
     public function index() {
+        $this->checkPermission('report');
         $this->load->language('bpos/report');
 
         $this->load->model('bpos/report');

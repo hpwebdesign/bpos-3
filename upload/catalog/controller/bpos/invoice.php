@@ -1,19 +1,5 @@
 <?php
 class ControllerBposInvoice extends Controller {
-    public function __construct($registry) {
-        parent::__construct($registry);
-        if (!$this->config->get('bpos_status')) {
-            $this->response->redirect($this->url->link('common/home', '', true));
-        }
-        // Load library user dari admin
-        $this->user = new Cart\User($this->registry);
-
-        // Cek login
-        if (!$this->user->isLogged()) {
-            $this->response->redirect($this->url->link('bpos/login', '', true));
-        }
-    }
-
     public function index() {
         if (!isset($this->request->get['order_id'])) {
             return $this->response->redirect($this->url->link('bpos/home'));
@@ -42,8 +28,8 @@ class ControllerBposInvoice extends Controller {
         $data['store_email']   = isset($store_config['config_email']) ? $store_config['config_email'] : '';
         $data['store_website'] = $order_info['store_url'];
         $data['invoice_no'] = $order_info['invoice_prefix'] . $order_info['invoice_no'];
-        $data['date_added'] = date('d/m/Y', strtotime($order_info['date_added']));
-        $data['due_date']   = date('d/m/Y', strtotime($order_info['date_added'] . ' +3 days'));
+        $data['date_added'] = $this->config->get('setting_bpos_date_format') ? date($this->config->get('setting_bpos_date_format'),strtotime($order_info['date_added'])) : date('d/m/Y', strtotime($order_info['date_added']));
+        $data['due_date']   = $this->config->get('setting_bpos_date_format') ? date($this->config->get('setting_bpos_date_format'),strtotime($order_info['date_added']. ' +3 days')) : date('d/m/Y', strtotime($order_info['date_added'] . ' +3 days'));
         $data['tax_id']     = 0;
         $data['customer_name']  = trim($order_info['firstname'] . ' ' . $order_info['lastname']);
         $data['customer_email'] = $order_info['email'];
@@ -137,6 +123,8 @@ class ControllerBposInvoice extends Controller {
         } else {
             $data['notes'] = '';
         }
+
+        $data['receipt_header']      = $this->config->get('setting_bpos_header_'.$this->config->get('config_language_id')) ? 'Orders - '.$this->config->get('setting_bpos_header_'.$this->config->get('config_language_id')) : 'Receipt';
 
         $data['approved_by'] = 'Finance';
         $data['terms'] = "";

@@ -240,9 +240,9 @@
     </div>
 
     <div class="field">
-      <label>Session Timeout</label>
+      <label>Session Timeout (Hours)</label>
       <input id="session_timeout" name="session_timeout" type="number"
-             value="{{ settings.setting_bpos_session_timeout ?? 30 }}">
+             value="{{ settings.setting_bpos_session_timeout ?? 1 }}">
     </div>
 
     <div class="field">
@@ -464,7 +464,7 @@
 </div>
 
  
-  <link rel="stylesheet" href="catalog/view/theme/default/stylesheet/bpos_setting.css">
+  <link rel="stylesheet" href="catalog/view/theme/default/stylesheet/bpos/setting.css">
 <script>
 (function(){
   if (!window.notyf) {
@@ -808,28 +808,28 @@ const roleSelect = document.getElementById('role_default');
 // default structure (admin & staff)
 let perms = {
   admin: {
-    neworder: {{ settings.setting_bpos_perm_admin_neworder ? 1 : 0 }},
-    refund: {{ settings.setting_bpos_perm_admin_refund ? 1 : 0 }},
-    editprice: {{ settings.setting_bpos_perm_admin_editprice ? 1 : 0 }},
-    viewcost: {{ settings.setting_bpos_perm_admin_viewcost ? 1 : 0 }},
-    exportsales: {{ settings.setting_bpos_perm_admin_exportsales ? 1 : 0 }}
+    home: {{ settings.setting_bpos_perm_admin_home ? 1 : 0 }},
+    order: {{ settings.setting_bpos_perm_admin_order ? 1 : 0 }},
+    report: {{ settings.setting_bpos_perm_admin_report ? 1 : 0 }},
+    customer: {{ settings.setting_bpos_perm_admin_customer ? 1 : 0 }},
+    setting: {{ settings.setting_bpos_perm_admin_setting ? 1 : 0 }}
   },
   staff: {
-    neworder: {{ settings.setting_bpos_perm_staff_neworder ? 1 : 0 }},
-    refund: {{ settings.setting_bpos_perm_staff_refund ? 1 : 0 }},
-    editprice: {{ settings.setting_bpos_perm_staff_editprice ? 1 : 0 }},
-    viewcost: {{ settings.setting_bpos_perm_staff_viewcost ? 1 : 0 }},
-    exportsales: {{ settings.setting_bpos_perm_staff_exportsales ? 1 : 0 }}
+    home: {{ settings.setting_bpos_perm_staff_home ? 1 : 0 }},
+    order: {{ settings.setting_bpos_perm_staff_order ? 1 : 0 }},
+    report: {{ settings.setting_bpos_perm_staff_report ? 1 : 0 }},
+    customer: {{ settings.setting_bpos_perm_staff_customer ? 1 : 0 }},
+    setting: {{ settings.setting_bpos_perm_staff_setting ? 1 : 0 }}
   }
 };
 
 // label map
 const PERM_LABELS = {
-  neworder: 'New Order',
-  refund: 'Refund',
-  editprice: 'Edit Item Price',
-  viewcost: 'View Cost',
-  exportsales: 'Export Sales'
+  home: 'Create Order',
+  order: 'Orders Page',
+  report: 'Reports Page',
+  customer: 'Customers Page',
+  setting: 'Settings'
 };
 
 // render permissions for current role

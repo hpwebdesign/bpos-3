@@ -1,18 +1,8 @@
 <?php
-class ControllerBposOrder extends Controller {
-    public function __construct($registry) {
-        parent::__construct($registry);
-        if (!$this->config->get('bpos_status')) {
-            $this->response->redirect($this->url->link('common/home', '', true));
-        }
-        $this->user = new Cart\User($this->registry);
-
-        if (!$this->user->isLogged()) {
-            $this->response->redirect($this->url->link('bpos/login', '', true));
-        }
-    }
-
+require_once(DIR_APPLICATION . 'controller/bpos/bpos_base.php');
+class ControllerBposOrder extends ControllerBposBposBase {
     public function index() {
+        $this->checkPermission('order');
         $this->load->language('account/order');
         $this->load->model('bpos/order');
         $this->load->language('bpos/bpos');

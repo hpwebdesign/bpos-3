@@ -90,16 +90,17 @@ $(function () {
   //   // alert('Password login submitted');
   // });
 
-  $panelPin.on('submit', function(e){
-    e.preventDefault();
-    checkOnlineState();
-    if ($pinInput.val().length !== 6) {
-      alert('Please enter a 6-digit PIN');
-      return;
-    }
-    alert('PIN login submitted: ' + $pinInput.val().replace(/\d/g,'•'));
-    clearPin();
-  });
+  // $panelPin.on('submit', function(e){
+  //   e.preventDefault();
+  //   checkOnlineState();
+  //   if ($pinInput.val().length !== 6) {
+  //     alert('Please enter a 6-digit PIN');
+  //     return;
+  //   }
+  //    this.submit();
+  //   clearPin();
+
+  // });
 
   // Online status
   var $statusDot  = $('#statusDot');
