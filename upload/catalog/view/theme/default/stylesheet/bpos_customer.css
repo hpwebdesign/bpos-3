@@ -96,9 +96,15 @@
     align-items: center;
     font-weight: normal;
 }
-.customers .btn:active {
-    transform: translateY(1px)
+
+.customers .btn:hover {
+    transform: translateY(2px)
 }
+
+.customers .btn:active {
+    transform: translateY(2px)
+}
+
 .customers .btn.ghost {
     background: #fff;
     color: var(--navy);
@@ -114,7 +120,8 @@
     border: 1px solid var(--line);
     border-radius: 12px;
     padding: 10px 12px;
-    background: #fff
+    background: #fff;
+    font-size: 13px;
 }
 /* Surface */
 
