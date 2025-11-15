@@ -93,7 +93,8 @@
     box-shadow: var(--shadow);
     display: inline-flex;
     gap: 8px;
-    align-items: center
+    align-items: center;
+    font-weight: normal;
 }
 .customers .btn:active {
     transform: translateY(1px)
