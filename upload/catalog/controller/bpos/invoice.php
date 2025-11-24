@@ -125,7 +125,7 @@ class ControllerBposInvoice extends Controller {
         }
 
         $data['receipt_header']      = $this->config->get('bpos_header_'.$this->config->get('config_language_id')) ? 'Orders - '.$this->config->get('bpos_header_'.$this->config->get('config_language_id')) : 'Receipt';
-
+        $data['pos_name'] = $this->config->get('bpos_pos_name') ? $this->config->get('bpos_pos_name') : $this->config->get('config_name');
         $data['approved_by'] = 'Finance';
         $data['terms'] = "";
         $data['home'] = $this->url->link('bpos/home','',true);

@@ -12,22 +12,44 @@ class ModelExtensionModuleBpos extends Model {
     return $this->db->query($sql)->rows;
     }
 
-    public function addUser($username, $pin, $role, $status) {
+    public function getSeoPos($store_id, $language_id) {
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "seo_url WHERE `query` = 'bpos/home'  AND store_id = '" . (int)$store_id . "' AND language_id = '" . (int)$language_id . "'");
+        if ($query->num_rows) {
+            return $query->row['seo_url_id'];
+        }
+        return false;
+    }
+
+    public function addUser($username, $pin, $role, $status,$password) {
         $this->db->query("INSERT INTO " . DB_PREFIX . "user_bpos 
             SET username = '" . $this->db->escape($username) . "', 
                 pin = '" . $this->db->escape($pin) . "', 
+                password = '" . $this->db->escape(password_hash($password, PASSWORD_DEFAULT)) . "',
                 role = '" . $this->db->escape($role) . "', 
                 status = '" . (int)$status . "', 
                 date_added = NOW()");
     }
+    // public function addUser($data) {
+    //     $this->db->query("INSERT INTO " . DB_PREFIX . "bpos_user SET 
+    //         username = '" . $this->db->escape($data['username']) . "',
+    //         pin = '" . $this->db->escape($data['pin']) . "',
+    //         password = '" . $this->db->escape(password_hash($data['password'], PASSWORD_DEFAULT)) . "',
+    //         role = '" . $this->db->escape($data['role']) . "',
+    //         active = '" . (int)$data['active'] . "',
+    //         date_added = NOW()"
+    //     );
+    // }
 
-    public function editUser($id, $username, $pin, $role, $status) {
+    public function editUser($id, $username, $pin, $role, $status,$password) {
         $sql = "UPDATE " . DB_PREFIX . "user_bpos 
                 SET username = '" . $this->db->escape($username) . "',
                     role = '" . $this->db->escape($role) . "',
                     status = '" . (int)$status . "'";
         if ($pin) {
             $sql .= ", pin = '" . $this->db->escape($pin) . "'";
+        }
+        if (!empty($password)) {
+            $sql .= ", password = '" . $this->db->escape(password_hash($password, PASSWORD_DEFAULT)) . "'";
         }
         $sql .= " WHERE user_bpos_id = '" . (int)$id . "'";
         $this->db->query($sql);

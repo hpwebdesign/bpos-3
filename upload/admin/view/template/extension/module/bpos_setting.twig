@@ -161,13 +161,13 @@
     <div class="field">
       <label for="pos_name">POS Display Name</label>
       <input id="pos_name" name="pos_name" type="text"
-             value="{{ settings.bpos_pos_name ?? '' }}">
+             value="{{ settings.bpos_pos_name ?? store_name }}">
     </div>
 
     <div class="field">
       <label for="pos_path">POS URL Path</label>
       <input id="pos_path" name="pos_path" type="text"
-             value="{{ settings.bpos_pos_path ?? '/pos' }}">
+             value="{{ settings.bpos_pos_path ?? 'pos' }}">
     </div>
 
     <div class="field">
@@ -562,10 +562,6 @@
             <input id="u-username" type="text" placeholder="e.g., cashier01">
           </div>
           <div class="field">
-            <label for="u-pin">PIN</label>
-            <input id="u-pin" type="password" placeholder="4–6 digits">
-          </div>
-          <div class="field">
             <label for="u-role">Role</label>
             <select id="u-role">
         <option value="admin">
@@ -576,6 +572,15 @@
         </option>
             </select>
           </div>
+          <div class="field">
+            <label for="u-pin">PIN</label>
+            <input id="u-pin" type="password" placeholder="6 digits">
+          </div>
+          <div class="field">
+            <label for="u-password">Password</label>
+            <input id="u-password" type="password" placeholder="Password">
+          </div>
+          
           <div class="field">
             <label for="u-active">Active</label>
             <div class="row"><div id="u-active" class="toggle on"><i></i></div><span>Enable login</span></div>
@@ -731,6 +736,7 @@ $(function(){
     $('#user-modal-title').text(mode==='create'?'New User':'Edit User');
     $('#u-username').val(user?user.username:'');
     $('#u-pin').val('');
+    $('#u-password').val('');
     $('#u-role').val(user?user.role:'staff');
     $('#u-active').toggleClass('on',user?user.active:true);
 
@@ -757,6 +763,7 @@ $(function(){
   $('.user-modal-save').on('click', async function(){
     const username = $('#u-username').val().trim();
     const pin = $('#u-pin').val().trim();
+    const password = $('#u-password').val().trim();
     const role = $('#u-role').val();
     const active = $('#u-active').hasClass('on') ? 1 : 0;
 
@@ -764,7 +771,7 @@ $(function(){
     if(window.mUser.mode==='create' && (pin.length<4 || pin.length>6))
       return showToast("PIN 4–6 digits", false);
 
-    const payload = { username, pin, role, status: active };
+    const payload = { username, pin, role, password, status: active };
     if(window.mUser.mode==='edit') payload.user_id = window.mUser.id;
 
     const route = window.mUser.mode==='create'

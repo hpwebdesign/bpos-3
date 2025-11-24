@@ -23,6 +23,7 @@ class ControllerBposCustomer extends ControllerBposBposBase {
         ];
 
         $data['title']      = $this->config->get('bpos_title_'.$this->config->get('config_language_id')) ? 'Customers - '.$this->config->get('bpos_title_'.$this->config->get('config_language_id')) : 'Customers - POS System';
+        $data['pos_name'] = $this->config->get('bpos_pos_name') ? $this->config->get('bpos_pos_name') : $this->config->get('config_name');
         $data['language']   = $this->load->controller('bpos/language');
         $data['currency']   = $this->load->controller('bpos/currency');
         $data['store']      = $this->load->controller('bpos/store');

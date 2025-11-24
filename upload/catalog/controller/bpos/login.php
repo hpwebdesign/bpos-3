@@ -28,17 +28,22 @@ class ControllerBposLogin extends Controller {
                 $password = html_entity_decode($this->request->post['password'], ENT_QUOTES, 'UTF-8');
 
                 if (!$this->user->login($username, $password)) {
-                    $data['error_warning'] = 'Wrong Username or Password!';
+                    if (!$this->user_bpos->login($username, $password)) {
+                         $data['error_warning'] = 'Wrong Username or Password!';
+                    } else {
+                        $this->response->redirect($this->url->link('bpos/home', '', true));
+                    }
+                   
                 } else {
                     $this->response->redirect($this->url->link('bpos/home', '', true));
                 }
             }
 
             if (isset($this->request->post['pin'])) {
-
+                $username = $this->request->post['username'];
                 $pin = $this->request->post['pin'];
 
-                if (!$this->user_bpos->loginByPin($pin)) {
+                if (!$this->user_bpos->loginByPin($username,$pin)) {
                     $data['error_warning'] = 'Wrong PIN!';
                 } else {
                     $this->response->redirect($this->url->link('bpos/home', '', true));
@@ -58,7 +63,7 @@ class ControllerBposLogin extends Controller {
         } else {
             $data['logo'] = '';
         }
-
+         $data['pos_name'] = $this->config->get('bpos_pos_name') ? $this->config->get('bpos_pos_name') : $this->config->get('config_name');
         $data['action'] = $this->url->link('bpos/login', '', true);
         $this->response->setOutput($this->load->view('bpos/login', $data));
     }

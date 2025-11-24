@@ -56,7 +56,8 @@ class ControllerBposOrder extends ControllerBposBposBase {
         ];
 
 
-        $data['title']      = 'Orders - POS System';
+        $data['title']      = $this->config->get('bpos_title_'.$this->config->get('config_language_id')) ? 'Orders - '.$this->config->get('bpos_title_'.$this->config->get('config_language_id')) : 'Orders - POS System';
+        $data['pos_name'] = $this->config->get('bpos_pos_name') ? $this->config->get('bpos_pos_name') : $this->config->get('config_name');
         $data['language']   = $this->load->controller('bpos/language');
         $data['currency']   = $this->load->controller('bpos/currency');
         $data['store']      = $this->load->controller('bpos/store');

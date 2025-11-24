@@ -27,10 +27,10 @@ class User_BPOS {
         }
     }
 
-    public function loginByPin($pin) {
+    public function loginByPin($username,$pin) {
         $query = $this->db->query("
             SELECT * FROM " . DB_PREFIX . "user_bpos
-            WHERE pin = '" . $this->db->escape($pin) . "'
+            WHERE  username = '" . $this->db->escape($username) . "' AND pin = '" . $this->db->escape($pin) . "'
             AND status = 1
         ");
 
@@ -42,6 +42,37 @@ class User_BPOS {
             $this->role         = $query->row['role'];
 
             return true;
+        }
+
+        return false;
+    }
+
+    public function login($username, $password) {
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "user_bpos 
+            WHERE username = '" . $this->db->escape($username) . "' 
+              AND status = 1 LIMIT 1");
+
+        if ($query->num_rows) {
+            $user = $query->row;
+
+            // Cek password hash
+            if (!empty($user['password']) && password_verify($password, $user['password'])) {
+                $this->session->data['bpos_user_id'] = $query->row['user_bpos_id'];
+                $this->user_bpos_id = $query->row['user_bpos_id'];
+                $this->username     = $query->row['username'];
+                $this->role         = $query->row['role'];
+                
+                return true;
+            }
+
+            // fallback: cek PIN
+            if ($user['pin'] && $user['pin'] === $password) {
+                $this->session->data['bpos_user_id'] = $query->row['user_bpos_id'];
+                $this->user_bpos_id = $query->row['user_bpos_id'];
+                $this->username     = $query->row['username'];
+                $this->role         = $query->row['role'];
+                return true;
+            }
         }
 
         return false;

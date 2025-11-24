@@ -57,7 +57,7 @@ class ControllerBposHome extends ControllerBposBposBase  {
         $ajax_url = $this->url->link('bpos/home', 'page={page}&category_id='.$category_id, true);
         $pagination->url = "javascript:loadPage('" . $ajax_url . "');";
         $data['pagination'] = $pagination->render();
-
+        $data['pos_name'] = $this->config->get('bpos_pos_name') ? $this->config->get('bpos_pos_name') : $this->config->get('config_name');
         $data['language'] = $this->load->controller('bpos/common/language');
         $data['currency'] = $this->load->controller('bpos/common/currency');
         $data['store']    = $this->load->controller('bpos/common/store');

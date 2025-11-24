@@ -475,6 +475,14 @@
     transform: translateY(8px) scale(.98);
     opacity: 1;
     animation: popIn .26s ease forwards;
+    left: 45%;
+    position: relative;
+}
+@media (max-width: 768px) {
+    .modal .sheet-setting {
+        left: auto;
+        position: relative;
+    }
 }
 .sheet-setting header {
     padding: 14px 16px;

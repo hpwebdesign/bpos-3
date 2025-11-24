@@ -278,7 +278,7 @@ class ControllerExtensionModuleBposSetting extends Controller {
 
 		$data['user_token'] = $this->session->data['user_token'];
 		$this->load->model('localisation/order_status');
-
+		$data['store_name'] = $this->config->get('config_name');
 		$data['order_statuses'] = $this->model_localisation_order_status->getOrderStatuses();
 		$data['heading_title'] 	= $this->language->get('heading_title2');
 		$data['header'] 				= $this->load->controller('common/header');
@@ -294,7 +294,10 @@ class ControllerExtensionModuleBposSetting extends Controller {
         $data = [];
         if ($this->request->server['REQUEST_METHOD'] == 'POST' && $this->validate()) {
             $this->load->model('setting/setting');
-
+            $this->load->model('setting/store');
+            $this->load->model('extension/module/bpos');
+	        $this->load->model('design/seo_url');
+	        $this->load->model('localisation/language');
 			$bpos_status = isset($this->request->post['status']) && $this->request->post['status'] ? 1 : 0;
 
 
@@ -307,6 +310,37 @@ class ControllerExtensionModuleBposSetting extends Controller {
                 $setting[$code . "_" . $key] = $value;
             }
 
+            // ambil semua store
+	          $stores = [['store_id' => 0, 'name' => $this->language->get('text_default')]];
+	          foreach ($this->model_setting_store->getStores() as $store) {
+	              $stores[] = ['store_id' => $store['store_id'], 'name' => $store['name']];
+	          }
+
+	          // ambil semua bahasa
+	          $languages = $this->model_localisation_language->getLanguages();
+
+
+	          foreach ($stores as $store) {
+              foreach ($languages as $language) {
+                  // === PRODUCT PREFIX ===
+                  if (!empty($setting[$code . "_pos_path"])) {
+                      $prefix = $setting[$code . "_pos_path"];
+                      $seo_url_id = $this->model_extension_module_bpos->getSeoPos($store['store_id'], $language['language_id']);
+                      $data = [
+                          'store_id'    => $store['store_id'],
+                          'language_id' => $language['language_id'],
+                          'query'       => 'bpos/home',
+                          'keyword'     => $prefix
+                      ];
+                      if ($seo_url_id) {
+                          $this->model_design_seo_url->editSeoUrl($seo_url_id, $data);
+                      } else {
+                          $this->model_design_seo_url->addSeoUrl($data);
+                      }
+                  }
+
+              }
+          }
 
 			// Default Store
 			$this->model_setting_setting->editSetting($code, $setting);
@@ -340,15 +374,16 @@ class ControllerExtensionModuleBposSetting extends Controller {
         if ($this->request->server['REQUEST_METHOD'] == 'POST') {
             $username = trim($this->request->post['username'] ?? '');
             $pin = trim($this->request->post['pin'] ?? '');
+            $password = trim($this->request->post['password'] ?? '');
             $role = strtolower(trim($this->request->post['role'] ?? 'staff'));
             $status = (int)($this->request->post['status'] ?? 1);
 
-            if (!$username || strlen($pin) < 4 || strlen($pin) > 6) {
-                $json = ['success' => false, 'message' => 'Invalid username or PIN (4–6 digits required)'];
+            if (!$username || strlen($pin) != 6) {
+                $json = ['success' => false, 'message' => 'Invalid username or PIN (6 digits required)'];
             } elseif ($this->model_extension_module_bpos->userExists($username)) {
                 $json = ['success' => false, 'message' => 'Username already exists'];
             } else {
-                $this->model_extension_module_bpos->addUser($username, $pin, $role, $status);
+                $this->model_extension_module_bpos->addUser($username, $pin, $role, $status,$password);
                 $json = ['success' => true, 'message' => 'User created successfully'];
             }
         } else {
@@ -367,13 +402,14 @@ class ControllerExtensionModuleBposSetting extends Controller {
             $id = (int)$this->request->post['user_id'];
             $username = trim($this->request->post['username'] ?? '');
             $pin = trim($this->request->post['pin'] ?? '');
+            $password = trim($this->request->post['password'] ?? '');
             $role = strtolower(trim($this->request->post['role'] ?? 'staff'));
             $status = (int)($this->request->post['status'] ?? 1);
 
             if ($this->model_extension_module_bpos->userExists($username, $id)) {
                 $json = ['success' => false, 'message' => 'Username already exists'];
             } else {
-                $this->model_extension_module_bpos->editUser($id, $username, $pin, $role, $status);
+                $this->model_extension_module_bpos->editUser($id, $username, $pin, $role, $status,$password);
                 $json = ['success' => true, 'message' => 'User updated successfully'];
             }
         } else {
@@ -428,6 +464,12 @@ class ControllerExtensionModuleBposSetting extends Controller {
 		foreach ($queries as $query) {
 			$error += ($query->num_rows) ? 0 : 1;
 		}
+		if (!$error) {
+			$q = $this->db->query("SHOW COLUMNS FROM `" . DB_PREFIX . "user_bpos` LIKE 'password';");
+			if (!$q->num_rows) {
+				$error += 1;
+			}
+		}
 
 		return $error ? false : true;
 	}
@@ -443,12 +485,17 @@ class ControllerExtensionModuleBposSetting extends Controller {
 		 `user_bpos_id` INT(11) NOT NULL AUTO_INCREMENT,
 		  `username` VARCHAR(64) NOT NULL,
 		  `pin` VARCHAR(10) NOT NULL,
+		  `password` TEXT DEFAULT NULL,
 		  `role` ENUM('admin','staff') NOT NULL DEFAULT 'staff',
 		  `status` TINYINT(1) NOT NULL DEFAULT 1,
 		  `date_added` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		  PRIMARY KEY (`user_bpos_id`),
 		  UNIQUE KEY `username` (`username`)
 		  )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
+		}
+		$check_password = $this->db->query("SHOW COLUMNS FROM `" . DB_PREFIX . "user_bpos` LIKE 'password'");
+		if(!$check_password->num_rows){
+			$this->db->query("ALTER TABLE `" . DB_PREFIX . "user_bpos` ADD `password` TEXT DEFAULT NULL AFTER `pin`;");
 		}
 		$data['success'] = true;
 		$this->response->addHeader('Content-Type: application/json');
@@ -467,12 +514,17 @@ class ControllerExtensionModuleBposSetting extends Controller {
 			 `user_bpos_id` INT(11) NOT NULL AUTO_INCREMENT,
 			  `username` VARCHAR(64) NOT NULL,
 			  `pin` VARCHAR(10) NOT NULL,
+			  `password` TEXT DEFAULT NULL,
 			  `role` ENUM('admin','staff') NOT NULL DEFAULT 'staff',
 			  `status` TINYINT(1) NOT NULL DEFAULT 1,
 			  `date_added` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			  PRIMARY KEY (`user_bpos_id`),
 			  UNIQUE KEY `username` (`username`)
 			  )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;");
+		}
+		$check_password = $this->db->query("SHOW COLUMNS FROM `" . DB_PREFIX . "user_bpos` LIKE 'password'");
+		if(!$check_password->num_rows){
+			$this->db->query("ALTER TABLE `" . DB_PREFIX . "user_bpos` ADD `password` TEXT DEFAULT NULL AFTER `pin`;");
 		}
 		$this->response->redirect($this->url->link('extension/module/bpos_setting', 'user_token=' . $this->session->data['user_token'] . "&install=true", true));
 	}
