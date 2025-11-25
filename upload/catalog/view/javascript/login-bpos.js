@@ -39,49 +39,57 @@ $(function () {
   $tabPin.on('click', function(){ $('.alert-login').html(''); setTab('pin'); });
 
   // PIN keypad
-  var $pinInput = $('#pinInput');
-  var $dots     = $('.pin-dot');
+ var $pinInput = $('#pinInput');
+var $dots     = $('.pin-dot');
 
-  function renderDots() {
-    var v = $pinInput.val();
-    $dots.each(function(i, el){
-      $(el).toggleClass('filled', i < v.length);
-    });
-  }
-
-  function addDigit(d) {
-    if ($pinInput.val().length >= 6) return;
-    $pinInput.val($pinInput.val() + d);
-    renderDots();
-    checkOnlineState();
-  }
-
-  function backspace() {
-    $pinInput.val($pinInput.val().slice(0, -1));
-    renderDots();
-    checkOnlineState();
-  }
-
-  function clearPin() {
-    $pinInput.val('');
-    renderDots();
-    checkOnlineState();
-  }
-
-  $('.keypad .key').on('click', function(){
-    var $btn   = $(this);
-    var key    = $btn.attr('data-key');
-    var action = $btn.attr('data-action');
-
-    if (key) { addDigit(key); return; }
-    if (action === 'backspace') { backspace(); return; }
-    if (action === 'clear') { clearPin(); return; }
+function renderDots() {
+  var v = $pinInput.val() || '';
+  $dots.each(function(i, el){
+    $(el).toggleClass('filled', i < v.length);
   });
+}
+
+function addDigit(d) {
+  var current = $pinInput.val() || '';
+  if (current.length >= 6) return;
+  $pinInput.val(current + d);
+  renderDots();
+  checkOnlineState();
+}
+
+function backspace() {
+  var current = $pinInput.val() || '';
+  $pinInput.val(current.slice(0, -1));
+  renderDots();
+  checkOnlineState();
+}
+
+function clearPin() {
+  $pinInput.val('');
+  renderDots();
+  checkOnlineState();
+}
+
+// 🔥 PENTING: pakai DELEGATION ke document
+$(document).on('click', '.keypad .key', function (e) {
+  e.preventDefault();
+
+  const key    = this.dataset.key;
+  const action = this.dataset.action;
+
+  if (key) {
+    addDigit(key);
+  } else if (action === 'backspace') {
+    backspace();
+  } else if (action === 'clear') {
+    clearPin();
+  }
+});
 
   // Focus listeners to refresh status
-  $.each(['username','password'], function(_, id){
-    $('#' + id).on('focus', function(){ checkOnlineState(); });
-  });
+  $.each(['username','password','pin-username'], function(_, id){
+  $('#' + id).on('focus', function(){ checkOnlineState(); });
+});
 
   // Submit handlers
   // $panelPassword.on('submit', function(e){

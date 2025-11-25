@@ -6,6 +6,35 @@
     <author>HP Web Design</author>
     <link>https://hpwebdesign.io</link>
 
+    <file path="admin/language/*/common/column_left.php">
+        <operation error="skip">
+            <search><![CDATA[// Text]]></search>
+            <add position="after">
+                <![CDATA[// HPEV
+                    $_['text_bpos_setting']         = 'Barik POS';
+                    // HPEV]]>
+            </add>
+        </operation>
+    </file>
+
+    <file path="admin/controller/common/column_left.php">
+        <operation error="skip">
+            <search><![CDATA[$hpwd = array();]]></search>
+            <add position="after">
+                <![CDATA[
+                    // HPEV
+                    if ($this->user->hasPermission('access', 'extension/module/bpos_setting')) {
+                        $hpwd[] = array(
+                            'name'     => $this->language->get('text_bpos_setting'),
+                            'href'     => $this->url->link('extension/module/bpos_setting', 'user_token=' . $this->session->data['user_token'], true),
+                            'children' => array()
+                        );
+                    }
+                    // HPEV
+                ]]>
+            </add>
+        </operation>
+    </file>
     <!-- Tambah link POS di header admin -->
     <file path="admin/view/template/common/header.twig">
         <operation>

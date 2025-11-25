@@ -35,7 +35,7 @@
        {% if error_warning %}
             <div class="alert-login">{{ error_warning }}</div>
           {% endif %}
-      <form action="{{ action }}" method="post" id="panel-password" role="tabpanel" aria-labelledby="tab-password">
+      <form action="{{ action }}" method="post" id="panel-password" role="tabpanel" aria-labelledby="tab-password" novalidate>
         <div class="field">
           <label class="label" for="username">{{ text_username }}</label>
           <input class="input" id="username" name="username" type="text" autocomplete="username" required autofocus>
@@ -53,13 +53,13 @@
         <button type="submit" class="btn">{{ text_signin }}</button>
       </form>
 
-      <form id="panel-pin" action="{{ action }}" method="post" role="tabpanel" aria-labelledby="tab-pin" class="pin-wrap" autocomplete="off">
+      <form id="panel-pin" action="{{ action }}" method="post" role="tabpanel" aria-labelledby="tab-pin" class="pin-wrap" autocomplete="off" novalidate>
         <div class="field">
-          <label class="label" for="username">Username</label>
-          <input class="input" id="username" name="username" type="text" autocomplete="username" required autofocus>
+          <label class="label" for="pin-username">Username</label>
+          <input class="input" id="pin-username" name="username" type="text" autocomplete="username" required autofocus>
         </div>
         <label class="label" for="pinInput">Enter your 6-digit PIN</label>
-        <input id="pinInput" name="pin" type="password" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" class="sr-only" aria-hidden="false">
+        <input id="pinInput" name="pin" type="hidden">
         <div class="pin-input" aria-live="polite" aria-label="PIN dots">
           <div class="pin-dot" data-i="0"></div>
           <div class="pin-dot" data-i="1"></div>
