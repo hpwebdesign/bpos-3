@@ -96,7 +96,7 @@
             <add position="after"><![CDATA[
             if ($this->config->get('module_bpos_setting_status')) {
                 if (isset($this->session->data['bpos'])) {
-                    if (isset($this->session->data['order_id']) && ) {
+                    if (isset($this->session->data['order_id'])) {
                         $this->response->redirect($this->url->link('bpos/checkout/order_confirm', 'order_id='.$this->session->data['order_id'], true));
                     } else {
                         $this->response->redirect($this->url->link('bpos/home', '', true));
