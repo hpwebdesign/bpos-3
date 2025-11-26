@@ -191,7 +191,7 @@
     flex-direction: column;
     gap: 6px;
     background: #fff;
-    border: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
     padding: 12px;
     border-radius: 10px;
     transition: box-shadow .2s ease, transform .2s ease, border-color .2s ease;
