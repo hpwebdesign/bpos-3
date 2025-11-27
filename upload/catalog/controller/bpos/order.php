@@ -536,21 +536,42 @@ class ControllerBposOrder extends ControllerBposBposBase {
         $this->session->data['order_id'] = $order_id;
 
         $payment_code = isset($order_data['payment_code']) ? $order_data['payment_code'] : '';
-        $is_gateway   = false;
+        // $is_gateway   = false;
         $confirm_html = '';
 
-        $gateway_methods = $this->config->get('bpos_payment_gateway'); // daftar gateway kamu
-        $json['gateway_methods'] = $gateway_methods;
-        $json['payment_code'] = $payment_code;
+        // $gateway_methods = $this->config->get('bpos_payment_gateway'); // daftar gateway kamu
+        // $json['gateway_methods'] = $gateway_methods;
+        // $json['payment_code'] = $payment_code;
 
-        foreach ($gateway_methods as $g) {
+        // foreach ($gateway_methods as $g) {
 
-            if (strpos($payment_code, $g) !== false) {
-                $is_gateway = true;
-                break;
+        //     if (strpos($payment_code, $g) !== false) {
+        //         $is_gateway = true;
+        //         break;
+        //     }
+        // }
+        //  $json['is_gateway'] = $is_gateway;
+        $is_gateway = true;
+
+        $payment_code = $this->session->data['payment_method']['code'];
+
+        $controller_file = DIR_APPLICATION . 'controller/extension/payment/' . $payment_code . '.php';
+
+        if (file_exists($controller_file)) {
+
+            require_once($controller_file);
+
+            $class = 'ControllerExtensionPayment' . preg_replace('/[^a-zA-Z0-9]/', '', $payment_code);
+
+            if (class_exists($class)) {
+
+                if (method_exists($class, 'confirm')) {
+                    $is_gateway = false;
+                }
             }
         }
-         $json['is_gateway'] = $is_gateway;
+
+        $json['is_gateway'] = $is_gateway;
 
         if ($is_gateway) {
 

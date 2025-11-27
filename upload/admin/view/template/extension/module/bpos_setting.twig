@@ -41,7 +41,7 @@
       <button role="tab" aria-selected="false" data-tab="advanced">{{ text_advanced }}</button>
       <button role="tab" aria-selected="false" data-tab="help">{{ text_help }}</button>
     </nav>
-
+    <form id="bpos-setting-form">
     {# panels diambil dari file html, bisa dipotong sesuai kebutuhan #}
     <section class="panel" id="panel-general">
   <div class="grid">
@@ -88,7 +88,7 @@
           <input type="checkbox"
                  name="shipping_methods[]"
                  value="{{ method.code }}"
-                 {{ method.code in selected_shipping ? 'checked' }}>
+                 {{ method.code in shipping_methods ? 'checked' }}>
           {{ method.title }}
         </label>
       {% endfor %}
@@ -105,7 +105,7 @@
           <input type="checkbox"
                  name="payment_methods[]"
                  value="{{ method.code }}"
-                 {{ method.code in selected_payment ? 'checked' }}>
+                 {{ method.code in payment_methods ? 'checked' }}>
           {{ method.title }}
         </label>
       {% endfor %}
@@ -113,7 +113,7 @@
   </div>
 
   <!-- Payment Gateway -->
-  <div class="field">
+  {# <div class="field">
     <label>Payment Gateway</label>
     <div class="well-sm">
      {% set selected_gateway = settings.bpos_payment_gateway[0]|split(',') %}
@@ -127,7 +127,7 @@
         </label>
       {% endfor %}
     </div>
-  </div>
+  </div> #}
 
   <!-- Default Shipping Method -->
   <div class="field">
@@ -538,7 +538,7 @@
 
   </div>
 </section>
-
+  </form>
 
 
     <div class="savebar">
@@ -912,48 +912,40 @@ $(function(){
     return;
   }
 
-  const payload = {};
+  // ================================
+  // SERIALIZE FORM (ARRAY AMAN)
+  // ================================
+  let data = $('#bpos-setting-form').serialize();
 
   // ================================
-  // NORMAL INPUT (text, select, hidden)
+  // TOGGLE
   // ================================
-  $('[name]').each(function() {
-  const name = $(this).attr('name');
-
-  if ($(this).is(':checkbox')) {
-    if (!payload[name]) payload[name] = [];
-    if ($(this).is(':checked')) {
-      payload[name].push($(this).val());
-    }
-  } else {
-    payload[name] = $(this).val();
-  }
-});
-
-  // ================================
-  // TOGGLE HANDLER
-  // ================================
-  $('.toggle[data-bind]').each(function () {
-    payload[$(this).data('bind')] = $(this).hasClass('on') ? 1 : 0;
+  $('.toggle[data-bind]').each(function(){
+    data += '&' + encodeURIComponent($(this).data('bind')) + '=' + 
+            ($(this).hasClass('on') ? 1 : 0);
   });
 
   // ================================
   // PERMISSIONS
   // ================================
-  for (let role of ['admin', 'staff']) {
+  for (let role of ['admin','staff']) {
     for (let k in perms[role]) {
-      payload[`perm_${role}_${k}`] = perms[role][k];
+      data += '&' + encodeURIComponent(`perm_${role}_${k}`) + '=' + 
+              encodeURIComponent(perms[role][k]);
     }
   }
 
-  console.log('PAYLOAD DEBUG:', payload);
+  console.log('SERIALIZED DATA:', data);
 
   try {
-    const res = await fetch(`index.php?route=extension/module/bpos_setting/save&user_token={{ user_token }}`, {
-      method: 'POST',
-      headers: {'Content-Type':'application/x-www-form-urlencoded'},
-      body: new URLSearchParams(payload).toString()
-    });
+    const res = await fetch(
+      `index.php?route=extension/module/bpos_setting/save&user_token={{ user_token }}`,
+      {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: data
+      }
+    );
 
     const json = await res.json();
 
@@ -963,12 +955,13 @@ $(function(){
       showToast(json.message || 'Failed to save', false);
     }
 
-  } catch (e) {
+  } catch(e){
     console.error(e);
     showToast('Save error', false);
   }
 
 });
+
 
 
 
