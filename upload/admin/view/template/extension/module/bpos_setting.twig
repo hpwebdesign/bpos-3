@@ -67,17 +67,28 @@
     </div>
     <input type="hidden" name="country_code" value="{{ settings.bpos_country_code ?? '62' }}">
   </div>
+   <div class="field">
+      <label for="pos_name">POS Display Name</label>
+      <input id="pos_name" name="pos_name" type="text"
+             value="{{ settings.bpos_pos_name ?? store_name }}">
+    </div>
 
+    <div class="field">
+      <label for="pos_path">POS URL Path</label>
+      <input id="pos_path" name="pos_path" type="text"
+             value="{{ settings.bpos_pos_path ?? 'pos' }}">
+    </div>
   <!-- Shipping Methods -->
   <div class="field">
     <label>Shipping Methods</label>
     <div class="well-sm">
+      {% set selected_shipping = settings.bpos_shipping_methods[0]|split(',') %}
       {% for method in delivery_methods %}
         <label class="checkbox" style="display:block; margin-bottom:6px;">
           <input type="checkbox"
                  name="shipping_methods[]"
                  value="{{ method.code }}"
-                 {{ method.code in settings.bpos_shipping_methods ? 'checked' }}>
+                 {{ method.code in selected_shipping ? 'checked' }}>
           {{ method.title }}
         </label>
       {% endfor %}
@@ -88,12 +99,13 @@
   <div class="field">
     <label>Payment Methods</label>
     <div class="well-sm">
+    {% set selected_payment = settings.bpos_payment_methods[0]|split(',') %}
       {% for method in pay_methods %}
         <label class="checkbox" style="display:block; margin-bottom:6px;">
           <input type="checkbox"
                  name="payment_methods[]"
                  value="{{ method.code }}"
-                 {{ method.code in settings.bpos_payment_methods ? 'checked' }}>
+                 {{ method.code in selected_payment ? 'checked' }}>
           {{ method.title }}
         </label>
       {% endfor %}
@@ -104,12 +116,13 @@
   <div class="field">
     <label>Payment Gateway</label>
     <div class="well-sm">
+     {% set selected_gateway = settings.bpos_payment_gateway[0]|split(',') %}
       {% for method in pay_methods %}
         <label class="checkbox" style="display:block; margin-bottom:6px;">
           <input type="checkbox"
                  name="payment_gateway[]"
                  value="{{ method.code }}"
-                 {{ method.code in settings.bpos_payment_gateway ? 'checked' }}>
+                 {{ method.code in selected_gateway ? 'checked' }}>
           {{ method.title }}
         </label>
       {% endfor %}
@@ -157,18 +170,6 @@
       {% endfor %}
     </select>
   </div>
-
-    <div class="field">
-      <label for="pos_name">POS Display Name</label>
-      <input id="pos_name" name="pos_name" type="text"
-             value="{{ settings.bpos_pos_name ?? store_name }}">
-    </div>
-
-    <div class="field">
-      <label for="pos_path">POS URL Path</label>
-      <input id="pos_path" name="pos_path" type="text"
-             value="{{ settings.bpos_pos_path ?? 'pos' }}">
-    </div>
 
     <div class="field">
       <label for="currency">Default Currency</label>
@@ -905,44 +906,70 @@ $(function(){
    * ============================================ */
   $('.save').on('click', async function(){
 
-    const missing = REQUIRED_FIELDS.filter(k=>!val(k).trim());
-    if(missing.length){
-      showToast('Missing fields: '+missing.join(', '),false);
-      return;
+  const missing = REQUIRED_FIELDS.filter(k => !val(k).trim());
+  if (missing.length) {
+    showToast('Missing fields: ' + missing.join(', '), false);
+    return;
+  }
+
+  const payload = {};
+
+  // ================================
+  // NORMAL INPUT (text, select, hidden)
+  // ================================
+  $('[name]').each(function() {
+  const name = $(this).attr('name');
+
+  if ($(this).is(':checkbox')) {
+    if (!payload[name]) payload[name] = [];
+    if ($(this).is(':checked')) {
+      payload[name].push($(this).val());
     }
+  } else {
+    payload[name] = $(this).val();
+  }
+});
 
-    const payload = {};
-
-    $('[name]').each(function(){
-      payload[$(this).attr('name')] = $(this).val();
-    });
-
-    $('.toggle[data-bind]').each(function(){
-      payload[$(this).data('bind')] = $(this).hasClass('on') ? 1 : 0;
-    });
-
-    for(let role of ['admin','staff']){
-      for(let k in perms[role]){
-        payload[`perm_${role}_${k}`] = perms[role][k];
-      }
-    }
-
-    try {
-      const res = await fetch(`index.php?route=extension/module/bpos_setting/save&user_token={{ user_token }}`, {
-        method:'POST',
-        headers:{'Content-Type':'application/x-www-form-urlencoded'},
-        body: new URLSearchParams(payload).toString()
-      });
-      const json = await res.json();
-
-      if(json.success) showToast('Settings saved');
-      else showToast(json.message || 'Failed',false);
-
-    } catch(e){
-      console.log(e);
-      showToast('Save error',false);
-    }
+  // ================================
+  // TOGGLE HANDLER
+  // ================================
+  $('.toggle[data-bind]').each(function () {
+    payload[$(this).data('bind')] = $(this).hasClass('on') ? 1 : 0;
   });
+
+  // ================================
+  // PERMISSIONS
+  // ================================
+  for (let role of ['admin', 'staff']) {
+    for (let k in perms[role]) {
+      payload[`perm_${role}_${k}`] = perms[role][k];
+    }
+  }
+
+  console.log('PAYLOAD DEBUG:', payload);
+
+  try {
+    const res = await fetch(`index.php?route=extension/module/bpos_setting/save&user_token={{ user_token }}`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/x-www-form-urlencoded'},
+      body: new URLSearchParams(payload).toString()
+    });
+
+    const json = await res.json();
+
+    if (json.success) {
+      showToast('✅ Settings saved successfully');
+    } else {
+      showToast(json.message || 'Failed to save', false);
+    }
+
+  } catch (e) {
+    console.error(e);
+    showToast('Save error', false);
+  }
+
+});
+
 
 
   /** Discard */
