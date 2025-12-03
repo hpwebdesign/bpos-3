@@ -387,7 +387,7 @@
           <div class="toolbar">
             <div class="search">
               <input id="user-search" type="text" placeholder="Search username or role">
-              <button class="btn small" id="user-search-clear">Clear</button>
+              <button type="button" class="btn small" id="user-search-clear">Clear</button>
             </div>
             <div class="right">
               <span class="badge-sm muted" id="user-count">0 users</span>
@@ -453,7 +453,7 @@
           <option value="csv" {{ settings.bpos_export_fmt=='csv'?'selected':'' }}>CSV</option>
           <option value="xlsx" {{ settings.bpos_export_fmt=='xlsx'?'selected':'' }}>XLSX</option>
         </select>
-        <button class="btn" id="btnExportSales">Export</button>
+        <button type="button" class="btn" id="btnExportSales">Export</button>
       </div>
     </div>
 
@@ -486,15 +486,15 @@
     <div class="field">
       <label>Cache</label>
       <div class="row">
-        <button class="btn" id="btn-clear-cache">Clear Cache</button>
-        <button class="btn" id="btn-reset-ls">Reset Local Storage</button>
+        <button type="button" class="btn" id="btn-clear-cache">Clear Cache</button>
+        <button type="button" class="btn" id="btn-reset-ls">Reset Local Storage</button>
       </div>
     </div>
 
     <div class="field">
       <label>Diagnostics</label>
       <div class="row">
-        <button class="btn" id="btn-test-conn">Test Connection</button>
+        <button type="button" class="btn" id="btn-test-conn">Test Connection</button>
         <span id="diag-result" class="muted"></span>
       </div>
       <div class="hint">Ping API endpoint.</div>
@@ -544,8 +544,8 @@
     <div class="savebar">
       <div class="left">Changes are not saved</div>
       <div class="right">
-        <button class="btn" id="discard">Discard</button>
-        <button class="btn primary save" id="save">Save Settings</button>
+        <button type="button" class="btn" id="discard">Discard</button>
+        <button type="button" class="btn primary save" id="save">Save Settings</button>
       </div>
     </div>
   </div>
@@ -554,7 +554,7 @@
     <div class="sheet-setting">
       <header>
         <strong id="user-modal-title">New User</strong>
-        <button class="btn small" id="user-modal-close">✕</button>
+        <button type="button" class="btn small" id="user-modal-close">✕</button>
       </header>
       <div class="body">
         <div class="grid">
@@ -589,8 +589,8 @@
         </div>
       </div>
       <footer>
-        <button class="btn" id="user-modal-cancel">Cancel</button>
-        <button class="btn primary user-modal-save" id="user-modal-save">{{ button_save }}</button>
+        <button type="button" class="btn" id="user-modal-cancel">Cancel</button>
+        <button type="button" class="btn primary user-modal-save" id="user-modal-save">{{ button_save }}</button>
       </footer>
     </div>
   </div>
