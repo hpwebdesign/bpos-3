@@ -383,8 +383,8 @@ class ControllerBposOrder extends ControllerBposBposBase {
         if (!empty($this->session->data['payment_address'])) {
             $payment_address = $this->session->data['payment_address'];
 
-            $order_data['payment_firstname']       = $payment_address['firstname'] ?? $firstname;
-            $order_data['payment_lastname']        = $payment_address['lastname'] ?? $lastname;
+            $order_data['payment_firstname']       = $payment_address['firstname'] ??  $order_data['firstname'];
+            $order_data['payment_lastname']        = $payment_address['lastname'] ??  $order_data['lastname'];
             $order_data['payment_company']         = $payment_address['company'] ?? '';
             $order_data['payment_address_1']       = $payment_address['address_1'] ?? '';
             $order_data['payment_address_2']       = $payment_address['address_2'] ?? '';
@@ -397,8 +397,8 @@ class ControllerBposOrder extends ControllerBposBposBase {
             $order_data['payment_address_format']  = $payment_address['address_format'] ?? '';
         } else {
             // fallback ke config store
-            $order_data['payment_firstname']       = $firstname;
-            $order_data['payment_lastname']        = $lastname;
+            $order_data['payment_firstname']       = $order_data['firstname'];
+            $order_data['payment_lastname']        = $order_data['lastname'];
             $order_data['payment_company']         = '';
             $order_data['payment_address_1']       = (string)$this->config->get('config_address');
             $order_data['payment_address_2']       = '';
