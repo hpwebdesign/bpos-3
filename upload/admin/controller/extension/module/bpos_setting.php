@@ -8,6 +8,7 @@ class ControllerExtensionModuleBposSetting extends Controller {
 	private $extension_type = 'io';
 	private $domain 		= '';
 	private $demo           = false;
+	private $license_warning = '';
 
 	public function index() {
 		$this->domain = str_replace("www.", "", $_SERVER['SERVER_NAME']);
@@ -61,6 +62,7 @@ class ControllerExtensionModuleBposSetting extends Controller {
 		$data['doc_link']       = "https://hpwebdesign.".$this->extension_type."/docs/".$this->extension_code;
 		$data['ticket_link']    = "https://hpwebdesign.".$this->extension_type."/support";
 		$data['demo'] 			= $this->demo;
+		
 
 		$this->load->language('extension/module/bpos_setting');
 
@@ -281,6 +283,12 @@ class ControllerExtensionModuleBposSetting extends Controller {
 		$data['store_name'] = $this->config->get('config_name');
 		$data['order_statuses'] = $this->model_localisation_order_status->getOrderStatuses();
 		$data['heading_title'] 	= $this->language->get('heading_title2');
+		$data['license_warning'] = '';
+
+		if (!empty($this->license_warning)) {
+			$data['license_warning'] = $this->license_warning;
+		}
+
 		$data['header'] 				= $this->load->controller('common/header');
 		$data['column_left'] 			= $this->load->controller('common/column_left');
 		$data['footer'] 				= $this->load->controller('common/footer');
@@ -319,10 +327,10 @@ class ControllerExtensionModuleBposSetting extends Controller {
 	          // ambil semua bahasa
 	          $languages = $this->model_localisation_language->getLanguages();
 
-
+	          $this->db->query("DELETE FROM " . DB_PREFIX . "seo_url WHERE query = 'bpos/home'");
 	          foreach ($stores as $store) {
               foreach ($languages as $language) {
-                  // === PRODUCT PREFIX ===
+                 
                   if (!empty($setting[$code . "_pos_path"])) {
                       $prefix = $setting[$code . "_pos_path"];
                       $seo_url_id = $this->model_extension_module_bpos->getSeoPos($store['store_id'], $language['language_id']);
@@ -602,18 +610,31 @@ class ControllerExtensionModuleBposSetting extends Controller {
 	}
 
 	private function rightman() {
-		if($this->internetAccess()) {
+		if ($this->internetAccess()) {
 			$this->load->model('extension/module/system_startup');
 
 			$license = $this->model_extension_module_system_startup->checkLicenseKey($this->extension_code);
 
 			if ($license) {
+
+				// cek expiry support
+				if (!empty($license['support_expiry']) && strtotime($license['support_expiry']) < strtotime(date('Y-m-d'))) {
+					$this->license_warning = 'Your license module period has expired. Please renew your license to continue using this module.';
+					$this->flushdata();
+				}
+
 				if (isset($this->model_extension_module_system_startup->licensewalker)) {
-					$url = $this->model_extension_module_system_startup->licensewalker($license['license_key'],$this->extension_code,$this->domain);
+
+					$url = $this->model_extension_module_system_startup->licensewalker(
+						$license['license_key'],
+						$this->extension_code,
+						$this->domain
+					);
+
 					$data = $url;
 					$domain = isset($data['domain']) ? $data['domain'] : '';
 
-					if($domain == $this->domain) {
+					if ($domain == $this->domain) {
 						$this->v_d = $domain;
 					} else {
 						$this->flushdata();

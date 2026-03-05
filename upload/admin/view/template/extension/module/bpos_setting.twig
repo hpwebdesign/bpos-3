@@ -5,7 +5,14 @@
 
 <div class="container settings">
   <div class="card">
+   {% if license_warning %}
+      <div class="alert alert-warning alert-dismissible">
+        <i class="fa fa-exclamation-triangle"></i> {{ license_warning }}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    {% endif %}
     <div class="header" style="padding:16px 16px 0 16px">
+   
       <div class="title">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M5 7h14l-1 12H6L5 7Z" stroke="#1b5fb3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -617,7 +624,7 @@ $(function(){
     ok ? notyf.success(msg) : notyf.error(msg);
   };
 
-  const REQUIRED_FIELDS = ['pos_name','pos_path'];
+  const REQUIRED_FIELDS = ['pos_name'];
   const savebarLeft = $('.savebar .left');
 
 
