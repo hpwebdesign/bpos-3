@@ -12,7 +12,7 @@
       </div>
     {% endif %}
     <div class="header" style="padding:16px 16px 0 16px">
-   
+
       <div class="title">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M5 7h14l-1 12H6L5 7Z" stroke="#1b5fb3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -20,20 +20,20 @@
         </svg>
         <h1>{{ heading_title }}</h1>
         <nav class="bpos-breadcrumb">
-		  <ol>
-		    {% for breadcrumb in breadcrumbs %}
-		      <li>
-		        <a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a>
-		      </li>
-		    {% endfor %}
-		  </ol>
-		</nav>
+      <ol>
+        {% for breadcrumb in breadcrumbs %}
+          <li>
+            <a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a>
+          </li>
+        {% endfor %}
+      </ol>
+    </nav>
 
 
       </div>
       <div class="actions">
       <a target="_blank" class="btn ghost" id="btn-ticket"  href="{{ ticket_link }}"><i class="fa fa-life-ring"></i> {{text_raise_ticket}}</a>
-      <a target="_blank" class="btn ghost btn-sm" id="btn-docs" href="{{ doc_link }}"><i class="fa fa-book"></i> {{text_documentation}}</a>
+      <a target="_blank" class="btn ghost" id="btn-docs" href="{{ doc_link }}"><i class="fa fa-book"></i> {{text_documentation}}</a>
         <button type="button" class="btn primary save">{{ button_save }}</button>
       </div>
     </div>
@@ -66,11 +66,11 @@
     <label for="whatsapp_number">WhatsApp Number</label>
     <div class="row" style="gap:8px; align-items:center;">
      <div class="input-group">
-			<span class="input-group-addon" id="country-code">62</span>
-			<input id="whatsapp_number" name="whatsapp_number" type="text"
+      <span class="input-group-addon" id="country-code">62</span>
+      <input id="whatsapp_number" name="whatsapp_number" type="text"
              value="{{ settings.bpos_whatsapp_number ?? '' }}"
              placeholder="812xxxxxx">
-		</div>
+    </div>
     </div>
     <input type="hidden" name="country_code" value="{{ settings.bpos_country_code ?? '62' }}">
   </div>
@@ -307,7 +307,7 @@
 
   </div>
 </section>
-  
+
   <section class="panel" id="panel-device" hidden>
   <div class="grid">
 
@@ -588,7 +588,7 @@
             <label for="u-password">Password</label>
             <input id="u-password" type="password" placeholder="Password">
           </div>
-          
+
           <div class="field">
             <label for="u-active">Active</label>
             <div class="row"><div id="u-active" class="toggle on"><i></i></div><span>Enable login</span></div>
@@ -603,7 +603,7 @@
   </div>
 </div>
 
- 
+
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 
@@ -928,7 +928,7 @@ $(function(){
   // TOGGLE
   // ================================
   $('.toggle[data-bind]').each(function(){
-    data += '&' + encodeURIComponent($(this).data('bind')) + '=' + 
+    data += '&' + encodeURIComponent($(this).data('bind')) + '=' +
             ($(this).hasClass('on') ? 1 : 0);
   });
 
@@ -937,7 +937,7 @@ $(function(){
   // ================================
   for (let role of ['admin','staff']) {
     for (let k in perms[role]) {
-      data += '&' + encodeURIComponent(`perm_${role}_${k}`) + '=' + 
+      data += '&' + encodeURIComponent(`perm_${role}_${k}`) + '=' +
               encodeURIComponent(perms[role][k]);
     }
   }
@@ -985,32 +985,32 @@ $(function(){
 
 
 <script>
-	$("#upgrade-database").click(function () {
-		$("#upgrade-database").button('loading');
-		$.get('index.php?route=extension/module/bpos_setting/patch&user_token={{ user_token }}', function (data) {
-			if (data['success']) {
-				$("#upgrade-database").button('reset');
-				$("<div class='alert alert-success slideUp'><i class='fa fa-check-circle'></i> {{ text_success_installed }}<button type='button' class='close' data-dismiss='alert'>&times;</button></div>").insertBefore(".panel.panel-default");
-			}
-		})
-	});
+  $("#upgrade-database").click(function () {
+    $("#upgrade-database").button('loading');
+    $.get('index.php?route=extension/module/bpos_setting/patch&user_token={{ user_token }}', function (data) {
+      if (data['success']) {
+        $("#upgrade-database").button('reset');
+        $("<div class='alert alert-success slideUp'><i class='fa fa-check-circle'></i> {{ text_success_installed }}<button type='button' class='close' data-dismiss='alert'>&times;</button></div>").insertBefore(".panel.panel-default");
+      }
+    })
+  });
 
 
 
-	$(document).ready(function () {
+  $(document).ready(function () {
 
-		$.get("https://bariklabs.com/index.php?route=common/extension/version&code={{ extension_code }}&oc=3.0.x.x", function (data, status) {
-			const version = "{{ version }}".replace(/\D/g, '');
-			const latest_version = data.replace(/\D/g, '');
-			if (version < latest_version) {
-				$('form').parent().prepend(`<div class="alert alert-danger">
+    $.get("https://bariklabs.com/index.php?route=common/extension/version&code={{ extension_code }}&oc=3.0.x.x", function (data, status) {
+      const version = "{{ version }}".replace(/\D/g, '');
+      const latest_version = data.replace(/\D/g, '');
+      if (version < latest_version) {
+        $('form').parent().prepend(`<div class="alert alert-danger">
 <i class="fa fa-exclamation-circle"></i>
 {{ text_upgrade_version }}
-	</div>`);
-			}
-		});
+  </div>`);
+      }
+    });
 
-	});
+  });
 
 </script>
 
