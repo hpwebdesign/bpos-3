@@ -336,7 +336,7 @@ class ControllerBposOrder extends ControllerBposBposBase {
                 $customer_id = (int)$this->session->data['bpos_customer']['id'];
                 $customer_info = $this->model_account_customer->getCustomer($customer_id);
                 $email = $customer_info['email'];
-                $order_data['customer_id'] = $this->customer->getId();
+                $order_data['customer_id'] =  $customer_id;
                 $order_data['customer_group_id'] = $customer_info['customer_group_id'];
                 $order_data['firstname'] = $customer_info['firstname'];
                 $order_data['lastname'] = $customer_info['lastname'];
