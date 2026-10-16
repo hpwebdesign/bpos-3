@@ -1,0 +1,13 @@
+{% if terminals %}
+<div class="bps-devbar">
+  <i class="fa fa-desktop"></i>
+  <div class="bps-devbar-t"><b>{{ text_device_settings|e }}</b><small>{{ help_device_settings|e }}</small></div>
+  <select class="form-control bps-dev-sel">
+    {% for t in terminals %}
+    <option value="{{ t.terminal_id|e('html_attr') }}">{{ t.name|e }} · {{ t.store_name|e }}</option>
+    {% endfor %}
+  </select>
+</div>
+{% else %}
+<div class="bps-devbar"><i class="fa fa-info-circle"></i><div class="bps-devbar-t"><b>{{ text_no_terminals|e }}</b></div><a href="#bps-terminals" data-bps-tab="terminals" class="btn btn-default">{{ text_registered_terminals|e }}</a></div>
+{% endif %}
