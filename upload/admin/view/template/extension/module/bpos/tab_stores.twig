@@ -1,0 +1,56 @@
+<div class="bps-card">
+  <div class="bps-card-h"><h3>{{ text_stores|e }}</h3><span class="bps-scope"><i class="fa fa-globe"></i> {{ text_scope_all|e }}</span></div>
+  <p class="bps-lead">{{ help_stores|e }}</p>
+  {% for s in store_rows %}
+  <div class="bps-row">
+    <div class="bps-row-l"><b>{{ s.name|e }}</b><small>{{ text_cashiers_active|replace({'%d': s.users})|e }}</small></div>
+    <div class="bps-row-r"><a href="{{ s.edit|e('html_attr') }}" class="btn btn-default btn-sm"><i class="fa fa-pencil"></i> {{ button_edit_store|e }}</a></div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="bps-card" id="bps-users-card"
+     data-save="{{ ajax_user_save|e('html_attr') }}" data-del="{{ ajax_user_delete|e('html_attr') }}" data-confirm="{{ text_confirm_delete|e('html_attr') }}">
+  <div class="bps-card-h"><h3>{{ text_cashiers|e }}</h3><span class="bps-scope"><i class="fa fa-globe"></i> {{ text_scope_all|e }}</span></div>
+  <p class="bps-lead">{{ help_cashiers|e }}</p>
+
+  {% if users %}
+  <div class="bps-tbl bps-tbl-u">
+    <div class="bps-tr bps-th"><span>{{ entry_name|e }}</span><span>{{ entry_role|e }}</span><span>{{ entry_store|e }}</span><span>{{ entry_user_status|e }}</span><span></span></div>
+    {% for u in users %}
+    <div class="bps-tr" data-bps-user="{{ {'user_id': u.user_id, 'name': u.name, 'username': u.username, 'role': u.role, 'store_id': u.store_id, 'status': u.status, 'has_pin': u.has_pin}|json_encode|e('html_attr') }}">
+      <span class="bps-who"><span class="bps-av">{{ u.name|slice(0, 2)|upper|e }}</span><span><b>{{ u.name|e }}</b><small>{{ u.username|e }} · {{ text_last_login|e }}: {{ u.last_login ? u.last_login|e : text_never|e }}</small></span></span>
+      <span><span class="bps-badge">{{ role_names[u.role] is defined ? role_names[u.role]|e : u.role|e }}</span></span>
+      <span>{{ store_names[u.store_id] is defined ? store_names[u.store_id]|e : '-' }}</span>
+      <span><span class="bps-badge {{ u.status ? 'bps-b-ok' : '' }}">{{ u.status ? entry_user_status|e : status_disabled|e }}</span></span>
+      <span class="bps-acts-r"><button type="button" class="btn btn-default btn-sm" data-bps-user-edit><i class="fa fa-pencil"></i> {{ button_edit|e }}</button> <button type="button" class="btn btn-default btn-sm" data-bps-user-del="{{ u.user_id|e('html_attr') }}"><i class="fa fa-trash-o"></i></button></span>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="bps-note">{{ text_no_users|e }}</div>
+  {% endif %}
+
+  <div class="bps-row"><div class="bps-row-l"></div><div class="bps-row-r"><button type="button" class="btn btn-default" id="bps-user-add"><i class="fa fa-plus"></i> {{ button_add_user|e }}</button></div></div>
+
+  <div class="bps-form" id="bps-user-form" hidden>
+    <input type="hidden" data-bps-uf name="user_id" value="0">
+    <div class="bps-grid2">
+      <div><label>{{ entry_name|e }}</label><input type="text" class="form-control" data-bps-uf name="name" maxlength="64"><div class="bps-err" data-bps-uerr="name"></div></div>
+      <div><label>{{ entry_username|e }}</label><input type="text" class="form-control" data-bps-uf name="username" maxlength="40" autocomplete="off" spellcheck="false"><div class="bps-err" data-bps-uerr="username"></div></div>
+      <div><label>{{ entry_password|e }}</label><input type="password" class="form-control" data-bps-uf name="password" autocomplete="new-password"><small class="bps-help" id="bps-pw-help" data-edit="{{ help_password_edit|e('html_attr') }}"></small><div class="bps-err" data-bps-uerr="password"></div></div>
+      <div><label>{{ entry_pin|e }}</label><input type="text" class="form-control" data-bps-uf name="pin" inputmode="numeric" maxlength="6" autocomplete="off"><small class="bps-help">{{ help_pin|e }}</small><div class="bps-err" data-bps-uerr="pin"></div></div>
+      <div><label>{{ entry_role|e }}</label>
+        <select class="form-control" data-bps-uf name="role">{% for role, label in role_names %}<option value="{{ role|e('html_attr') }}">{{ label|e }}</option>{% endfor %}</select><div class="bps-err" data-bps-uerr="role"></div></div>
+      <div><label>{{ entry_store|e }}</label>
+        <select class="form-control" data-bps-uf name="store_id">{% for id, name in store_names %}<option value="{{ id|e('html_attr') }}">{{ name|e }}</option>{% endfor %}</select><div class="bps-err" data-bps-uerr="store_id"></div></div>
+    </div>
+    <div class="bps-form-foot">
+      <label class="bps-chk"><input type="checkbox" data-bps-uf name="status" value="1" checked> {{ entry_user_status|e }}</label>
+      <label class="bps-chk" id="bps-clearpin-wrap" hidden><input type="checkbox" data-bps-uf name="clear_pin" value="1"> {{ text_clear_pin|e }}</label>
+      <span class="bps-grow"></span>
+      <button type="button" class="btn btn-default" id="bps-user-cancel">{{ button_cancel_form|e }}</button>
+      <button type="button" class="btn btn-primary" id="bps-user-save"><i class="fa fa-check"></i> {{ button_save_user|e }}</button>
+    </div>
+  </div>
+</div>

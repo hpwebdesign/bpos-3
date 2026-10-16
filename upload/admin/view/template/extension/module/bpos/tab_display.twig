@@ -1,0 +1,14 @@
+{{ dev_bar }}
+{% for t in terminals %}
+<div class="bps-dev" data-bps-dev="{{ t.terminal_id|e('html_attr') }}">
+  <div class="bps-card">
+    <div class="bps-card-h"><h3>{{ text_product_layout|e }}</h3><span class="bps-scope bps-scope-dev"><i class="fa fa-desktop"></i> {{ text_scope_device|e }}</span></div>
+    <div class="bps-lc-wrap">
+      <label class="bps-lc"><input type="radio" data-bps-field name="terminal[{{ t.terminal_id }}][layout]" value="compact"{% if t.opt.layout == 'compact' %} checked{% endif %}>
+        <span class="bps-lc-in"><span class="bps-mini bps-mini-cmp"><i></i><i></i><i></i><i></i></span><b>{{ text_layout_compact|e }}</b><small>{{ help_layout_compact|e }}</small></span></label>
+      <label class="bps-lc"><input type="radio" data-bps-field name="terminal[{{ t.terminal_id }}][layout]" value="gallery"{% if t.opt.layout == 'gallery' %} checked{% endif %}>
+        <span class="bps-lc-in"><span class="bps-mini bps-mini-gal"><i></i><i></i><i></i></span><b>{{ text_layout_gallery|e }}</b><small>{{ help_layout_gallery|e }}</small></span></label>
+    </div>
+  </div>
+</div>
+{% endfor %}

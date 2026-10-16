@@ -1,0 +1,107 @@
+<div class="bps-cols">
+  <div class="bps-col">
+
+    <div class="bps-card">
+      <div class="bps-card-h"><h3>{{ text_address|e }}</h3></div>
+      <p class="bps-lead">{{ help_address|e }}</p>
+      <div class="bps-row bps-stack">
+        <div class="bps-row-l"><b>{{ entry_slug|e }}</b></div>
+        <div class="bps-row-r">
+          <div class="bps-slug">
+            <span class="bps-slug-pre">{{ site_host|e }}/</span>
+            <input type="text" class="form-control" data-bps-field name="module_bpos_slug" id="bps-slug" maxlength="40" value="{{ settings.module_bpos_slug|e('html_attr') }}" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="bps-err" data-bps-err="module_bpos_slug"></div>
+          {% if not slug_complete %}<div class="bps-warn">{{ text_slug_incomplete|e }}</div>{% endif %}
+        </div>
+      </div>
+      <div class="bps-row bps-stack">
+        <div class="bps-row-l"><b>{{ text_signin_pages|e }}</b></div>
+        <div class="bps-row-r">
+          <div class="bps-urls" id="bps-urls">
+            {% for item in pos_urls %}
+            <div class="bps-url">
+              <span class="bps-url-n">{{ item.name|e }}</span>
+              <code data-bps-url="{{ item.url|e('html_attr') }}">{{ item.url|e }}</code>
+              <button type="button" class="btn btn-default btn-sm" data-bps-copy>{{ button_copy|e }}</button>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="bps-note">{{ help_rewrite }}</div>
+    </div>
+
+    <div class="bps-card">
+      <div class="bps-card-h"><h3>{{ text_logo|e }}</h3><span class="bps-sub">{{ help_logo_card|e }}</span></div>
+      <div class="bps-row">
+        <div class="bps-row-l"><b>{{ entry_logo|e }}</b><small>{{ help_logo|e }}</small></div>
+        <div class="bps-row-r bps-logo">
+          <span class="bps-tile" id="bps-tile">{% if logo_url %}<img src="{{ logo_url|e('html_attr') }}" alt="">{% else %}<span class="bps-def">B</span>{% endif %}</span>
+          <input type="hidden" data-bps-field name="module_bpos_login_logo" id="bps-logo-path" value="{{ settings.module_bpos_login_logo|e('html_attr') }}">
+          <input type="file" id="bps-logo-file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden>
+          <button type="button" class="btn btn-default" id="bps-logo-up"><i class="fa fa-upload"></i> <span data-upload="{{ button_upload|e('html_attr') }}" data-change="{{ button_change|e('html_attr') }}">{{ settings.module_bpos_login_logo ? button_change|e : button_upload|e }}</span></button>
+          <button type="button" class="btn btn-default" id="bps-logo-rm"{% if not settings.module_bpos_login_logo %} hidden{% endif %}><i class="fa fa-trash-o"></i> {{ button_remove|e }}</button>
+        </div>
+      </div>
+      <div class="bps-err bps-err-pad" data-bps-err="module_bpos_login_logo"></div>
+    </div>
+
+    <div class="bps-card">
+      <div class="bps-card-h"><h3>{{ text_texts|e }}</h3><span class="bps-sub">{{ help_texts|e }}</span></div>
+      <div class="bps-seg" id="bps-lang-seg">
+        {% set first = true %}
+        {% for code, language in languages %}
+        <button type="button" data-bps-lang="{{ code|e('html_attr') }}" class="{{ first ? 'bps-on' : '' }}">{{ language.name|e }}</button>
+        {% set first = false %}
+        {% endfor %}
+      </div>
+      {% set first = true %}
+      {% for code, language in languages %}
+      <div class="bps-lang-pane{{ first ? ' bps-on' : '' }}" data-bps-lang-pane="{{ code|e('html_attr') }}">
+        <div class="bps-row bps-stack">
+          <div class="bps-row-l"><b>{{ entry_head|e }}</b></div>
+          <div class="bps-row-r">
+            <input type="text" class="form-control" data-bps-field data-bps-head maxlength="60" name="module_bpos_login_head[{{ code|e('html_attr') }}]" value="{{ (settings.module_bpos_login_head[code] ?? '')|e('html_attr') }}" placeholder="{{ default_head|e('html_attr') }}">
+            <div class="bps-err" data-bps-err="module_bpos_login_head[{{ code|e('html_attr') }}]"></div>
+          </div>
+        </div>
+        <div class="bps-row bps-stack">
+          <div class="bps-row-l"><b>{{ entry_desc|e }}</b></div>
+          <div class="bps-row-r">
+            <textarea class="form-control" rows="3" data-bps-field data-bps-desc maxlength="160" name="module_bpos_login_desc[{{ code|e('html_attr') }}]" placeholder="{{ default_desc|e('html_attr') }}">{{ (settings.module_bpos_login_desc[code] ?? '')|e }}</textarea>
+            <div class="bps-err" data-bps-err="module_bpos_login_desc[{{ code|e('html_attr') }}]"></div>
+          </div>
+        </div>
+      </div>
+      {% set first = false %}
+      {% endfor %}
+      <div class="bps-row">
+        <div class="bps-row-l"><b>{{ button_reset_text|e }}</b></div>
+        <div class="bps-row-r"><button type="button" class="btn btn-default" id="bps-reset-text"><i class="fa fa-undo"></i> {{ button_reset_text|e }}</button></div>
+      </div>
+      <div class="bps-note">{{ text_store_name_note|e }}</div>
+    </div>
+
+    <div class="bps-card">
+      <div class="bps-card-h"><h3>{{ text_illustration|e }}</h3><span class="bps-sub">{{ help_illustration|e }}</span></div>
+      <div class="bps-row">
+        <div class="bps-row-l"><b>{{ entry_doodle|e }}</b><small>{{ help_doodle|e }}</small></div>
+        <div class="bps-row-r">
+          <label class="bps-sw"><input type="checkbox" data-bps-field name="module_bpos_login_doodle" value="1"{% if settings.module_bpos_login_doodle %} checked{% endif %}><span></span></label>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bps-col bps-col-side">
+    <div class="bps-card">
+      <div class="bps-card-h"><h3>{{ text_preview|e }}</h3></div>
+      <div class="bps-pv" id="bps-pv" data-def-head="{{ default_head|e('html_attr') }}" data-def-desc="{{ default_desc|e('html_attr') }}">
+        <div class="bps-pv-top"><span class="bps-pv-logo" id="bps-pv-logo">{% if logo_url %}<img src="{{ logo_url|e('html_attr') }}" alt="">{% else %}B{% endif %}</span><span>Barik POS</span></div>
+        <div class="bps-pv-txt"><h4 id="bps-pv-h"></h4><p id="bps-pv-p"></p></div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,39 @@
+<div class="bps-card" id="bps-term-card"
+     data-save="{{ ajax_terminal_save|e('html_attr') }}" data-del="{{ ajax_terminal_delete|e('html_attr') }}" data-confirm="{{ text_confirm_delete|e('html_attr') }}">
+  <div class="bps-card-h"><h3>{{ text_registered_terminals|e }}</h3><span class="bps-scope"><i class="fa fa-globe"></i> {{ text_scope_all|e }}</span></div>
+  <p class="bps-lead">{{ help_terminal|e }}</p>
+  {% if terminals %}
+  <div class="bps-tbl bps-tbl-t">
+    <div class="bps-tr bps-th"><span>{{ col_device|e }}</span><span>{{ col_store|e }}</span><span>{{ col_printer|e }}</span><span>{{ col_status|e }}</span><span></span></div>
+    {% for t in terminals %}
+    <div class="bps-tr" data-bps-term="{{ {'terminal_id': t.terminal_id, 'name': t.name, 'store_id': t.store_id, 'status': t.status}|json_encode|e('html_attr') }}">
+      <span><b>{{ t.name|e }}</b><small>{{ text_last_seen|e }}: {{ t.last_seen ? t.last_seen|e : text_never|e }}</small></span>
+      <span>{{ t.store_name|e }}</span>
+      <span>{{ t.receipt_width|e }} mm · {{ conn_names[t.printer_profile] is defined ? conn_names[t.printer_profile]|e : conn_names['browser']|e }}</span>
+      <span><span class="bps-badge {{ not t.status ? '' : (t.online ? 'bps-b-ok' : '') }}">{{ not t.status ? status_disabled|e : (t.online ? status_online|e : status_offline|e) }}</span></span>
+      <span class="bps-acts-r">
+        <button type="button" class="btn btn-default btn-sm" data-bps-config="{{ t.terminal_id|e('html_attr') }}">{{ button_configure|e }}</button>
+        <button type="button" class="btn btn-default btn-sm" data-bps-term-edit><i class="fa fa-pencil"></i></button>
+        <button type="button" class="btn btn-default btn-sm" data-bps-term-del="{{ t.terminal_id|e('html_attr') }}"><i class="fa fa-trash-o"></i></button>
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  <div class="bps-row"><div class="bps-row-l"></div><div class="bps-row-r"><button type="button" class="btn btn-default" id="bps-term-add"><i class="fa fa-plus"></i> {{ button_add_terminal|e }}</button></div></div>
+
+  <div class="bps-form" id="bps-term-form" data-default="{{ text_default_terminal|e('html_attr') }}" hidden>
+    <input type="hidden" data-bps-tf name="terminal_id" value="0">
+    <div class="bps-grid2">
+      <div><label>{{ entry_terminal_name|e }}</label><input type="text" class="form-control" data-bps-tf name="name" maxlength="64"><div class="bps-err" data-bps-terr="name"></div></div>
+      <div><label>{{ entry_store|e }}</label>
+        <select class="form-control" data-bps-tf name="store_id">{% for id, name in store_names %}<option value="{{ id|e('html_attr') }}">{{ name|e }}</option>{% endfor %}</select><div class="bps-err" data-bps-terr="store_id"></div></div>
+    </div>
+    <div class="bps-form-foot">
+      <label class="bps-chk"><input type="checkbox" data-bps-tf name="status" value="1" checked> {{ entry_user_status|e }}</label>
+      <span class="bps-grow"></span>
+      <button type="button" class="btn btn-default" id="bps-term-cancel">{{ button_cancel_form|e }}</button>
+      <button type="button" class="btn btn-primary" id="bps-term-save"><i class="fa fa-check"></i> {{ button_save_terminal|e }}</button>
+    </div>
+  </div>
+</div>

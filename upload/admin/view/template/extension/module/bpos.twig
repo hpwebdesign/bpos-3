@@ -1,0 +1,91 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href|e('html_attr') }}">{{ breadcrumb.text|e }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-warning"><i class="fa fa-exclamation-circle"></i> {{ error_warning|e }}</div>
+    {% endif %}
+    <div id="bps-alert"></div>
+
+    <div id="bps-root" class="bps"
+         data-save="{{ ajax_save_settings|e('html_attr') }}"
+         data-logo="{{ ajax_logo_upload|e('html_attr') }}"
+         data-patch="{{ ajax_patch|e('html_attr') }}"
+         data-remove="{{ ajax_remove_data|e('html_attr') }}"
+         data-fail="{{ error_request|e('html_attr') }}">
+
+      <div class="bps-ph">
+        <div><h1>{{ heading_title|e }}</h1><p>{{ text_settings_sub|e }}</p></div>
+        <div class="bps-acts">
+          <span class="bps-un" id="bps-un" hidden><i class="fa fa-exclamation-circle"></i> {{ text_unsaved|e }}</span>
+          <a href="{{ pos_urls[0].url|e('html_attr') }}" target="_blank" rel="noopener" class="btn btn-default"><i class="fa fa-external-link"></i> {{ button_open_pos|e }}</a>
+          <a href="{{ cancel|e('html_attr') }}" class="btn btn-default"><i class="fa fa-reply"></i> {{ button_cancel|e }}</a>
+          <button type="button" id="bps-save" class="btn btn-primary" disabled><i class="fa fa-check"></i> {{ button_save|e }}</button>
+        </div>
+      </div>
+
+      <div class="bps-lay">
+        <nav class="bps-sn" role="tablist">
+          <div class="bps-sg">{{ text_group_store|e }}</div>
+          <a href="#bps-general" data-bps-tab="general" class="bps-snav bps-on"><i class="fa fa-sliders"></i> {{ text_tab_general|e }}</a>
+          <a href="#bps-login" data-bps-tab="login" class="bps-snav"><i class="fa fa-sign-in"></i> {{ text_tab_login|e }}</a>
+          <a href="#bps-stores" data-bps-tab="stores" class="bps-snav"><i class="fa fa-building-o"></i> {{ text_nav_stores|e }}</a>
+          <a href="#bps-sales" data-bps-tab="sales" class="bps-snav"><i class="fa fa-shopping-cart"></i> {{ text_nav_sales|e }}</a>
+          <a href="#bps-pay" data-bps-tab="pay" class="bps-snav"><i class="fa fa-credit-card"></i> {{ text_nav_pay|e }}</a>
+          <a href="#bps-perm" data-bps-tab="perm" class="bps-snav"><i class="fa fa-key"></i> {{ text_nav_perm|e }}</a>
+          <a href="#bps-oc" data-bps-tab="oc" class="bps-snav"><i class="fa fa-plug"></i> {{ text_nav_oc|e }}</a>
+          <div class="bps-sg">{{ text_group_device|e }}</div>
+          <a href="#bps-display" data-bps-tab="display" class="bps-snav"><i class="fa fa-columns"></i> {{ text_nav_display|e }}</a>
+          <a href="#bps-receipt" data-bps-tab="receipt" class="bps-snav"><i class="fa fa-print"></i> {{ text_nav_receipt|e }}</a>
+          <a href="#bps-scan" data-bps-tab="scan" class="bps-snav"><i class="fa fa-barcode"></i> {{ text_nav_scan|e }}</a>
+          <div class="bps-sg">{{ text_group_system|e }}</div>
+          <a href="#bps-terminals" data-bps-tab="terminals" class="bps-snav"><i class="fa fa-desktop"></i> {{ text_nav_terminals|e }}</a>
+          <a href="#bps-sync" data-bps-tab="sync" class="bps-snav"><i class="fa fa-cloud"></i> {{ text_nav_sync|e }}</a>
+          <a href="#bps-maintenance" data-bps-tab="maintenance" class="bps-snav"><i class="fa fa-wrench"></i> {{ text_tab_maintenance|e }}</a>
+        </nav>
+
+        <main class="bps-main">
+          <div class="bps-pane bps-on" id="bps-general">{{ tab_general }}</div>
+          <div class="bps-pane" id="bps-login">{{ tab_login }}</div>
+          <div class="bps-pane" id="bps-stores">{{ tab_stores }}</div>
+          <div class="bps-pane" id="bps-sales">{{ tab_sales }}</div>
+          <div class="bps-pane" id="bps-pay">{{ tab_pay }}</div>
+          <div class="bps-pane" id="bps-perm">{{ tab_perm }}</div>
+          <div class="bps-pane" id="bps-oc">{{ tab_oc }}</div>
+          <div class="bps-pane" id="bps-display">{{ tab_display }}</div>
+          <div class="bps-pane" id="bps-receipt">{{ tab_receipt }}</div>
+          <div class="bps-pane" id="bps-scan">{{ tab_scan }}</div>
+          <div class="bps-pane" id="bps-terminals">{{ tab_terminals }}</div>
+          <div class="bps-pane" id="bps-sync">{{ tab_sync }}</div>
+          <div class="bps-pane" id="bps-maintenance">
+            <div class="bps-card bps-maint">
+              <div class="bps-card-h"><h3>{{ text_maintenance|e }}</h3><span class="bps-pill">{{ text_bpos_version|e }}</span></div>
+              <div class="bps-row">
+                <div class="bps-row-l"><b>{{ button_patch|e }}</b></div>
+                <div class="bps-row-r"><button type="button" class="btn btn-default" id="bps-patch">{{ button_patch|e }}</button></div>
+              </div>
+              <div class="bps-row bps-stack">
+                <div class="bps-row-l"><b>{{ button_remove_data|e }}</b><small>{{ help_remove_data }}</small></div>
+                <div class="bps-row-r">
+                  <input type="text" class="form-control bps-confirm" id="bps-confirm" placeholder="bpos" autocomplete="off">
+                  <button type="button" class="btn btn-danger" id="bps-remove" disabled>{{ button_remove_data|e }}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+</div>
+<link href="view/stylesheet/bpos/bpos_setting.css?v={{ version|e('url') }}" rel="stylesheet" type="text/css">
+<script src="view/javascript/bpos/bpos_setting.js?v={{ version|e('url') }}"></script>
+{{ footer }}

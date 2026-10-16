@@ -1,0 +1,46 @@
+{{ dev_bar }}
+{% for t in terminals %}
+<div class="bps-dev" data-bps-dev="{{ t.terminal_id|e('html_attr') }}">
+  <div class="bps-card">
+    <div class="bps-card-h"><h3>{{ text_scanner|e }}</h3><span class="bps-scope bps-scope-dev"><i class="fa fa-desktop"></i> {{ text_scope_device|e }}</span></div>
+    <div class="bps-row">
+      <div class="bps-row-l"><b>{{ entry_scan_suffix|e }}</b><small>{{ help_scan_suffix|e }}</small></div>
+      <div class="bps-row-r"><div class="bps-seg2">
+        {% for k in ['Enter', 'Tab'] %}<label><input type="radio" data-bps-field name="terminal[{{ t.terminal_id }}][scan_suffix]" value="{{ k }}"{% if t.opt.scan_suffix == k %} checked{% endif %}><span>{{ k }}</span></label>{% endfor %}
+      </div></div>
+    </div>
+    <div class="bps-row">
+      <div class="bps-row-l"><b>{{ entry_scan_auto|e }}</b></div>
+      <div class="bps-row-r"><label class="bps-sw"><input type="checkbox" data-bps-field name="terminal[{{ t.terminal_id }}][scan_auto]" value="1"{% if t.opt.scan_auto %} checked{% endif %}><span></span></label></div>
+    </div>
+    <div class="bps-row">
+      <div class="bps-row-l"><b>{{ entry_scan_beep|e }}</b></div>
+      <div class="bps-row-r"><label class="bps-sw"><input type="checkbox" data-bps-field name="terminal[{{ t.terminal_id }}][scan_beep]" value="1"{% if t.opt.scan_beep %} checked{% endif %}><span></span></label></div>
+    </div>
+  </div>
+  <div class="bps-card">
+    <div class="bps-card-h"><h3>{{ text_label_printing|e }}</h3><span class="bps-scope bps-scope-dev"><i class="fa fa-desktop"></i> {{ text_scope_device|e }}</span></div>
+    <div class="bps-row">
+      <div class="bps-row-l"><b>{{ entry_label|e }}</b></div>
+      <div class="bps-row-r"><select class="form-control" data-bps-field name="terminal[{{ t.terminal_id }}][label]">
+        {% for k, label in {'58': label_58, '80': label_80, 'a4': label_a4} %}<option value="{{ k }}"{% if t.opt.label == k %} selected{% endif %}>{{ label|e }}</option>{% endfor %}
+      </select></div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<div class="bps-card">
+  <div class="bps-card-h"><h3>{{ text_barcode_gen|e }}</h3><span class="bps-scope"><i class="fa fa-globe"></i> {{ text_scope_all|e }}</span></div>
+  <div class="bps-row">
+    <div class="bps-row-l"><b>{{ entry_barcode_source|e }}</b><small>{{ help_barcode_source|e }}</small></div>
+    <div class="bps-row-r"><div class="bps-seg2">
+      <label><input type="radio" data-bps-field name="module_bpos_barcode_source" value="sku"{% if settings.module_bpos_barcode_source != 'model' %} checked{% endif %}><span>{{ text_source_sku|e }}</span></label>
+      <label><input type="radio" data-bps-field name="module_bpos_barcode_source" value="model"{% if settings.module_bpos_barcode_source == 'model' %} checked{% endif %}><span>{{ text_source_model|e }}</span></label>
+    </div></div>
+  </div>
+  <div class="bps-row">
+    <div class="bps-row-l"><b>{{ entry_format|e }}</b></div>
+    <div class="bps-row-r"><span class="bps-badge">Code 128</span></div>
+  </div>
+</div>
