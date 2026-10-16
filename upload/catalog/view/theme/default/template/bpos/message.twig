@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>{{ title|e }}</title>
+<link rel="stylesheet" href="{{ icons|e }}">
+<link rel="stylesheet" href="{{ css|e }}">
+<script>try { var th = localStorage.getItem('bpos.theme'); if (th) document.documentElement.setAttribute('data-theme', th); } catch (e) {}</script>
+</head>
+<body style="overflow:auto">
+<div class="bp-msg">
+  <div class="bp-modal">
+    <i class="bi bi-info-circle"></i>
+    <h2>{{ title|e }}</h2>
+    <p>{{ message|e }}</p>
+    <a class="btn pri" href="{{ login_url|e }}">{{ text_sign_in|e }}</a>
+  </div>
+</div>
+</body>
+</html>

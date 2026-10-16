@@ -1,0 +1,20 @@
+<section class="page" id="bp-sales" data-title="{{ title|e }}" data-page="sales">
+  <link rel="stylesheet" href="{{ style|e }}">
+  <div class="ph">
+    <div>
+      <h1>{{ heading_sales|e }}</h1>
+      <p>{{ text_sales_sub|e }}</p>
+    </div>
+  </div>
+
+  <div class="sl-cards">
+    <div class="sl-card"><small>{{ text_cashier|e }}</small><b>{{ user_name|e }}</b></div>
+    <div class="sl-card"><small>{{ text_role|e }}</small><b>{{ role_label|e }}</b></div>
+    <div class="sl-card"><small>{{ text_store|e }}</small><b>{{ store_name|e }}</b></div>
+    <div class="sl-card"><small>{{ text_terminal|e }}</small><b>{{ terminal_name|e }}</b></div>
+    <div class="sl-card"><small>{{ text_session_left|e }}</small><b id="sl-left" data-expires="{{ expires|e }}">--:--:--</b></div>
+  </div>
+
+  <p class="sl-note">{{ text_sales_next|e }}</p>
+  <script src="{{ script|e }}" data-bp-page></script>
+</section>

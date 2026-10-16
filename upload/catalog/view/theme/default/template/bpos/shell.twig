@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="{{ boot.lang|slice(0, 2) }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>{{ title|e }} · {{ text_brand|e }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="{{ icons|e }}">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Figtree:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Manrope:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="{{ css|e }}">
+<script>try { var th = localStorage.getItem('bpos.theme'); if (th) document.documentElement.setAttribute('data-theme', th); } catch (e) {}</script>
+<script>window.BPOS_BOOT = {{ boot_json }};</script>
+{% for src in scripts_head %}
+<script src="{{ src|e }}"></script>
+{% endfor %}
+</head>
+<body data-page="{{ active|e }}">
+<div id="lbar" aria-hidden="true"></div>
+<div class="app">
+  <nav class="rail" aria-label="{{ text_menu|e }}">
+    <div class="logo">B</div>
+    {% for item in boot.nav %}
+    <a class="nav{% if item.key == active %} on{% endif %}" data-route="{{ item.key|e }}" href="{{ item.href|e }}"><i class="bi bi-{{ item.icon|e }}"></i><span>{{ item.label|e }}</span></a>
+    {% endfor %}
+    <div class="grow"></div>
+    <button class="nav" id="bp-theme" type="button" aria-label="{{ text_theme|e }}"><i class="bi bi-moon-stars"></i><span>{{ text_theme_short|e }}</span></button>
+  </nav>
+
+  <div class="main">
+    <header class="top">
+      <div class="hi"><small id="bp-sub">{{ boot.store.name|e }}{% if boot.terminal.name %} · {{ boot.terminal.name|e }}{% endif %}</small><b id="bp-greeting">{{ greeting|e }}</b></div>
+      <div class="sp"></div>
+      <div id="bp-top-slot" class="top-slot"></div>
+      {% if boot.langs|length > 1 %}
+      <div class="dd">
+        <button class="ddb" type="button" data-dd="lang" aria-haspopup="menu" aria-label="{{ text_language|e }}"><i class="bi bi-translate"></i><span class="code">{{ boot.lang|slice(0, 2)|upper }}</span><i class="bi bi-chevron-down chev"></i></button>
+        <div class="ddm" id="bp-menu-lang" role="menu" hidden>
+          {% for l in boot.langs %}
+          <button type="button" role="menuitem" data-lang="{{ l.code|e }}"{% if l.code == boot.lang %} class="on"{% endif %}><span class="code">{{ l.code|slice(0, 2)|upper }}</span>{{ l.name|e }}<i class="bi bi-check-lg chk"></i></button>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      <div class="dd">
+        <button class="av" type="button" data-dd="acct" aria-haspopup="menu" aria-label="{{ text_account|e }}">{{ boot.user.initials|e }}</button>
+        <div class="ddm" id="bp-menu-acct" role="menu" hidden>
+          <div class="acct">
+            <b>{{ boot.user.name|e }}</b>
+            <small>{{ boot.user.role_label|e }}{% if boot.user.admin %} · {{ text_admin_session|e }}{% endif %}</small>
+            <small>{{ text_store|e }}: {{ boot.store.name|e }}</small>
+            <small id="bp-acct-terminal">{{ text_terminal|e }}: {% if boot.terminal.name %}{{ boot.terminal.name|e }}{% else %}{{ text_no_terminal|e }}{% endif %}</small>
+          </div>
+          {% if boot.terminals|length > 1 %}
+          <button type="button" role="menuitem" id="bp-change-terminal"><i class="bi bi-hdd-network"></i>{{ text_change_terminal|e }}</button>
+          {% endif %}
+          <button type="button" role="menuitem" id="bp-logout" class="danger"><i class="bi bi-box-arrow-right"></i>{{ button_sign_out|e }}</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="body" id="bp-main">{{ fragment }}</div>
+  </div>
+</div>
+
+<nav class="tabs" aria-label="{{ text_menu|e }}">
+  {% for item in boot.nav %}
+  <a data-route="{{ item.key|e }}" class="{% if item.key == active %}on{% endif %}" href="{{ item.href|e }}"><i class="bi bi-{{ item.icon|e }}"></i><span>{{ item.label|e }}</span></a>
+  {% endfor %}
+</nav>
+
+<div class="toasts" id="bp-toasts" role="status" aria-live="polite"></div>
+<div class="bp-ov" id="bp-ov" hidden></div>
+
+{% for src in scripts %}
+<script src="{{ src|e }}"></script>
+{% endfor %}
+</body>
+</html>
