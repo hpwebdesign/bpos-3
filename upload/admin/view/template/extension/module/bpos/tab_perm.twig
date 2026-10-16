@@ -1,0 +1,21 @@
+<div class="bps-card">
+  <div class="bps-card-h"><h3>{{ text_permissions|e }}</h3><span class="bps-scope"><i class="fa fa-globe"></i> {{ text_scope_all|e }}</span></div>
+  <p class="bps-lead">{{ help_permissions|e }}</p>
+  <div class="bps-pm">
+    <div class="bps-pr bps-th"><span>{{ text_capability|e }}</span>{% for role in roles %}<span>{{ role_names[role]|e }}</span>{% endfor %}</div>
+    {% for c in locked_caps %}
+    <div class="bps-pr"><span class="bps-pn"><b>{{ c.name|e }}</b></span>{% for g in c.grant %}<span><label class="bps-sw"><input type="checkbox" disabled{% if g %} checked{% endif %}><span></span></label></span>{% endfor %}</div>
+    {% endfor %}
+    {% for cap, grants in perm %}
+    <div class="bps-pr"><span class="bps-pn"><b>{{ cap_names[cap]|e }}</b>{% if cap == 'void' %}<small>{{ text_same_day|e }}</small>{% endif %}</span>
+      {% for role in roles %}
+      {% if role == 'owner' %}
+      <span><label class="bps-sw"><input type="checkbox" disabled checked><span></span></label></span>
+      {% else %}
+      <span><label class="bps-sw"><input type="checkbox" data-bps-field name="module_bpos_perm[{{ cap|e('html_attr') }}][{{ role|e('html_attr') }}]" value="1"{% if grants[role] %} checked{% endif %}><span></span></label></span>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+</div>

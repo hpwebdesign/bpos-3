@@ -1,0 +1,37 @@
+<div class="bps-card">
+  <div class="bps-card-h"><h3>{{ text_order_statuses|e }}</h3><span class="bps-scope"><i class="fa fa-globe"></i> {{ text_scope_all|e }}</span></div>
+  <p class="bps-lead">{{ help_order_statuses|e }}</p>
+  {% for key, label in {'complete': entry_status_complete, 'refund': entry_status_refund, 'void': entry_status_void} %}
+  <div class="bps-row">
+    <div class="bps-row-l"><b>{{ label|e }}</b></div>
+    <div class="bps-row-r">
+      <select class="form-control" data-bps-field name="module_bpos_status_{{ key }}">
+        {% for id, name in order_statuses %}
+        <option value="{{ id|e('html_attr') }}"{% if attribute(settings, 'module_bpos_status_' ~ key) == id %} selected{% endif %}>{{ name|e }}</option>
+        {% endfor %}
+      </select>
+      <div class="bps-err" data-bps-err="module_bpos_status_{{ key }}"></div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="bps-card">
+  <div class="bps-card-h"><h3>{{ text_customer_section|e }}</h3><span class="bps-scope"><i class="fa fa-globe"></i> {{ text_scope_all|e }}</span></div>
+  <div class="bps-row">
+    <div class="bps-row-l"><b>{{ entry_customer_group|e }}</b></div>
+    <div class="bps-row-r">
+      <select class="form-control" data-bps-field name="module_bpos_customer_group">
+        <option value="0">{{ text_store_default|e }}</option>
+        {% for id, name in customer_groups %}
+        <option value="{{ id|e('html_attr') }}"{% if settings.module_bpos_customer_group == id %} selected{% endif %}>{{ name|e }}</option>
+        {% endfor %}
+      </select>
+      <div class="bps-err" data-bps-err="module_bpos_customer_group"></div>
+    </div>
+  </div>
+  <div class="bps-row">
+    <div class="bps-row-l"><b>{{ entry_create_customer|e }}</b><small>{{ help_create_customer|e }}</small></div>
+    <div class="bps-row-r"><label class="bps-sw"><input type="checkbox" data-bps-field name="module_bpos_create_customer" value="1"{% if settings.module_bpos_create_customer %} checked{% endif %}><span></span></label></div>
+  </div>
+</div>

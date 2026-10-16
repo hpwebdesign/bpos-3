@@ -1,0 +1,36 @@
+<div class="bps-card">
+  <div class="bps-card-h"><h3>{{ text_payment_methods|e }}</h3><span class="bps-scope"><i class="fa fa-globe"></i> {{ text_scope_all|e }}</span></div>
+  <p class="bps-lead">{{ help_payment_methods|e }}</p>
+  {% for code, name in payment_methods %}
+  <div class="bps-row">
+    <div class="bps-row-l"><b>{{ name|e }}</b>{% if code != 'cash' %}<small>{{ text_oc_extension|e }}: {{ code|e }}</small>{% endif %}</div>
+    <div class="bps-row-r"><label class="bps-sw"><input type="checkbox" data-bps-field name="module_bpos_payment[{{ code|e('html_attr') }}]" value="1"{% if code in settings.module_bpos_payment %} checked{% endif %}><span></span></label></div>
+  </div>
+  {% endfor %}
+  <div class="bps-err bps-err-pad" data-bps-err="module_bpos_payment"></div>
+</div>
+
+<div class="bps-card">
+  <div class="bps-card-h"><h3>{{ text_shipping_methods|e }}</h3><span class="bps-scope"><i class="fa fa-globe"></i> {{ text_scope_all|e }}</span></div>
+  <p class="bps-lead">{{ help_shipping_methods|e }}</p>
+  {% for code, name in shipping_methods %}
+  <div class="bps-row">
+    <div class="bps-row-l"><b>{{ name|e }}</b><small>{{ text_oc_extension|e }}: {{ code|e }}</small></div>
+    <div class="bps-row-r"><label class="bps-sw"><input type="checkbox" data-bps-field name="module_bpos_shipping[{{ code|e('html_attr') }}]" value="1"{% if code in settings.module_bpos_shipping %} checked{% endif %}><span></span></label></div>
+  </div>
+  {% else %}
+  <div class="bps-note">{{ text_none_enabled|e }}</div>
+  {% endfor %}
+  {% if shipping_methods %}
+  <div class="bps-row">
+    <div class="bps-row-l"><b>{{ entry_shipping_default|e }}</b></div>
+    <div class="bps-row-r">
+      <select class="form-control" data-bps-field name="module_bpos_shipping_default">
+        {% for code, name in shipping_methods %}
+        <option value="{{ code|e('html_attr') }}"{% if settings.module_bpos_shipping_default == code %} selected{% endif %}>{{ name|e }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  {% endif %}
+</div>

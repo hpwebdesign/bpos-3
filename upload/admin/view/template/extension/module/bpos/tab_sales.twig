@@ -1,0 +1,26 @@
+<div class="bps-card">
+  <div class="bps-card-h"><h3>{{ text_stock|e }}</h3><span class="bps-scope"><i class="fa fa-globe"></i> {{ text_scope_all|e }}</span></div>
+  <div class="bps-row">
+    <div class="bps-row-l"><b>{{ entry_low_stock|e }}</b><small>{{ help_low_stock|e }}</small></div>
+    <div class="bps-row-r">
+      <div class="bps-unit"><input type="number" class="form-control" data-bps-field name="module_bpos_low_stock" min="0" max="99" step="1" value="{{ settings.module_bpos_low_stock|e('html_attr') }}"><span>{{ text_items|e }}</span></div>
+      <div class="bps-err" data-bps-err="module_bpos_low_stock"></div>
+    </div>
+  </div>
+  <div class="bps-row">
+    <div class="bps-row-l"><b>{{ entry_negative_stock|e }}</b><small>{{ help_negative_stock|e }} <a href="{{ link_option_setting|e('html_attr') }}" target="_blank" rel="noopener"><i class="fa fa-external-link"></i></a></small></div>
+    <div class="bps-row-r"><span class="bps-badge {{ stock_checkout ? 'bps-b-warn' : 'bps-b-ok' }}">{{ stock_checkout ? text_allowed|e : text_not_allowed|e }}</span></div>
+  </div>
+</div>
+
+<div class="bps-card">
+  <div class="bps-card-h"><h3>{{ text_pricing|e }}</h3><span class="bps-scope"><i class="fa fa-globe"></i> {{ text_scope_all|e }}</span></div>
+  <div class="bps-row">
+    <div class="bps-row-l"><b>{{ entry_max_discount|e }}</b><small>{{ help_max_discount|e }}</small></div>
+    <div class="bps-row-r">
+      <div class="bps-unit"><input type="number" class="form-control" data-bps-field name="module_bpos_max_discount" min="0" max="100" step="1" value="{{ settings.module_bpos_max_discount|e('html_attr') }}"><span>%</span></div>
+      <div class="bps-err" data-bps-err="module_bpos_max_discount"></div>
+    </div>
+  </div>
+  <div class="bps-note">{{ help_tax_note|e }}</div>
+</div>

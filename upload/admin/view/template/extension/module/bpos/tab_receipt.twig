@@ -1,0 +1,66 @@
+<div class="bps-cols">
+  <div class="bps-col">
+    {{ dev_bar }}
+    {% for t in terminals %}
+    <div class="bps-dev" data-bps-dev="{{ t.terminal_id|e('html_attr') }}">
+      <div class="bps-card">
+        <div class="bps-card-h"><h3>{{ text_printer|e }}</h3><span class="bps-scope bps-scope-dev"><i class="fa fa-desktop"></i> {{ text_scope_device|e }}</span></div>
+        <div class="bps-row">
+          <div class="bps-row-l"><b>{{ entry_paper|e }}</b></div>
+          <div class="bps-row-r"><div class="bps-seg2">
+            {% for w in ['58', '80'] %}<label><input type="radio" data-bps-field data-bps-paper name="terminal[{{ t.terminal_id }}][paper]" value="{{ w }}"{% if t.receipt_width == w %} checked{% endif %}><span>{{ w }} mm</span></label>{% endfor %}
+          </div></div>
+        </div>
+        <div class="bps-row">
+          <div class="bps-row-l"><b>{{ entry_connection|e }}</b></div>
+          <div class="bps-row-r"><select class="form-control" data-bps-field name="terminal[{{ t.terminal_id }}][conn]">
+            {% for code, label in conn_names %}<option value="{{ code }}"{% if t.printer_profile == code %} selected{% endif %}>{{ label|e }}</option>{% endfor %}
+          </select></div>
+        </div>
+        <div class="bps-row">
+          <div class="bps-row-l"><b>{{ entry_copies|e }}</b></div>
+          <div class="bps-row-r"><div class="bps-seg2">
+            {% for n in [1, 2, 3] %}<label><input type="radio" data-bps-field name="terminal[{{ t.terminal_id }}][copies]" value="{{ n }}"{% if t.opt.copies == n %} checked{% endif %}><span>{{ n }}</span></label>{% endfor %}
+          </div></div>
+        </div>
+        <div class="bps-row">
+          <div class="bps-row-l"><b>{{ entry_auto_print|e }}</b></div>
+          <div class="bps-row-r"><label class="bps-sw"><input type="checkbox" data-bps-field name="terminal[{{ t.terminal_id }}][auto]" value="1"{% if t.opt.auto %} checked{% endif %}><span></span></label></div>
+        </div>
+        <div class="bps-row">
+          <div class="bps-row-l"><b>{{ entry_cut|e }}</b></div>
+          <div class="bps-row-r"><label class="bps-sw"><input type="checkbox" data-bps-field name="terminal[{{ t.terminal_id }}][cut]" value="1"{% if t.opt.cut %} checked{% endif %}><span></span></label></div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+    <div class="bps-card">
+      <div class="bps-card-h"><h3>{{ text_receipt_content|e }}</h3><span class="bps-scope"><i class="fa fa-globe"></i> {{ text_scope_all|e }}</span></div>
+      <div class="bps-row bps-stack">
+        <div class="bps-row-l"><b>{{ entry_rc_header|e }}</b></div>
+        <div class="bps-row-r"><textarea class="form-control" rows="3" maxlength="300" data-bps-field data-bps-rc name="module_bpos_rc_header" placeholder="{{ placeholder_rc_header|e('html_attr') }}">{{ settings.module_bpos_rc_header|e }}</textarea><div class="bps-err" data-bps-err="module_bpos_rc_header"></div></div>
+      </div>
+      <div class="bps-row bps-stack">
+        <div class="bps-row-l"><b>{{ entry_rc_footer|e }}</b></div>
+        <div class="bps-row-r"><textarea class="form-control" rows="3" maxlength="300" data-bps-field data-bps-rc name="module_bpos_rc_footer">{{ settings.module_bpos_rc_footer|e }}</textarea><div class="bps-err" data-bps-err="module_bpos_rc_footer"></div></div>
+      </div>
+      {% for key, label in {'logo': entry_rc_logo, 'barcode': entry_rc_barcode, 'cashier': entry_rc_cashier, 'tax': entry_rc_tax} %}
+      <div class="bps-row">
+        <div class="bps-row-l"><b>{{ label|e }}</b></div>
+        <div class="bps-row-r"><label class="bps-sw"><input type="checkbox" data-bps-field data-bps-rc name="module_bpos_rc_{{ key }}" value="1"{% if attribute(settings, 'module_bpos_rc_' ~ key) %} checked{% endif %}><span></span></label></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="bps-col bps-col-side bps-col-wide">
+    <div class="bps-card">
+      <div class="bps-card-h"><h3>{{ text_receipt_preview|e }} · <span id="bps-rc-w">58</span> mm</h3><span class="bps-sub">{{ help_receipt_preview|e }}</span></div>
+      <div class="bps-pvbox"><div class="bps-paper" id="bps-paper"
+        data-store="{{ store_names[0]|e('html_attr') }}"
+        data-l-order="{{ rc_order|e('html_attr') }}" data-l-cashier="{{ rc_cashier|e('html_attr') }}" data-l-sub="{{ rc_subtotal|e('html_attr') }}"
+        data-l-tax="{{ rc_tax|e('html_attr') }}" data-l-total="{{ rc_total|e('html_attr') }}" data-l-cash="{{ rc_cash|e('html_attr') }}" data-l-change="{{ rc_change|e('html_attr') }}"></div></div>
+    </div>
+  </div>
+</div>
