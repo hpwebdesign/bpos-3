@@ -1,0 +1,49 @@
+<div class="page mg" id="cu-root" data-title="{{ title|e }}" data-page="customers">
+  <link rel="stylesheet" href="{{ style|e }}">
+
+  <div class="ph">
+    <div>
+      <h1>{{ heading_customers|e }}</h1>
+      <p>{{ subtitle|e }}</p>
+    </div>
+    <div class="phr">
+      {% if can_export %}<button class="btn" id="cu-export" type="button"><i class="bi bi-download"></i><span>{{ button_export|e }}</span></button>{% endif %}
+      {% if can_edit %}<button class="btn pri" id="cu-new" type="button"><i class="bi bi-person-plus"></i><span>{{ js_sl_new_customer|e }}</span></button>{% endif %}
+    </div>
+  </div>
+
+  <div class="mg-bar">
+    <label class="mg-search">
+      <i class="bi bi-search"></i>
+      <input id="cu-q" type="text" autocomplete="off" placeholder="{{ text_customers_search|e }}" aria-label="{{ text_customers_search|e }}">
+    </label>
+  </div>
+
+  <div class="mg-card" id="cu-card">
+    <div class="mg-scroll">
+      <table class="mg-t">
+        <thead>
+          <tr>
+            <th data-sort="name">{{ text_customer|e }}</th>
+            <th class="hm">{{ js_sl_phone|e }}</th>
+            <th class="num hs" data-sort="orders">{{ text_orders_count|e }}</th>
+            <th class="num" data-sort="spent">{{ text_spent|e }}</th>
+            <th class="hm" data-sort="last">{{ text_last_purchase|e }}</th>
+          </tr>
+        </thead>
+        <tbody id="cu-body"></tbody>
+      </table>
+    </div>
+    <div class="mg-foot" id="cu-foot"></div>
+  </div>
+
+  <div class="mg-scrim" id="cu-scrim" hidden></div>
+  <aside class="mg-drawer" id="cu-drawer" role="dialog" aria-modal="true" aria-label="{{ text_customer|e }}" hidden>
+    <div class="mg-dh"><h2 id="cu-dt"></h2><button type="button" id="cu-dx" aria-label="{{ button_close|e }}"><i class="bi bi-x-lg"></i></button></div>
+    <div class="mg-db" id="cu-db"></div>
+    <div class="mg-df" id="cu-df"></div>
+  </aside>
+
+  <script type="application/json" id="cu-data">{{ page_json }}</script>
+  <script src="{{ script|e }}" data-bp-page></script>
+</div>

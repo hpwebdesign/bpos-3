@@ -17,7 +17,7 @@ $_['bpos_pages'] = array(
 	'orders'    => array('route' => 'bpos/orders',    'icon' => 'receipt',       'cap' => 'orders',    'ready' => true),
 	'products'  => array('route' => 'bpos/products',  'icon' => 'box-seam',      'cap' => 'products',  'ready' => false),
 	'reports'   => array('route' => 'bpos/reports',   'icon' => 'bar-chart-line', 'cap' => 'reports',   'ready' => false),
-	'customers' => array('route' => 'bpos/customers', 'icon' => 'people',        'cap' => 'customers', 'ready' => false)
+	'customers' => array('route' => 'bpos/customers', 'icon' => 'people',        'cap' => 'customers', 'ready' => true)
 );
 
 // Roles from lowest to highest rank
