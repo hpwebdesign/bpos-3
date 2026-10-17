@@ -11,7 +11,7 @@
   var ic = function (n) { return '<i class="bi bi-' + n + '"></i>'; };
   var lang = d.documentElement.lang || undefined;
 
-  var S = { q: '', sort: 'name', dir: 'asc', page: 1, pages: 1, total: 0, rows: [], loaded: false, open: 0 };
+  var S = { q: '', k: '', g: 0, stats: null, sort: 'name', dir: 'asc', page: 1, pages: 1, total: 0, rows: [], loaded: false, open: 0 };
   var ctl = null;
   var timer = null;
   var current = null;
@@ -52,9 +52,9 @@
     $('cu-card').classList.add('busy');
     if (!S.loaded) { skeleton(); }
 
-    B.api(url(P.urls.data, 'q=' + encodeURIComponent(S.q) + '&sort=' + S.sort + '&dir=' + S.dir + '&page=' + S.page), { signal: ctl.signal }).then(function (r) {
+    B.api(url(P.urls.data, 'q=' + encodeURIComponent(S.q) + '&k=' + S.k + '&g=' + S.g + '&sort=' + S.sort + '&dir=' + S.dir + '&page=' + S.page), { signal: ctl.signal }).then(function (r) {
       S.loaded = true;
-      S.rows = r.rows; S.page = r.page; S.pages = r.pages; S.total = r.total;
+      S.rows = r.rows; S.page = r.page; S.pages = r.pages; S.total = r.total; S.stats = r.stats;
       $('cu-card').classList.remove('busy');
       render();
     }).catch(function (e) {
@@ -64,7 +64,36 @@
     });
   }
 
+  function fillSelect(sel, list, cur) {
+    sel.innerHTML = list.map(function (o) { return '<option value="' + esc(String(o[0])) + '"' + (String(o[0]) === String(cur) ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('');
+  }
+
+  function renderTools() {
+    fillSelect($('cu-grp'), [[0, t('cu_all_groups', 'All groups')]].concat((P.groups || []).map(function (g) { return [g.id, g.name]; })), S.g);
+    fillSelect($('cu-seg'), [
+      ['', t('cu_seg_all', 'All customers')], ['new', t('cu_seg_new', 'New (30 days)')], ['repeat', t('cu_seg_repeat', 'Repeat (2+ orders)')],
+      ['inactive', t('cu_seg_inactive', 'Inactive 30+ days')], ['never', t('cu_seg_never', 'No purchases')]
+    ], S.k);
+  }
+
+  function renderStats() {
+    var st = S.stats;
+    if (!st) { return; }
+
+    function tile(icon, key, n, label, warn) {
+      var on = S.k === (key === 'all' ? '' : key);
+
+      return '<button type="button" class="catc' + (on ? ' on' : '') + (warn && n > 0 ? ' warn' : '') + '" data-stat="' + key + '" role="tab" aria-selected="' + (on ? 'true' : 'false') + '"><span class="ci g-All">' + ic(icon) + '</span><span><b>' + n + '</b><small>' + esc(label) + '</small></span></button>';
+    }
+
+    $('cu-stats').innerHTML = tile('people', 'all', st.all, t('cu_stat_all', 'Customers')) +
+      tile('person-plus', 'new', st.new, t('cu_stat_new', 'New (30 days)')) +
+      tile('arrow-repeat', 'repeat', st.repeat, t('cu_stat_repeat', 'Repeat')) +
+      tile('moon', 'inactive', st.inactive, t('cu_stat_inactive', 'Inactive 30+ days'), true);
+  }
+
   function render() {
+    renderStats();
     $('cu-body').innerHTML = S.rows.length ? S.rows.map(function (r) {
       return '<tr data-open="' + r.id + '" tabindex="0">' +
         '<td><div class="mg-who"><span class="av sm">' + esc(initials(r.name)) + '</span><span>' + esc(r.name) + '<small>' + esc(r.email || '') + '</small></span></div></td>' +
@@ -245,7 +274,7 @@
     var btn = $('cu-export');
     btn.disabled = true;
 
-    B.api(url(P.urls.export, 'q=' + encodeURIComponent(S.q))).then(function (r) {
+    B.api(url(P.urls.export, 'q=' + encodeURIComponent(S.q) + '&k=' + S.k + '&g=' + S.g)).then(function (r) {
       var rows = [['customer_id', 'name', 'email', 'phone', 'orders', 'spent', 'currency', 'last_purchase', 'last_store']].concat(r.rows.map(function (x) {
         return [x.id, x.name, x.email, x.phone, x.orders, x.spent, x.currency, x.last_date, x.last_store];
       }));
@@ -259,6 +288,14 @@
   /* ---------- events ---------- */
   function onClick(e) {
     var x;
+
+    if ((x = e.target.closest('[data-stat]'))) {
+      var key = x.getAttribute('data-stat');
+      S.k = key === 'all' ? '' : key;
+      $('cu-seg').value = S.k;
+      load(false);
+      return;
+    }
 
     if ((x = e.target.closest('[data-pg]'))) { S.page = Math.max(1, Math.min(S.pages, S.page + Number(x.getAttribute('data-pg')))); load(true); return; }
 
@@ -292,6 +329,10 @@
 
   root.addEventListener('click', onClick);
   d.addEventListener('keydown', onKey);
+
+  renderTools();
+  $('cu-grp').addEventListener('change', function () { S.g = Number(this.value) || 0; load(false); });
+  $('cu-seg').addEventListener('change', function () { S.k = this.value; load(false); });
 
   $('cu-q').addEventListener('input', function () {
     clearTimeout(timer);

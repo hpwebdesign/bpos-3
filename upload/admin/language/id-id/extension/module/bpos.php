@@ -29,6 +29,17 @@ $_['help_status']               = 'Matikan untuk memblokir POS di semua terminal
 $_['entry_lang']                = 'Bahasa bawaan';
 $_['entry_currency']            = 'Mata uang bawaan';
 $_['text_use_store_default']    = 'Ikuti bawaan toko';
+$_['text_background'] = 'Latar belakang';
+$_['help_background'] = 'Warna latar POS di semua terminal. Kosongkan warna untuk memakai bawaan.';
+$_['text_bg_light'] = 'Tema terang';
+$_['text_bg_dark'] = 'Tema gelap';
+$_['entry_bg_base'] = 'Warna dasar';
+$_['entry_bg_g1'] = 'Cahaya kiri atas';
+$_['entry_bg_g2'] = 'Cahaya kanan atas';
+$_['button_bg_reset'] = 'Kembalikan ke bawaan';
+$_['error_color_invalid'] = 'Isi warna seperti #3558D6.';
+$_['entry_currency_switch']     = 'Izinkan ganti mata uang';
+$_['help_currency_switch']      = 'Kasir bisa berpindah antar mata uang toko yang aktif lewat header. Pilihan hanya berlaku di perangkat ini, dan setiap order disimpan dalam mata uang saat dijual.';
 $_['entry_guest']               = 'Izinkan checkout tamu';
 $_['help_guest']                = 'Kasir bisa menjual tanpa memilih pelanggan.';
 

@@ -117,6 +117,38 @@ class Response {
 		$this->response->redirect($url);
 	}
 
+	// Background colors set in the admin: only validated hex values reach the CSS
+	private function background() {
+		$config = $this->registry->get('config');
+		$vars = array('base' => '--bg', 'g1' => '--glow1', 'g2' => '--glow2');
+		$set = array();
+
+		foreach (array('l', 'd') as $mode) {
+			$set[$mode] = array();
+
+			foreach ($vars as $part => $var) {
+				$value = (string)$config->get('module_bpos_bg_' . $mode . '_' . $part);
+
+				if (preg_match('/^#[0-9A-Fa-f]{6}$/', $value)) {
+					$set[$mode][] = $var . ':' . $value;
+				}
+			}
+		}
+
+		$css = '';
+
+		if ($set['l']) {
+			$css .= ':root{' . implode(';', $set['l']) . '}';
+		}
+
+		if ($set['d']) {
+			$dark = implode(';', $set['d']);
+			$css .= '@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){' . $dark . '}}:root[data-theme="dark"]{' . $dark . '}';
+		}
+
+		return $css;
+	}
+
 	// Full document for a normal request, the bare fragment for XHR
 	public function page($fragment, $title, $active, Auth $auth) {
 		if ($this->isXhr()) {
@@ -139,6 +171,7 @@ class Response {
 		$data['boot_json'] = json_encode($boot, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE);
 		$data['css'] = $this->asset('theme/default/stylesheet/bpos/bpos_core.css');
 		$data['icons'] = $this->asset('javascript/bpos/vendor/bootstrap-icons/bootstrap-icons.css');
+		$data['bg_css'] = $this->background();
 
 		// Core files load in the head so page scripts inside the fragment can use BPOS while the page parses
 		$data['scripts_head'] = array();

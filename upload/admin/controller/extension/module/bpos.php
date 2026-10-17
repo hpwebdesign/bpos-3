@@ -230,7 +230,7 @@ class ControllerExtensionModuleBpos extends Controller {
     $clean = [];
     $errors = [];
 
-    foreach (['module_bpos_status', 'module_bpos_guest', 'module_bpos_login_doodle'] as $key) {
+    foreach (['module_bpos_status', 'module_bpos_guest', 'module_bpos_login_doodle', 'module_bpos_currency_switch'] as $key) {
       $clean[$key] = empty($post[$key]) ? 0 : 1;
     }
 
@@ -353,6 +353,21 @@ class ControllerExtensionModuleBpos extends Controller {
 
     foreach (['module_bpos_create_customer', 'module_bpos_rc_logo', 'module_bpos_rc_address', 'module_bpos_rc_phone', 'module_bpos_rc_barcode', 'module_bpos_rc_cashier', 'module_bpos_rc_terminal', 'module_bpos_rc_customer', 'module_bpos_rc_tax'] as $key) {
       $clean[$key] = empty($post[$key]) ? 0 : 1;
+    }
+
+    // POS background colors: empty keeps the theme default
+    foreach (['l', 'd'] as $mode) {
+      foreach (['base', 'g1', 'g2'] as $part) {
+        $key = 'module_bpos_bg_' . $mode . '_' . $part;
+        $color = strtoupper(trim((string)($post[$key] ?? '')));
+
+        if ($color !== '' && !preg_match('/^#[0-9A-F]{6}$/', $color)) {
+          $errors[$key] = $this->language->get('error_color_invalid');
+          $color = (string)($old[$key] ?? '');
+        }
+
+        $clean[$key] = $color;
+      }
     }
 
     // Capability matrix (owner always passes, so it is not stored)

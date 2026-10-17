@@ -110,7 +110,7 @@
     $('pr-sub').textContent = st.total + ' ' + t('pr_products', 'products') + ' · ' + st.shown + ' ' + t('pr_shown_pos', 'shown in POS');
 
     function kp(icon, key, n, label, on, warn) {
-      return '<button type="button" class="catc' + (on ? ' on' : '') + (warn ? ' warn' : '') + '" data-kp="' + key + '" role="tab" aria-selected="' + (on ? 'true' : 'false') + '"><span class="ci">' + ic(icon) + '</span><span><b>' + esc(label) + '</b><small>' + n + ' ' + esc(t('pr_items', 'items')) + '</small></span></button>';
+      return '<button type="button" class="catc' + (on ? ' on' : '') + (warn ? ' warn' : '') + '" data-kp="' + key + '" role="tab" aria-selected="' + (on ? 'true' : 'false') + '"><span class="ci g-All">' + ic(icon) + '</span><span><b>' + n + '</b><small>' + esc(label) + '</small></span></button>';
     }
 
     $('pr-kpis').innerHTML = kp('grid', 'all', st.total, t('pr_total', 'Total products'), !S.pos && S.bc !== 'attn') +

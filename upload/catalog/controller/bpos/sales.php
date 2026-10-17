@@ -22,6 +22,7 @@ class ControllerBposSales extends Controller {
 
 		$page = array(
 			'currency'   => array('code' => $pricing->currencyCode(), 'decimals' => $pricing->decimals()),
+			'rates'      => $this->rates($pricing),
 			'categories' => $categories,
 			'low'        => (int)$this->config->get('module_bpos_low_stock'),
 			'negStock'   => (bool)$this->config->get('config_stock_checkout'),
@@ -572,6 +573,11 @@ class ControllerBposSales extends Controller {
 			$state = 'paid';
 		}
 
+		// Same cleanup as checkout/success: the gateway page leaves its order in the session
+		if ($state === 'paid') {
+			unset($this->session->data['order_id'], $this->session->data['payment_method'], $this->session->data['payment_methods']);
+		}
+
 		$out->json(array('ok' => true, 'state' => $state));
 	}
 
@@ -921,6 +927,17 @@ class ControllerBposSales extends Controller {
 	}
 
 	// Terminal option "print automatically after checkout" (on unless the admin turned it off)
+	// Currency rates by code, to convert a saved cart after a currency switch
+	private function rates(\Bpos\Pricing $pricing) {
+		$rates = array();
+
+		foreach ($pricing->currencies() as $c) {
+			$rates[$c['code']] = $c['value'];
+		}
+
+		return $rates;
+	}
+
 	private function autoPrint(array $user) {
 		if (!(int)$user['terminal_id']) {
 			return false;

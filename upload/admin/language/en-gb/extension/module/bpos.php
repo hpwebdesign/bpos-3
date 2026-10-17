@@ -29,6 +29,17 @@ $_['help_status']               = 'Turn off to block the POS on every terminal, 
 $_['entry_lang']                = 'Default language';
 $_['entry_currency']            = 'Default currency';
 $_['text_use_store_default']    = 'Use the store default';
+$_['text_background'] = 'Background';
+$_['help_background'] = 'Colors of the POS background on every terminal. Leave a color empty to keep the default.';
+$_['text_bg_light'] = 'Light theme';
+$_['text_bg_dark'] = 'Dark theme';
+$_['entry_bg_base'] = 'Base color';
+$_['entry_bg_g1'] = 'Glow, top left';
+$_['entry_bg_g2'] = 'Glow, top right';
+$_['button_bg_reset'] = 'Reset to default';
+$_['error_color_invalid'] = 'Enter a color like #3558D6.';
+$_['entry_currency_switch']     = 'Allow currency switch';
+$_['help_currency_switch']      = 'Cashiers can switch between the enabled store currencies from the header. The choice applies to this device only, and each order is stored in the currency it was sold in.';
 $_['entry_guest']               = 'Allow guest checkout';
 $_['help_guest']                = 'Cashiers can sell without choosing a customer.';
 

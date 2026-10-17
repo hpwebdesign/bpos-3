@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="{{ icons|e }}">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Figtree:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Manrope:wght@600;700;800&display=swap">
 <link rel="stylesheet" href="{{ css|e }}">
+{% if bg_css %}<style id="bpos-bg">{{ bg_css }}</style>{% endif %}
 <script>try { var th = localStorage.getItem('bpos.theme'); if (th) document.documentElement.setAttribute('data-theme', th); } catch (e) {}</script>
 <script>window.BPOS_BOOT = {{ boot_json }};</script>
 {% for src in scripts_head %}
@@ -39,6 +40,16 @@
         <div class="ddm" id="bp-menu-lang" role="menu" hidden>
           {% for l in boot.langs %}
           <button type="button" role="menuitem" data-lang="{{ l.code|e }}"{% if l.code == boot.lang %} class="on"{% endif %}><span class="code">{{ l.code|slice(0, 2)|upper }}</span>{{ l.name|e }}<i class="bi bi-check-lg chk"></i></button>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      {% if boot.currencies|length > 1 %}
+      <div class="dd">
+        <button class="ddb" type="button" data-dd="cur" aria-haspopup="menu" aria-label="{{ text_currency|e }}"><i class="bi bi-currency-exchange"></i><span class="code">{{ boot.currency|e }}</span><i class="bi bi-chevron-down chev"></i></button>
+        <div class="ddm" id="bp-menu-cur" role="menu" hidden>
+          {% for c in boot.currencies %}
+          <button type="button" role="menuitem" data-cur="{{ c.code|e('html_attr') }}"{% if c.code == boot.currency %} class="on"{% endif %}><span class="code">{{ c.code|e }}</span>{{ c.title|e }}<i class="bi bi-check-lg chk"></i></button>
           {% endfor %}
         </div>
       </div>

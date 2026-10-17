@@ -12,3 +12,27 @@
   </div>
 </div>
 {% endfor %}
+
+<div class="bps-card">
+  <div class="bps-card-h"><h3>{{ text_background|e }}</h3><span class="bps-scope"><i class="fa fa-globe"></i> {{ text_scope_all|e }}</span></div>
+  <p class="bps-note">{{ help_background|e }}</p>
+  {% set bgdef = {'l': {'base': '#EEF2FC', 'g1': '#D6E1FF', 'g2': '#EADFFF'}, 'd': {'base': '#0A1022', 'g1': '#14275A', 'g2': '#261B55'}} %}
+  {% for m, title in {'l': text_bg_light, 'd': text_bg_dark} %}
+  <div class="bps-bgh"><b>{{ title|e }}</b><button type="button" class="btn btn-default btn-sm" data-bps-bgreset="{{ m }}">{{ button_bg_reset|e }}</button></div>
+  {% for p, label in {'base': entry_bg_base, 'g1': entry_bg_g1, 'g2': entry_bg_g2} %}
+  {% set key = 'module_bpos_bg_' ~ m ~ '_' ~ p %}
+  {% set val = attribute(settings, key) %}
+  <div class="bps-row">
+    <div class="bps-row-l"><b>{{ label|e }}</b></div>
+    <div class="bps-row-r">
+      <div class="bps-color" data-m="{{ m }}" data-p="{{ p }}">
+        <input type="color" class="bps-cp" value="{{ (val ?: bgdef[m][p])|lower|e('html_attr') }}" data-def="{{ bgdef[m][p] }}" aria-label="{{ label|e('html_attr') }}">
+        <input type="text" class="form-control" data-bps-field name="{{ key }}" maxlength="7" value="{{ val|e('html_attr') }}" placeholder="{{ bgdef[m][p] }}" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="bps-err" data-bps-err="{{ key }}"></div>
+    </div>
+  </div>
+  {% endfor %}
+  <div class="bps-bgpv" data-bps-bgpv="{{ m }}"></div>
+  {% endfor %}
+</div>

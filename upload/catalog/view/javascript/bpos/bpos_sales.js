@@ -47,11 +47,21 @@
       S.shipping = saved.shipping || '';
       S.pay = saved.pay || 'cash';
       S.rid = saved.rid || '';
+
+      // The currency was switched since the cart was saved: convert the fixed discount and the charge
+      if (saved.cur && saved.cur !== P.currency.code && P.rates && P.rates[saved.cur] && P.rates[P.currency.code]) {
+        var f = P.rates[P.currency.code] / P.rates[saved.cur];
+        var conv = function (v) { return Math.round(v * f * Math.pow(10, P.currency.decimals)) / Math.pow(10, P.currency.decimals); };
+
+        S.charge = conv(S.charge);
+        if (S.discount && S.discount.type !== '%') { S.discount = { type: S.discount.type, value: conv(Number(S.discount.value) || 0) }; }
+        S.rid = '';
+      }
     }
   } catch (e) { /* ignore a broken saved cart */ }
 
   function persist() {
-    B.store.set(KEY, JSON.stringify({ cart: S.cart, customer: S.customer, discount: S.discount, charge: S.charge, coupon: S.coupon, shipping: S.shipping, pay: S.pay, rid: S.rid }));
+    B.store.set(KEY, JSON.stringify({ cart: S.cart, customer: S.customer, discount: S.discount, charge: S.charge, coupon: S.coupon, shipping: S.shipping, pay: S.pay, rid: S.rid, cur: P.currency.code }));
   }
 
   function uid() {
@@ -762,11 +772,13 @@
   }
 
   function showDone(r) {
+    // The sale is final: drop the saved cart now so a refresh cannot bring it back. The receipt is read from the order by id.
+    resetSale();
+
     // Auto print: success toast, print, and a fresh cart without waiting for a click
     if (r.auto_print) {
       B.ui.toast(t('sl_checkout_done', 'Checkout successful') + ' · #' + r.order_id);
       printReceipt(r.receipt_url);
-      resetSale();
 
       return;
     }
@@ -788,7 +800,7 @@
 
       var nb = box.querySelector('[data-new]');
       if (nb) { nb.focus(); }
-    }, false).then(function () { resetSale(); });
+    }, false);
   }
 
   /* ---------- mobile sheet ---------- */

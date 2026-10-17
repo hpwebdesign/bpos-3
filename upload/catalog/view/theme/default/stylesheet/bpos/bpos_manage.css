@@ -8,6 +8,9 @@
 .mg-seg button { height: 38px; padding: 0 14px; border-radius: 13px; font-weight: 700; font-size: 13px; color: var(--mute); }
 .mg-seg button.on { background: var(--navy); color: #fff; }
 .mg-sel, .mg-date { height: 44px; border-radius: 16px; padding: 0 12px; background: var(--surface); color: var(--ink); border: 0; box-shadow: inset 0 0 0 1px var(--line); font-size: 13px; font-weight: 600; max-width: 100%; }
+.mg-fld { position: relative; flex: none; display: inline-flex; }
+.mg-fld > .bi { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--mute); pointer-events: none; font-size: 15px; z-index: 1; }
+.mg-fld .mg-sel { padding-left: 36px; cursor: pointer; }
 .mg-dates { display: inline-flex; align-items: center; gap: 6px; color: var(--mute); }
 .mg-dates[hidden] { display: none; }
 .mg-tabs { display: flex; gap: 6px; flex-wrap: wrap; flex: none; }
@@ -134,17 +137,22 @@
 /* KPI strip, same look as the category chips on Sales */
 .mg .cats.kp { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; flex: none; padding: 4px 4px 10px; margin: -4px -4px -6px; }
 .mg .cats.kp::-webkit-scrollbar { display: none; }
-.mg .catc { flex: 1 0 auto; display: flex; align-items: center; gap: 10px; padding: 6px 22px 6px 6px; border-radius: 999px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); text-align: left; cursor: default; }
+.mg .catc { flex: none; display: flex; align-items: center; gap: 10px; padding: 6px 22px 6px 6px; border-radius: 999px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); text-align: left; cursor: default; }
 .mg .catc .ci { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--tile); color: var(--accent-ink); }
 .mg .catc .ci .bi { font-size: 20px; }
 .mg .catc b { display: block; font-weight: 700; font-size: 17px; white-space: nowrap; line-height: 1.2; font-family: var(--f-num); }
 .mg .catc small { display: block; color: var(--mute); font-size: 12px; white-space: nowrap; }
 .mg .catc small .rp-dl { margin-left: 4px; padding: 0 6px; font-size: 11px; }
+.mg button.catc { cursor: pointer; font: inherit; color: var(--ink); }
+.mg .catc.on { background: var(--soft); box-shadow: inset 0 0 0 1.5px var(--accent); color: var(--ink); }
+.mg .catc.on small { color: var(--mute); }
+.mg .catc.on .ci { background: var(--tile); color: var(--accent-ink); }
+.mg .catc.warn b { color: var(--amber); }
 
 /* daily sales chart (inline SVG) */
 .rp-amc { position: relative; }
-.rp-amc svg { display: block; overflow: visible; }
-.rp-amc text { fill: var(--mute); font-size: 11px; }
+.rp-amc > svg { display: block; overflow: visible; }
+.rp-amc .ax text { fill: var(--mute); font-size: 11px; }
 .rp-amc .g { stroke: var(--line); stroke-width: 1; }
 .rp-amc .ar { fill: var(--accent); fill-opacity: .12; }
 .rp-amc .ln { fill: none; stroke: var(--accent); stroke-width: 2; }
@@ -152,3 +160,40 @@
 .rp-tip { position: absolute; z-index: 2; pointer-events: none; padding: 6px 10px; border-radius: 8px; background: var(--navy); color: #fff; font-size: 12px; white-space: nowrap; display: flex; flex-direction: column; gap: 1px; }
 .rp-tip[hidden] { display: none; }
 .rp-tip span { opacity: .75; }
+
+/* Reports redesign */
+.rp-hh { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.rp-sub, .rp-n { color: var(--mute); font-size: 12.5px; }
+.rp-n:empty, .rp-sub:empty { display: none; }
+.rp-lc { color: var(--mute); font-size: 13px; }
+.rp-lc b { color: var(--ink); font-family: var(--f-num); }
+.rp-donut { height: 220px; position: relative; }
+.rp-list { display: flex; flex-direction: column; }
+.rp-li { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid var(--line); min-width: 0; }
+.rp-li:first-child { border-top: 0; }
+.rp-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.rp-ln { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.rp-ln b { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-ln small { color: var(--mute); font-size: 12px; }
+.rp-lv { font-family: var(--f-num); font-weight: 600; }
+.rp-pill { min-width: 52px; text-align: center; padding: 2px 9px; border-radius: 12px; background: var(--fill); font-size: 12px; font-weight: 700; }
+.rp-st { display: inline-block; padding: 2px 9px; border-radius: 12px; font-size: 12px; font-weight: 700; }
+.rp-st.out { color: var(--red); background: var(--red-soft); }
+.rp-st.low { color: var(--amber); background: var(--amber-soft); }
+.rp-lnk { align-self: flex-start; margin-top: 10px; }
+.kv { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 13.5px; }
+.kv:first-child { border-top: 0; }
+.kv .num { font-family: var(--f-num); font-weight: 600; }
+.kv.kvt { font-weight: 700; font-size: 15px; border-top: 2px solid var(--line); }
+.kv.mut { color: var(--mute); }
+.rp-drawer { background: var(--fill); border-radius: 16px; padding: 10px 14px; }
+.rp-drawer small { display: block; color: var(--mute); font-size: 12px; margin-top: 4px; }
+.rp-drawer .kv { border-color: transparent; padding: 5px 0; }
+.rp-drawer .kv.kvt { border-top: 1px solid var(--line); }
+.rp-card[hidden] { display: none; }
+.rp-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start; }
+@media (max-width: 1100px) { .rp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .rp-grid { grid-template-columns: minmax(0, 1fr); } }
+.rp-donut { height: 200px; }
+#rp-kpis { transition: opacity .12s; }
+#rp-kpis.busy { opacity: .55; }
