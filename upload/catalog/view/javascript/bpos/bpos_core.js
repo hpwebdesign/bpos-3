@@ -78,6 +78,17 @@
       });
     },
 
+    // Moves a page's <template data-bp-top> into the header slot (first load; the router does it on navigation)
+    mountTop: function (scope) {
+      var slot = d.getElementById('bp-top-slot');
+      var tpl = (scope || d).querySelector('template[data-bp-top]');
+
+      if (slot && tpl) {
+        slot.innerHTML = tpl.innerHTML;
+        tpl.parentNode.removeChild(tpl);
+      }
+    },
+
     esc: function (s) {
       return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
         return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];

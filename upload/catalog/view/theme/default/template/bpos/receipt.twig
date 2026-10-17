@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="{{ lang_code|e }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>{{ text_receipt|e }} #{{ order_id|e }}</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; }
+  body { font: 12px/1.35 'Courier New', ui-monospace, monospace; color: #000; }
+  .rc { width: {{ width|e }}mm; max-width: 100%; margin: 0 auto; padding: 4mm 3mm 6mm; }
+  .c { text-align: center; }
+  .logo { max-width: 60%; max-height: 18mm; margin: 0 auto 2mm; display: block; }
+  .hd { margin-bottom: 2mm; }
+  hr { border: 0; border-top: 1px dashed #000; margin: 2mm 0; }
+  table { width: 100%; border-collapse: collapse; }
+  td { vertical-align: top; padding: 0; }
+  td.r { text-align: right; white-space: nowrap; padding-left: 2mm; }
+  .opt { padding-left: 2mm; font-size: 11px; }
+  .big td { font-weight: 700; font-size: 14px; padding-top: 1mm; }
+  .meta { font-size: 11px; }
+  .bc { margin: 3mm 4mm 1mm; }
+  @page { size: {{ width|e }}mm auto; margin: 0; }
+  @media print { .rc { width: 100%; padding: 2mm 2mm 4mm; } }
+</style>
+</head>
+<body>
+<div class="rc">
+  {% if logo %}<img class="logo" src="{{ logo|e }}" alt="">{% endif %}
+  <div class="hd c">{{ header_html }}</div>
+  <hr>
+  <div class="meta">
+    <div>{{ text_receipt|e }} #{{ order_id|e }}</div>
+    <div>{{ date|e }}</div>
+    {% if cashier %}<div>{{ text_rc_cashier|e }}: {{ cashier|e }}</div>{% endif %}
+    {% if terminal %}<div>{{ text_terminal|e }}: {{ terminal|e }}</div>{% endif %}
+    {% if customer %}<div>{{ text_customer|e }}: {{ customer|e }}</div>{% endif %}
+  </div>
+  <hr>
+  <table>
+    {% for l in lines %}
+    <tr><td colspan="2">{{ l.name|e }}</td></tr>
+    {% if l.options %}<tr><td colspan="2" class="opt">{{ l.options|e }}</td></tr>{% endif %}
+    <tr><td class="opt">{{ l.qty|e }} x {{ l.price|e }}</td><td class="r">{{ l.total|e }}</td></tr>
+    {% endfor %}
+  </table>
+  <hr>
+  <table>
+    {% for t in totals %}
+    <tr{% if t.big %} class="big"{% endif %}><td>{{ t.title|e }}</td><td class="r">{{ t.value|e }}</td></tr>
+    {% endfor %}
+  </table>
+  <hr>
+  <table>
+    <tr><td>{{ text_payment|e }}</td><td class="r">{{ payment|e }}</td></tr>
+    {% if cash %}
+    <tr><td>{{ text_received|e }}</td><td class="r">{{ tendered|e }}</td></tr>
+    <tr><td>{{ text_change|e }}</td><td class="r">{{ change|e }}</td></tr>
+    {% endif %}
+  </table>
+  {% if footer_html %}<hr><div class="c">{{ footer_html }}</div>{% endif %}
+  {% if barcode %}<div class="bc">{{ barcode }}</div><div class="c meta">{{ order_id|e }}</div>{% endif %}
+</div>
+</body>
+</html>

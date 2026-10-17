@@ -43,6 +43,13 @@ a { text-decoration: none; }
 .rail .grow { flex: 1; }
 
 .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+/* page controls injected into the header (search, layout switch) */
+.top-slot { display: flex; align-items: center; gap: 12px; flex: 1 1 auto; min-width: 0; }
+.top-slot:empty { display: none; }
+.top-slot .lay { margin-left: auto; }
+.top:has(.top-slot:not(:empty)) .sp { display: none; }
+#bp-main { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+#bp-main > .sales, #bp-main > .page, #bp-main > .bp-msg { flex: 1; }
 /* top bar */
 .top { height: 60px; flex: none; padding: 0 4px 0 8px; display: flex; align-items: center; gap: 14px; }
 .hi small { display: block; color: var(--mute); font-size: 12.5px; font-weight: 500; }
@@ -133,6 +140,7 @@ body.loading #lbar { opacity: 1; }
   .ddb { padding: 0 12px; }
   .ddb .chev { display: none; }
   .ddm { min-width: 200px; }
+  #bp-main { display: block; }
   .tabs { display: flex; position: fixed; left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); height: 64px; border-radius: 32px; background: linear-gradient(180deg, var(--navy2), var(--navy)); box-shadow: var(--sh-pop); z-index: 31; padding: 0 8px; }
   .tabs a { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 11px; color: rgba(255,255,255,.66); text-decoration: none; border-radius: 24px; margin: 6px 0; }
   .tabs a.on { color: var(--navy); background: #fff; font-weight: 700; }

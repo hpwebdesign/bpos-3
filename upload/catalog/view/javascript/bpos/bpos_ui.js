@@ -83,6 +83,9 @@
     });
   };
 
+  // Generic modal: build(box, close) fills the dialog, close(value) resolves the promise
+  ui.modal = overlay;
+
   // items: [{id, label}] -> resolves with the picked id, or null when dismissed
   ui.choose = function (title, items, dismissible) {
     return overlay(function (box, close) {

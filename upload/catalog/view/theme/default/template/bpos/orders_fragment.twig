@@ -1,0 +1,65 @@
+<div class="page mg" id="od-root" data-title="{{ title|e }}" data-page="orders">
+  <link rel="stylesheet" href="{{ style|e }}">
+
+  <div class="ph">
+    <div>
+      <h1>{{ heading_orders|e }}</h1>
+      <p>{{ store|e }}</p>
+    </div>
+    <div class="phr">
+      {% if can_export %}<button class="btn" id="od-export" type="button"><i class="bi bi-download"></i><span>{{ button_export|e }}</span></button>{% endif %}
+    </div>
+  </div>
+
+  <div class="mg-bar">
+    <label class="mg-search">
+      <i class="bi bi-search"></i>
+      <input id="od-q" type="text" autocomplete="off" placeholder="{{ text_orders_search|e }}" aria-label="{{ text_orders_search|e }}">
+    </label>
+    <div class="mg-seg" id="od-range" role="group" aria-label="{{ text_range|e }}">
+      <button type="button" data-range="today">{{ text_range_today|e }}</button>
+      <button type="button" data-range="7" class="on">{{ text_range_7|e }}</button>
+      <button type="button" data-range="30">{{ text_range_30|e }}</button>
+      <button type="button" data-range="custom">{{ text_range_custom|e }}</button>
+    </div>
+    <span class="mg-dates" id="od-dates" hidden>
+      <input class="mg-date" type="date" id="od-from" aria-label="{{ text_date_from|e }}">
+      <span>–</span>
+      <input class="mg-date" type="date" id="od-to" aria-label="{{ text_date_to|e }}">
+    </span>
+    <select class="mg-sel" id="od-pay" aria-label="{{ text_payment|e }}"></select>
+    <select class="mg-sel" id="od-cashier" aria-label="{{ text_rc_cashier|e }}"></select>
+  </div>
+
+  <div class="mg-tabs" id="od-tabs" role="tablist" aria-label="{{ text_status|e }}"></div>
+
+  <div class="mg-card" id="od-card">
+    <div class="mg-scroll">
+      <table class="mg-t">
+        <thead>
+          <tr>
+            <th data-sort="id">{{ text_order|e }}</th>
+            <th data-sort="date">{{ text_when|e }}</th>
+            <th class="hm">{{ text_rc_cashier|e }}</th>
+            <th class="hs">{{ text_customer|e }}</th>
+            <th class="hm">{{ text_payment|e }}</th>
+            <th class="num" data-sort="total">{{ text_total|e }}</th>
+            <th data-sort="status">{{ text_status|e }}</th>
+          </tr>
+        </thead>
+        <tbody id="od-body"></tbody>
+      </table>
+    </div>
+    <div class="mg-foot" id="od-foot"></div>
+  </div>
+
+  <div class="mg-scrim" id="od-scrim" hidden></div>
+  <aside class="mg-drawer" id="od-drawer" role="dialog" aria-modal="true" aria-label="{{ text_order_detail|e }}" hidden>
+    <div class="mg-dh"><h2 id="od-dt"></h2><button type="button" id="od-dx" aria-label="{{ button_close|e }}"><i class="bi bi-x-lg"></i></button></div>
+    <div class="mg-db" id="od-db"></div>
+    <div class="mg-df" id="od-df"></div>
+  </aside>
+
+  <script type="application/json" id="od-data">{{ page_json }}</script>
+  <script src="{{ script|e }}" data-bp-page></script>
+</div>

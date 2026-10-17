@@ -14,7 +14,7 @@ $_['bpos_ip_window']      = 600;   // seconds
 // Pages shown in the navigation. Set 'ready' to true when the page exists.
 $_['bpos_pages'] = array(
 	'sales'     => array('route' => 'bpos/sales',     'icon' => 'cart3',         'cap' => 'sales',     'ready' => true),
-	'orders'    => array('route' => 'bpos/orders',    'icon' => 'receipt',       'cap' => 'orders',    'ready' => false),
+	'orders'    => array('route' => 'bpos/orders',    'icon' => 'receipt',       'cap' => 'orders',    'ready' => true),
 	'products'  => array('route' => 'bpos/products',  'icon' => 'box-seam',      'cap' => 'products',  'ready' => false),
 	'reports'   => array('route' => 'bpos/reports',   'icon' => 'bar-chart-line', 'cap' => 'reports',   'ready' => false),
 	'customers' => array('route' => 'bpos/customers', 'icon' => 'people',        'cap' => 'customers', 'ready' => false)

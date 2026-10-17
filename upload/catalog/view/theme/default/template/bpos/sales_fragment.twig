@@ -1,20 +1,41 @@
-<section class="page" id="bp-sales" data-title="{{ title|e }}" data-page="sales">
+<div class="sales" id="sl-root" data-title="{{ title|e }}" data-page="sales">
   <link rel="stylesheet" href="{{ style|e }}">
-  <div class="ph">
-    <div>
-      <h1>{{ heading_sales|e }}</h1>
-      <p>{{ text_sales_sub|e }}</p>
+
+  <template data-bp-top>
+    <label class="search">
+      <i class="bi bi-search"></i>
+      <input id="sl-q" type="text" autocomplete="off" placeholder="{{ text_search_ph|e }}" aria-label="{{ text_search_ph|e }}">
+      <span class="kbd">F2</span>
+    </label>
+    <div class="lay" id="sl-lay" role="group" aria-label="{{ text_layout|e }}">
+      <button type="button" data-layout="compact" class="on" aria-label="{{ text_layout_list|e }}"><i class="bi bi-view-list"></i></button>
+      <button type="button" data-layout="gallery" aria-label="{{ text_layout_grid|e }}"><i class="bi bi-grid"></i></button>
     </div>
-  </div>
+  </template>
 
-  <div class="sl-cards">
-    <div class="sl-card"><small>{{ text_cashier|e }}</small><b>{{ user_name|e }}</b></div>
-    <div class="sl-card"><small>{{ text_role|e }}</small><b>{{ role_label|e }}</b></div>
-    <div class="sl-card"><small>{{ text_store|e }}</small><b>{{ store_name|e }}</b></div>
-    <div class="sl-card"><small>{{ text_terminal|e }}</small><b>{{ terminal_name|e }}</b></div>
-    <div class="sl-card"><small>{{ text_session_left|e }}</small><b id="sl-left" data-expires="{{ expires|e }}">--:--:--</b></div>
-  </div>
+  <section class="cat" aria-label="{{ text_catalog|e }}">
+    <h3 class="sh">{{ text_categories|e }}</h3>
+    <div class="cats" id="sl-pills" role="tablist" aria-label="{{ text_categories|e }}"></div>
+    <h3 class="sh" id="sl-ph"></h3>
+    <div class="grid compact" id="sl-grid"></div>
+  </section>
 
-  <p class="sl-note">{{ text_sales_next|e }}</p>
+  <aside class="order" id="sl-order" aria-label="{{ text_current_order|e }}">
+    <div class="oh">
+      <h2><span class="ttl">{{ text_current_order|e }}</span><span id="sl-cnt"></span></h2>
+      <div>
+        <button class="txt" id="sl-close" type="button"><i class="bi bi-x-lg"></i><span>{{ button_close|e }}</span></button>
+        <button class="txt danger" id="sl-clear" type="button"><i class="bi bi-trash3"></i><span>{{ button_clear|e }}</span></button>
+      </div>
+    </div>
+    <div class="lines" id="sl-lines"></div>
+    <div class="opts" id="sl-opts"></div>
+    <div class="tot" id="sl-tot"></div>
+    <div class="payw"><button class="pay" id="sl-pay" type="button" disabled></button></div>
+  </aside>
+
+  <div class="mbar" id="sl-mbar"><button type="button" id="sl-open"><span><i class="bi bi-bag-check"></i> <span id="sl-mcount"></span></span><span class="mono" id="sl-mtotal"></span></button></div>
+
+  <script type="application/json" id="sl-data">{{ page_json }}</script>
   <script src="{{ script|e }}" data-bp-page></script>
-</section>
+</div>

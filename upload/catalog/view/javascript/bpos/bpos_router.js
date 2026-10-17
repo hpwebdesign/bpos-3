@@ -9,6 +9,8 @@
     if (dup) { l.parentNode.removeChild(l); } else { d.head.appendChild(l); }
   });
 
+  B.mountTop(main);
+
   var ctrl = null;
   var seq = 0;
   var current = w.location.href;
@@ -96,6 +98,9 @@
 
     var scripts = [];
     Array.prototype.forEach.call(root.querySelectorAll('script'), function (s) {
+      // Data blocks (application/json) stay in the page for the page script to read
+      if (s.type && !/javascript|ecmascript|module/i.test(s.type)) { return; }
+
       scripts.push({ src: s.getAttribute('src') ? s.src : '', text: s.text, page: s.hasAttribute('data-bp-page') });
       s.parentNode.removeChild(s);
     });
