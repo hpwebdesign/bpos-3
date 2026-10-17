@@ -91,6 +91,7 @@
       S.pages = r.pages;
       S.total = r.total;
       S.counts = r.counts;
+      S.kpis = r.kpis;
       $('od-card').classList.remove('busy');
       render();
     }).catch(function (e) {
@@ -107,6 +108,7 @@
 
   function render() {
     renderTabs();
+    renderKpis();
 
     var rows = S.rows;
 
@@ -134,6 +136,19 @@
       '<span class="mg-pg"><button type="button" data-pg="-1" aria-label="' + esc(t('od_prev', 'Previous page')) + '"' + (S.page <= 1 ? ' disabled' : '') + '>' + ic('chevron-left') + '</button>' +
       '<span>' + S.page + ' / ' + S.pages + '</span>' +
       '<button type="button" data-pg="1" aria-label="' + esc(t('od_next', 'Next page')) + '"' + (S.page >= S.pages ? ' disabled' : '') + '>' + ic('chevron-right') + '</button></span>';
+  }
+
+  function tile(icon, value, label, style) {
+    return '<div class="catc static"><span class="ci g-All"><i class="bi bi-' + icon + '"></i></span><span><b' + (style ? ' style="' + style + '"' : '') + '>' + esc(value) + '</b><small>' + esc(label) + '</small></span></div>';
+  }
+
+  function renderKpis() {
+    var k = S.kpis;
+
+    $('od-kpis').innerHTML = k ? tile('cash-coin', k.sales, t('od_kpi_sales', 'Sales total')) +
+      tile('receipt', String(k.orders), t('od_kpi_orders', 'Orders')) +
+      tile('graph-up', k.avg, t('od_kpi_avg', 'Average order')) +
+      tile('arrow-counterclockwise', k.refunded, t('od_kpi_refunded', 'Refunded'), 'color:var(--amber)') : '';
   }
 
   function renderTabs() {

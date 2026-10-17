@@ -95,7 +95,7 @@ class ControllerBposOrders extends Controller {
 			$rows[] = $this->row($r, $map);
 		}
 
-		$out->json(array('ok' => true, 'rows' => $rows, 'total' => $total, 'page' => $page, 'pages' => $pages, 'counts' => $counts));
+		$out->json(array('ok' => true, 'rows' => $rows, 'total' => $total, 'page' => $page, 'pages' => $pages, 'counts' => $counts, 'kpis' => $this->kpis($this->model_bpos_order->getStatusTotals($user['store_id'], $f))));
 	}
 
 	// ---- detail ----
@@ -330,6 +330,31 @@ class ControllerBposOrders extends Controller {
 		$key = array_search((int)$status_id, $map, true);
 
 		return ($status_id && $key !== false) ? $key : 'other';
+	}
+
+	// Sales exclude refunded, voided and missing orders. Amounts are shown in the POS currency.
+	private function kpis(array $totals) {
+		$code = (new \Bpos\Pricing($this->registry))->currencyCode();
+		$refund = (int)$this->config->get('module_bpos_status_refund');
+		$void = (int)$this->config->get('module_bpos_status_void');
+		$sales = 0;
+		$orders = 0;
+		$refunded = 0;
+
+		foreach ($totals as $id => $t) {
+			if ($id && $id === $refund) {
+				$refunded += $t['total'];
+			} elseif ($id && $id !== $void) {
+				$sales += $t['total'];
+				$orders += $t['n'];
+			}
+		}
+
+		$fmt = function ($v) use ($code) {
+			return html_entity_decode($this->currency->format($v, $code), ENT_QUOTES, 'UTF-8');
+		};
+
+		return array('sales' => $fmt($sales), 'orders' => $orders, 'avg' => $fmt($orders ? $sales / $orders : 0), 'refunded' => $fmt($refunded));
 	}
 
 	private function money($value, $code, $rate) {

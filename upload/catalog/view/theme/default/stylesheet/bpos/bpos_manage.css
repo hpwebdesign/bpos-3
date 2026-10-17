@@ -104,3 +104,39 @@
   .mg { padding-bottom: 96px; }
 }
 @media (prefers-reduced-motion: reduce) { .mg-card.busy .mg-scroll { transition: none; } }
+
+/* reports */
+.rp-range-text { color: var(--mute); font-size: 13px; }
+.rp-body { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding: 2px 4px 12px 2px; transition: opacity .12s; }
+.rp-body.busy { opacity: .55; }
+.rp-dl { display: inline-flex; align-items: center; gap: 3px; font-weight: 700; padding: 1px 8px; border-radius: 10px; width: fit-content; background: var(--fill); }
+.rp-dl.up { color: var(--green); background: var(--green-soft); }
+.rp-dl.down { color: var(--red); background: var(--red-soft); }
+.rp-card { background: var(--surface); border-radius: 24px; box-shadow: var(--sh-card); padding: 16px 18px 18px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.rp-h { margin: 0; font: 700 16px var(--f-disp); letter-spacing: -.01em; }
+.rp-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+.rp-card .mg-t td { height: 46px; }
+.rp-amc { height: 260px; }
+.rp-mix { display: flex; flex-direction: column; gap: 12px; }
+.rp-mix-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; font-size: 13.5px; }
+.rp-mix-row b { font-family: var(--f-num); }
+.rp-track { grid-column: 1 / -1; height: 8px; border-radius: 4px; background: var(--fill); overflow: hidden; }
+.rp-track i { display: block; height: 100%; border-radius: 4px; background: var(--accent); }
+.rp-empty { color: var(--mute); text-align: center; padding: 28px 0; }
+@media (max-width: 900px) {
+  .rp-two { grid-template-columns: minmax(0, 1fr); }
+  .rp-body { padding-bottom: 96px; }
+  .rp-amc { height: 220px; }
+  #rp-range { overflow-x: auto; max-width: 100%; }
+  #rp-range button { flex: none; white-space: nowrap; }
+}
+
+/* KPI strip, same look as the category chips on Sales */
+.mg .cats.kp { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; flex: none; padding: 4px 4px 10px; margin: -4px -4px -6px; }
+.mg .cats.kp::-webkit-scrollbar { display: none; }
+.mg .catc { flex: 1 0 auto; display: flex; align-items: center; gap: 10px; padding: 6px 22px 6px 6px; border-radius: 999px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); text-align: left; cursor: default; }
+.mg .catc .ci { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--tile); color: var(--accent-ink); }
+.mg .catc .ci .bi { font-size: 20px; }
+.mg .catc b { display: block; font-weight: 700; font-size: 17px; white-space: nowrap; line-height: 1.2; font-family: var(--f-num); }
+.mg .catc small { display: block; color: var(--mute); font-size: 12px; white-space: nowrap; }
+.mg .catc small .rp-dl { margin-left: 4px; padding: 0 6px; font-size: 11px; }

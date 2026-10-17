@@ -142,6 +142,17 @@ class ModelBposOrder extends Model {
 	}
 
 	// Cashiers who sold in this store, for the filter
+	// status_id => array(n, total) with the same filters as the list
+	public function getStatusTotals($store_id, array $f) {
+		$out = array();
+
+		foreach ($this->db->query("SELECT o.order_status_id, COUNT(*) AS n, COALESCE(SUM(o.total), 0) AS total" . $this->from() . $this->where($store_id, $f) . " GROUP BY o.order_status_id")->rows as $row) {
+			$out[(int)$row['order_status_id']] = array('n' => (int)$row['n'], 'total' => (float)$row['total']);
+		}
+
+		return $out;
+	}
+
 	public function getCashiers($store_id) {
 		return $this->db->query("SELECT user_id, name FROM `" . DB_PREFIX . "bpos_user` WHERE store_id = '" . (int)$store_id . "' ORDER BY name ASC")->rows;
 	}
