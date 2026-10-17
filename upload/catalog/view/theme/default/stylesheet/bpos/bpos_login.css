@@ -6,8 +6,8 @@
   --green: #2F855A; --green-soft: #E3F4EA; --amber: #B7791F; --amber-soft: #FDF3DC; --red: #C53030; --red-soft: #FDE8E8;
   --sh-card: 0 1px 2px rgba(16,31,69,.05), 0 10px 24px -10px rgba(16,31,69,.14);
   --sh-pop: 0 24px 60px -16px rgba(16,31,69,.45);
-  --f-body: 'Figtree', system-ui, sans-serif; --f-disp: 'Bricolage Grotesque', 'Figtree', system-ui, sans-serif;
-  --f-mono: 'DM Mono', ui-monospace, monospace; --f-num: 'Manrope', 'Figtree', system-ui, sans-serif;
+  --f-body: "Helvetica Neue", Helvetica, Arial, sans-serif; --f-disp: var(--f-body);
+  --f-mono: ui-monospace, Menlo, Consolas, monospace; --f-num: var(--f-body);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
