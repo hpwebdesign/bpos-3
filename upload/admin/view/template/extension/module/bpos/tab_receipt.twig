@@ -18,12 +18,6 @@
           </select></div>
         </div>
         <div class="bps-row">
-          <div class="bps-row-l"><b>{{ entry_copies|e }}</b></div>
-          <div class="bps-row-r"><div class="bps-seg2">
-            {% for n in [1, 2, 3] %}<label><input type="radio" data-bps-field name="terminal[{{ t.terminal_id }}][copies]" value="{{ n }}"{% if t.opt.copies == n %} checked{% endif %}><span>{{ n }}</span></label>{% endfor %}
-          </div></div>
-        </div>
-        <div class="bps-row">
           <div class="bps-row-l"><b>{{ entry_auto_print|e }}</b></div>
           <div class="bps-row-r"><label class="bps-sw"><input type="checkbox" data-bps-field name="terminal[{{ t.terminal_id }}][auto]" value="1"{% if t.opt.auto %} checked{% endif %}><span></span></label></div>
         </div>

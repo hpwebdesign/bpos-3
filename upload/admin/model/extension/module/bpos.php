@@ -593,7 +593,6 @@ class ModelExtensionModuleBpos extends Model {
   public function getTerminalOptionDefaults() {
     return [
       'layout'      => 'compact',
-      'copies'      => 1,
       'auto'        => 1,
       'cut'         => 1,
       'scan_suffix' => 'Enter',

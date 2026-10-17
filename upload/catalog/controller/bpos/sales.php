@@ -606,7 +606,7 @@ class ControllerBposSales extends Controller {
 		$width = $terminal && (int)$terminal['receipt_width'] === 58 ? 58 : 80;
 
 		// Per-terminal print options saved in the admin settings
-		$opt = array('copies' => 1, 'auto' => 1, 'cut' => 1);
+		$opt = array('cut' => 1);
 
 		if ($terminal) {
 			$saved = json_decode((string)$terminal['options'], true);
@@ -717,7 +717,6 @@ class ControllerBposSales extends Controller {
 				'tendered' => $fmt((float)$order['tendered']),
 				'change'   => $fmt((float)$order['change_due']),
 				'width'    => $width,
-				'copies'   => min(3, max(1, (int)$opt['copies'])),
 				'cut'      => $terminal ? (bool)$opt['cut'] : null,
 				'barcode'  => (bool)$this->config->get('module_bpos_rc_barcode'),
 				'labels'   => array(

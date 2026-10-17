@@ -217,7 +217,6 @@ $_['conn_browser'] = 'Dialog cetak browser';
 $_['conn_net'] = 'Printer jaringan (IP)';
 $_['conn_usb'] = 'USB (WebUSB)';
 $_['conn_bt'] = 'Bluetooth';
-$_['entry_copies'] = 'Salinan';
 $_['entry_auto_print'] = 'Cetak otomatis setelah checkout';
 $_['entry_cut'] = 'Potong kertas setelah cetak';
 $_['text_receipt_content'] = 'Isi struk';

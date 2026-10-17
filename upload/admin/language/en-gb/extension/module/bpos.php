@@ -217,7 +217,6 @@ $_['conn_browser'] = 'Browser print dialog';
 $_['conn_net'] = 'Network printer (IP)';
 $_['conn_usb'] = 'USB (WebUSB)';
 $_['conn_bt'] = 'Bluetooth';
-$_['entry_copies'] = 'Copies';
 $_['entry_auto_print'] = 'Print automatically after checkout';
 $_['entry_cut'] = 'Cut paper after printing';
 $_['text_receipt_content'] = 'Receipt content';

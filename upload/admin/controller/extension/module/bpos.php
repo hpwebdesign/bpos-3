@@ -435,7 +435,6 @@ class ControllerExtensionModuleBpos extends Controller {
       $paper = $enum('paper', ['58', '80'], (string)$row['receipt_width']);
       $conn = $enum('conn', ['browser', 'net', 'usb', 'bt'], (string)$row['printer_profile']);
       $opt['layout'] = $enum('layout', ['compact', 'gallery'], $opt['layout']);
-      $opt['copies'] = (int)$enum('copies', ['1', '2', '3'], (string)$opt['copies']);
       $opt['scan_suffix'] = $enum('scan_suffix', ['Enter', 'Tab'], $opt['scan_suffix']);
       $opt['label'] = $enum('label', ['58', '80', 'a4'], $opt['label']);
 

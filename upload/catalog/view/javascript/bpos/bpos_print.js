@@ -245,7 +245,8 @@
     });
 
     if (align) { raw(0x1b, 0x61, 0); }
-    raw(0x1b, 0x64, 4);
+    // The cutter sits about 2 cm behind the print head, so the last lines need a fixed feed before the cut
+    raw(0x1b, 0x64, cut ? 6 : 3);
     if (cut) { raw(0x1d, 0x56, 66, 0); }
 
     return new Uint8Array(o);
@@ -355,6 +356,8 @@
         return dev.claimInterface(target.ifc).then(function () {
           return chunks(bytes, 4096, function (part) { return dev.transferOut(target.ep, part); });
         }).then(function () {
+          return wait(600);
+        }).then(function () {
           return dev.releaseInterface(target.ifc);
         });
       }).then(function () { return dev.close(); }, function (e) {
@@ -389,13 +392,7 @@
 
     return B.api(htmlUrl + (htmlUrl.indexOf('?') > -1 ? '&' : '?') + 'format=json').then(function (r) {
       return withLogo(r, colsFor(r)).then(function () {
-        var one = build(r, colsFor(r), r.cut == null ? cfg.cut : !!r.cut);
-        var n = Math.max(1, Math.min(3, +r.copies || 1));
-        var all = new Uint8Array(one.length * n);
-
-        for (var i = 0; i < n; i++) { all.set(one, i * one.length); }
-
-        return send(all);
+        return send(build(r, colsFor(r), r.cut == null ? cfg.cut : !!r.cut));
       });
     }).then(function () {
       ui.toast(t('pr_sent', 'Receipt sent to the printer.'));
