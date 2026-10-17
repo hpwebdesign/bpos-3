@@ -1,0 +1,68 @@
+<div class="page mg pr" id="pr-root" data-title="{{ title|e }}" data-page="products">
+  <link rel="stylesheet" href="{{ base_style|e }}">
+  <link rel="stylesheet" href="{{ style|e }}">
+
+  <div class="ph">
+    <div>
+      <h1>{{ heading_products|e }}</h1>
+      <p id="pr-sub">&nbsp;</p>
+    </div>
+    <div class="phr">
+      {% if can_edit %}<button class="btn" id="pr-gen" type="button"><i class="bi bi-upc-scan"></i><span>{{ text_gen_missing|e }}</span></button>{% endif %}
+      <button class="btn" id="pr-print" type="button"><i class="bi bi-printer"></i><span>{{ text_print_labels|e }}</span></button>
+      {% if can_edit %}<button class="btn pri" id="pr-new" type="button"><i class="bi bi-plus-lg"></i><span>{{ text_add_product|e }}</span></button>{% endif %}
+    </div>
+  </div>
+
+  <div class="cats kp" id="pr-kpis" role="tablist" aria-live="polite"></div>
+
+  <div class="mg-bar">
+    <label class="mg-search">
+      <i class="bi bi-search"></i>
+      <input id="pr-q" type="text" autocomplete="off" placeholder="{{ text_products_search|e }}" aria-label="{{ text_products_search|e }}">
+    </label>
+    <button class="btn pr-fbtn" id="pr-fbtn" type="button" aria-expanded="false"><i class="bi bi-sliders"></i><span>{{ text_filters|e }}</span><b class="pr-n" id="pr-fn" hidden></b></button>
+    <label class="pr-fld"><i class="bi bi-list-ol"></i><select class="mg-sel" id="pr-per" aria-label="{{ text_per_page|e }}"></select></label>
+  </div>
+
+  <div class="pr-more" id="pr-panel" hidden>
+    <label class="pr-l">{{ text_category|e }}<select class="mg-sel" id="pr-cat"></select></label>
+    <label class="pr-l">{{ text_stock|e }}<select class="mg-sel" id="pr-stock"></select></label>
+    <label class="pr-l">{{ text_barcode|e }}<select class="mg-sel" id="pr-bc"></select></label>
+    <button class="btn" id="pr-reset" type="button"><i class="bi bi-arrow-counterclockwise"></i><span>{{ text_reset_filters|e }}</span></button>
+  </div>
+
+  <div class="pr-chips" id="pr-chips"></div>
+  <div class="pr-bulk" id="pr-bulk" hidden></div>
+
+  <div class="mg-card" id="pr-card">
+    <div class="mg-scroll">
+      <table class="mg-t pr-t">
+        <thead>
+          <tr>
+            <th class="pr-cb"><input class="pr-check" type="checkbox" id="pr-all" aria-label="{{ text_select_all|e }}"></th>
+            <th data-sort="name">{{ text_product|e }}</th>
+            <th class="hm" data-sort="model">{{ text_model_sku|e }}</th>
+            <th class="hm" data-sort="barcode">{{ text_barcode|e }}</th>
+            <th class="num hm" data-sort="price">{{ text_price|e }}</th>
+            <th class="hm" data-sort="stock">{{ text_stock|e }}</th>
+            <th class="hm" data-sort="pos">POS</th>
+            <th class="pr-acts"></th>
+          </tr>
+        </thead>
+        <tbody id="pr-body"></tbody>
+      </table>
+    </div>
+    <div class="mg-foot" id="pr-foot"></div>
+  </div>
+
+  <div class="mg-scrim" id="pr-scrim" hidden></div>
+  <aside class="mg-drawer" id="pr-drawer" role="dialog" aria-modal="true" aria-label="{{ text_product|e }}" hidden>
+    <div class="mg-dh"><h2 id="pr-dt"></h2><button type="button" id="pr-dx" aria-label="{{ button_close|e }}"><i class="bi bi-x-lg"></i></button></div>
+    <div class="mg-db" id="pr-db"></div>
+    <div class="mg-df" id="pr-df"></div>
+  </aside>
+
+  <script type="application/json" id="pr-data">{{ page_json }}</script>
+  <script src="{{ script|e }}" data-bp-page></script>
+</div>

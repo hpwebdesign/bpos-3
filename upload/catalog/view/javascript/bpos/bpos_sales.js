@@ -205,6 +205,7 @@
   function refresh(now) {
     persist();
     clearTimeout(quoteTimer);
+    clearTimeout(waitTimer);
 
     if (!S.cart.length) {
       quoteSeq++;
@@ -663,7 +664,7 @@
 
     B.api(P.urls.checkout, { data: data }).then(function (r) {
       S.paying = false;
-      showDone(r);
+      if (r.state === 'waiting') { showWaiting(r); } else { showDone(r); }
     }).catch(function (e) {
       S.paying = false;
 
@@ -699,6 +700,59 @@
     closeSheet();
     var q = $('sl-q');
     if (q) { q.focus(); }
+  }
+
+  var waitTimer = null;
+
+  // Online gateway: the customer pays on the gateway page, the POS polls until the gateway confirms the order
+  function showWaiting(r) {
+    var method = payTitle();
+    var live = true;
+
+    function stop() { live = false; clearTimeout(waitTimer); }
+
+    B.ui.modal(function (box, close) {
+      box.className = 'bp-modal sl-done';
+      box.style.width = 'min(480px, 94vw)';
+      box.innerHTML = '<h2>' + esc(t('sl_wait_title', 'Waiting for payment')) + '</h2>' +
+        '<dl><dt>' + esc(t('sl_order', 'Order')) + '</dt><dd>#' + r.order_id + '</dd><dt>' + esc(t('sl_method', 'Method')) + '</dt><dd>' + esc(method) + '</dd><dt>' + esc(t('sl_total', 'Total')) + '</dt><dd>' + money(r.total) + '</dd></dl>' +
+        '<iframe title="' + esc(method) + '" src="' + esc(r.pay_url + (r.pay_url.indexOf('?') > -1 ? '&' : '?') + 'embed=1') + '" style="width:100%;height:min(480px, 58vh);border:0;border-radius:14px;background:var(--fill)"></iframe>' +
+        '<p style="margin:0;color:var(--mute);font-size:12.5px">' + esc(t('sl_wait_hint', 'If the payment form does not appear here, use Open payment page.')) + '</p>' +
+        '<div class="row"><a class="btn" href="' + esc(r.pay_url) + '" target="_blank" rel="noopener">' + ic('box-arrow-up-right') + esc(t('sl_open_pay', 'Open payment page')) + '</a><button class="btn" type="button" data-copy>' + ic('link-45deg') + esc(t('sl_copy_link', 'Copy link')) + '</button></div>' +
+        '<div class="row"><button class="btn" type="button" data-cancel>' + esc(t('sl_wait_cancel', 'Cancel and change method')) + '</button></div>';
+
+      box.addEventListener('click', function (e) {
+        if (e.target.closest('[data-cancel]')) { stop(); close('cancel'); }
+
+        if (e.target.closest('[data-copy]')) {
+          var done = function () { B.ui.toast(t('sl_copied', 'Link copied')); };
+          if (w.navigator.clipboard && w.navigator.clipboard.writeText) { w.navigator.clipboard.writeText(r.pay_url).then(done); } else { done(); }
+        }
+      });
+
+      function poll() {
+        if (!live) { return; }
+
+        B.api(P.urls.status + (P.urls.status.indexOf('?') > -1 ? '&' : '?') + 'order_id=' + r.order_id).then(function (s) {
+          if (!live) { return; }
+          if (s.state === 'paid') { stop(); close('paid'); }
+          else if (s.state === 'failed') { stop(); close('failed'); }
+          else { waitTimer = setTimeout(poll, 3000); }
+        }).catch(function () { if (live) { waitTimer = setTimeout(poll, 5000); } });
+      }
+
+      waitTimer = setTimeout(poll, 3000);
+    }, false).then(function (result) {
+      stop();
+
+      if (result === 'paid') { showDone(r); return; }
+
+      // Cancelled or failed: a new attempt id, the cart stays so the cashier can pick another method
+      S.rid = '';
+      persist();
+      renderOrder();
+      if (result === 'failed') { B.ui.toast(t('sl_pay_failed', 'The payment was not completed. Choose a method and try again.'), 'err'); }
+    });
   }
 
   function showDone(r) {

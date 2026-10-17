@@ -241,27 +241,16 @@
   }
 
   /* ---------- export ---------- */
-  function csvCell(v) {
-    v = v == null ? '' : String(v);
-    if (/^[=+\-@\t\r]/.test(v)) { v = "'" + v; }
-    return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
-  }
-
-  function exportCsv() {
+  function exportXlsx() {
     var btn = $('cu-export');
     btn.disabled = true;
 
     B.api(url(P.urls.export, 'q=' + encodeURIComponent(S.q))).then(function (r) {
-      var lines = ['customer_id,name,email,phone,orders,spent,currency,last_purchase,last_store'].concat(r.rows.map(function (x) {
-        return [x.id, x.name, x.email, x.phone, x.orders, x.spent, x.currency, x.last_date, x.last_store].map(csvCell).join(',');
+      var rows = [['customer_id', 'name', 'email', 'phone', 'orders', 'spent', 'currency', 'last_purchase', 'last_store']].concat(r.rows.map(function (x) {
+        return [x.id, x.name, x.email, x.phone, x.orders, x.spent, x.currency, x.last_date, x.last_store];
       }));
 
-      var a = d.createElement('a');
-      a.href = URL.createObjectURL(new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' }));
-      a.download = 'customers.csv';
-      d.body.appendChild(a);
-      a.click();
-      setTimeout(function () { URL.revokeObjectURL(a.href); d.body.removeChild(a); }, 500);
+      B.xlsx('customers.xlsx', [{ name: 'Customers', rows: rows }]);
 
       if (r.truncated) { B.ui.toast(t('cu_export_cut', 'Export is limited to 5000 customers.')); }
     }).catch(function (e) { B.ui.toast(e.message, 'err'); }).then(function () { btn.disabled = false; });
@@ -310,7 +299,7 @@
   });
 
   if ($('cu-new')) { $('cu-new').addEventListener('click', function () { form(null); }); }
-  if ($('cu-export')) { $('cu-export').addEventListener('click', exportCsv); }
+  if ($('cu-export')) { $('cu-export').addEventListener('click', exportXlsx); }
 
   B.onLeave(function () {
     if (ctl) { ctl.abort(); }

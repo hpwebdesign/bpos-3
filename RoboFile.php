@@ -14,6 +14,7 @@ if (file_exists('.env')) {
 }
 
 use phpseclib\Net\SFTP;
+use phpseclib\Crypt\RSA;
 use TQ\Git\Repository\Repository as Repo;
 
 class RoboFile extends \Robo\Tasks
@@ -707,12 +708,13 @@ class RoboFile extends \Robo\Tasks
 		$host          = $vars['FTP_HOST']      ?? null;
 		$username      = $vars['FTP_USERNAME']  ?? null;
 		$password      = $vars['FTP_PASSWORD']  ?? null;
+		$key           = $vars['FTP_KEY']       ?? null;
 		$ftp_path      = $vars['FTP_PATH']      ?? null;
 		$is_sftp       = ($vars['IS_SFTP']      ?? 'false') === 'true';
 		$rebuild_url   = $vars['REBUILD_URL']   ?? null;
 		$rebuild_token = $vars['REBUILD_TOKEN'] ?? null;
 
-		if (!$host || !$username || !$password || !$ftp_path) {
+		if (!$host || !$username || (!$password && !$key) || !$ftp_path) {
 			return null;
 		}
 
@@ -720,7 +722,7 @@ class RoboFile extends \Robo\Tasks
 		// misal: https://demo.bariklabs.com/blabs → admin_path = blabs
 		$admin_path = $this->extractAdminPath($rebuild_url);
 
-		return compact('host', 'username', 'password', 'ftp_path', 'is_sftp', 'rebuild_url', 'rebuild_token', 'admin_path');
+		return compact('host', 'username', 'password', 'key', 'ftp_path', 'is_sftp', 'rebuild_url', 'rebuild_token', 'admin_path');
 	}
 
 	/**
@@ -736,18 +738,19 @@ class RoboFile extends \Robo\Tasks
 		$host          = $vars[$p . 'FTP_HOST']      ?? null;
 		$username      = $vars[$p . 'FTP_USERNAME']  ?? null;
 		$password      = $vars[$p . 'FTP_PASSWORD']  ?? null;
+		$key           = $vars[$p . 'FTP_KEY']       ?? null;
 		$ftp_path      = $vars[$p . 'FTP_PATH']      ?? null;
 		$is_sftp       = ($vars[$p . 'IS_SFTP']      ?? 'false') === 'true';
 		$rebuild_url   = $vars[$p . 'REBUILD_URL']   ?? null;
 		$rebuild_token = $vars[$p . 'REBUILD_TOKEN'] ?? null;
 
-		if (!$host || !$username || !$password || !$ftp_path) {
+		if (!$host || !$username || (!$password && !$key) || !$ftp_path) {
 			return null;
 		}
 
 		$admin_path = $this->extractAdminPath($rebuild_url);
 
-		return compact('host', 'username', 'password', 'ftp_path', 'is_sftp', 'rebuild_url', 'rebuild_token', 'admin_path');
+		return compact('host', 'username', 'password', 'key', 'ftp_path', 'is_sftp', 'rebuild_url', 'rebuild_token', 'admin_path');
 	}
 
 
@@ -777,6 +780,28 @@ class RoboFile extends \Robo\Tasks
 	}
 
 	/**
+	 * SFTP login: use RSA private key if FTP_KEY is set, otherwise password.
+	 * phpseclib 2.x does not support ed25519 keys, so use an RSA key.
+	 */
+	private function sftpLogin(SFTP $sftp, array $creds): bool
+	{
+		if (!empty($creds['key'])) {
+			if (!is_readable($creds['key'])) {
+				throw new \Exception("Private key not readable: " . $creds['key']);
+			}
+
+			$rsa = new RSA();
+			if (!$rsa->loadKey(file_get_contents($creds['key']))) {
+				throw new \Exception("Invalid private key: " . $creds['key']);
+			}
+
+			return $sftp->login($creds['username'], $rsa);
+		}
+
+		return $sftp->login($creds['username'], $creds['password']);
+	}
+
+	/**
 	 * Deploy daftar file ke satu server (SFTP atau FTP).
 	 */
 	private function deployToServer(array $creds, array $files, $do_rebuild = false)
@@ -799,7 +824,7 @@ class RoboFile extends \Robo\Tasks
 					// --- SFTP ---
 					$sftp = new SFTP($host);
 
-					if (!$sftp->login($username, $password)) {
+					if (!$this->sftpLogin($sftp, $creds)) {
 						throw new \Exception("SFTP login gagal ke $host");
 					}
 

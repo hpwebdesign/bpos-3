@@ -1,110 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <modification>
     <name>Barik Point Of Sales</name>
-    <code>HPBPOS</code>
+    <code>BPOS</code>
     <version>1.0.0.0</version>
     <author>HP Web Design</author>
     <link>https://hpwebdesign.io</link>
 
-    <file path="admin/language/*/common/column_left.php">
-        <operation error="skip">
-            <search><![CDATA[// Text]]></search>
-            <add position="after">
-                <![CDATA[// HPEV
-                    $_['text_bpos_setting']         = 'Barik POS';
-                    // HPEV]]>
-            </add>
-        </operation>
-    </file>
-
+    <!-- Admin menu: inside the shared $hpwd group when system.ocmod.xml provides it -->
     <file path="admin/controller/common/column_left.php">
         <operation error="skip">
             <search><![CDATA[$hpwd = array();]]></search>
-            <add position="after">
-                <![CDATA[
-                    // HPEV
-                    if ($this->user->hasPermission('access', 'extension/module/bpos_setting')) {
+            <add position="after"><![CDATA[
+                    // BPOS
+                    if ($this->user->hasPermission('access', 'extension/module/bpos')) {
                         $hpwd[] = array(
-                            'name'     => $this->language->get('text_bpos_setting'),
-                            'href'     => $this->url->link('extension/module/bpos_setting', 'user_token=' . $this->session->data['user_token'], true),
+                            'name'     => 'Barik POS',
+                            'href'     => $this->url->link('extension/module/bpos', 'user_token=' . $this->session->data['user_token'], true),
                             'children' => array()
                         );
                     }
-                    // HPEV
-                ]]>
-            </add>
+                    // BPOS
+            ]]></add>
         </operation>
-    </file>
-    <!-- Tambah link POS di header admin -->
-    <file path="admin/view/template/common/header.twig">
-        <operation>
-            <search><![CDATA[<ul class="nav navbar-nav navbar-right">]]></search>
-            <add position="after"><![CDATA[
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <span style="width: 30px;height: 30px;border-radius: 4px;background: linear-gradient(135deg,#6aa8ff,#2a6cf6);color: #fff;font-weight: 800;line-height: 30px;display: inline-block;padding: 0 10px;">B</span>
-                        <span>POS</span> <i class="fa fa-caret-down fa-fw"></i></a>
-
-                    <ul class="dropdown-menu dropdown-menu-right">
-                        <li><a href="{{ pos_frontend }}" target="_blank"><i class="fa fa-shopping-cart fa-fw"></i> Frontend</a></li>
-                        <li><a href="{{ pos_setting }}" target="_self"><i class="fa fa-gears fa-fw"></i> Setting</a></li>
-                      </ul>
-                </li>
+        <!-- Fallback: own top-level menu when the shared $hpwd group is not there -->
+        <operation error="skip">
+            <ignoreif><![CDATA[$hpwd = array();]]></ignoreif>
+            <search><![CDATA[// Stats]]></search>
+            <add position="before"><![CDATA[
+			// BPOS
+			if ($this->user->hasPermission('access', 'extension/module/bpos')) {
+				$data['menus'][] = array(
+					'id'       => 'menu-bpos',
+					'icon'     => 'fa-shopping-cart',
+					'name'     => 'Barik POS',
+					'href'     => $this->url->link('extension/module/bpos', 'user_token=' . $this->session->data['user_token'], true),
+					'children' => array()
+				);
+			}
+			// BPOS
             ]]></add>
         </operation>
     </file>
+
+    <!-- Header dropdown: only for users who may open the BPOS settings -->
     <file path="admin/controller/common/header.php">
-        <operation>
-            <search><![CDATA[$data['home'] = $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true);]]></search>
+        <operation error="skip">
+            <search><![CDATA[$data['profile'] = $this->url->link('common/profile']]></search>
             <add position="after"><![CDATA[
-        // === POS link (prefer SEO URL if exists) ===
-        $catalog_base = HTTPS_CATALOG;
-        $keyword = '';
+			// BPOS
+			$data['pos_menu'] = $this->user->hasPermission('access', 'extension/module/bpos');
 
-        // Try SEO URL for current store & language
-        $seo_sql = "SELECT keyword FROM " . DB_PREFIX . "seo_url
-                    WHERE query = 'bpos/home'
-                      AND store_id = '" . (int)$this->config->get('config_store_id') . "'
-                      AND language_id = '" . (int)$this->config->get('config_language_id') . "'
-                    LIMIT 1";
-        $seo_q = $this->db->query($seo_sql);
+			if ($data['pos_menu']) {
+				// Same address as the sign-in page in the BPOS settings: the saved slug, if its SEO URL exists
+				$bpos_slug = (string)$this->config->get('module_bpos_slug');
+				$bpos_seo = $bpos_slug === '' ? false : $this->db->query("SELECT `keyword` FROM `" . DB_PREFIX . "seo_url` WHERE `query` = 'bpos/auth' AND `store_id` = '0' AND `keyword` = '" . $this->db->escape($bpos_slug) . "' LIMIT 1");
 
-        if ($seo_q->num_rows) {
-          $keyword = $seo_q->row['keyword'];
-        }
-
-        if (!$keyword) {
-          $seo_q2 = $this->db->query("SELECT keyword FROM " . DB_PREFIX . "seo_url WHERE query = 'bpos/home' ORDER BY store_id ASC LIMIT 1");
-          if ($seo_q2->num_rows) {
-            $keyword = $seo_q2->row['keyword'];
-          }
-        }
-
-        if ($keyword) {
-          $data['pos_frontend'] = rtrim($catalog_base, '/') . '/' . ltrim($keyword, '/');
-        } else {
-          $data['pos_frontend'] = rtrim($catalog_base, '/') . '/index.php?route=bpos/home';
-        }
-
-        $data['pos_setting'] = $this->url->link('extension/module/bpos_setting', 'user_token=' . $this->session->data['user_token'], true);
-          ]]></add>
+				$data['pos_frontend'] = rtrim(HTTPS_CATALOG, '/') . '/' . ($bpos_seo && $bpos_seo->num_rows ? $bpos_slug : 'index.php?route=bpos/auth');
+				$data['pos_setting'] = $this->url->link('extension/module/bpos', 'user_token=' . $this->session->data['user_token'], true);
+			}
+			// BPOS
+            ]]></add>
         </operation>
     </file>
-    <file path="catalog/controller/checkout/success.php">
-        <operation>
-            <search><![CDATA[public function index() {]]></search>
+    <file path="admin/view/template/common/header.twig">
+        <operation error="skip">
+            <search><![CDATA[<ul class="nav navbar-nav navbar-right">]]></search>
             <add position="after"><![CDATA[
-            if ($this->config->get('module_bpos_setting_status')) {
-                if (isset($this->session->data['bpos'])) {
-                    if (isset($this->session->data['order_id'])) {
-                        $this->response->redirect($this->url->link('bpos/checkout/order_confirm', 'order_id='.$this->session->data['order_id'], true));
-                    } else {
-                        $this->response->redirect($this->url->link('bpos/home', '', true));
-                    }
-                }
-
-            }
-          ]]></add>
+      {% if pos_menu %}
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span style="display:inline-block;width:30px;height:30px;line-height:30px;padding:0 10px;border-radius:4px;background:linear-gradient(135deg,#6aa8ff,#2a6cf6);color:#fff;font-weight:800;">B</span> <span>POS</span> <i class="fa fa-caret-down fa-fw"></i></a>
+        <ul class="dropdown-menu dropdown-menu-right">
+          <li><a href="{{ pos_frontend }}" target="_blank" rel="noopener"><i class="fa fa-shopping-cart fa-fw"></i> Frontend</a></li>
+          <li><a href="{{ pos_setting }}"><i class="fa fa-gears fa-fw"></i> Setting</a></li>
+        </ul>
+      </li>
+      {% endif %}
+            ]]></add>
         </operation>
     </file>
 </modification>

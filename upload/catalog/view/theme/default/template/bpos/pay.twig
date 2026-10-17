@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>{{ title|e }}</title>
+<link rel="stylesheet" href="{{ bootstrap|e }}">
+<link rel="stylesheet" href="{{ icons|e }}">
+<link rel="stylesheet" href="{{ css|e }}">
+<script src="{{ jquery|e }}"></script>
+<script src="{{ bootstrap_js|e }}"></script>
+<style>
+.bp-embed{padding:8px 4px 4px}.bp-embed-in{max-width:420px;margin:0 auto;text-align:left!important}.bp-embed h2{font-size:18px;margin:0 0 10px}
+.bp-embed fieldset{border:0;padding:0;margin:0;min-width:0}.bp-embed legend{font-size:15px;font-weight:700;border:0;margin-bottom:8px;padding:0}
+.bp-embed .form-group,.bp-embed .form-horizontal .form-group{margin:0 0 10px}.bp-embed label,.bp-embed .control-label{display:block;text-align:left;font-weight:700;font-size:13px;margin-bottom:4px;float:none;width:auto;padding:0}
+.bp-embed .form-control,.bp-embed select{display:block;width:100%;height:42px;border-radius:12px;margin:0 0 10px;padding:0 12px}
+.bp-embed .buttons,.bp-embed .pull-right{display:block;float:none;margin-top:14px;text-align:center}
+.bp-embed .buttons .btn,.bp-embed .btn,.bp-embed input[type=button],.bp-embed input[type=submit]{display:inline-flex;align-items:center;justify-content:center;width:100%;height:46px;padding:0 24px;border:0;border-radius:23px;background:#0f1b3d;color:#fff!important;font-weight:700;font-size:15px;cursor:pointer;opacity:1}
+.bp-embed .btn:hover,.bp-embed input[type=button]:hover{background:#1b2c5e}.bp-embed .btn[disabled],.bp-embed input[disabled]{opacity:.6}
+.bp-embed .alert{border-radius:12px;margin:0 0 10px;padding:10px 12px}
+</style>
+</head>
+<body style="overflow:auto{% if embed %};background:transparent{% endif %}">
+<div class="{% if embed %}bp-embed{% else %}bp-msg{% endif %}">
+  <div class="{% if embed %}bp-embed-in{% else %}bp-modal{% endif %}" style="text-align:center">
+    {% if message %}
+    <i class="bi bi-info-circle"></i>
+    <h2>{{ title|e }}</h2>
+    <p>{{ message|e }}</p>
+    {% else %}
+    <h2>{{ store|e }}</h2>
+    <dl style="display:grid;grid-template-columns:auto 1fr;gap:6px 16px;text-align:left;margin:0 0 16px">
+      <dt style="color:var(--mute)">{{ text_pay_order|e }}</dt><dd style="margin:0;font-weight:700">#{{ order_id }}</dd>
+      <dt style="color:var(--mute)">{{ text_pay_method|e }}</dt><dd style="margin:0;font-weight:700">{{ method|e }}</dd>
+      <dt style="color:var(--mute)">{{ text_pay_total|e }}</dt><dd style="margin:0;font-weight:800;font-size:20px">{{ total|e }}</dd>
+    </dl>
+    <div class="buttons">{{ gateway }}</div>
+    {% endif %}
+  </div>
+</div>
+{% if embed %}<script>
+// Gateways that redirect to their own site (PayPal and similar) refuse to load inside a frame, so their form opens in a popup window
+document.addEventListener('submit', function (e) {
+  var f = e.target;
+  var a = document.createElement('a');
+  a.href = f.getAttribute('action') || '';
+  if (a.host && a.host !== location.host) {
+    window.open('', 'bpos_pay', 'popup=yes,width=560,height=780');
+    f.target = 'bpos_pay';
+  }
+}, true);
+</script>{% endif %}
+</body>
+</html>

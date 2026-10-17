@@ -105,62 +105,82 @@
     el.setAttribute('role', 'img');
     el.setAttribute('aria-label', t('rp_daily', 'Daily sales') + ': ' + rows.map(function (r) { return r.date + ' ' + r.text; }).join(', '));
 
-    B.load(P.urls.am).then(function () {
-      // A newer render may have run while the library was loading
-      if (mine !== drawId || !el.isConnected) { return; }
+    var tip = d.createElement('div');
+    tip.className = 'rp-tip';
+    tip.hidden = true;
 
-      var am4core = w.am4core;
-      var am4charts = w.am4charts;
-      var ink = cssVar('--mute', '#6b7280');
-      var line = cssVar('--line', '#e5e7eb');
-      var accent = cssVar('--accent', '#3b5bdb');
+    function draw() {
+      var W = Math.max(280, el.clientWidth);
+      var H = el.clientHeight || 260;
+      var m = { l: 46, r: 16, t: 12, b: 28 };
+      var iw = W - m.l - m.r;
+      var ih = H - m.t - m.b;
+      var max = 0;
 
-      am4core.useTheme(w.am4themes_animated);
-      chart = am4core.create(el, am4charts.XYChart);
-      chart.fontFamily = cssVar('--f-body', 'inherit');
-      chart.fontSize = 11;
-      chart.paddingLeft = 0;
-      chart.paddingRight = 6;
-      chart.numberFormatter.numberFormat = '#.#a';
+      rows.forEach(function (r) { max = Math.max(max, r.sales); });
 
-      chart.data = rows.map(function (r) {
-        return { label: day(r.date, rows.length > 12 ? { day: 'numeric', month: 'short' } : { weekday: 'short', day: 'numeric' }), full: day(r.date, { weekday: 'short', day: 'numeric', month: 'short' }), sales: r.sales, text: r.text, orders: r.orders };
+      // Round the top of the axis to 1, 2 or 5 times a power of ten, four steps
+      var raw = max / 4;
+      var pow = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+      var step = [1, 2, 5, 10].map(function (k) { return k * pow; }).filter(function (v) { return v >= raw; })[0];
+      var top = step * 4;
+
+      function X(i) { return m.l + (rows.length > 1 ? iw * i / (rows.length - 1) : iw / 2); }
+      function Y(v) { return m.t + ih - ih * v / top; }
+
+      var pts = rows.map(function (r, i) { return [X(i), Y(r.sales)]; });
+      var line = 'M' + pts[0][0] + ',' + pts[0][1];
+
+      for (var i = 1; i < pts.length; i++) {
+        var mx = (pts[i - 1][0] + pts[i][0]) / 2;
+        line += ' C' + mx + ',' + pts[i - 1][1] + ' ' + mx + ',' + pts[i][1] + ' ' + pts[i][0] + ',' + pts[i][1];
+      }
+
+      var area = line + ' L' + pts[pts.length - 1][0] + ',' + (m.t + ih) + ' L' + pts[0][0] + ',' + (m.t + ih) + ' Z';
+      var g = '';
+
+      for (var k = 0; k <= 4; k++) {
+        var v = step * k;
+        g += '<line x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + Y(v) + '" y2="' + Y(v) + '" class="g"/><text x="' + (m.l - 8) + '" y="' + (Y(v) + 4) + '" text-anchor="end">' + (v >= 1000 ? (v / 1000) + 'k' : v) + '</text>';
+      }
+
+      var every = Math.max(1, Math.ceil(rows.length / Math.max(1, Math.floor(iw / 64))));
+
+      rows.forEach(function (r, j) {
+        g += '<line x1="' + X(j) + '" x2="' + X(j) + '" y1="' + m.t + '" y2="' + (m.t + ih) + '" class="g"/>';
+        if (j % every === 0) { g += '<text x="' + X(j) + '" y="' + (H - 8) + '" text-anchor="middle">' + esc(day(r.date, rows.length > 12 ? { day: 'numeric', month: 'short' } : { weekday: 'short', day: 'numeric' })) + '</text>'; }
       });
 
-      var x = chart.xAxes.push(new am4charts.CategoryAxis());
-      x.dataFields.category = 'label';
-      x.renderer.grid.template.disabled = true;
-      x.renderer.minGridDistance = 36;
-      x.renderer.labels.template.fill = am4core.color(ink);
-      x.renderer.line.stroke = am4core.color(line);
+      el.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" focusable="false"><g class="ax">' + g + '</g>' +
+        '<path d="' + area + '" class="ar"/><path d="' + line + '" class="ln"/>' +
+        pts.map(function (p) { return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="3.2" class="dt"/>'; }).join('') + '</svg>';
+      el.appendChild(tip);
 
-      var y = chart.yAxes.push(new am4charts.ValueAxis());
-      y.min = 0;
-      y.renderer.grid.template.stroke = am4core.color(line);
-      y.renderer.grid.template.strokeDasharray = '3,3';
-      y.renderer.labels.template.fill = am4core.color(ink);
-      y.renderer.line.disabled = true;
+      var svg = el.querySelector('svg');
 
-      var s = chart.series.push(new am4charts.ColumnSeries());
-      s.dataFields.categoryX = 'label';
-      s.dataFields.valueY = 'sales';
-      s.columns.template.fill = am4core.color(accent);
-      s.columns.template.stroke = am4core.color(accent);
-      s.columns.template.column.cornerRadiusTopLeft = 8;
-      s.columns.template.column.cornerRadiusTopRight = 8;
-      s.columns.template.width = am4core.percent(70);
-      s.columns.template.tooltipText = '[bold]{text}[/]\n{full} · {orders}';
-      s.tooltip.getFillFromObject = false;
-      s.tooltip.background.fill = am4core.color(cssVar('--navy', '#0f1b3d'));
-      s.tooltip.background.stroke = am4core.color(cssVar('--navy', '#0f1b3d'));
-      s.tooltip.label.fill = am4core.color('#ffffff');
+      svg.addEventListener('mousemove', function (e) {
+        var box = svg.getBoundingClientRect();
+        var px = e.clientX - box.left;
+        var best = 0;
 
-      chart.cursor = new am4charts.XYCursor();
-      chart.cursor.lineX.disabled = true;
-      chart.cursor.lineY.disabled = true;
-    }).catch(function (e) {
-      el.innerHTML = '<div class="rp-empty">' + esc(e.message) + '</div>';
-    });
+        pts.forEach(function (p, n) { if (Math.abs(p[0] - px) < Math.abs(pts[best][0] - px)) { best = n; } });
+
+        var r = rows[best];
+        tip.innerHTML = '<b>' + esc(r.text) + '</b><span>' + esc(day(r.date, { weekday: 'short', day: 'numeric', month: 'short' })) + ' · ' + esc(String(r.orders)) + '</span>';
+        tip.hidden = false;
+        tip.style.left = Math.min(W - tip.offsetWidth - 4, Math.max(4, pts[best][0] - tip.offsetWidth / 2)) + 'px';
+        tip.style.top = Math.max(0, pts[best][1] - tip.offsetHeight - 12) + 'px';
+      });
+
+      svg.addEventListener('mouseleave', function () { tip.hidden = true; });
+    }
+
+    var timer = 0;
+    function onResize() { clearTimeout(timer); timer = setTimeout(function () { if (el.isConnected && mine === drawId) { draw(); } }, 120); }
+
+    w.addEventListener('resize', onResize);
+    chart = { dispose: function () { clearTimeout(timer); w.removeEventListener('resize', onResize); } };
+    draw();
   }
 
   function renderMix(rows) {
@@ -241,43 +261,20 @@
   }
 
   /* ---------- export ---------- */
-  function csvCell(v) {
-    v = v == null ? '' : String(v);
-
-    if (/^[=+\-@\t\r]/.test(v)) { v = "'" + v; }
-
-    return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
-  }
-
-  function exportCsv() {
+  function exportXlsx() {
     var btn = $('rp-export');
     btn.disabled = true;
 
     B.api(url(P.urls.export)).then(function (r) {
-      var line = function (a) { return a.map(csvCell).join(','); };
       var s = r.summary;
-      var out = [
-        line(['from', 'to', 'currency']), line([r.from, r.to, r.currency]), '',
-        line(['sales', 'orders', 'average_order', 'refunds', 'refund_count', 'void_count', 'items']),
-        line([s.sales.value, s.orders.value, s.avg.value, s.refunds.value, s.refunds.count, s.voids, s.items]), '',
-        line(['date', 'orders', 'sales'])
-      ].concat(r.daily.map(function (x) { return line([x.date, x.orders, x.sales]); }));
 
-      out.push('', line(['payment', 'orders', 'sales', 'share_pct']));
-      r.payment.forEach(function (x) { out.push(line([x.name || x.code, x.orders, x.sales, x.pct])); });
-      out.push('', line(['cashier', 'orders', 'sales', 'average_order', 'refunds', 'share_pct']));
-      r.cashier.forEach(function (x) { out.push(line([x.name, x.orders, x.sales, x.avg, x.refunds, x.pct])); });
-      out.push('', line(['terminal', 'orders', 'sales', 'average_order', 'share_pct']));
-      r.terminal.forEach(function (x) { out.push(line([x.name, x.orders, x.sales, x.avg, x.pct])); });
-
-      var blob = new Blob(['﻿' + out.join('\r\n')], { type: 'text/csv;charset=utf-8' });
-      var a = d.createElement('a');
-
-      a.href = URL.createObjectURL(blob);
-      a.download = 'report-' + r.from + '_' + r.to + '.csv';
-      d.body.appendChild(a);
-      a.click();
-      setTimeout(function () { URL.revokeObjectURL(a.href); d.body.removeChild(a); }, 500);
+      B.xlsx('report-' + r.from + '_' + r.to + '.xlsx', [
+        { name: 'Summary', rows: [['from', 'to', 'currency'], [r.from, r.to, r.currency], [], ['sales', 'orders', 'average_order', 'refunds', 'refund_count', 'void_count', 'items'], [s.sales.value, s.orders.value, s.avg.value, s.refunds.value, s.refunds.count, s.voids, s.items]] },
+        { name: 'Daily', rows: [['date', 'orders', 'sales']].concat(r.daily.map(function (x) { return [x.date, x.orders, x.sales]; })) },
+        { name: 'Payment', rows: [['payment', 'orders', 'sales', 'share_pct']].concat(r.payment.map(function (x) { return [x.name || x.code, x.orders, x.sales, x.pct]; })) },
+        { name: 'Cashier', rows: [['cashier', 'orders', 'sales', 'average_order', 'refunds', 'share_pct']].concat(r.cashier.map(function (x) { return [x.name, x.orders, x.sales, x.avg, x.refunds, x.pct]; })) },
+        { name: 'Terminal', rows: [['terminal', 'orders', 'sales', 'average_order', 'share_pct']].concat(r.terminal.map(function (x) { return [x.name, x.orders, x.sales, x.avg, x.pct]; })) }
+      ]);
     }).catch(function (e) {
       B.ui.toast(e.message, 'err');
     }).then(function () { btn.disabled = false; });
@@ -291,7 +288,7 @@
   $('rp-from').addEventListener('change', function () { S.from = this.value; if (S.to && S.from > S.to) { S.to = $('rp-to').value = S.from; } load(); });
   $('rp-to').addEventListener('change', function () { S.to = this.value; if (S.from && S.to < S.from) { S.from = $('rp-from').value = S.to; } load(); });
 
-  if ($('rp-export')) { $('rp-export').addEventListener('click', exportCsv); }
+  if ($('rp-export')) { $('rp-export').addEventListener('click', exportXlsx); }
 
   B.onLeave(function () { if (ctl) { ctl.abort(); } disposeChart(); });
 

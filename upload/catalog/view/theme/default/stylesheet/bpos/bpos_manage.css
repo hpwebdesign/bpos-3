@@ -140,3 +140,15 @@
 .mg .catc b { display: block; font-weight: 700; font-size: 17px; white-space: nowrap; line-height: 1.2; font-family: var(--f-num); }
 .mg .catc small { display: block; color: var(--mute); font-size: 12px; white-space: nowrap; }
 .mg .catc small .rp-dl { margin-left: 4px; padding: 0 6px; font-size: 11px; }
+
+/* daily sales chart (inline SVG) */
+.rp-amc { position: relative; }
+.rp-amc svg { display: block; overflow: visible; }
+.rp-amc text { fill: var(--mute); font-size: 11px; }
+.rp-amc .g { stroke: var(--line); stroke-width: 1; }
+.rp-amc .ar { fill: var(--accent); fill-opacity: .12; }
+.rp-amc .ln { fill: none; stroke: var(--accent); stroke-width: 2; }
+.rp-amc .dt { fill: var(--accent); stroke: var(--surface); stroke-width: 1.5; }
+.rp-tip { position: absolute; z-index: 2; pointer-events: none; padding: 6px 10px; border-radius: 8px; background: var(--navy); color: #fff; font-size: 12px; white-space: nowrap; display: flex; flex-direction: column; gap: 1px; }
+.rp-tip[hidden] { display: none; }
+.rp-tip span { opacity: .75; }

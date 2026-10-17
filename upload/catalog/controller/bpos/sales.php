@@ -36,6 +36,7 @@ class ControllerBposSales extends Controller {
 				'customers' => $out->url('bpos/sales/customers'),
 				'customer'  => $out->url('bpos/sales/customer'),
 				'checkout'  => $out->url('bpos/sales/checkout'),
+				'status'    => $out->url('bpos/sales/status'),
 				'receipt'   => $out->url('bpos/sales/receipt')
 			)
 		);
@@ -468,11 +469,17 @@ class ControllerBposSales extends Controller {
 			'extra_charge'   => $order['charge']
 		));
 
+		$kind = \Bpos\Paylink::kind($pay_code);
 		$status_id = (int)$this->config->get('module_bpos_status_complete');
 
 		if (!$status_id) {
 			$done = (array)$this->config->get('config_complete_status');
 			$status_id = $done ? (int)reset($done) : (int)$this->config->get('config_order_status_id');
+		}
+
+		// Bank transfer, COD and cheque keep the status set in their OpenCart settings, like the storefront confirm step
+		if ($kind === 'offline') {
+			$status_id = (int)$this->config->get('payment_' . $pay_code . '_order_status_id') ?: (int)$this->config->get('config_order_status_id');
 		}
 
 		// POS sales send no order e-mails
@@ -486,6 +493,17 @@ class ControllerBposSales extends Controller {
 			'change'      => $change,
 			'receipt_url' => $out->url('bpos/sales/receipt', 'order_id=' . $order_id)
 		);
+
+		// Online gateways confirm the order themselves through their callback. The order stays unconfirmed until then.
+		if ($kind === 'online') {
+			$result['state'] = 'waiting';
+			$result['pay_url'] = $out->url('bpos/pay', 'order_id=' . $order_id . '&token=' . \Bpos\Paylink::token($order_id, $pay_code));
+
+			$this->model_bpos_audit->add('order_add', $user['user_id'], $user['admin_user_id'], $request_id, $result);
+			$out->json(array_merge(array('ok' => true), $result));
+
+			return;
+		}
 
 		$failed = null;
 
@@ -517,6 +535,43 @@ class ControllerBposSales extends Controller {
 		$this->model_bpos_audit->add('order_add', $user['user_id'], $user['admin_user_id'], $request_id, $result);
 
 		$out->json(array_merge(array('ok' => true), $result));
+	}
+
+	// ---- online payment progress ----
+
+	// state: waiting (not confirmed yet), paid, or failed
+	public function status() {
+		$bpos = new \Bpos\Auth($this->registry);
+
+		if (!$bpos->guard('sales')) {
+			return;
+		}
+
+		$out = $bpos->out();
+		$user = $bpos->user();
+		$this->load->model('bpos/order');
+
+		$order = $this->model_bpos_order->getReceipt(isset($this->request->get['order_id']) ? (int)$this->request->get['order_id'] : 0, $user['store_id']);
+
+		if (!$order || (int)$order['pos_user_id'] !== $user['user_id'] || (int)$order['pos_admin_id'] !== $user['admin_user_id']) {
+			$out->error(404, 'not_found', $this->language->get('error_order_missing'));
+
+			return;
+		}
+
+		$status_id = (int)$order['order_status_id'];
+		$paid = array_map('intval', array_merge((array)$this->config->get('config_complete_status'), (array)$this->config->get('config_processing_status')));
+		$paid[] = (int)$this->config->get('module_bpos_status_complete');
+
+		$state = 'failed';
+
+		if ($status_id === 0 || $status_id === (int)$this->config->get('config_order_status_id')) {
+			$state = 'waiting';
+		} elseif (in_array($status_id, $paid, true)) {
+			$state = 'paid';
+		}
+
+		$out->json(array('ok' => true, 'state' => $state));
 	}
 
 	// ---- receipt ----

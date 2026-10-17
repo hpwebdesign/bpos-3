@@ -287,34 +287,17 @@
   }
 
   /* ---------- export ---------- */
-  function csvCell(v) {
-    v = v == null ? '' : String(v);
-
-    // Stop spreadsheet formulas coming from customer names
-    if (/^[=+\-@\t\r]/.test(v)) { v = "'" + v; }
-
-    return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
-  }
-
-  function exportCsv() {
+  function exportXlsx() {
     var btn = $('od-export');
     btn.disabled = true;
 
     B.api(url(P.urls.export, params({}))).then(function (r) {
-      var head = ['order_id', 'date', 'cashier', 'terminal', 'customer', 'payment', 'items', 'currency', 'total', 'status'];
-      var lines = [head.join(',')].concat(r.rows.map(function (x) {
-        return [x.id, x.date, x.cashier, x.terminal, x.customer, x.payment, x.items, x.currency, x.total, x.status].map(csvCell).join(',');
+      var rows = [['order_id', 'date', 'cashier', 'terminal', 'customer', 'payment', 'items', 'currency', 'total', 'status']].concat(r.rows.map(function (x) {
+        return [x.id, x.date, x.cashier, x.terminal, x.customer, x.payment, x.items, x.currency, x.total, x.status];
       }));
-
-      var blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
-      var a = d.createElement('a');
       var rg = rangeDates();
 
-      a.href = URL.createObjectURL(blob);
-      a.download = 'orders-' + (rg.from || 'all') + '_' + (rg.to || 'all') + '.csv';
-      d.body.appendChild(a);
-      a.click();
-      setTimeout(function () { URL.revokeObjectURL(a.href); d.body.removeChild(a); }, 500);
+      B.xlsx('orders-' + (rg.from || 'all') + '_' + (rg.to || 'all') + '.xlsx', [{ name: 'Orders', rows: rows }]);
 
       if (r.truncated) { B.ui.toast(t('od_export_cut', 'Export is limited to the newest 5000 orders.')); }
     }).catch(function (e) {
@@ -369,7 +352,7 @@
   $('od-from').addEventListener('change', function () { S.from = this.value; if (S.to && S.from > S.to) { S.to = $('od-to').value = S.from; } load(false); });
   $('od-to').addEventListener('change', function () { S.to = this.value; if (S.from && S.to < S.from) { S.from = $('od-from').value = S.to; } load(false); });
 
-  if ($('od-export')) { $('od-export').addEventListener('click', exportCsv); }
+  if ($('od-export')) { $('od-export').addEventListener('click', exportXlsx); }
 
   B.onLeave(function () {
     if (ctl) { ctl.abort(); }
