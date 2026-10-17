@@ -69,67 +69,182 @@
     return rows;
   }
 
-  function build(r, cols, cut) {
-    var o = [];
-    var raw = function () { for (var i = 0; i < arguments.length; i++) { o.push(arguments[i]); } };
-    var line = function (s) {
-      var a = ascii(s);
+  /* ---------- logo ---------- */
+  var logoCache = {};
 
-      for (var i = 0; i < a.length; i++) { o.push(a.charCodeAt(i)); }
-      o.push(10);
-    };
-    var lines = function (arr) { arr.forEach(line); };
+  // Store logo as a 1-bit raster at most half the paper width. 58 mm prints 384 dots, 80 mm prints 576 dots.
+  function logoRaster(url, cols) {
+    var key = url + '|' + cols;
+
+    if (!logoCache[key]) {
+      logoCache[key] = new Promise(function (resolve, reject) {
+        var img = new w.Image();
+
+        img.crossOrigin = 'anonymous';
+        img.onload = function () {
+          try {
+            var scale = Math.min((cols >= 48 ? 288 : 192) / img.naturalWidth, 120 / img.naturalHeight);
+            var wd = Math.max(8, Math.ceil(img.naturalWidth * scale / 8) * 8);
+            var ht = Math.max(1, Math.round(img.naturalHeight * scale));
+            var cv = d.createElement('canvas');
+
+            cv.width = wd;
+            cv.height = ht;
+
+            var ctx = cv.getContext('2d');
+
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, wd, ht);
+            ctx.drawImage(img, 0, 0, wd, ht);
+
+            var px = ctx.getImageData(0, 0, wd, ht).data;
+            var wb = wd / 8;
+            var bits = new Uint8Array(wb * ht);
+
+            for (var y = 0; y < ht; y++) {
+              for (var x = 0; x < wd; x++) {
+                var i = (y * wd + x) * 4;
+
+                if (0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2] < 150) { bits[y * wb + (x >> 3)] |= 0x80 >> (x & 7); }
+              }
+            }
+
+            resolve({ w: wd, h: ht, wb: wb, data: bits });
+          } catch (e) { reject(e); }
+        };
+        img.onerror = function () { reject(new Error('logo')); };
+        img.src = url;
+      });
+
+      logoCache[key].catch(function () { delete logoCache[key]; });
+    }
+
+    return logoCache[key];
+  }
+
+  // CODE39 as the printer draws it (GS k 4): 2 dot narrow bars, 4 dot wide bars, *text* with start and stop marks.
+  var C39 = { '0': 'nnnwwnwnn', '1': 'wnnwnnnnw', '2': 'nnwwnnnnw', '3': 'wnwwnnnnn', '4': 'nnnwwnnnw', '5': 'wnnwwnnnn', '6': 'nnwwwnnnn', '7': 'nnnwnnwnw', '8': 'wnnwnnwnn', '9': 'nnwwnnwnn', '*': 'nwnnwnwnn' };
+
+  // Canvas preview of the barcode: 60 dots high, 12 printer dots per character column
+  function barcodeCanvas(text) {
+    var parts = ('*' + text + '*').split('');
+    var cv = d.createElement('canvas');
+    var x = 0;
+    var runs = [];
+
+    parts.forEach(function (ch, n) {
+      (C39[ch] || C39['0']).split('').forEach(function (k, i) {
+        var wd = k === 'w' ? 4 : 2;
+
+        if (i % 2 === 0) { runs.push([x, wd]); }
+        x += wd;
+      });
+
+      if (n < parts.length - 1) { x += 2; }
+    });
+
+    cv.width = x;
+    cv.height = 60;
+
+    var ctx = cv.getContext('2d');
+
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, x, 60);
+    ctx.fillStyle = '#000';
+    runs.forEach(function (r) { ctx.fillRect(r[0], 0, r[1], 60); });
+    cv.style.width = (x / 12) + 'ch';
+    cv.style.display = 'block';
+    cv.style.margin = '8px auto 2px';
+
+    return cv;
+  }
+
+  // Adds the raster to the receipt when it has a logo URL. A logo that fails to load is skipped.
+  function withLogo(r, cols) {
+    if (!r.logo) { return Promise.resolve(r); }
+
+    return logoRaster(r.logo, cols).then(function (g) { r.logoRaster = g; return r; }, function () { return r; });
+  }
+
+  // One layout feeds both the printer bytes and the admin preview. Entries: { s, c } text (c = centred) or { bar } barcode.
+  function layout(r, cols) {
+    var out = [];
     var hr = new Array(cols + 1).join('-');
     var L = r.labels || {};
+    var add = function (arr, c) { arr.forEach(function (s) { out.push({ s: s, c: !!c }); }); };
+    var txt = function (s) { out.push({ s: ascii(s), c: false }); };
 
-    raw(0x1b, 0x40, 0x1b, 0x74, 0);
-    raw(0x1b, 0x61, 1);
-    lines(wrap(r.header || '', cols));
-    raw(0x1b, 0x61, 0);
-    line(hr);
-    line((L.receipt || 'Receipt') + ' #' + r.order_id);
-    line(r.date);
-    if (r.cashier) { lines(wrap((L.cashier || 'Cashier') + ': ' + r.cashier, cols)); }
-    if (r.terminal) { lines(wrap((L.terminal || 'Terminal') + ': ' + r.terminal, cols)); }
-    if (r.customer) { lines(wrap((L.customer || 'Customer') + ': ' + r.customer, cols)); }
-    line(hr);
+    if (r.logoRaster) { out.push({ img: r.logoRaster }); }
+    add(wrap(r.header || '', cols), true);
+    txt(hr);
+    txt((L.receipt || 'Receipt') + ' #' + r.order_id);
+    txt(r.date);
+    if (r.cashier) { add(wrap((L.cashier || 'Cashier') + ': ' + r.cashier, cols)); }
+    if (r.terminal) { add(wrap((L.terminal || 'Terminal') + ': ' + r.terminal, cols)); }
+    if (r.customer) { add(wrap((L.customer || 'Customer') + ': ' + r.customer, cols)); }
+    txt(hr);
 
     r.lines.forEach(function (l) {
-      lines(wrap(l.name, cols));
-      if (l.options) { wrap(l.options, cols - 2).forEach(function (x) { line('  ' + x); }); }
-      lines(pad('  ' + l.qty + ' x ' + l.price, l.total, cols));
+      add(wrap(l.name, cols));
+      if (l.options) { wrap(l.options, cols - 2).forEach(function (x) { txt('  ' + x); }); }
+      add(pad('  ' + l.qty + ' x ' + l.price, l.total, cols));
     });
 
-    line(hr);
-
-    r.totals.forEach(function (x) {
-      if (x.big) { raw(0x1b, 0x45, 1); }
-      lines(pad(x.title, x.value, cols));
-      if (x.big) { raw(0x1b, 0x45, 0); }
-    });
-
-    line(hr);
-    lines(pad(L.payment || 'Payment', r.payment, cols));
+    txt(hr);
+    r.totals.forEach(function (x) { add(pad(x.title, x.value, cols)); });
+    txt(hr);
+    add(pad(L.payment || 'Payment', r.payment, cols));
 
     if (r.cash) {
-      lines(pad(L.received || 'Received', r.tendered, cols));
-      lines(pad(L.change || 'Change', r.change, cols));
+      add(pad(L.received || 'Received', r.tendered, cols));
+      add(pad(L.change || 'Change', r.change, cols));
     }
 
     if (r.footer) {
-      line(hr);
-      raw(0x1b, 0x61, 1);
-      lines(wrap(r.footer, cols));
-      raw(0x1b, 0x61, 0);
+      txt(hr);
+      add(wrap(r.footer, cols), true);
     }
 
-    if (r.barcode) {
-      raw(0x1b, 0x61, 1, 10);
-      raw(0x1d, 0x68, 60, 0x1d, 0x77, 2, 0x1d, 0x48, 2, 0x1d, 0x6b, 4);
-      String(r.order_id).split('').forEach(function (c) { raw(c.charCodeAt(0)); });
-      raw(0, 10, 0x1b, 0x61, 0);
-    }
+    if (r.barcode) { out.push({ bar: String(r.order_id) }); }
 
+    return out;
+  }
+
+  function build(r, cols, cut) {
+    var o = [];
+    var align = 0;
+    var raw = function () { for (var i = 0; i < arguments.length; i++) { o.push(arguments[i]); } };
+
+    raw(0x1b, 0x40, 0x1b, 0x74, 0);
+
+    layout(r, cols).forEach(function (x) {
+      if (x.img) {
+        raw(0x1b, 0x61, 1, 0x1d, 0x76, 0x30, 0, x.img.wb & 255, x.img.wb >> 8, x.img.h & 255, x.img.h >> 8);
+        for (var k = 0; k < x.img.data.length; k++) { o.push(x.img.data[k]); }
+        raw(0x1b, 0x61, 0);
+        align = 0;
+
+        return;
+      }
+
+      if (x.bar !== undefined) {
+        raw(0x1b, 0x61, 1, 10, 0x1d, 0x68, 60, 0x1d, 0x77, 2, 0x1d, 0x48, 2, 0x1d, 0x6b, 4);
+        x.bar.split('').forEach(function (c) { raw(c.charCodeAt(0)); });
+        raw(0, 10, 0x1b, 0x61, 0);
+        align = 0;
+
+        return;
+      }
+
+      var a = x.c ? 1 : 0;
+
+      if (a !== align) { raw(0x1b, 0x61, a); align = a; }
+
+      for (var i = 0; i < x.s.length; i++) { o.push(x.s.charCodeAt(i)); }
+      o.push(10);
+    });
+
+    if (align) { raw(0x1b, 0x61, 0); }
     raw(0x1b, 0x64, 4);
     if (cut) { raw(0x1d, 0x56, 66, 0); }
 
@@ -142,7 +257,7 @@
     return {
       order_id: 0, date: new Date().toLocaleString(), header: 'BPOS', footer: '', cashier: '', terminal: '', customer: '', width: 58,
       lines: [{ name: 'Test item', options: '', qty: 1, price: '1.00', total: '1.00' }],
-      totals: [{ title: 'Total', value: '1.00', big: true }], payment: 'Cash', cash: false, tendered: '', change: '', barcode: false,
+      totals: [{ title: 'Total', value: '1.00' }], payment: 'Cash', cash: false, tendered: '', change: '', barcode: false,
       labels: { receipt: t('pr_test_title', 'Test print') }
     };
   }
@@ -273,7 +388,15 @@
     ui.busy(true);
 
     return B.api(htmlUrl + (htmlUrl.indexOf('?') > -1 ? '&' : '?') + 'format=json').then(function (r) {
-      return send(build(r, colsFor(r), cfg.cut));
+      return withLogo(r, colsFor(r)).then(function () {
+        var one = build(r, colsFor(r), r.cut == null ? cfg.cut : !!r.cut);
+        var n = Math.max(1, Math.min(3, +r.copies || 1));
+        var all = new Uint8Array(one.length * n);
+
+        for (var i = 0; i < n; i++) { all.set(one, i * one.length); }
+
+        return send(all);
+      });
     }).then(function () {
       ui.toast(t('pr_sent', 'Receipt sent to the printer.'));
     }).catch(function (e) {
@@ -283,6 +406,20 @@
 
       return true;
     });
+  };
+
+  // Settings-page test: o = { mode, cols, cut, receipt }. Always lets the browser ask for a printer.
+  print.test = function (o) {
+    var prev = cfg;
+    var done = function () { var usb = cfg.usb; cfg = prev; cfg.usb = usb; save(); };
+
+    cfg = Object.assign({}, prev, { mode: o.mode, cols: o.cols, cut: !!o.cut });
+
+    var cols = o.cols || colsFor(o.receipt);
+
+    return withLogo(o.receipt, cols).then(function (r) {
+      return send(build(r, cols, cfg.cut), true);
+    }).then(done, function (e) { done(); throw e; });
   };
 
   function setup() {
@@ -346,6 +483,9 @@
 
   print.setup = setup;
   print.build = build;
+  print.layout = layout;
+  print.logo = logoRaster;
+  print.barcode = barcodeCanvas;
 
   d.addEventListener('click', function (e) {
     if (e.target.closest && e.target.closest('#bp-printer')) { setup(); }

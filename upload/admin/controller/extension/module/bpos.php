@@ -101,6 +101,8 @@ class ControllerExtensionModuleBpos extends Controller {
     $this->document->setTitle($data['heading_title']);
 
     $data['version'] = $this->version;
+    // File times bust the browser cache when the scripts change
+    $data['asset_v'] = $this->version . '.' . max((int)@filemtime(DIR_APPLICATION . 'view/javascript/bpos/bpos_setting.js'), (int)@filemtime(DIR_APPLICATION . 'view/stylesheet/bpos/bpos_setting.css'));
     $data['schema'] = $this->model_extension_module_bpos->getSchemaVersion();
     $data['text_bpos_version'] = sprintf($this->language->get('text_bpos_version'), $this->version, $data['schema']);
     $data['extension_code'] = $this->extension_code;
@@ -137,6 +139,7 @@ class ControllerExtensionModuleBpos extends Controller {
     $slug = (string)$settings['module_bpos_slug'];
     $data['slug_complete'] = $this->model_extension_module_bpos->slugIsComplete($slug);
 
+    $data['print_js'] = HTTPS_CATALOG . 'catalog/view/javascript/bpos/bpos_print.js?v=' . rawurlencode($this->version . '.' . (int)@filemtime(DIR_CATALOG . 'view/javascript/bpos/bpos_print.js'));
     $data['logo_url'] = $settings['module_bpos_login_logo'] ? HTTPS_CATALOG . 'image/' . $settings['module_bpos_login_logo'] : '';
     $data['default_head'] = $this->language->get('text_default_head');
     $data['default_desc'] = $this->language->get('text_default_desc');
@@ -348,7 +351,7 @@ class ControllerExtensionModuleBpos extends Controller {
 
     $clean['module_bpos_customer_group'] = $group;
 
-    foreach (['module_bpos_create_customer', 'module_bpos_rc_logo', 'module_bpos_rc_barcode', 'module_bpos_rc_cashier', 'module_bpos_rc_tax'] as $key) {
+    foreach (['module_bpos_create_customer', 'module_bpos_rc_logo', 'module_bpos_rc_address', 'module_bpos_rc_phone', 'module_bpos_rc_barcode', 'module_bpos_rc_cashier', 'module_bpos_rc_terminal', 'module_bpos_rc_customer', 'module_bpos_rc_tax'] as $key) {
       $clean[$key] = empty($post[$key]) ? 0 : 1;
     }
 
@@ -363,14 +366,39 @@ class ControllerExtensionModuleBpos extends Controller {
     }
 
     // Receipt text
-    $header = str_replace("\r", '', $this->str($post['module_bpos_rc_header'] ?? ''));
-    $footer = str_replace("\r", '', $this->str($post['module_bpos_rc_footer'] ?? ''));
+    $rc_languages = $model->getLanguages();
 
-    if (mb_strlen($header) > 300) { $errors['module_bpos_rc_header'] = sprintf($this->language->get('error_text_length'), 300); }
-    if (mb_strlen($footer) > 300) { $errors['module_bpos_rc_footer'] = sprintf($this->language->get('error_text_length'), 300); }
+    foreach (['header', 'footer'] as $name) {
+      $clean['module_bpos_rc_' . $name] = [];
+      $values = isset($post['module_bpos_rc_' . $name]) && is_array($post['module_bpos_rc_' . $name]) ? $post['module_bpos_rc_' . $name] : [];
 
-    $clean['module_bpos_rc_header'] = $header;
-    $clean['module_bpos_rc_footer'] = $footer;
+      foreach ($rc_languages as $code => $language) {
+        $text = trim((string)preg_replace('/\s+/u', ' ', $this->str($values[$code] ?? '')));
+
+        if (mb_strlen($text) > 60) {
+          $errors['module_bpos_rc_' . $name . '[' . $code . ']'] = sprintf($this->language->get('error_text_length'), 60);
+        }
+
+        $clean['module_bpos_rc_' . $name][$code] = $text;
+      }
+    }
+
+    // Receipt label translations typed by the admin. Empty keeps the language file default.
+    $clean['module_bpos_rc_labels'] = [];
+    $posted_labels = isset($post['module_bpos_rc_labels']) && is_array($post['module_bpos_rc_labels']) ? $post['module_bpos_rc_labels'] : [];
+
+    foreach ($rc_languages as $code => $language) {
+      foreach (['receipt', 'cashier', 'terminal', 'customer', 'payment', 'received', 'change'] as $key) {
+        $raw = isset($posted_labels[$code]) && is_array($posted_labels[$code]) ? $posted_labels[$code][$key] ?? '' : '';
+        $text = trim((string)preg_replace('/\s+/u', ' ', $this->str($raw)));
+
+        if (mb_strlen($text) > 30) {
+          $errors['module_bpos_rc_labels[' . $code . '][' . $key . ']'] = sprintf($this->language->get('error_text_length'), 30);
+        }
+
+        $clean['module_bpos_rc_labels'][$code][$key] = $text;
+      }
+    }
 
     $source = $this->str($post['module_bpos_barcode_source'] ?? 'sku');
     $clean['module_bpos_barcode_source'] = in_array($source, ['sku', 'model'], true) ? $source : 'sku';
@@ -669,6 +697,31 @@ class ControllerExtensionModuleBpos extends Controller {
   // Tab data
   // ---------------------------------------------------------------
 
+  // Receipt labels in every store language. English fills any key a language file lacks.
+  private function receiptLabels(array $languages) {
+    $map = ['receipt' => 'text_receipt', 'cashier' => 'text_rc_cashier', 'terminal' => 'text_terminal', 'customer' => 'text_customer', 'payment' => 'text_payment', 'received' => 'text_received', 'change' => 'text_change', 'guest' => 'text_guest', 'sub' => 'text_sub_total', 'tax' => 'text_rc_tax', 'total' => 'text_total', 'cash' => 'text_pay_cash'];
+    $read = function ($dir) {
+      $file = DIR_CATALOG . 'language/' . basename((string)$dir) . '/bpos/bpos.php';
+      $_ = [];
+
+      if (is_file($file)) { include $file; }
+
+      return $_;
+    };
+    $base = $read('en-gb');
+    $out = [];
+
+    foreach ($languages as $code => $language) {
+      $strings = array_merge($base, $read($language['directory'] ?? $code));
+
+      foreach ($map as $key => $source) {
+        $out[$code][$key] = (string)($strings[$source] ?? '');
+      }
+    }
+
+    return $out;
+  }
+
   private function tabData(array &$data, array $settings) {
     $model = $this->model_extension_module_bpos;
     $token = $this->session->data['user_token'];
@@ -698,6 +751,13 @@ class ControllerExtensionModuleBpos extends Controller {
 
     $stores = $model->getStoreNames();
     $data['store_names'] = $stores;
+
+    // Receipt preview: translated labels per language (read from the POS language files) and the default header per store
+    $rc_langs = $model->getLanguages();
+    $data['languages'] = $rc_langs;
+    $data['rc_label_defaults'] = $this->receiptLabels($rc_langs);
+    $data['rc_labels'] = json_encode($data['rc_label_defaults'], JSON_UNESCAPED_UNICODE);
+    $data['rc_stores'] = json_encode($model->getReceiptStores(), JSON_UNESCAPED_UNICODE);
     $users = $model->getUsers();
     $counts = [];
 

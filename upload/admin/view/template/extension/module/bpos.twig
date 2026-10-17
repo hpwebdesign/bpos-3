@@ -20,7 +20,10 @@
          data-logo="{{ ajax_logo_upload|e('html_attr') }}"
          data-patch="{{ ajax_patch|e('html_attr') }}"
          data-remove="{{ ajax_remove_data|e('html_attr') }}"
-         data-fail="{{ error_request|e('html_attr') }}">
+         data-fail="{{ error_request|e('html_attr') }}"
+         data-print-js="{{ print_js|e('html_attr') }}"
+         data-test-sent="{{ text_test_sent|e('html_attr') }}"
+         data-test-conn="{{ error_test_conn|e('html_attr') }}">
 
       <div class="bps-ph">
         <div><h1>{{ heading_title|e }}</h1><p>{{ text_settings_sub|e }}</p></div>
@@ -83,9 +86,14 @@
           </div>
         </main>
       </div>
+
+      <div class="bps-foot">
+        <span class="bps-un" id="bps-un-foot" hidden><i class="fa fa-exclamation-circle"></i> {{ text_unsaved|e }}</span>
+        <button type="button" id="bps-save-foot" class="btn btn-primary" title="Ctrl + S" disabled><i class="fa fa-check"></i> {{ button_save|e }}</button>
+      </div>
     </div>
   </div>
 </div>
-<link href="view/stylesheet/bpos/bpos_setting.css?v={{ version|e('url') }}" rel="stylesheet" type="text/css">
-<script src="view/javascript/bpos/bpos_setting.js?v={{ version|e('url') }}"></script>
+<link href="view/stylesheet/bpos/bpos_setting.css?v={{ asset_v|e('url') }}" rel="stylesheet" type="text/css">
+<script src="view/javascript/bpos/bpos_setting.js?v={{ asset_v|e('url') }}"></script>
 {{ footer }}

@@ -4,7 +4,7 @@
   <div class="bps-devbar-t"><b>{{ text_device_settings|e }}</b><small>{{ help_device_settings|e }}</small></div>
   <select class="form-control bps-dev-sel">
     {% for t in terminals %}
-    <option value="{{ t.terminal_id|e('html_attr') }}">{{ t.name|e }} · {{ t.store_name|e }}</option>
+    <option value="{{ t.terminal_id|e('html_attr') }}" data-store="{{ t.store_id|e('html_attr') }}">{{ t.name|e }} · {{ t.store_name|e }}</option>
     {% endfor %}
   </select>
 </div>

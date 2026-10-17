@@ -762,6 +762,15 @@
   }
 
   function showDone(r) {
+    // Auto print: success toast, print, and a fresh cart without waiting for a click
+    if (r.auto_print) {
+      B.ui.toast(t('sl_checkout_done', 'Checkout successful') + ' · #' + r.order_id);
+      printReceipt(r.receipt_url);
+      resetSale();
+
+      return;
+    }
+
     var method = payTitle();
     var cash = S.pay === 'cash';
 

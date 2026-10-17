@@ -28,8 +28,12 @@
           <div class="bps-row-r"><label class="bps-sw"><input type="checkbox" data-bps-field name="terminal[{{ t.terminal_id }}][auto]" value="1"{% if t.opt.auto %} checked{% endif %}><span></span></label></div>
         </div>
         <div class="bps-row">
-          <div class="bps-row-l"><b>{{ entry_cut|e }}</b></div>
+          <div class="bps-row-l"><b>{{ entry_cut|e }}</b><small>{{ help_cut|e }}</small></div>
           <div class="bps-row-r"><label class="bps-sw"><input type="checkbox" data-bps-field name="terminal[{{ t.terminal_id }}][cut]" value="1"{% if t.opt.cut %} checked{% endif %}><span></span></label></div>
+        </div>
+        <div class="bps-row">
+          <div class="bps-row-l"><b>{{ button_test_print|e }}</b></div>
+          <div class="bps-row-r"><button type="button" class="btn" data-bps-testprint><i class="fa fa-print"></i> {{ button_test_print|e }}</button></div>
         </div>
       </div>
     </div>
@@ -37,19 +41,57 @@
 
     <div class="bps-card">
       <div class="bps-card-h"><h3>{{ text_receipt_content|e }}</h3><span class="bps-scope"><i class="fa fa-globe"></i> {{ text_scope_all|e }}</span></div>
-      <div class="bps-row bps-stack">
-        <div class="bps-row-l"><b>{{ entry_rc_header|e }}</b></div>
-        <div class="bps-row-r"><textarea class="form-control" rows="3" maxlength="300" data-bps-field data-bps-rc name="module_bpos_rc_header" placeholder="{{ placeholder_rc_header|e('html_attr') }}">{{ settings.module_bpos_rc_header|e }}</textarea><div class="bps-err" data-bps-err="module_bpos_rc_header"></div></div>
+      <div class="bps-seg bps-rlang-seg">
+        {% set first = true %}
+        {% for code, language in languages %}
+        <button type="button" data-bps-rlang="{{ code|e('html_attr') }}" class="{{ first ? 'bps-on' : '' }}">{{ language.name|e }}</button>
+        {% set first = false %}
+        {% endfor %}
       </div>
-      <div class="bps-row bps-stack">
-        <div class="bps-row-l"><b>{{ entry_rc_footer|e }}</b></div>
-        <div class="bps-row-r"><textarea class="form-control" rows="3" maxlength="300" data-bps-field data-bps-rc name="module_bpos_rc_footer">{{ settings.module_bpos_rc_footer|e }}</textarea><div class="bps-err" data-bps-err="module_bpos_rc_footer"></div></div>
+      {% set first = true %}
+      {% for code, language in languages %}
+      {% set h = settings.module_bpos_rc_header %}
+      {% set f = settings.module_bpos_rc_footer %}
+      <div class="bps-rlang-pane{{ first ? ' bps-on' : '' }}" data-bps-rlang-pane="{{ code|e('html_attr') }}">
+        <div class="bps-row bps-stack">
+          <div class="bps-row-l"><b>{{ entry_rc_header|e }}</b></div>
+          <div class="bps-row-r"><input type="text" class="form-control" maxlength="60" data-bps-field data-bps-rc name="module_bpos_rc_header[{{ code|e('html_attr') }}]" value="{{ (h is iterable ? (h[code] ?? '') : h)|e('html_attr') }}" placeholder="{{ placeholder_rc_header|e('html_attr') }}"><div class="bps-err" data-bps-err="module_bpos_rc_header[{{ code|e('html_attr') }}]"></div></div>
+        </div>
+        <div class="bps-row bps-stack">
+          <div class="bps-row-l"><b>{{ entry_rc_footer|e }}</b></div>
+          <div class="bps-row-r"><input type="text" class="form-control" maxlength="60" data-bps-field data-bps-rc name="module_bpos_rc_footer[{{ code|e('html_attr') }}]" value="{{ (f is iterable ? (f[code] ?? '') : f)|e('html_attr') }}"><div class="bps-err" data-bps-err="module_bpos_rc_footer[{{ code|e('html_attr') }}]"></div></div>
+        </div>
       </div>
-      {% for key, label in {'logo': entry_rc_logo, 'barcode': entry_rc_barcode, 'cashier': entry_rc_cashier, 'tax': entry_rc_tax} %}
+      {% set first = false %}
+      {% endfor %}
+      {% for key, label in {'logo': entry_rc_logo, 'address': entry_rc_address, 'phone': entry_rc_phone, 'terminal': entry_rc_terminal, 'customer': entry_rc_customer, 'barcode': entry_rc_barcode, 'cashier': entry_rc_cashier, 'tax': entry_rc_tax} %}
       <div class="bps-row">
-        <div class="bps-row-l"><b>{{ label|e }}</b></div>
+        <div class="bps-row-l"><b>{{ label|e }}</b>{% if key == 'logo' %}<small>{{ help_rc_logo|e }}</small>{% elseif key == 'address' or key == 'phone' %}<small>{{ help_rc_store_info|e }}</small>{% endif %}</div>
         <div class="bps-row-r"><label class="bps-sw"><input type="checkbox" data-bps-field data-bps-rc name="module_bpos_rc_{{ key }}" value="1"{% if attribute(settings, 'module_bpos_rc_' ~ key) %} checked{% endif %}><span></span></label></div>
       </div>
+      {% endfor %}
+    </div>
+
+    <div class="bps-card">
+      <div class="bps-card-h"><h3>{{ text_rc_translation|e }}</h3><span class="bps-sub">{{ help_rc_translation|e }}</span></div>
+      <div class="bps-seg bps-rlang-seg">
+        {% set first = true %}
+        {% for code, language in languages %}
+        <button type="button" data-bps-rlang="{{ code|e('html_attr') }}" class="{{ first ? 'bps-on' : '' }}">{{ language.name|e }}</button>
+        {% set first = false %}
+        {% endfor %}
+      </div>
+      {% set first = true %}
+      {% for code, language in languages %}
+      <div class="bps-rlang-pane{{ first ? ' bps-on' : '' }}" data-bps-rlang-pane="{{ code|e('html_attr') }}">
+        {% for key, label in {'receipt': text_lbl_receipt, 'cashier': text_lbl_cashier, 'terminal': text_lbl_terminal, 'customer': text_lbl_customer, 'payment': text_lbl_payment, 'received': text_lbl_received, 'change': text_lbl_change} %}
+        <div class="bps-row">
+          <div class="bps-row-l"><b>{{ label|e }}</b></div>
+          <div class="bps-row-r"><input type="text" class="form-control" maxlength="30" data-bps-field data-bps-rc name="module_bpos_rc_labels[{{ code|e('html_attr') }}][{{ key }}]" value="{{ (settings.module_bpos_rc_labels[code][key] ?? '')|e('html_attr') }}" placeholder="{{ (rc_label_defaults[code][key] ?? '')|e('html_attr') }}"><div class="bps-err" data-bps-err="module_bpos_rc_labels[{{ code|e('html_attr') }}][{{ key }}]"></div></div>
+        </div>
+        {% endfor %}
+      </div>
+      {% set first = false %}
       {% endfor %}
     </div>
   </div>
@@ -58,9 +100,7 @@
     <div class="bps-card">
       <div class="bps-card-h"><h3>{{ text_receipt_preview|e }} · <span id="bps-rc-w">58</span> mm</h3><span class="bps-sub">{{ help_receipt_preview|e }}</span></div>
       <div class="bps-pvbox"><div class="bps-paper" id="bps-paper"
-        data-store="{{ store_names[0]|e('html_attr') }}"
-        data-l-order="{{ rc_order|e('html_attr') }}" data-l-cashier="{{ rc_cashier|e('html_attr') }}" data-l-sub="{{ rc_subtotal|e('html_attr') }}"
-        data-l-tax="{{ rc_tax|e('html_attr') }}" data-l-total="{{ rc_total|e('html_attr') }}" data-l-cash="{{ rc_cash|e('html_attr') }}" data-l-change="{{ rc_change|e('html_attr') }}"></div></div>
+        data-labels="{{ rc_labels|e('html_attr') }}" data-stores="{{ rc_stores|e('html_attr') }}"></div></div>
     </div>
   </div>
 </div>

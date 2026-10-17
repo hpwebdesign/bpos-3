@@ -491,7 +491,8 @@ class ControllerBposSales extends Controller {
 			'total'       => $total_view,
 			'tendered'    => $tendered,
 			'change'      => $change,
-			'receipt_url' => $out->url('bpos/sales/receipt', 'order_id=' . $order_id)
+			'receipt_url' => $out->url('bpos/sales/receipt', 'order_id=' . $order_id),
+			'auto_print'  => $this->autoPrint($user)
 		);
 
 		// Online gateways confirm the order themselves through their callback. The order stays unconfirmed until then.
@@ -604,6 +605,14 @@ class ControllerBposSales extends Controller {
 		$terminal = (int)$order['pos_terminal_id'] ? $this->model_bpos_user->getTerminal($order['pos_terminal_id'], $user['store_id']) : array();
 		$width = $terminal && (int)$terminal['receipt_width'] === 58 ? 58 : 80;
 
+		// Per-terminal print options saved in the admin settings
+		$opt = array('copies' => 1, 'auto' => 1, 'cut' => 1);
+
+		if ($terminal) {
+			$saved = json_decode((string)$terminal['options'], true);
+			$opt = array_merge($opt, is_array($saved) ? array_intersect_key($saved, $opt) : array());
+		}
+
 		$cur = $order['currency_code'];
 		$val = (float)$order['currency_value'];
 		$fmt = function ($v) use ($cur, $val) {
@@ -646,12 +655,35 @@ class ControllerBposSales extends Controller {
 			$totals[] = array('title' => html_entity_decode($t['title'], ENT_QUOTES, 'UTF-8'), 'value' => $fmt($t['value']), 'big' => $t['code'] === 'total');
 		}
 
-		$header = trim((string)$this->config->get('module_bpos_rc_header'));
-		$footer = trim((string)$this->config->get('module_bpos_rc_footer'));
+		// Receipt texts are stored per language code (older installs saved one plain string)
+		$code = $bpos->lang()->code();
+		$pick = function ($v) use ($code) {
+			return trim(is_array($v) ? (string)($v[$code] ?? '') : (string)$v);
+		};
 
-		if ($header === '') {
-			$header = trim($cfg['config_name'] . "\n" . $cfg['config_address'] . ($cfg['config_telephone'] !== '' ? "\n" . $cfg['config_telephone'] : ''));
-		}
+		// Optional receipt lines are on unless the admin turned them off
+		$show = function ($key) {
+			$v = $this->config->get($key);
+
+			return $v === null || (bool)$v;
+		};
+
+		$header = $pick($this->config->get('module_bpos_rc_header'));
+		$footer = $pick($this->config->get('module_bpos_rc_footer'));
+		// Label words: the admin's own translation for this language, else the language file
+		$custom = $this->config->get('module_bpos_rc_labels');
+		$lbl = function ($key, $source) use ($custom, $code) {
+			$v = is_array($custom) && isset($custom[$code][$key]) ? trim((string)$custom[$code][$key]) : '';
+
+			return $v !== '' ? $v : $this->language->get($source);
+		};
+		$terminal_name = $show('module_bpos_rc_terminal') && $terminal ? $terminal['name'] : '';
+		$customer_name = $show('module_bpos_rc_customer') ? html_entity_decode(trim($order['firstname'] . ' ' . $order['lastname']), ENT_QUOTES, 'UTF-8') : '';
+
+		// Header text falls back to the store name. Address and phone come from the store settings and follow their own switches.
+		$cfg_name = $header !== '' ? $header : trim($cfg['config_name']);
+		$header = trim($cfg_name . ($show('module_bpos_rc_address') && trim($cfg['config_address']) !== '' ? "\n" . trim($cfg['config_address']) : '') . ($show('module_bpos_rc_phone') && $cfg['config_telephone'] !== '' ? "\n" . $cfg['config_telephone'] : ''));
+
 
 		$cashier = '';
 
@@ -674,9 +706,10 @@ class ControllerBposSales extends Controller {
 				'date'     => date($this->language->get('datetime_format'), strtotime($order['date_added'])),
 				'header'   => $header,
 				'footer'   => $footer,
+				'logo'     => $logo,
 				'cashier'  => $cashier,
-				'terminal' => $terminal ? $terminal['name'] : '',
-				'customer' => html_entity_decode(trim($order['firstname'] . ' ' . $order['lastname']), ENT_QUOTES, 'UTF-8'),
+				'terminal' => $terminal_name,
+				'customer' => $customer_name,
 				'lines'    => $lines,
 				'totals'   => $totals,
 				'payment'  => html_entity_decode($order['payment_method'], ENT_QUOTES, 'UTF-8'),
@@ -684,15 +717,17 @@ class ControllerBposSales extends Controller {
 				'tendered' => $fmt((float)$order['tendered']),
 				'change'   => $fmt((float)$order['change_due']),
 				'width'    => $width,
+				'copies'   => min(3, max(1, (int)$opt['copies'])),
+				'cut'      => $terminal ? (bool)$opt['cut'] : null,
 				'barcode'  => (bool)$this->config->get('module_bpos_rc_barcode'),
 				'labels'   => array(
-					'receipt'  => $this->language->get('text_receipt'),
-					'cashier'  => $this->language->get('text_rc_cashier'),
-					'terminal' => $this->language->get('text_terminal'),
-					'customer' => $this->language->get('text_customer'),
-					'payment'  => $this->language->get('text_payment'),
-					'received' => $this->language->get('text_received'),
-					'change'   => $this->language->get('text_change')
+					'receipt'  => $lbl('receipt', 'text_receipt'),
+					'cashier'  => $lbl('cashier', 'text_rc_cashier'),
+					'terminal' => $lbl('terminal', 'text_terminal'),
+					'customer' => $lbl('customer', 'text_customer'),
+					'payment'  => $lbl('payment', 'text_payment'),
+					'received' => $lbl('received', 'text_received'),
+					'change'   => $lbl('change', 'text_change')
 				)
 			));
 
@@ -700,6 +735,13 @@ class ControllerBposSales extends Controller {
 		}
 
 		$data = $this->language->all();
+		$data['text_receipt'] = $lbl('receipt', 'text_receipt');
+		$data['text_rc_cashier'] = $lbl('cashier', 'text_rc_cashier');
+		$data['text_terminal'] = $lbl('terminal', 'text_terminal');
+		$data['text_customer'] = $lbl('customer', 'text_customer');
+		$data['text_payment'] = $lbl('payment', 'text_payment');
+		$data['text_received'] = $lbl('received', 'text_received');
+		$data['text_change'] = $lbl('change', 'text_change');
 		$data['order_id'] = (int)$order['order_id'];
 		$data['date'] = date($this->language->get('datetime_format'), strtotime($order['date_added']));
 		$data['header_html'] = nl2br(htmlspecialchars($header, ENT_QUOTES, 'UTF-8'), false);
@@ -712,8 +754,8 @@ class ControllerBposSales extends Controller {
 		$data['tendered'] = $fmt((float)$order['tendered']);
 		$data['change'] = $fmt((float)$order['change_due']);
 		$data['cashier'] = $cashier;
-		$data['customer'] = html_entity_decode(trim($order['firstname'] . ' ' . $order['lastname']), ENT_QUOTES, 'UTF-8');
-		$data['terminal'] = $terminal ? $terminal['name'] : '';
+		$data['customer'] = $customer_name;
+		$data['terminal'] = $terminal_name;
 		$data['width'] = $width;
 		$data['barcode'] = $this->config->get('module_bpos_rc_barcode') ? \Bpos\Barcode::svg((int)$order['order_id']) : '';
 		$data['lang_code'] = $this->language->get('code');
@@ -877,5 +919,24 @@ class ControllerBposSales extends Controller {
 		}
 
 		return $built;
+	}
+
+	// Terminal option "print automatically after checkout" (on unless the admin turned it off)
+	private function autoPrint(array $user) {
+		if (!(int)$user['terminal_id']) {
+			return false;
+		}
+
+		$this->load->model('bpos/user');
+
+		$terminal = $this->model_bpos_user->getTerminal($user['terminal_id'], $user['store_id']);
+
+		if (!$terminal) {
+			return false;
+		}
+
+		$saved = json_decode((string)$terminal['options'], true);
+
+		return (bool)(is_array($saved) && isset($saved['auto']) ? $saved['auto'] : 1);
 	}
 }

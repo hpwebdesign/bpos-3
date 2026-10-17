@@ -72,7 +72,7 @@ class ModelBposUser extends Model {
 	}
 
 	public function getTerminal($terminal_id, $store_id) {
-		$query = $this->db->query("SELECT `terminal_id`, `name`, `receipt_width`, `printer_profile` FROM `" . DB_PREFIX . "bpos_terminal` WHERE `terminal_id` = '" . (int)$terminal_id . "' AND `store_id` = '" . (int)$store_id . "' AND `status` = '1'");
+		$query = $this->db->query("SELECT `terminal_id`, `name`, `receipt_width`, `printer_profile`, `options` FROM `" . DB_PREFIX . "bpos_terminal` WHERE `terminal_id` = '" . (int)$terminal_id . "' AND `store_id` = '" . (int)$store_id . "' AND `status` = '1'");
 
 		return $query->row;
 	}

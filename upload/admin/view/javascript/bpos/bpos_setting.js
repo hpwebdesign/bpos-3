@@ -46,6 +46,16 @@
   }
   $root.on('click', '[data-bps-lang]', function () { showLang($(this).data('bps-lang')); });
 
+  // Language switch for the receipt texts (also picks the labels shown in the preview)
+  var curRLang = $('.bps-rlang-seg button.bps-on').first().data('bps-rlang');
+  function showRLang(code) {
+    curRLang = code;
+    $('.bps-rlang-seg button').removeClass('bps-on').filter('[data-bps-rlang="' + code + '"]').addClass('bps-on');
+    $('.bps-rlang-pane').removeClass('bps-on').filter('[data-bps-rlang-pane="' + code + '"]').addClass('bps-on');
+    drawReceipt();
+  }
+  $root.on('click', '[data-bps-rlang]', function () { showRLang($(this).data('bps-rlang')); });
+
   // Live preview of the sign-in text and logo
   function preview() {
     var $pane = $('.bps-lang-pane[data-bps-lang-pane="' + curLang + '"]');
@@ -129,8 +139,8 @@
   function stable(o) { return JSON.stringify(Object.keys(o).sort().map(function (k) { return [k, o[k]]; })); }
   function syncDirty() {
     var d = stable(flat()) !== stable(baseline);
-    $('#bps-save').prop('disabled', !d || saving);
-    $('#bps-un').prop('hidden', !d);
+    $('#bps-save, #bps-save-foot').prop('disabled', !d || saving);
+    $('#bps-un, #bps-un-foot').prop('hidden', !d);
   }
   $root.on('input change', '[data-bps-field]', syncDirty);
 
@@ -164,13 +174,15 @@
       if ($pane.length) { showTab($pane.attr('id').replace('bps-', '')); }
       var $lp = first.closest('.bps-lang-pane');
       if ($lp.length) { showLang($lp.data('bps-lang-pane')); }
+      var $rp = first.closest('.bps-rlang-pane');
+      if ($rp.length) { showRLang($rp.data('bps-rlang-pane')); }
     }
   }
 
-  $('#bps-save').on('click', function () {
+  function saveSettings() {
     if (saving) { return; }
     saving = true;
-    var $b = $(this).prop('disabled', true);
+    $('#bps-save, #bps-save-foot').prop('disabled', true);
     $.ajax({ url: URL.save, type: 'POST', data: JSON.stringify(collect()), contentType: 'application/json', dataType: 'json' })
       .done(function (r) {
         if (r.success) { showErr({}); alertBox('success', r.message); baseline = flat(); }
@@ -178,6 +190,15 @@
       })
       .fail(function () { alertBox('danger', FAIL); })
       .always(function () { saving = false; syncDirty(); });
+  }
+  $('#bps-save, #bps-save-foot').on('click', saveSettings);
+
+  // Ctrl+S / Cmd+S saves like the button, and never opens the browser's save-page dialog
+  $(document).on('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && String(e.key).toLowerCase() === 's') {
+      e.preventDefault();
+      if (!$('#bps-save').prop('disabled')) { saveSettings(); }
+    }
   });
 
   $('#bps-patch').on('click', function () {
@@ -217,29 +238,115 @@
   // Receipt preview, built from the current form values
   // ---------------------------------------------------------------
   function money(n) { return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+  // One sample receipt feeds both the preview and the test print. The preview is drawn by the same layout code that builds the printer bytes.
+  function receiptData() {
+    var $p = $('#bps-paper');
+    var on = function (k) { return $root.find('[name="module_bpos_rc_' + k + '"]').is(':checked'); };
+    var tax = 120;
+    var sub = 1200 + (on('tax') ? 0 : tax);
+    var $opt = $('.bps-dev-sel option:selected');
+    var terminal = $.trim(String($opt.text() || '').split(' · ')[0]);
+    var L = $.extend({}, ($p.data('labels') || {})[curRLang] || {});
+
+    $.each(['receipt', 'cashier', 'terminal', 'customer', 'payment', 'received', 'change'], function (i, k) {
+      var v = $.trim($root.find('[name="module_bpos_rc_labels[' + curRLang + '][' + k + ']"]').val() || '');
+
+      if (v) { L[k] = v; }
+    });
+    var text = function (k) { return $.trim($root.find('[name="module_bpos_rc_' + k + '[' + curRLang + ']"]').val() || ''); };
+    var store = (($p.data('stores') || {})[$opt.data('store') || 0]) || {};
+    var d = new Date();
+    var p2 = function (n) { return ('0' + n).slice(-2); };
+    var totals = [{ title: L.sub, value: money(sub) }];
+
+    if (on('tax')) { totals.push({ title: L.tax, value: money(tax) }); }
+    totals.push({ title: L.total, value: money(1320) });
+
+    return {
+      order_id: 1046,
+      date: p2(d.getDate()) + '/' + p2(d.getMonth() + 1) + '/' + d.getFullYear() + ' ' + p2(d.getHours()) + ':' + p2(d.getMinutes()) + ':' + p2(d.getSeconds()),
+      header: [text('header') || store.name || '', on('address') ? store.address || '' : '', on('phone') ? store.phone || '' : ''].filter(function (x) { return $.trim(x) !== ''; }).join('\n'),
+      logo: on('logo') ? store.logo || '' : '',
+      footer: text('footer'),
+      cashier: on('cashier') ? 'Rina' : '',
+      terminal: on('terminal') ? terminal : '',
+      customer: on('customer') ? L.guest : '',
+      barcode: on('barcode'),
+      lines: [
+        { name: 'MacBook Air', options: '', qty: 1, price: money(1000), total: money(1000) },
+        { name: 'iPod Nano', options: '', qty: 2, price: money(100), total: money(200) }
+      ],
+      totals: totals,
+      payment: L.cash,
+      cash: true,
+      tendered: money(1500),
+      change: money(180),
+      labels: { receipt: L.receipt, cashier: L.cashier, terminal: L.terminal, customer: L.customer, payment: L.payment, received: L.received, change: L.change }
+    };
+  }
+
+  // The logo raster as a canvas: 12 printer dots per character column
+  function rasterCanvas(g) {
+    var c = document.createElement('canvas');
+    var ctx = c.getContext('2d');
+    var im = ctx.createImageData(g.w, g.h);
+
+    c.width = g.w;
+    c.height = g.h;
+    im = ctx.createImageData(g.w, g.h);
+
+    for (var y = 0; y < g.h; y++) {
+      for (var x = 0; x < g.w; x++) {
+        var v = g.data[y * g.wb + (x >> 3)] & (0x80 >> (x & 7)) ? 0 : 255;
+        var i = (y * g.w + x) * 4;
+
+        im.data[i] = im.data[i + 1] = im.data[i + 2] = v;
+        im.data[i + 3] = 255;
+      }
+    }
+
+    ctx.putImageData(im, 0, 0);
+    c.style.width = (g.w / 12) + 'ch';
+    c.style.display = 'block';
+    c.style.margin = '0 auto';
+
+    return c;
+  }
+
+  var drawSeq = 0;
+
   function drawReceipt() {
     var $p = $('#bps-paper');
-    if (!$p.length) { return; }
+    if (!$p.length || !(window.BPOS && window.BPOS.print && window.BPOS.print.layout)) { return; }
     var paper = $('.bps-dev.bps-on [data-bps-paper]:checked').val() || '58';
-    var on = function (k) { return $root.find('[name="module_bpos_rc_' + k + '"]').is(':checked'); };
-    var header = $.trim($root.find('[name="module_bpos_rc_header"]').val()) || $p.data('store');
-    var footer = $root.find('[name="module_bpos_rc_footer"]').val() || '';
-    var tax = 120;
-    var $h = $('<div>');
-    var line = function (a, b, cls) { return $('<div class="rl">').addClass(cls || '').append($('<span>').text(a), $('<span>').text(b)); };
-    var pc = function (t, cls) { return $('<div class="pc">').addClass(cls || '').text(t); };
-    var dash = function () { return $('<div class="pd">'); };
+    var cols = paper === '80' ? 48 : 32;
+    var r = receiptData();
+    var seq = ++drawSeq;
 
-    if (on('logo')) { $h.append('<div class="plogo"><i class="fa fa-shopping-bag"></i></div>'); }
-    $.each(String(header).split('\n'), function (i, t) { $h.append(pc(t, i === 0 ? 'b' : '')); });
-    $h.append(dash(), line($p.data('l-order') + ' #1046', '16 Oct 2026'));
-    if (on('cashier')) { $h.append(line($p.data('l-cashier'), 'Rina')); }
-    $h.append(dash(), $('<div class="pi">').text('MacBook Air'), line('1 x ' + money(1000), money(1000)), $('<div class="pi">').text('iPod Nano'), line('2 x ' + money(100), money(200)), dash(), line($p.data('l-sub'), money(1200)));
-    if (on('tax')) { $h.append(line($p.data('l-tax'), money(tax))); }
-    $h.append(line($p.data('l-total'), money(1200 + (on('tax') ? tax : 0)), 'b'), line($p.data('l-cash'), money(1500)), line($p.data('l-change'), money(1500 - 1200 - (on('tax') ? tax : 0))), dash(), pc(footer));
-    if (on('barcode')) { $h.append('<div class="pbar"></div>'); }
-    $p.attr('class', 'bps-paper w' + paper).empty().append($h.children());
-    $('#bps-rc-w').text(paper);
+    var paint = function () {
+      if (seq !== drawSeq) { return; }
+
+      var $h = $('<div>');
+
+      $.each(window.BPOS.print.layout(r, cols), function (i, x) {
+        if (x.img) { $h.append(rasterCanvas(x.img)); return; }
+
+        if (x.bar !== undefined) {
+          $h.append(window.BPOS.print.barcode(x.bar), $('<div class="pl c">').text('* ' + x.bar.split('').join(' ') + ' *'));
+          return;
+        }
+
+        $h.append($('<div class="pl">').toggleClass('c', x.c).text(x.s));
+      });
+
+      $p.attr('class', 'bps-paper w' + paper).empty().append($h.children());
+      $('#bps-rc-w').text(paper);
+    };
+
+    if (!r.logo) { paint(); return; }
+
+    window.BPOS.print.logo(r.logo, cols).then(function (g) { r.logoRaster = g; paint(); }, paint);
   }
   $root.on('input change', '[data-bps-rc], [data-bps-paper]', drawReceipt);
 
@@ -389,6 +496,43 @@
   if (hash && $('#bps-' + hash).hasClass('bps-pane')) { showTab(hash); }
   var $firstDev = $('.bps-dev-sel').first();
   if ($firstDev.length) { showDev($firstDev.val()); }
+
+  // Test print: loads the POS print module and sends a sample receipt using this terminal's settings
+  var printReady = false;
+  var printSrc = $root.data('print-js');
+
+  if (printSrc) {
+    window.BPOS = window.BPOS || {
+      store: { get: function (k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { window.localStorage.setItem(k, v); } catch (e) { /* ignore */ } } },
+      t: function (k, f) { return f; },
+      esc: function (s) { return $('<i>').text(s).html(); },
+      ui: { toast: function () {}, busy: function () {}, modal: function () {} }
+    };
+    $.getScript(printSrc).done(function () { printReady = !!(window.BPOS.print && window.BPOS.print.test); drawReceipt(); });
+  }
+
+  $root.on('click', '[data-bps-testprint]', function () {
+    var $btn = $(this);
+    var $dev = $btn.closest('.bps-dev');
+    var mode = { usb: 'usb', bt: 'serial' }[$dev.find('select[name$="[conn]"]').val()];
+
+    if (!mode) { alertBox('warning', $root.data('test-conn')); return; }
+    if (!printReady) { alertBox('danger', FAIL); return; }
+
+    var paper = $dev.find('[data-bps-paper]:checked').val();
+
+    $btn.prop('disabled', true);
+    window.BPOS.print.test({
+      mode: mode,
+      cols: paper === '80' ? 48 : 32,
+      cut: $dev.find('input[name$="[cut]"]').is(':checked'),
+      receipt: receiptData()
+    }).then(function () {
+      alertBox('success', $root.data('test-sent'));
+    }, function (e) {
+      alertBox('danger', (e && e.message) || FAIL);
+    }).then(function () { $btn.prop('disabled', false); });
+  });
 
   preview();
   baseline = flat();

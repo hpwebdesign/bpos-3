@@ -346,6 +346,11 @@ class ModelExtensionModuleBpos extends Model {
       'module_bpos_rc_header'   => '',
       'module_bpos_rc_footer'   => 'Thank you for shopping!',
       'module_bpos_rc_logo'     => 1,
+      'module_bpos_rc_address'  => 1,
+      'module_bpos_rc_phone'    => 1,
+      'module_bpos_rc_terminal' => 1,
+      'module_bpos_rc_labels'   => [],
+      'module_bpos_rc_customer' => 1,
       'module_bpos_rc_barcode'  => 1,
       'module_bpos_rc_cashier'  => 1,
       'module_bpos_rc_tax'      => 1,
@@ -405,6 +410,27 @@ class ModelExtensionModuleBpos extends Model {
   // ---------------------------------------------------------------
 
   // Store 0 first, then every OC store: [store_id => name]
+  // Store details the receipt falls back to (name, address, phone, logo), per store with the default store as base
+  public function getReceiptStores() {
+    $cfg = [];
+    $query = $this->db->query("SELECT `store_id`, `key`, `value` FROM `" . DB_PREFIX . "setting` WHERE `code` = 'config' AND `key` IN ('config_name', 'config_address', 'config_telephone', 'config_logo')");
+
+    foreach ($query->rows as $r) {
+      $cfg[(int)$r['store_id']][$r['key']] = (string)$r['value'];
+    }
+
+    $out = [];
+
+    foreach (array_keys($this->getStoreNames()) as $id) {
+      $v = array_merge(['config_name' => '', 'config_address' => '', 'config_telephone' => '', 'config_logo' => ''], $cfg[0] ?? [], $cfg[$id] ?? []);
+      $logo = $v['config_logo'] !== '' && preg_match('#^[A-Za-z0-9_./ -]+$#', $v['config_logo']) && strpos($v['config_logo'], '..') === false && is_file(DIR_IMAGE . $v['config_logo']) ? HTTPS_CATALOG . 'image/' . $v['config_logo'] : '';
+
+      $out[$id] = ['name' => $v['config_name'], 'address' => $v['config_address'], 'phone' => $v['config_telephone'], 'logo' => $logo];
+    }
+
+    return $out;
+  }
+
   public function getStoreNames() {
     $this->load->model('setting/store');
 
