@@ -83,7 +83,7 @@
         img.crossOrigin = 'anonymous';
         img.onload = function () {
           try {
-            var scale = Math.min((cols >= 48 ? 288 : 192) / img.naturalWidth, 120 / img.naturalHeight);
+            var scale = Math.min((cols >= 64 ? 288 : 192) / img.naturalWidth, 120 / img.naturalHeight);
             var wd = Math.max(8, Math.ceil(img.naturalWidth * scale / 8) * 8);
             var ht = Math.max(1, Math.round(img.naturalHeight * scale));
             var cv = d.createElement('canvas');
@@ -215,7 +215,8 @@
     var align = 0;
     var raw = function () { for (var i = 0; i < arguments.length; i++) { o.push(arguments[i]); } };
 
-    raw(0x1b, 0x40, 0x1b, 0x74, 0);
+    // Font B (9x17 dots) is smaller than font A; ESC 3 sets a roomier line pitch
+    raw(0x1b, 0x40, 0x1b, 0x74, 0, 0x1b, 0x4d, 1, 0x1b, 0x33, 28);
 
     layout(r, cols).forEach(function (x) {
       if (x.img) {
@@ -246,13 +247,19 @@
 
     if (align) { raw(0x1b, 0x61, 0); }
     // The cutter sits about 2 cm behind the print head, so the last lines need a fixed feed before the cut
-    raw(0x1b, 0x64, cut ? 6 : 3);
+    // Extra 5 mm of bottom margin: ESC J feeds n dots, 40 dots = 5 mm at 8 dots per mm
+    raw(0x1b, 0x64, cut ? 6 : 3, 0x1b, 0x4a, 40);
     if (cut) { raw(0x1d, 0x56, 66, 0); }
 
     return new Uint8Array(o);
   }
 
-  function colsFor(r) { return cfg.cols || (r && r.width === 58 ? 32 : 48); }
+  // Font B columns: 384 / 9 = 42 for 58 mm, 576 / 9 = 64 for 80 mm. Older saved values (32, 48) map to the same paper.
+  function colsFor(r) {
+    if (cfg.cols) { return cfg.cols <= 32 ? 42 : (cfg.cols <= 48 ? 64 : cfg.cols); }
+
+    return r && r.width === 58 ? 42 : 64;
+  }
 
   function sample() {
     return {
@@ -430,7 +437,7 @@
       box.innerHTML = '<h2>' + esc(t('pr_title', 'Printer')) + '</h2>' +
         '<p>' + esc(t('pr_hint', 'Saved on this device only.')) + '</p>' +
         '<label class="pr-f"><span>' + esc(t('pr_mode', 'Print method')) + '</span><select id="pr-mode">' + modes.map(function (m) { return '<option value="' + m[0] + '"' + (m[0] === local.mode ? ' selected' : '') + '>' + esc(m[1]) + '</option>'; }).join('') + '</select></label>' +
-        '<label class="pr-f"><span>' + esc(t('pr_cols', 'Paper width')) + '</span><select id="pr-cols"><option value="0">' + esc(t('pr_cols_auto', 'Automatic (from terminal)')) + '</option><option value="32">58 mm</option><option value="48">80 mm</option></select></label>' +
+        '<label class="pr-f"><span>' + esc(t('pr_cols', 'Paper width')) + '</span><select id="pr-cols"><option value="0">' + esc(t('pr_cols_auto', 'Automatic (from terminal)')) + '</option><option value="42">58 mm</option><option value="64">80 mm</option></select></label>' +
         '<label class="pr-c"><input type="checkbox" id="pr-cut"> <span>' + esc(t('pr_cut', 'Cut paper after printing')) + '</span></label>' +
         '<div class="pr-row" id="pr-conn"><button class="btn" type="button" id="pr-choose">' + esc(t('pr_choose', 'Choose printer')) + '</button><button class="btn" type="button" id="pr-test">' + esc(t('pr_test', 'Test print')) + '</button></div>' +
         '<small id="pr-msg" class="pr-msg"></small>' +
@@ -439,7 +446,7 @@
       var $ = function (id) { return box.querySelector('#' + id); };
       var msg = function (s, bad) { $('pr-msg').textContent = s || ''; $('pr-msg').className = 'pr-msg' + (bad ? ' bad' : ''); };
 
-      $('pr-cols').value = String(local.cols);
+      $('pr-cols').value = String(local.cols ? (local.cols <= 32 ? 42 : (local.cols <= 48 ? 64 : local.cols)) : 0);
       $('pr-cut').checked = !!local.cut;
 
       function sync() {

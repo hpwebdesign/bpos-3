@@ -320,7 +320,7 @@
     var $p = $('#bps-paper');
     if (!$p.length || !(window.BPOS && window.BPOS.print && window.BPOS.print.layout)) { return; }
     var paper = $('.bps-dev.bps-on [data-bps-paper]:checked').val() || '58';
-    var cols = paper === '80' ? 48 : 32;
+    var cols = paper === '80' ? 64 : 42;
     var r = receiptData();
     var seq = ++drawSeq;
 
@@ -524,7 +524,7 @@
     $btn.prop('disabled', true);
     window.BPOS.print.test({
       mode: mode,
-      cols: paper === '80' ? 48 : 32,
+      cols: paper === '80' ? 64 : 42,
       cut: $dev.find('input[name$="[cut]"]').is(':checked'),
       receipt: receiptData()
     }).then(function () {
