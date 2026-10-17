@@ -203,8 +203,8 @@ a.bps-snav.bps-on, a.bps-snav.bps-on:hover { background: var(--navy); color: #ff
 .bps-col-wide { flex: 0 0 380px; }
 .bps-pvbox { background: var(--tile); padding: 22px 12px; display: flex; justify-content: center; max-height: 70vh; overflow: auto; }
 .bps-paper { background: #fff; color: #111; font: 12px/1.5 "DM Mono", ui-monospace, monospace; padding: 18px 14px 20px; box-shadow: 0 10px 26px -14px rgba(0,0,0,.45); flex: none; }
-.bps-paper.w58 { width: calc(42ch + 28px); }
-.bps-paper.w80 { width: calc(64ch + 28px); }
+.bps-paper.w58 { width: calc(32ch + 28px); }
+.bps-paper.w80 { width: calc(48ch + 28px); }
 .bps-paper .pc { text-align: center; white-space: pre-wrap; }
 .bps-paper .pc.b { font-weight: 700; font-size: 13px; }
 .bps-paper .plogo { text-align: center; font-size: 26px; }
