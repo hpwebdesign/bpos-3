@@ -241,6 +241,14 @@
   }
 
   function printReceipt(id) {
+    var link = url(P.urls.receipt, 'order_id=' + id);
+
+    if (!B.print) { printDialog(link); return; }
+
+    B.print.receipt(link).then(function (done) { if (!done) { printDialog(link); } });
+  }
+
+  function printDialog(link) {
     var old = d.querySelector('iframe.od-print');
     if (old) { old.parentNode.removeChild(old); }
 
@@ -251,7 +259,7 @@
     f.onload = function () {
       try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { B.ui.toast(t('sl_print_fail', 'Could not open the print dialog.'), 'err'); }
     };
-    f.src = url(P.urls.receipt, 'order_id=' + id);
+    f.src = link;
     d.body.appendChild(f);
   }
 

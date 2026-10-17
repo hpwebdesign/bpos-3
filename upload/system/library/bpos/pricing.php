@@ -426,7 +426,7 @@ class Pricing {
 			if (!$l['error']) {
 				$order_products[] = array(
 					'product_id' => $p['product_id'],
-					'name'       => $p['name_raw'],
+					'name'       => $p['name_raw'] !== '' ? $p['name_raw'] : $p['model'],
 					'model'      => $p['model'],
 					'option'     => $l['opts'],
 					'download'   => array(),

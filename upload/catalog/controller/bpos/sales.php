@@ -614,7 +614,7 @@ class ControllerBposSales extends Controller {
 
 		foreach ($order['lines'] as $l) {
 			$lines[] = array(
-				'name'    => html_entity_decode($l['name'], ENT_QUOTES, 'UTF-8'),
+				'name'    => html_entity_decode($l['name'] !== '' ? $l['name'] : $l['model'], ENT_QUOTES, 'UTF-8'),
 				'options' => html_entity_decode(implode(' · ', $l['options']), ENT_QUOTES, 'UTF-8'),
 				'qty'     => (int)$l['quantity'],
 				'price'   => $fmt($l['price'] + ((float)$l['tax'])),
@@ -664,6 +664,39 @@ class ControllerBposSales extends Controller {
 
 		if ($this->config->get('module_bpos_rc_logo') && $cfg['config_logo'] !== '' && is_file(DIR_IMAGE . $cfg['config_logo'])) {
 			$logo = $out->base() . 'image/' . $cfg['config_logo'];
+		}
+
+		// Plain data for direct ESC/POS printing from the browser
+		if (isset($this->request->get['format']) && $this->request->get['format'] === 'json') {
+			$out->json(array(
+				'ok'       => true,
+				'order_id' => (int)$order['order_id'],
+				'date'     => date($this->language->get('datetime_format'), strtotime($order['date_added'])),
+				'header'   => $header,
+				'footer'   => $footer,
+				'cashier'  => $cashier,
+				'terminal' => $terminal ? $terminal['name'] : '',
+				'customer' => html_entity_decode(trim($order['firstname'] . ' ' . $order['lastname']), ENT_QUOTES, 'UTF-8'),
+				'lines'    => $lines,
+				'totals'   => $totals,
+				'payment'  => html_entity_decode($order['payment_method'], ENT_QUOTES, 'UTF-8'),
+				'cash'     => $order['pay_code'] === 'cash',
+				'tendered' => $fmt((float)$order['tendered']),
+				'change'   => $fmt((float)$order['change_due']),
+				'width'    => $width,
+				'barcode'  => (bool)$this->config->get('module_bpos_rc_barcode'),
+				'labels'   => array(
+					'receipt'  => $this->language->get('text_receipt'),
+					'cashier'  => $this->language->get('text_rc_cashier'),
+					'terminal' => $this->language->get('text_terminal'),
+					'customer' => $this->language->get('text_customer'),
+					'payment'  => $this->language->get('text_payment'),
+					'received' => $this->language->get('text_received'),
+					'change'   => $this->language->get('text_change')
+				)
+			));
+
+			return;
 		}
 
 		$data = $this->language->all();

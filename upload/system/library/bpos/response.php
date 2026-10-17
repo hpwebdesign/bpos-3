@@ -144,7 +144,7 @@ class Response {
 		$data['scripts_head'] = array();
 		$data['scripts'] = array();
 
-		foreach (array('core', 'api', 'ui') as $name) {
+		foreach (array('core', 'api', 'ui', 'print') as $name) {
 			$data['scripts_head'][] = $this->asset('javascript/bpos/bpos_' . $name . '.js');
 		}
 

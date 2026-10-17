@@ -679,6 +679,12 @@
   }
 
   function printReceipt(url) {
+    if (!B.print) { printDialog(url); return; }
+
+    B.print.receipt(url).then(function (done) { if (!done) { printDialog(url); } });
+  }
+
+  function printDialog(url) {
     var old = d.querySelector('iframe.sl-print');
     if (old) { old.parentNode.removeChild(old); }
 
