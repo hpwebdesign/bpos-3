@@ -15,21 +15,60 @@ class ModelBposCustomer extends Model {
 		return $sql;
 	}
 
-	private function where($q) {
-		if ($q === '') {
-			return '';
+	// Per-customer sales figures, joined as alias s
+	private function sales(array $exclude) {
+		return " LEFT JOIN (SELECT o.customer_id, COUNT(*) AS orders, SUM(o.total) AS spent, MAX(o.date_added) AS last_at FROM `" . DB_PREFIX . "order` o WHERE o.customer_id > 0 AND " . $this->valid($exclude) . " GROUP BY o.customer_id) s ON (s.customer_id = c.customer_id)";
+	}
+
+	// Segment filters of the stat tiles: new, repeat, inactive
+	private function segment($k) {
+		$cut = "DATE_SUB(NOW(), INTERVAL 30 DAY)";
+		$map = array(
+			'new'      => "c.date_added >= " . $cut,
+			'repeat'   => "COALESCE(s.orders, 0) >= 2",
+			'inactive' => "COALESCE(s.orders, 0) > 0 AND s.last_at < " . $cut,
+			'never'    => "COALESCE(s.orders, 0) = 0"
+		);
+
+		return isset($map[$k]) ? $map[$k] : '';
+	}
+
+	private function where($q, $k = '', $g = 0) {
+		$parts = array();
+
+		if ($g > 0) {
+			$parts[] = "c.customer_group_id = '" . (int)$g . "'";
 		}
 
-		$like = $this->like($q);
+		if ($q !== '') {
+			$like = $this->like($q);
+			$parts[] = "(CONCAT(c.firstname, ' ', c.lastname) LIKE '%" . $like . "%' OR c.telephone LIKE '%" . $like . "%' OR c.email LIKE '%" . $like . "%')";
+		}
 
-		return " WHERE (CONCAT(c.firstname, ' ', c.lastname) LIKE '%" . $like . "%' OR c.telephone LIKE '%" . $like . "%' OR c.email LIKE '%" . $like . "%')";
+		if ($this->segment($k) !== '') {
+			$parts[] = "(" . $this->segment($k) . ")";
+		}
+
+		return $parts ? " WHERE " . implode(' AND ', $parts) : '';
 	}
 
-	public function getTotal($q) {
-		return (int)$this->db->query("SELECT COUNT(*) AS n FROM `" . DB_PREFIX . "customer` c" . $this->where($q))->row['n'];
+	public function getTotal($q, $k, array $exclude, $g = 0) {
+		return (int)$this->db->query("SELECT COUNT(*) AS n FROM `" . DB_PREFIX . "customer` c" . $this->sales($exclude) . $this->where($q, $k, $g))->row['n'];
 	}
 
-	public function getCustomers($q, $start, $limit, $sort, $dir, array $exclude) {
+	public function getGroups() {
+		return $this->db->query("SELECT cg.customer_group_id AS id, cgd.name FROM `" . DB_PREFIX . "customer_group` cg LEFT JOIN `" . DB_PREFIX . "customer_group_description` cgd ON (cgd.customer_group_id = cg.customer_group_id AND cgd.language_id = '" . (int)$this->config->get('config_language_id') . "') ORDER BY cg.sort_order, cgd.name")->rows;
+	}
+
+	// Counts for the stat tiles, independent of search and segment
+	public function getStats(array $exclude) {
+		$cut = "DATE_SUB(NOW(), INTERVAL 30 DAY)";
+		$r = $this->db->query("SELECT COUNT(*) AS total, SUM(c.date_added >= " . $cut . ") AS fresh, SUM(COALESCE(s.orders, 0) >= 2) AS again, SUM(COALESCE(s.orders, 0) > 0 AND s.last_at < " . $cut . ") AS idle FROM `" . DB_PREFIX . "customer` c" . $this->sales($exclude))->row;
+
+		return array('all' => (int)$r['total'], 'new' => (int)$r['fresh'], 'repeat' => (int)$r['again'], 'inactive' => (int)$r['idle']);
+	}
+
+	public function getCustomers($q, $start, $limit, $sort, $dir, array $exclude, $k = '', $g = 0) {
 		$sorts = array(
 			'name'   => 'c.firstname %s, c.lastname %s',
 			'orders' => 's.orders %s, c.customer_id DESC',
@@ -42,8 +81,8 @@ class ModelBposCustomer extends Model {
 
 		$sql = "SELECT c.customer_id, c.firstname, c.lastname, c.email, c.telephone, c.status, COALESCE(s.orders, 0) AS orders, COALESCE(s.spent, 0) AS spent, s.last_at, " .
 			"(SELECT o2.store_name FROM `" . DB_PREFIX . "order` o2 WHERE o2.customer_id = c.customer_id AND " . str_replace('o.', 'o2.', $this->valid($exclude)) . " ORDER BY o2.date_added DESC, o2.order_id DESC LIMIT 1) AS last_store " .
-			"FROM `" . DB_PREFIX . "customer` c LEFT JOIN (SELECT o.customer_id, COUNT(*) AS orders, SUM(o.total) AS spent, MAX(o.date_added) AS last_at FROM `" . DB_PREFIX . "order` o WHERE o.customer_id > 0 AND " . $this->valid($exclude) . " GROUP BY o.customer_id) s ON (s.customer_id = c.customer_id)" .
-			$this->where($q) . " ORDER BY " . $order . " LIMIT " . (int)$start . "," . (int)$limit;
+			"FROM `" . DB_PREFIX . "customer` c" . $this->sales($exclude) .
+			$this->where($q, $k, $g) . " ORDER BY " . $order . " LIMIT " . (int)$start . "," . (int)$limit;
 
 		return $this->db->query($sql)->rows;
 	}

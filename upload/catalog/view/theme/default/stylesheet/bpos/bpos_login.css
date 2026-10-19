@@ -6,8 +6,8 @@
   --green: #2F855A; --green-soft: #E3F4EA; --amber: #B7791F; --amber-soft: #FDF3DC; --red: #C53030; --red-soft: #FDE8E8;
   --sh-card: 0 1px 2px rgba(16,31,69,.05), 0 10px 24px -10px rgba(16,31,69,.14);
   --sh-pop: 0 24px 60px -16px rgba(16,31,69,.45);
-  --f-body: 'Figtree', system-ui, sans-serif; --f-disp: 'Bricolage Grotesque', 'Figtree', system-ui, sans-serif;
-  --f-mono: 'DM Mono', ui-monospace, monospace; --f-num: 'Manrope', 'Figtree', system-ui, sans-serif;
+  --f-body: "Helvetica Neue", Helvetica, Arial, sans-serif; --f-disp: var(--f-body);
+  --f-mono: ui-monospace, Menlo, Consolas, monospace; --f-num: var(--f-body);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -37,8 +37,6 @@ button { cursor: pointer; border: 0; background: none; }
 .moon { position: absolute; right: clamp(24px, 9vw, 150px); top: clamp(70px, 11vh, 120px); width: clamp(54px, 5.4vw, 84px); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 36% 34%, #fff, #E2E6FF 60%, #C6CDF3); box-shadow: 0 0 60px 18px rgba(190,205,255,.28), 0 0 160px 60px rgba(150,165,255,.14); }
 .moon::before, .moon::after { content: ""; position: absolute; border-radius: 50%; background: rgba(150,160,215,.35); }
 .moon::before { width: 22%; height: 22%; left: 26%; top: 30%; } .moon::after { width: 13%; height: 13%; left: 58%; top: 56%; }
-.cloud { position: absolute; left: -30vw; height: 34px; width: 22vw; max-width: 320px; border-radius: 30px; background: rgba(110,120,190,.12); filter: blur(10px); animation: drift 110s linear infinite; }
-.cloud.c2 { top: 26%; width: 16vw; height: 26px; animation-duration: 150s; animation-delay: -70s; } .cloud.c1 { top: 17%; animation-delay: -20s; } .cloud.c3 { top: 36%; animation-duration: 130s; animation-delay: -105s; }
 #town { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; overflow: visible; }
 #town .sgn { font-family: var(--f-body); font-weight: 800; letter-spacing: .04em; }
 #town .par { transition: transform .5s cubic-bezier(.2,.7,.2,1); }
@@ -48,21 +46,18 @@ button { cursor: pointer; border: 0; background: none; }
 #town .p4 { transform: translate(calc(var(--mx, 0) * 16px), calc(var(--my, 0) * 6px)); }
 #town .tw { animation: tw 4s ease-in-out infinite; }
 #town .neon { animation: neon 7s linear infinite; } #town .neon2 { animation: neon 5s linear infinite; animation-delay: -2s; }
-#town .pulse { animation: pls 6s ease-in-out infinite; } #town .flick { animation: flk 5s ease-in-out infinite; } #town .tail { animation: pls 3s ease-in-out infinite; }
-#town .spk { animation-name: rise; animation-timing-function: ease-out; animation-iteration-count: infinite; opacity: 0; }
+#town .pulse { animation: pls 6s ease-in-out infinite; } #town .tail { animation: pls 3s ease-in-out infinite; }
 #town .van { animation: drive 15s linear infinite; }
-#town .van.img #riderImg { animation: bob .55s ease-in-out infinite alternate; }
 #town .vbody { animation: bob .55s ease-in-out infinite alternate; }
+#town .flag { transform-box: fill-box; transform-origin: 100% 50%; animation: wave 1.4s ease-in-out infinite alternate; }
 #town .wh { transform-box: fill-box; transform-origin: 50% 50%; animation: spin 1.25s linear infinite; }
 @keyframes drive { from { transform: translateX(-1000px); } to { transform: translateX(1500px); } }
 @keyframes bob { to { transform: translateY(-1.6px); } }
+@keyframes wave { to { transform: skewY(10deg); } }
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes tw { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
-@keyframes drift { to { transform: translateX(160vw); } }
 @keyframes neon { 0%, 18%, 22%, 62%, 100% { opacity: 1; } 20%, 60% { opacity: .55; } 21% { opacity: .9; } }
 @keyframes pls { 0%, 100% { opacity: .7; } 50% { opacity: 1; } }
-@keyframes flk { 0%, 100% { opacity: .85; } 47% { opacity: 1; } 50% { opacity: .7; } 53% { opacity: 1; } }
-@keyframes rise { 0% { transform: translateY(0); opacity: 0; } 12% { opacity: .9; } 100% { transform: translateY(-300px) translateX(26px); opacity: 0; } }
 
 .page { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; padding: 18px 28px 22px; }
 .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -164,8 +159,7 @@ button { cursor: pointer; border: 0; background: none; }
   .card { justify-self: center; margin-top: auto; }
 }
 @media (max-width: 480px) { .card { padding: 22px 18px 18px; border-radius: 24px; } .adm { flex-wrap: wrap; } .adm .btn { width: 100%; } .bname small { display: none; } }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } #town .spk { opacity: 0; } }
-
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } 
 /* Terminal chooser (shown when a store has several counters) */
 .tlist { display: flex; flex-direction: column; gap: 8px; }
 .tlist button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 0 16px; border-radius: 16px; background: var(--fill); font-weight: 600; text-align: left; box-shadow: inset 0 0 0 1px var(--line); }

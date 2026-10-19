@@ -35,6 +35,14 @@
     });
   });
 
+  // Currency: amounts are priced on the server, so switching reloads the page
+  Array.prototype.forEach.call(d.querySelectorAll('[data-cur]'), function (b) {
+    b.addEventListener('click', function () {
+      d.cookie = 'bpos_currency=' + encodeURIComponent(b.getAttribute('data-cur')) + '; path=/; max-age=31536000; SameSite=Lax' + (w.location.protocol === 'https:' ? '; Secure' : '');
+      w.location.reload();
+    });
+  });
+
   // Sign out
   if ($('bp-logout')) {
     $('bp-logout').addEventListener('click', function () {

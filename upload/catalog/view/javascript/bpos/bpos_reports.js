@@ -8,6 +8,7 @@
   var $ = function (id) { return d.getElementById(id); };
   var esc = B.esc;
   var t = function (k, f) { return B.t(k, f); };
+  var ic = function (n) { return '<i class="bi bi-' + n + '"></i>'; };
   var lang = d.documentElement.lang || undefined;
 
   var S = { range: '7', from: '', to: '' };
@@ -59,25 +60,170 @@
     return '<div class="catc static"><span class="ci g-All"><i class="bi bi-' + icon + '"></i></span><span><b' + (style ? ' style="' + style + '"' : '') + '>' + esc(value) + '</b><small>' + esc(label) + (extra || '') + '</small></span></div>';
   }
 
-  function renderKpis(s) {
+  // Period shown on the tiles, follows the selected range
+  function period(r) {
+    var rg = r.range || S.range;
+    var names = { today: t('rp_per_today', 'Today'), '7': t('rp_per_7', 'Last 7 days'), '30': t('rp_per_30', 'Last 30 days'), month: t('rp_per_month', 'This month') };
+
+    if (names[rg]) { return names[rg]; }
+
+    var o = { day: 'numeric', month: 'short' };
+
+    return r.from === r.to ? day(r.from, o) : day(r.from, o) + ' – ' + day(r.to, o);
+  }
+
+  function renderKpis(s, r) {
     var vs = t('rp_vs_prev', 'vs previous period');
+    var per = ' · ' + period(r);
     var chip = function (v) { return v == null ? '' : ' ' + delta(v); };
 
     $('rp-kpis').innerHTML =
-      kpi('cash-coin', t('rp_sales', 'Sales'), s.sales.text, chip(s.sales.delta)) +
-      kpi('receipt', t('rp_orders', 'Orders'), s.orders.text, chip(s.orders.delta)) +
-      kpi('graph-up', t('rp_avg', 'Average order'), s.avg.text, chip(s.avg.delta)) +
-      kpi('arrow-counterclockwise', t('rp_refunds', 'Refunds'), s.refunds.text, ' <span class="rp-dl">' + s.refunds.count + ' · ' + s.voids + ' ' + esc(t('rp_voids', 'voided')) + '</span>', 'color:var(--amber)');
+      kpi('cash-coin', t('rp_net_sales', 'Net sales') + per, s.sales.text, chip(s.sales.delta)) +
+      kpi('receipt', t('rp_transactions', 'Transactions') + per, s.orders.text, chip(s.orders.delta)) +
+      kpi('graph-up', t('rp_avg', 'Average order') + per, s.avg.text, chip(s.avg.delta)) +
+      kpi('bag-check', t('rp_items', 'Items sold') + per, s.items.text) +
+      kpi('percent', t('rp_discounts', 'Discounts') + per, s.discounts.text) +
+      kpi('arrow-counterclockwise', t('rp_refunded_voided', 'Refunded + Voided') + ' · ' + s.rv.count, s.rv.text, '', s.rv.count ? 'color:var(--amber)' : '');
 
     $('rp-kpis').setAttribute('title', vs);
   }
 
   var chart = null;
+  var donuts = [];
   var drawId = 0;
+  var amLoad = null;
+  var amThemed = false;
 
   function disposeChart() {
     drawId++;
     if (chart) { chart.dispose(); chart = null; }
+    donuts.forEach(function (c) { c.dispose(); });
+    donuts = [];
+  }
+
+  // The amCharts bundle is local and loaded once, on first use
+  function loadAm() {
+    if (!(w.am4core && w.am4charts)) {
+      if (!amLoad) {
+        amLoad = new Promise(function (ok, fail) {
+          var s = d.createElement('script');
+          s.src = P.urls.am;
+          s.onload = ok;
+          s.onerror = function () { amLoad = null; fail(new Error('amCharts')); };
+          d.head.appendChild(s);
+        });
+      }
+    }
+
+    return (amLoad || Promise.resolve()).then(function () {
+      if (!amThemed) { w.am4core.useTheme(w.am4themes_animated); amThemed = true; }
+    });
+  }
+
+  function amStyle(axis, ink, line) {
+    axis.renderer.grid.template.stroke = w.am4core.color(line);
+    axis.renderer.grid.template.strokeOpacity = 1;
+    axis.renderer.labels.template.fill = w.am4core.color(ink);
+    axis.renderer.line.disabled = true;
+  }
+
+  function amTip(ser) {
+    var am = w.am4core;
+
+    ser.tooltip.getFillFromObject = false;
+    ser.tooltip.background.fill = am.color(cssVar('--navy', '#101F45'));
+    ser.tooltip.background.strokeOpacity = 0;
+    ser.tooltip.label.fill = am.color('#FFFFFF');
+  }
+
+  function drawAm(el, rows) {
+    var am = w.am4core;
+    var ac = w.am4charts;
+    var ink = cssVar('--mute', '#66728F');
+    var line = cssVar('--line', '#E4E9F5');
+    var accent = cssVar('--accent', '#3558D6');
+    var c = am.create(el, ac.XYChart);
+    var fmt = rows.length > 12 ? 'd MMM' : 'EEE d';
+
+    c.fontSize = 11;
+    c.paddingRight = 12;
+    c.data = rows.map(function (r) {
+      var p = r.date.split('-');
+
+      return { date: new Date(+p[0], +p[1] - 1, +p[2]), sales: r.sales, text: r.text, orders: r.orders };
+    });
+
+    var x = c.xAxes.push(new ac.DateAxis());
+    x.baseInterval = { timeUnit: 'day', count: 1 };
+    x.renderer.minGridDistance = 56;
+    x.renderer.grid.template.disabled = true;
+    x.renderer.labels.template.fill = am.color(ink);
+    x.renderer.line.stroke = am.color(line);
+    x.dateFormats.setKey('day', fmt);
+    x.periodChangeDateFormats.setKey('day', fmt);
+
+    var y = c.yAxes.push(new ac.ValueAxis());
+    y.min = 0;
+    y.numberFormatter.numberFormat = '#.#a';
+    amStyle(y, ink, line);
+
+    var ser = c.series.push(new ac.LineSeries());
+    ser.dataFields.valueY = 'sales';
+    ser.dataFields.dateX = 'date';
+    ser.strokeWidth = 2;
+    ser.stroke = am.color(accent);
+    ser.fill = am.color(accent);
+    ser.fillOpacity = 0.12;
+    ser.tensionX = 0.8;
+    ser.tooltipText = '[bold]{text}[/]\n{orders}';
+    amTip(ser);
+
+    var dot = ser.bullets.push(new ac.CircleBullet());
+    dot.circle.radius = 3.5;
+    dot.circle.fill = am.color(accent);
+    dot.circle.stroke = am.color(cssVar('--surface', '#FFFFFF'));
+    dot.circle.strokeWidth = 2;
+    dot.defaultState.properties.visible = rows.length <= 31;
+    dot.states.create('hover').properties.scale = 1.4;
+
+    c.cursor = new ac.XYCursor();
+    c.cursor.lineY.disabled = true;
+    c.cursor.lineX.stroke = am.color(line);
+
+    chart = c;
+  }
+
+  var PALETTE = ['#3558D6', '#12B76A', '#F59E0B', '#E5484D', '#8E4EC6', '#0EA5B7', '#94A3B8'];
+
+  function colorOf(i, other) { return other ? '#94A3B8' : PALETTE[i % 6]; }
+
+  function drawDonutAm(el, rows) {
+    var am = w.am4core;
+    var ac = w.am4charts;
+    var c = am.create(el, ac.PieChart);
+
+    c.fontSize = 11;
+    c.innerRadius = am.percent(55);
+    c.data = rows.map(function (r) { return { category: r.label, value: r.value, text: r.text, pct: r.pct, color: am.color(r.color) }; });
+
+    var ser = c.series.push(new ac.PieSeries());
+    ser.dataFields.value = 'value';
+    ser.dataFields.category = 'category';
+    ser.slices.template.propertyFields.fill = 'color';
+    ser.slices.template.stroke = am.color(cssVar('--surface', '#FFFFFF'));
+    ser.slices.template.strokeWidth = 2;
+    ser.slices.template.strokeOpacity = 1;
+    ser.slices.template.tooltipText = '{category}: {pct}% · {text}';
+    ser.labels.template.text = '{category}';
+    ser.labels.template.fill = am.color(cssVar('--ink', '#14203D'));
+    ser.labels.template.maxWidth = 120;
+    ser.labels.template.wrap = true;
+    ser.ticks.template.stroke = am.color(cssVar('--ink', '#14203D'));
+    ser.ticks.template.strokeOpacity = 1;
+    ser.ticks.template.strokeWidth = 1.5;
+    amTip(ser);
+
+    donuts.push(c);
   }
 
   function cssVar(name, fallback) {
@@ -105,6 +251,7 @@
     el.setAttribute('role', 'img');
     el.setAttribute('aria-label', t('rp_daily', 'Daily sales') + ': ' + rows.map(function (r) { return r.date + ' ' + r.text; }).join(', '));
 
+    function drawSvg() {
     var tip = d.createElement('div');
     tip.className = 'rp-tip';
     tip.hidden = true;
@@ -181,33 +328,137 @@
     w.addEventListener('resize', onResize);
     chart = { dispose: function () { clearTimeout(timer); w.removeEventListener('resize', onResize); } };
     draw();
+    }
+
+    loadAm().then(function () {
+      if (mine === drawId && el.isConnected) { drawAm(el, rows); }
+    }, function () {
+      if (mine === drawId && el.isConnected) { drawSvg(); }
+    });
   }
 
-  function renderMix(rows) {
-    $('rp-pay').innerHTML = rows.length ? '<div class="rp-mix">' + rows.map(function (r) {
-      return '<div class="rp-mix-row"><span>' + esc(r.name || r.code) + ' <small style="color:var(--mute)">· ' + r.orders + '</small></span><b>' + esc(r.text) + '</b>' +
-        '<div class="rp-track"><i style="width:' + Math.min(100, r.pct) + '%"></i></div></div>';
-    }).join('') + '</div>' : '<div class="rp-empty">' + esc(t('rp_no_sales', 'No sales in this period.')) + '</div>';
+  // Donut with a legend list below: rows are { label, sub, value, text, pct, color }
+  function renderDonut(chartEl, listEl, rows) {
+    var mine = drawId;
+
+    if (!rows.length) {
+      chartEl.className = '';
+      chartEl.style.height = '';
+      chartEl.innerHTML = '<div class="rp-empty">' + esc(t('rp_no_sales', 'No sales in this period.')) + '</div>';
+      listEl.innerHTML = '';
+      return;
+    }
+
+    chartEl.innerHTML = '';
+    chartEl.className = 'rp-donut';
+    chartEl.setAttribute('role', 'img');
+    chartEl.setAttribute('aria-label', rows.map(function (r) { return r.label + ' ' + r.text; }).join(', '));
+
+    listEl.innerHTML = rows.map(function (r) {
+      return '<div class="rp-li"><span class="rp-dot" style="background:' + r.color + '"></span><span class="rp-ln"><b>' + esc(r.label) + '</b>' + (r.sub ? '<small>' + esc(r.sub) + '</small>' : '') + '</span><span class="rp-lv">' + esc(r.text) + '</span><span class="rp-pill">' + r.pct + '%</span></div>';
+    }).join('');
+
+    loadAm().then(function () {
+      if (mine === drawId && chartEl.isConnected) { drawDonutAm(chartEl, rows); }
+    }, function () {
+      if (mine === drawId) { chartEl.className = ''; chartEl.innerHTML = ''; }
+    });
+  }
+
+  function renderPayments(r) {
+    var rows = r.payment.map(function (x, i) {
+      return { label: x.name || x.code, sub: x.orders + ' ' + t('rp_orders_l', 'orders'), value: x.sales, text: x.text, pct: x.pct, color: colorOf(i, false) };
+    });
+
+    renderDonut($('rp-pay'), $('rp-pay-list'), rows);
+
+    var dw = r.drawer;
+
+    $('rp-drawer').innerHTML = '<div class="kv"><span>' + esc(t('rp_cash_sales', 'Cash sales')) + '</span><span class="num">' + esc(dw.sales.text) + '</span></div>' +
+      '<div class="kv"><span>' + esc(t('rp_cash_refunds', 'Cash refunds')) + '</span><span class="num">' + esc(dw.refunds.text) + '</span></div>' +
+      '<div class="kv kvt"><span>' + esc(t('rp_cash_expected', 'Expected cash in drawer')) + '</span><span class="num">' + esc(dw.expected.text) + '</span></div>' +
+      '<small>' + esc(t('rp_cash_note', 'Opening float is not included.')) + '</small>';
+  }
+
+  function renderCategory(r) {
+    var rows = r.category.map(function (x, i) {
+      return { label: x.other ? t('rp_other', 'Other') : (x.name || t('rp_uncat', 'Uncategorized')), sub: x.qty + ' ' + t('rp_units', 'sold'), value: x.sales, text: x.text, pct: x.pct, color: colorOf(i, x.other) };
+    });
+
+    renderDonut($('rp-cat'), $('rp-cat-list'), rows);
   }
 
   function table(el, cols, rows, mapper) {
     el.innerHTML = '<thead><tr>' + cols.map(function (c) { return '<th' + (c.cls ? ' class="' + c.cls + '"' : '') + '>' + esc(c.label) + '</th>'; }).join('') + '</tr></thead>' +
-      '<tbody>' + (rows.length ? rows.map(mapper).join('') : '<tr><td colspan="' + cols.length + '"><div class="mg-empty">' + esc(t('rp_no_sales', 'No sales in this period.')) + '</div></td></tr>') + '</tbody>';
+      '<tbody>' + (rows.length ? rows.map(function (x, i) { return mapper(x, i); }).join('') : '<tr><td colspan="' + cols.length + '"><div class="mg-empty">' + esc(t('rp_no_sales', 'No sales in this period.')) + '</div></td></tr>') + '</tbody>';
+  }
+
+  function renderSummary(r) {
+    var b = r.breakdown;
+    var kv = function (label, v, cls) { return '<div class="kv' + (cls ? ' ' + cls : '') + '"><span>' + esc(label) + '</span><span class="num">' + esc(v) + '</span></div>'; };
+
+    $('rp-sum').innerHTML = kv(t('rp_subtotal', 'Items subtotal'), b.subtotal.text) +
+      kv(t('rp_discounts', 'Discounts'), b.discounts.text) +
+      kv(t('rp_coupons', 'Coupons'), b.coupons.text) +
+      kv(t('rp_shipping', 'Shipping fees'), b.shipping.text) +
+      (b.charge.value ? kv(t('rp_charge', 'Extra charges'), b.charge.text) : '') +
+      kv(t('rp_tax', 'Tax'), b.tax.text) +
+      kv(t('rp_net_sales', 'Net sales'), b.net.text, 'kvt') +
+      kv(t('rp_refunded', 'Refunded') + ' · ' + b.refunded.count, b.refunded.text, 'mut') +
+      kv(t('rp_voided', 'Voided') + ' · ' + b.voided.count, b.voided.text, 'mut');
+  }
+
+  function renderTrendInfo(r) {
+    var bz = r.busiest;
+
+    $('rp-busy').textContent = bz ? t('rp_busiest', 'Busiest') + ': ' + day(bz.date, { weekday: 'short', month: 'short', day: 'numeric' }) + ' · ' + bz.text : '';
+    $('rp-trend-sum').innerHTML = '<b>' + esc(r.summary.sales.text) + '</b> ' + esc(t('rp_net_sales_l', 'net sales')) + ' · ' + r.summary.orders.text + ' ' + esc(t('rp_orders_l', 'orders')) + ' ' + esc(t('rp_in_period', 'in this period'));
+  }
+
+  function renderProducts(r) {
+    table($('rp-prod'), [
+      { label: '#', cls: 'hs' }, { label: t('rp_product', 'Product') }, { label: t('rp_category', 'Category'), cls: 'hm' },
+      { label: t('rp_qty', 'Qty'), cls: 'num' }, { label: t('rp_revenue', 'Revenue'), cls: 'num' }
+    ], r.products, function (x, i) {
+      return '<tr><td class="hs">' + (i + 1) + '</td><td>' + esc(x.name) + '</td><td class="hm">' + (x.category ? esc(x.category) : '<span style="color:var(--mute)">–</span>') + '</td><td class="num">' + x.qty + '</td><td class="num">' + esc(x.text) + '</td></tr>';
+    });
+  }
+
+  function renderLow(r) {
+    var lw = r.low;
+
+    $('rp-low-n').textContent = lw.total ? String(lw.total) : '';
+    $('rp-low').innerHTML = (lw.rows.length ? lw.rows.map(function (x) {
+      var out = x.qty <= 0;
+
+      return '<div class="rp-li"><span class="rp-ln"><b>' + esc(x.name) + '</b>' + (x.category ? '<small>' + esc(x.category) + '</small>' : '') + '</span><span class="rp-st ' + (out ? 'out' : 'low') + '">' + esc(out ? t('rp_out', 'Out of stock') : x.qty + ' ' + t('rp_left', 'left')) + '</span></div>';
+    }).join('') : '<div class="rp-empty">' + esc(t('rp_low_none', 'No product is low on stock.')) + '</div>') +
+      (P.urls.products ? '<a class="btn rp-lnk" data-route="products" href="' + esc(P.urls.products) + '">' + ic('box-seam') + esc(t('rp_manage_products', 'Manage products')) + '</a>' : '');
   }
 
   function renderTables(r) {
     table($('rp-cash'), [
-      { label: t('rp_cashier', 'Cashier') }, { label: t('rp_orders', 'Orders'), cls: 'num' }, { label: t('rp_sales', 'Sales'), cls: 'num' },
-      { label: t('rp_avg', 'Average order'), cls: 'num hm' }, { label: t('rp_refunds', 'Refunds'), cls: 'num hm' }, { label: t('rp_share', 'Share'), cls: 'num hs' }
+      { label: t('rp_cashier', 'Cashier') }, { label: t('rp_store', 'Store'), cls: 'hm' }, { label: t('rp_orders', 'Orders'), cls: 'num' }, { label: t('rp_net_sales', 'Net sales'), cls: 'num' },
+      { label: t('rp_avg', 'Average order'), cls: 'num hm' }, { label: t('rp_discounts', 'Discounts'), cls: 'num hm' }, { label: t('rp_refunds', 'Refunds'), cls: 'num hs' }, { label: t('rp_voids_l', 'Voids'), cls: 'num hs' }
     ], r.cashier, function (x) {
-      return '<tr><td>' + (x.name ? esc(x.name) : '<span style="color:var(--mute)">–</span>') + '</td><td class="num">' + x.orders + '</td><td class="num">' + esc(x.text) + '</td><td class="num hm">' + esc(x.avg_text) + '</td><td class="num hm">' + x.refunds + '</td><td class="num hs">' + x.pct + '%</td></tr>';
+      return '<tr><td>' + (x.name ? esc(x.name) : '<span style="color:var(--mute)">–</span>') + (x.review ? ' <span class="rp-st low" title="' + esc(t('rp_review_tip', 'Refunds and voids are unusually high.')) + '">' + esc(t('rp_review', 'Review')) + '</span>' : '') + '</td><td class="hm">' + esc(x.store || '') + '</td><td class="num">' + x.orders + '</td><td class="num">' + esc(x.text) + '</td><td class="num hm">' + esc(x.avg_text) + '</td><td class="num hm">' + esc(x.disc_text) + '</td><td class="num hs">' + x.refunds + '</td><td class="num hs">' + x.voids + '</td></tr>';
     });
 
     table($('rp-term'), [
-      { label: t('rp_terminal', 'Terminal') }, { label: t('rp_orders', 'Orders'), cls: 'num' }, { label: t('rp_sales', 'Sales'), cls: 'num' }, { label: t('rp_share', 'Share'), cls: 'num hs' }
+      { label: t('rp_terminal', 'Terminal') }, { label: t('rp_orders', 'Orders'), cls: 'num' }, { label: t('rp_net_sales', 'Net sales'), cls: 'num' }, { label: t('rp_share', 'Share'), cls: 'num hs' }
     ], r.terminal, function (x) {
       return '<tr><td>' + (x.name ? esc(x.name) : '<span style="color:var(--mute)">–</span>') + '</td><td class="num">' + x.orders + '</td><td class="num">' + esc(x.text) + '</td><td class="num hs">' + x.pct + '%</td></tr>';
     });
+
+    $('rp-stores-card').hidden = !r.stores.length;
+
+    if (r.stores.length) {
+      table($('rp-stores'), [
+        { label: t('rp_store', 'Store') }, { label: t('rp_orders', 'Orders'), cls: 'num' }, { label: t('rp_net_sales', 'Net sales'), cls: 'num' }, { label: t('rp_avg', 'Average order'), cls: 'num hm' }, { label: t('rp_share', 'Share'), cls: 'num hs' }
+      ], r.stores, function (x) {
+        return '<tr><td>' + esc(x.name) + '</td><td class="num">' + x.orders + '</td><td class="num">' + esc(x.text) + '</td><td class="num hm">' + esc(x.avg_text) + '</td><td class="num hs">' + x.pct + '%</td></tr>';
+      });
+    }
   }
 
   function render(r) {
@@ -216,14 +467,19 @@
     var b = day(r.to, { day: 'numeric', month: 'short', year: 'numeric' });
 
     $('rp-rt').textContent = r.from === r.to ? a : a + ' – ' + b;
-    renderKpis(r.summary);
+    renderKpis(r.summary, r);
     renderChart(r.daily);
-    renderMix(r.payment);
+    renderTrendInfo(r);
+    renderSummary(r);
+    renderPayments(r);
+    renderCategory(r);
+    renderProducts(r);
+    renderLow(r);
     renderTables(r);
   }
 
   function skeleton() {
-    $('rp-kpis').innerHTML = [1, 2, 3, 4].map(function () { return '<div class="catc static" aria-hidden="true"><span class="ci g-All"></span><span><span class="sk" style="width:90px;height:16px;display:block"></span><span class="sk" style="width:60px;display:block;margin-top:6px"></span></span></div>'; }).join('');
+    $('rp-kpis').innerHTML = [1, 2, 3, 4, 5, 6].map(function () { return '<div class="catc static" aria-hidden="true"><span class="ci g-All"></span><span><span class="sk" style="width:90px;height:16px;display:block"></span><span class="sk" style="width:60px;display:block;margin-top:6px"></span></span></div>'; }).join('');
     disposeChart();
     $('rp-chart').className = '';
     $('rp-chart').innerHTML = '<span class="sk" style="width:100%;height:200px;display:block"></span>';
@@ -233,15 +489,21 @@
     if (ctl) { ctl.abort(); }
     ctl = new AbortController();
 
+    var rng = S.range;
+
     if (!last) { skeleton(); }
     $('rp-body').classList.add('busy');
+    $('rp-kpis').classList.add('busy');
 
     B.api(url(P.urls.data), { signal: ctl.signal }).then(function (r) {
       $('rp-body').classList.remove('busy');
+      $('rp-kpis').classList.remove('busy');
+      r.range = rng;
       render(r);
     }).catch(function (e) {
       if (e && e.name === 'AbortError') { return; }
       $('rp-body').classList.remove('busy');
+      $('rp-kpis').classList.remove('busy');
       B.ui.toast(e.message, 'err');
     });
   }
@@ -267,14 +529,21 @@
 
     B.api(url(P.urls.export)).then(function (r) {
       var s = r.summary;
+      var b = r.breakdown;
 
       B.xlsx('report-' + r.from + '_' + r.to + '.xlsx', [
-        { name: 'Summary', rows: [['from', 'to', 'currency'], [r.from, r.to, r.currency], [], ['sales', 'orders', 'average_order', 'refunds', 'refund_count', 'void_count', 'items'], [s.sales.value, s.orders.value, s.avg.value, s.refunds.value, s.refunds.count, s.voids, s.items]] },
+        { name: 'Summary', rows: [['from', 'to', 'currency'], [r.from, r.to, r.currency], [],
+          ['net_sales', 'orders', 'average_order', 'items', 'discounts', 'refunded_voided', 'refunded_voided_count'],
+          [s.sales.value, s.orders.value, s.avg.value, s.items.value, s.discounts.value, s.rv.value, s.rv.count], [],
+          ['items_subtotal', 'discounts', 'coupons', 'shipping', 'extra_charges', 'tax', 'net_sales', 'refunded', 'refunded_count', 'voided', 'voided_count'],
+          [b.subtotal.value, b.discounts.value, b.coupons.value, b.shipping.value, b.charge.value, b.tax.value, b.net.value, b.refunded.value, b.refunded.count, b.voided.value, b.voided.count]] },
         { name: 'Daily', rows: [['date', 'orders', 'sales']].concat(r.daily.map(function (x) { return [x.date, x.orders, x.sales]; })) },
         { name: 'Payment', rows: [['payment', 'orders', 'sales', 'share_pct']].concat(r.payment.map(function (x) { return [x.name || x.code, x.orders, x.sales, x.pct]; })) },
-        { name: 'Cashier', rows: [['cashier', 'orders', 'sales', 'average_order', 'refunds', 'share_pct']].concat(r.cashier.map(function (x) { return [x.name, x.orders, x.sales, x.avg, x.refunds, x.pct]; })) },
+        { name: 'Category', rows: [['category', 'qty', 'sales', 'share_pct']].concat(r.category.map(function (x) { return [x.other ? 'Other' : x.name, x.qty, x.sales, x.pct]; })) },
+        { name: 'Products', rows: [['product', 'category', 'qty', 'sales']].concat(r.products.map(function (x) { return [x.name, x.category, x.qty, x.sales]; })) },
+        { name: 'Cashier', rows: [['cashier', 'store', 'orders', 'sales', 'average_order', 'discounts', 'refunds', 'voids', 'share_pct']].concat(r.cashier.map(function (x) { return [x.name, x.store, x.orders, x.sales, x.avg, x.discounts, x.refunds, x.voids, x.pct]; })) },
         { name: 'Terminal', rows: [['terminal', 'orders', 'sales', 'average_order', 'share_pct']].concat(r.terminal.map(function (x) { return [x.name, x.orders, x.sales, x.avg, x.pct]; })) }
-      ]);
+      ].concat(r.stores.length ? [{ name: 'Stores', rows: [['store', 'orders', 'sales', 'average_order', 'share_pct']].concat(r.stores.map(function (x) { return [x.name, x.orders, x.sales, x.avg, x.pct]; })) }] : []));
     }).catch(function (e) {
       B.ui.toast(e.message, 'err');
     }).then(function () { btn.disabled = false; });

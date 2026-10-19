@@ -193,6 +193,32 @@
   }
   $('#bps-save, #bps-save-foot').on('click', saveSettings);
 
+  // Background colors: the picker and the hex field stay in sync, the preview uses the POS gradient
+  function paintBg() {
+    $('[data-bps-bgpv]').each(function () {
+      var m = $(this).attr('data-bps-bgpv');
+      var c = {};
+      $('.bps-color[data-m="' + m + '"]').each(function () {
+        var $t = $(this).find('input[type="text"]'), v = $.trim($t.val());
+        c[$(this).attr('data-p')] = /^#[0-9a-f]{6}$/i.test(v) ? v : $t.attr('placeholder');
+      });
+      $(this).css('background', 'radial-gradient(900px 520px at 8% -8%, ' + c.g1 + ', transparent 62%), radial-gradient(760px 520px at 100% 4%, ' + c.g2 + ', transparent 58%), ' + c.base);
+    });
+  }
+  $(document).on('input change', '.bps-color .bps-cp', function () {
+    $(this).siblings('input[type="text"]').val(this.value.toUpperCase()).trigger('input');
+  });
+  $(document).on('input', '.bps-color input[type="text"]', function () {
+    var v = $.trim($(this).val()), $cp = $(this).siblings('.bps-cp');
+    if (/^#[0-9a-f]{6}$/i.test(v)) { $cp.val(v.toLowerCase()); } else if (v === '') { $cp.val(String($cp.data('def')).toLowerCase()); }
+    paintBg();
+  });
+  $(document).on('click', '[data-bps-bgreset]', function () {
+    var m = $(this).attr('data-bps-bgreset');
+    $('.bps-color[data-m="' + m + '"] input[type="text"]').val('').trigger('input');
+  });
+  paintBg();
+
   // Ctrl+S / Cmd+S saves like the button, and never opens the browser's save-page dialog
   $(document).on('keydown', function (e) {
     if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && String(e.key).toLowerCase() === 's') {

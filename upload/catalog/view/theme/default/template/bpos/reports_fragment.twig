@@ -7,7 +7,7 @@
       <p>{{ scope|e }}</p>
     </div>
     <div class="phr">
-      {% if can_export %}<button class="btn" id="rp-export" type="button"><i class="bi bi-download"></i><span>{{ button_export|e }}</span></button>{% endif %}
+      {% if can_export %}<button class="btn xls" id="rp-export" type="button"><i class="bi bi-download"></i><span>{{ button_export|e }}</span></button>{% endif %}
     </div>
   </div>
 
@@ -30,12 +30,26 @@
   </div>
 
   <div class="rp-body" id="rp-body" aria-live="polite">
-    <section class="rp-card"><h3 class="rp-h">{{ text_daily_sales|e }}</h3><div id="rp-chart"></div></section>
-    <div class="rp-two">
-      <section class="rp-card"><h3 class="rp-h">{{ text_payment_mix|e }}</h3><div id="rp-pay"></div></section>
+    <section class="rp-card">
+      <div class="rp-hh"><h3 class="rp-h">{{ text_sales_trend|e }}</h3><span class="rp-sub" id="rp-busy"></span></div>
+      <div id="rp-chart"></div>
+      <div class="rp-lc" id="rp-trend-sum"></div>
+    </section>
+    <div class="rp-grid">
+      <section class="rp-card">
+        <h3 class="rp-h">{{ text_payments_cash|e }}</h3>
+        <div id="rp-pay"></div>
+        <div class="rp-list" id="rp-pay-list"></div>
+        <div class="rp-drawer" id="rp-drawer"></div>
+      </section>
+      <section class="rp-card"><h3 class="rp-h">{{ text_by_category|e }}</h3><div id="rp-cat"></div><div class="rp-list" id="rp-cat-list"></div></section>
+      <section class="rp-card"><h3 class="rp-h">{{ text_sales_summary|e }}</h3><div id="rp-sum"></div></section>
+      <section class="rp-card"><div class="rp-hh"><h3 class="rp-h">{{ text_low_stock|e }}</h3><span class="rp-n" id="rp-low-n"></span></div><div class="rp-list" id="rp-low"></div></section>
+      <section class="rp-card"><h3 class="rp-h">{{ text_top_products|e }}</h3><div class="mg-scroll"><table class="mg-t" id="rp-prod"></table></div></section>
       <section class="rp-card"><h3 class="rp-h">{{ text_by_terminal|e }}</h3><div class="mg-scroll"><table class="mg-t" id="rp-term"></table></div></section>
+      <section class="rp-card" id="rp-stores-card" hidden><h3 class="rp-h">{{ text_store_compare|e }}</h3><div class="mg-scroll"><table class="mg-t" id="rp-stores"></table></div></section>
     </div>
-    <section class="rp-card"><h3 class="rp-h">{{ text_by_cashier|e }}</h3><div class="mg-scroll"><table class="mg-t" id="rp-cash"></table></div></section>
+    <section class="rp-card rp-full"><h3 class="rp-h">{{ text_by_cashier|e }}</h3><div class="mg-scroll"><table class="mg-t" id="rp-cash"></table></div></section>
   </div>
 
   <script type="application/json" id="rp-data">{{ page_json }}</script>

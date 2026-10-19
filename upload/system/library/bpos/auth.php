@@ -451,6 +451,8 @@ class Auth {
 			}
 		}
 
+		$pricing = new Pricing($this->registry);
+		$currencies = $pricing->currencies();
 		$langs = array();
 
 		foreach ($this->lang->available() as $code => $info) {
@@ -479,6 +481,8 @@ class Auth {
 			'home'     => $this->homeUrl(),
 			'lang'     => $this->lang->code(),
 			'langs'    => $langs,
+			'currency' => $pricing->currencyCode(),
+			'currencies' => $currencies,
 			'urls'     => array(
 				'login'     => $this->loginUrl(),
 				'logout'    => $this->out->url('bpos/auth/logout'),

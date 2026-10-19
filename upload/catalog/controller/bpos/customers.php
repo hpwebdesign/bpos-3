@@ -29,6 +29,14 @@ class ControllerBposCustomers extends Controller {
 			)
 		);
 
+		$this->load->model('bpos/customer');
+
+		$page['groups'] = array();
+
+		foreach ($this->model_bpos_customer->getGroups() as $g) {
+			$page['groups'][] = array('id' => (int)$g['id'], 'name' => html_entity_decode((string)$g['name'], ENT_QUOTES, 'UTF-8'));
+		}
+
 		$data = $this->language->all();
 		$data['title'] = $this->language->get('heading_customers');
 		$data['subtitle'] = $this->language->get('text_customers_shared');
@@ -57,13 +65,15 @@ class ControllerBposCustomers extends Controller {
 		$dir = isset($this->request->get['dir']) && $this->request->get['dir'] === 'desc' ? 'desc' : 'asc';
 		$page = isset($this->request->get['page']) ? max(1, (int)$this->request->get['page']) : 1;
 
-		$total = $this->model_bpos_customer->getTotal($q);
+		$k = $this->segment();
+		$g = $this->group();
+		$total = $this->model_bpos_customer->getTotal($q, $k, $this->excluded(), $g);
 		$pages = max(1, (int)ceil($total / self::PAGE_SIZE));
 		$page = min($page, $pages);
 
 		$rows = array();
 
-		foreach ($this->model_bpos_customer->getCustomers($q, ($page - 1) * self::PAGE_SIZE, self::PAGE_SIZE, $sort, $dir, $this->excluded()) as $c) {
+		foreach ($this->model_bpos_customer->getCustomers($q, ($page - 1) * self::PAGE_SIZE, self::PAGE_SIZE, $sort, $dir, $this->excluded(), $k, $g) as $c) {
 			$rows[] = array(
 				'id'         => (int)$c['customer_id'],
 				'name'       => $this->name($c),
@@ -77,7 +87,7 @@ class ControllerBposCustomers extends Controller {
 			);
 		}
 
-		$bpos->out()->json(array('ok' => true, 'rows' => $rows, 'total' => $total, 'page' => $page, 'pages' => $pages));
+		$bpos->out()->json(array('ok' => true, 'rows' => $rows, 'total' => $total, 'page' => $page, 'pages' => $pages, 'stats' => $this->model_bpos_customer->getStats($this->excluded())));
 	}
 
 	// ---- detail ----
@@ -229,7 +239,7 @@ class ControllerBposCustomers extends Controller {
 
 		$rows = array();
 
-		foreach ($this->model_bpos_customer->getCustomers($this->query('q', 80), 0, self::EXPORT_MAX, 'name', 'asc', $this->excluded()) as $c) {
+		foreach ($this->model_bpos_customer->getCustomers($this->query('q', 80), 0, self::EXPORT_MAX, 'name', 'asc', $this->excluded(), $this->segment(), $this->group()) as $c) {
 			$rows[] = array(
 				'id'         => (int)$c['customer_id'],
 				'name'       => $this->name($c),
@@ -254,6 +264,16 @@ class ControllerBposCustomers extends Controller {
 		$value = isset($this->request->get[$key]) ? html_entity_decode((string)$this->request->get[$key], ENT_QUOTES, 'UTF-8') : '';
 
 		return utf8_substr(trim($value), 0, $max);
+	}
+
+	private function segment() {
+		$k = isset($this->request->get['k']) ? (string)$this->request->get['k'] : '';
+
+		return in_array($k, array('new', 'repeat', 'inactive', 'never'), true) ? $k : '';
+	}
+
+	private function group() {
+		return isset($this->request->get['g']) ? max(0, (int)$this->request->get['g']) : 0;
 	}
 
 	// Refunded and voided orders do not count as sales

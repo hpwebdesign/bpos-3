@@ -7,16 +7,20 @@
       <p>{{ subtitle|e }}</p>
     </div>
     <div class="phr">
-      {% if can_export %}<button class="btn" id="cu-export" type="button"><i class="bi bi-download"></i><span>{{ button_export|e }}</span></button>{% endif %}
+      {% if can_export %}<button class="btn xls" id="cu-export" type="button"><i class="bi bi-download"></i><span>{{ button_export|e }}</span></button>{% endif %}
       {% if can_edit %}<button class="btn pri" id="cu-new" type="button"><i class="bi bi-person-plus"></i><span>{{ js_sl_new_customer|e }}</span></button>{% endif %}
     </div>
   </div>
+
+  <div class="cats kp" id="cu-stats" role="tablist" aria-live="polite"></div>
 
   <div class="mg-bar">
     <label class="mg-search">
       <i class="bi bi-search"></i>
       <input id="cu-q" type="text" autocomplete="off" placeholder="{{ text_customers_search|e }}" aria-label="{{ text_customers_search|e }}">
     </label>
+    <label class="mg-fld"><i class="bi bi-people"></i><select class="mg-sel" id="cu-grp" aria-label="{{ text_cu_group|e }}"></select></label>
+    <label class="mg-fld"><i class="bi bi-funnel"></i><select class="mg-sel" id="cu-seg" aria-label="{{ text_cu_segment|e }}"></select></label>
   </div>
 
   <div class="mg-card" id="cu-card">

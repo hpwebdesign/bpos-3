@@ -29,7 +29,8 @@ class ControllerBposProducts extends Controller {
 				'save'     => $out->url('bpos/products/save'),
 				'toggle'   => $out->url('bpos/products/toggle'),
 				'generate' => $out->url('bpos/products/generate'),
-				'labels'   => $out->url('bpos/products/labels')
+				'labels'   => $out->url('bpos/products/labels'),
+				'barcode'  => $out->url('bpos/products/barcode')
 			)
 		);
 
@@ -40,8 +41,38 @@ class ControllerBposProducts extends Controller {
 		$data['base_style'] = $out->asset('theme/default/stylesheet/bpos/bpos_manage.css');
 		$data['style'] = $out->asset('theme/default/stylesheet/bpos/bpos_products.css');
 		$data['script'] = $out->asset('javascript/bpos/bpos_products.js');
+		$data['code128'] = $out->asset('javascript/bpos/bpos_code128.js');
 
 		$out->page($this->load->view('bpos/products_fragment', $data), $data['title'], 'products', $bpos);
+	}
+
+	// Label print page. The selection travels in the query string and is resolved by labels().
+	public function barcode() {
+		$bpos = new \Bpos\Auth($this->registry);
+
+		if (!$bpos->guard('products')) {
+			return;
+		}
+
+		$out = $bpos->out();
+
+		$page = array(
+			'max'  => self::LABEL_MAX,
+			'urls' => array(
+				'labels'   => $out->url('bpos/products/labels'),
+				'products' => $out->url('bpos/products')
+			)
+		);
+
+		$data = $this->language->all();
+		$data['title'] = $this->language->get('heading_barcode');
+		$data['page_json'] = json_encode($page, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
+		$data['style'] = $out->asset('theme/default/stylesheet/bpos/bpos_barcode.css');
+		$data['code128'] = $out->asset('javascript/bpos/bpos_code128.js');
+		$data['script'] = $out->asset('javascript/bpos/bpos_barcode.js');
+		$data['products_url'] = $page['urls']['products'];
+
+		$out->page($this->load->view('bpos/barcode_fragment', $data), $data['title'], 'products', $bpos);
 	}
 
 	// ---- list ----
@@ -222,9 +253,13 @@ class ControllerBposProducts extends Controller {
 		foreach ($this->model_bpos_product_manage->getMissing($this->source(), $ids) as $r) {
 			$value = (string)$r['value'];
 
-			// The scanner needs a unique value that Code 128 can print
-			if (utf8_strlen($value) > 14 || preg_match('/[^\x20-\x7E]/', $value) || $this->model_bpos_product_manage->barcodeTaken($value)) {
-				continue;
+			// The scanner needs a unique value that Code 128 can print, otherwise a generated EAN-13 is used
+			if ($value === '' || utf8_strlen($value) > 14 || preg_match('/[^\x20-\x7E]/', $value) || $this->model_bpos_product_manage->barcodeTaken($value)) {
+				$value = $this->ean13((int)$r['product_id']);
+
+				if ($this->model_bpos_product_manage->barcodeTaken($value)) {
+					continue;
+				}
 			}
 
 			$this->model_bpos_product_manage->setBarcode((int)$r['product_id'], $value);
@@ -236,6 +271,18 @@ class ControllerBposProducts extends Controller {
 		}
 
 		$out->json(array('ok' => true, 'count' => $done));
+	}
+
+	// In-store EAN-13: prefix 200, product id padded to nine digits, check digit
+	private function ean13($product_id) {
+		$base = '200' . str_pad((string)$product_id, 9, '0', STR_PAD_LEFT);
+		$sum = 0;
+
+		for ($i = 0; $i < 12; $i++) {
+			$sum += (int)$base[$i] * ($i % 2 ? 3 : 1);
+		}
+
+		return $base . ((10 - $sum % 10) % 10);
 	}
 
 	// ---- label data ----

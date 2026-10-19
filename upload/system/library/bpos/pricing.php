@@ -24,7 +24,31 @@ class Pricing {
 			$code = (string)$this->config->get('config_currency');
 		}
 
+		// A cashier can switch currency on this device when the setting allows it
+		if ((int)$this->config->get('module_bpos_currency_switch') && isset($this->request->cookie['bpos_currency'])) {
+			$pick = strtoupper(preg_replace('/[^A-Za-z]/', '', (string)$this->request->cookie['bpos_currency']));
+
+			if ($pick !== '' && $this->currency->has($pick)) {
+				$code = $pick;
+			}
+		}
+
 		return $code;
+	}
+
+	// Currencies a cashier may switch to; empty when switching is off
+	public function currencies() {
+		if (!(int)$this->config->get('module_bpos_currency_switch')) {
+			return array();
+		}
+
+		$list = array();
+
+		foreach ($this->db->query("SELECT code, title, value, decimal_place FROM `" . DB_PREFIX . "currency` WHERE status = '1' ORDER BY title")->rows as $r) {
+			$list[] = array('code' => $r['code'], 'title' => html_entity_decode((string)$r['title'], ENT_QUOTES, 'UTF-8'), 'value' => (float)$r['value'], 'decimals' => (int)$r['decimal_place']);
+		}
+
+		return $list;
 	}
 
 	private function out($value) {
