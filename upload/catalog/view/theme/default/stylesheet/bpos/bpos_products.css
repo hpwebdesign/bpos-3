@@ -1,5 +1,5 @@
 /* BPOS Products page. Builds on bpos_manage.css (mg-). Prefix pr-. */
-.pr .catc { cursor: pointer; }
+.pr .catc { cursor: pointer; flex: none; }
 .pr .catc.warn small { color: var(--amber); }
 .pr .catc.warn.on small { color: rgba(255,255,255,.7); }
 

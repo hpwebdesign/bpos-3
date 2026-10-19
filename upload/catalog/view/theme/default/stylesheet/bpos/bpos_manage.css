@@ -158,3 +158,4 @@
 .mg .catc.on small { color: rgba(255,255,255,.7); }
 .mg .catc.on .ci { background: rgba(255,255,255,.14); color: #fff; }
 :root[data-theme="dark"] .mg .catc.on, :root:not([data-theme="light"]) .mg .catc.on { background: var(--accent); }
+#cu-root .catc { flex: none; cursor: pointer; }
