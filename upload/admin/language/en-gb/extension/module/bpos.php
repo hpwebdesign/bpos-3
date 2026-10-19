@@ -62,9 +62,9 @@ $_['entry_desc']                = 'Description';
 $_['text_default_head']         = 'Sell faster. Count less.';
 $_['text_default_desc']         = 'Sign in to ring up sales, manage orders and keep every branch in sync.';
 $_['text_illustration']         = 'Illustration';
-$_['help_illustration']         = 'The animated delivery rider on the sign-in scene. The background scene always stays.';
-$_['entry_doodle']              = 'Delivery rider';
-$_['help_doodle']               = 'Turn off for a still street scene without the passing rider.';
+$_['help_illustration']         = 'The animated delivery robot on the sign-in scene. The background scene always stays.';
+$_['entry_doodle']              = 'Delivery robot';
+$_['help_doodle']               = 'Turn off for a still street scene without the passing robot.';
 $_['text_preview']              = 'Sign-in page preview';
 $_['text_store_name_note']      = 'The store name on the sign comes from Settings > Stores.';
 

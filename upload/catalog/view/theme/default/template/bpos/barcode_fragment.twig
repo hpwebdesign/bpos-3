@@ -1,0 +1,105 @@
+<div class="page bc" id="bc-root" data-title="{{ title|e }}" data-page="products">
+  <link rel="stylesheet" href="{{ style|e }}">
+
+  <div class="ph">
+    <div class="bc-hl">
+      <button class="bc-back" id="bc-back" type="button" aria-label="{{ text_bc_back|e }}"><i class="bi bi-arrow-left"></i></button>
+      <div>
+        <div class="bc-crumb">{{ heading_products|e }} / {{ text_barcode|e }}</div>
+        <h1>{{ text_print_labels|e }}</h1>
+        <p id="bc-sub">&nbsp;</p>
+      </div>
+    </div>
+    <div class="phr">
+      <button class="btn" id="bc-reset" type="button">{{ button_reset|e }}</button>
+      <button class="btn pri" id="bc-print" type="button"><i class="bi bi-printer"></i><span id="bc-pbtn">{{ text_print_labels|e }}</span></button>
+    </div>
+  </div>
+
+  <div class="bc-cols">
+    <div class="bc-set" id="bc-set">
+      <section class="bc-card">
+        <div class="bc-sel"><div><b id="bc-seln">&nbsp;</b><small>{{ text_bc_sel_hint|e }}</small></div><button type="button" class="bc-lnk" id="bc-change">{{ text_bc_change|e }}</button></div>
+      </section>
+
+      <section class="bc-card">
+        <div class="bc-sh"><h3>{{ text_bc_paper|e }}</h3><span id="bc-papertxt"></span></div>
+        <div class="bc-seg" id="bc-paper" role="group" aria-label="{{ text_bc_paper|e }}">
+          <button type="button" data-p="58">{{ text_bc_p58|e }}</button>
+          <button type="button" data-p="80">{{ text_bc_p80|e }}</button>
+          <button type="button" data-p="a4">{{ text_bc_pa4|e }}</button>
+          <button type="button" data-p="custom">{{ text_bc_pcustom|e }}</button>
+        </div>
+        <div class="bc-g2">
+          <label class="bc-f">{{ text_bc_pw|e }}<span class="bc-u"><input id="bc-pw" type="number" step="0.5" min="20" max="400" inputmode="decimal"><i>mm</i></span></label>
+          <label class="bc-f">{{ text_bc_ph|e }}<span class="bc-u"><input id="bc-ph" type="number" step="0.5" min="10" max="600" inputmode="decimal"><i>mm</i></span></label>
+        </div>
+        <p class="bc-hint" id="bc-rollhint">{{ text_bc_roll_hint|e }}</p>
+      </section>
+
+      <section class="bc-card">
+        <div class="bc-sh"><h3>{{ text_bc_layout|e }}</h3></div>
+        <div class="bc-g2">
+          <div class="bc-f">{{ text_bc_cols|e }}
+            <div class="bc-step"><button type="button" data-s="cols" data-d="-1" aria-label="-">−</button><input id="bc-cols" type="number" min="1" max="8"><button type="button" data-s="cols" data-d="1" aria-label="+">+</button></div>
+          </div>
+          <div class="bc-f">{{ text_bc_copies|e }}
+            <div class="bc-step"><button type="button" data-s="copies" data-d="-1" aria-label="-">−</button><input id="bc-copies" type="number" min="1" max="99"><button type="button" data-s="copies" data-d="1" aria-label="+">+</button></div>
+          </div>
+          <label class="bc-f">{{ text_bc_gx|e }}<span class="bc-u"><input id="bc-gx" type="number" step="0.5" min="0" max="30" inputmode="decimal"><i>mm</i></span></label>
+          <label class="bc-f">{{ text_bc_gy|e }}<span class="bc-u"><input id="bc-gy" type="number" step="0.5" min="0" max="30" inputmode="decimal"><i>mm</i></span></label>
+          <label class="bc-f">{{ text_bc_lh|e }}<span class="bc-u"><input id="bc-lh" type="number" step="0.5" min="8" max="200" inputmode="decimal"><i>mm</i></span></label>
+          <label class="bc-f">{{ text_bc_lw|e }}<span class="bc-u"><input id="bc-lw" type="number" disabled><i>mm</i></span></label>
+        </div>
+      </section>
+
+      <section class="bc-card">
+        <div class="bc-sh"><h3>{{ text_bc_margins|e }}</h3></div>
+        <div class="bc-g4">
+          <label class="bc-f">{{ text_bc_top|e }}<span class="bc-u"><input id="bc-mt" data-m type="number" step="0.5" min="0" max="50" inputmode="decimal"><i>mm</i></span></label>
+          <label class="bc-f">{{ text_bc_right|e }}<span class="bc-u"><input id="bc-mr" data-m type="number" step="0.5" min="0" max="50" inputmode="decimal"><i>mm</i></span></label>
+          <label class="bc-f">{{ text_bc_bottom|e }}<span class="bc-u"><input id="bc-mb" data-m type="number" step="0.5" min="0" max="50" inputmode="decimal"><i>mm</i></span></label>
+          <label class="bc-f">{{ text_bc_left|e }}<span class="bc-u"><input id="bc-ml" data-m type="number" step="0.5" min="0" max="50" inputmode="decimal"><i>mm</i></span></label>
+        </div>
+        <button class="bc-link" type="button" id="bc-lock" role="switch" aria-checked="true"><span class="bc-sw on"></span>{{ text_bc_same|e }}</button>
+      </section>
+
+      <section class="bc-card">
+        <div class="bc-sh"><h3>{{ text_barcode|e }}</h3><span>Code 128</span></div>
+        <div class="bc-g2">
+          <label class="bc-f">{{ text_bc_bw|e }}<span class="bc-u"><input id="bc-bw" type="number" step="0.5" min="10" max="200" inputmode="decimal"><i>mm</i></span></label>
+          <label class="bc-f">{{ text_bc_bh|e }}<span class="bc-u"><input id="bc-bh" type="number" step="0.5" min="4" max="60" inputmode="decimal"><i>mm</i></span></label>
+        </div>
+        <button class="bc-link" type="button" id="bc-fit" role="switch" aria-checked="true"><span class="bc-sw on"></span>{{ text_bc_fit|e }}</button>
+        <div class="bc-tg" id="bc-show">
+          <button type="button" data-k="name"><span class="bc-tick">✓</span>{{ text_bc_show_name|e }}</button>
+          <button type="button" data-k="code"><span class="bc-tick">✓</span>{{ text_bc_show_code|e }}</button>
+          <button type="button" data-k="price"><span class="bc-tick">✓</span>{{ text_bc_show_price|e }}</button>
+        </div>
+      </section>
+
+      <section class="bc-card">
+        <div class="bc-sh"><h3>{{ text_bc_presets|e }}</h3></div>
+        <div class="bc-pre" id="bc-pre">
+          <button type="button" data-pr="r58">{{ text_bc_pr_r58|e }}</button>
+          <button type="button" data-pr="r58b">{{ text_bc_pr_r58b|e }}</button>
+          <button type="button" data-pr="r80">{{ text_bc_pr_r80|e }}</button>
+          <button type="button" data-pr="a4">{{ text_bc_pr_a4|e }}</button>
+        </div>
+        <div class="bc-note"><i class="bi bi-info-circle"></i><span>{{ text_bc_note|e }}</span></div>
+      </section>
+    </div>
+
+    <section class="bc-pvp">
+      <div class="bc-pvt"><h3>{{ text_bc_preview|e }}</h3>
+        <div class="bc-pager"><button type="button" id="bc-prev" aria-label="{{ text_bc_prev|e }}"><i class="bi bi-chevron-left"></i></button><span id="bc-ptxt"></span><button type="button" id="bc-next" aria-label="{{ text_bc_next|e }}"><i class="bi bi-chevron-right"></i></button></div>
+      </div>
+      <div class="bc-stage" id="bc-stage" aria-live="polite"><div class="bc-sheet" id="bc-sheet"></div></div>
+      <div class="bc-pvb"><div class="bc-meta" id="bc-meta"></div></div>
+    </section>
+  </div>
+
+  <script type="application/json" id="bc-data">{{ page_json }}</script>
+  <script src="{{ code128|e }}"></script>
+  <script src="{{ script|e }}" data-bp-page></script>
+</div>

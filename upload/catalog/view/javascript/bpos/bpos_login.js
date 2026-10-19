@@ -311,30 +311,10 @@
     }, { passive: true });
   }
 
-  // Delivery rider: the setting turns it off; the scene itself always renders.
+  // Delivery robot: the setting turns it off; the scene itself always renders.
   var doodle = document.body.getAttribute('data-doodle') !== '0';
   var van = document.querySelector('#town .van');
   if (!doodle && van) { van.remove(); }
-
-  var ri = $('riderImg');
-  if (ri && doodle) {
-    var im = new Image();
-    im.onload = function () {
-      var H = 210, W = H * im.naturalWidth / im.naturalHeight, x = 780 - W / 2, y = 794 - H;
-      ri.setAttribute('href', im.src);
-      ri.setAttribute('x', x);
-      ri.setAttribute('y', y);
-      ri.setAttribute('width', W);
-      ri.setAttribute('height', H);
-      ri.setAttribute('visibility', 'visible');
-      var bm = $('riderBeam');
-      bm.setAttribute('transform', 'translate(' + (x + W * .94) + ' ' + (y + H * .62) + ')');
-      bm.setAttribute('visibility', 'visible');
-      $('riderSvg').setAttribute('display', 'none');
-      ri.parentNode.classList.add('img');
-    };
-    im.src = ri.getAttribute('data-src');
-  }
 
   // Long store names shrink to fit the sign
   var st = $('signTxt');

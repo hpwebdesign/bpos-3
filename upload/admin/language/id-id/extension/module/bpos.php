@@ -62,9 +62,9 @@ $_['entry_desc']                = 'Deskripsi';
 $_['text_default_head']         = 'Jual lebih cepat. Hitung lebih ringan.';
 $_['text_default_desc']         = 'Masuk untuk mencatat penjualan, mengelola pesanan, dan menjaga semua cabang tetap sinkron.';
 $_['text_illustration']         = 'Ilustrasi';
-$_['help_illustration']         = 'Kurir bergerak pada scene halaman login. Latar scene selalu tampil.';
-$_['entry_doodle']              = 'Kurir pengantar';
-$_['help_doodle']               = 'Matikan untuk scene jalan tanpa kurir yang lewat.';
+$_['help_illustration']         = 'Robot pengantar bergerak pada scene halaman login. Latar scene selalu tampil.';
+$_['entry_doodle']              = 'Robot pengantar';
+$_['help_doodle']               = 'Matikan untuk scene jalan tanpa robot yang lewat.';
 $_['text_preview']              = 'Pratinjau halaman login';
 $_['text_store_name_note']      = 'Nama toko pada papan diambil dari Pengaturan > Toko.';
 

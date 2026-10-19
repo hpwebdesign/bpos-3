@@ -23,38 +23,7 @@
     return 'q=' + encodeURIComponent(S.q) + '&category_id=' + S.cat + '&stock=' + S.stock + '&barcode=' + S.bc + '&pos=' + S.pos;
   }
 
-  /* ---------- Code 128 (set B) as inline SVG ---------- */
-  var C128 = ['212222', '222122', '222221', '121223', '121322', '131222', '122213', '122312', '132212', '221213', '221312', '231212', '112232', '122132', '122231', '113222', '123122', '123221', '223211', '221132', '221231', '213212', '223112', '312131', '311222', '321122', '321221', '312212', '322112', '322211', '212123', '212321', '232121', '111323', '131123', '131321', '112313', '132113', '132311', '211313', '231113', '231311', '112133', '112331', '132131', '113123', '113321', '133121', '313121', '211331', '231131', '213113', '213311', '213131', '311123', '311321', '331121', '312113', '312311', '332111', '314111', '221411', '431111', '111224', '111422', '121124', '121421', '141122', '141221', '112214', '112412', '122114', '122411', '142112', '142211', '241211', '221114', '413111', '241112', '134111', '111242', '121142', '121241', '114212', '124112', '124211', '411212', '421112', '421211', '212141', '214121', '412121', '111143', '111341', '131141', '114113', '114311', '411113', '411311', '113141', '114131', '311141', '411131', '211412', '211214', '211232', '2331112'];
-
-  function code128(value, height) {
-    value = String(value || '');
-    if (!value) { return ''; }
-
-    var codes = [104];
-    var sum = 104;
-
-    for (var i = 0; i < value.length; i++) {
-      var c = value.charCodeAt(i) - 32;
-      if (c < 0 || c > 94) { return ''; }
-      codes.push(c);
-      sum += c * (i + 1);
-    }
-
-    codes.push(sum % 103, 106);
-
-    var x = 10;
-    var bars = '';
-
-    codes.forEach(function (code) {
-      C128[code].split('').forEach(function (n, k) {
-        n = +n;
-        if (k % 2 === 0) { bars += '<rect x="' + x + '" y="0" width="' + n + '" height="' + height + '"/>'; }
-        x += n;
-      });
-    });
-
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (x + 10) + ' ' + height + '" preserveAspectRatio="none" fill="currentColor" role="img" aria-label="' + esc(value) + '">' + bars + '</svg>';
-  }
+  var code128 = B.code128;
 
   /* ---------- list ---------- */
   function skeleton() {
@@ -153,6 +122,8 @@
 
   function render() {
     renderBar();
+    $('pr-print').disabled = !selected().length;
+    $('pr-print').title = selected().length ? '' : t('pr_select_first', 'Select products first');
 
     var rows = S.rows;
     var allOn = rows.length && rows.every(function (r) { return S.sel[r.id]; });
@@ -217,29 +188,9 @@
     }).catch(function (e) { B.ui.toast(e.message, 'err'); });
   }
 
+  // The label page takes the selection (or the current filter) in its query string
   function printLabels(ids) {
-    var win = w.open('', '_blank');
-
-    if (!win) { B.ui.toast(t('pr_popup', 'Allow pop-ups to print labels.'), 'err'); return; }
-
-    B.api(url(P.urls.labels, filterQs() + (ids && ids.length ? '&ids=' + ids.join(',') : ''))).then(function (r) {
-      if (!r.rows.length) { win.close(); B.ui.toast(t('pr_no_labels', 'No products with a barcode to print.')); return; }
-
-      var cells = r.rows.map(function (x) {
-        return '<div class="l"><div class="n">' + esc(x.name) + '</div>' + code128(x.barcode, 60) + '<div class="c">' + esc(x.barcode) + '</div><div class="p">' + esc(x.price) + '</div></div>';
-      }).join('');
-
-      win.document.open();
-      win.document.write('<!doctype html><html><head><meta charset="utf-8"><title>' + esc(t('pr_print_labels', 'Print labels')) + '</title><style>' +
-        '@page{size:58mm auto;margin:0}body{margin:0;font-family:Arial,sans-serif;color:#000}.l{width:58mm;box-sizing:border-box;padding:3mm 4mm;page-break-after:always;text-align:center}' +
-        '.n{font-size:11px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}svg{width:100%;height:14mm;margin:2mm 0 1mm;color:#000}.c{font:11px monospace}.p{font-size:13px;font-weight:700;margin-top:1mm}' +
-        '</style></head><body>' + cells + '</body></html>');
-      win.document.close();
-      win.focus();
-      setTimeout(function () { win.print(); }, 250);
-
-      if (r.truncated) { B.ui.toast(t('pr_labels_cut', 'Only the first 500 labels are printed.')); }
-    }).catch(function (e) { win.close(); B.ui.toast(e.message, 'err'); });
+    B.router.go(url(P.urls.barcode, filterQs() + (ids && ids.length ? '&ids=' + ids.join(',') : '')));
   }
 
   /* ---------- manage menu ---------- */
@@ -565,7 +516,7 @@
 
   if ($('pr-new')) { $('pr-new').addEventListener('click', function () { openDrawer(null); }); }
   if ($('pr-gen')) { $('pr-gen').addEventListener('click', function () { generate([]); }); }
-  $('pr-print').addEventListener('click', function () { printLabels(selected()); });
+  $('pr-print').addEventListener('click', function () { if (selected().length) { printLabels(selected()); } });
 
   B.setDirty(function () { return !!(drawer && dirty); });
 

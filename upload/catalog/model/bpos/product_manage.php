@@ -172,10 +172,10 @@ class ModelBposProductManage extends Model {
 		$this->db->query("UPDATE `" . DB_PREFIX . "product` SET ean = '" . $this->db->escape($code) . "', date_modified = NOW() WHERE product_id = '" . (int)$product_id . "'");
 	}
 
-	// Products without a barcode that have a source value. Returns product_id, value.
+	// Products without a barcode. Returns product_id and the source value, which can be empty.
 	public function getMissing($source, array $ids) {
 		$field = $source === 'model' ? 'model' : 'sku';
-		$sql = "SELECT product_id, " . $field . " AS value FROM `" . DB_PREFIX . "product` WHERE ean = '' AND " . $field . " <> ''";
+		$sql = "SELECT product_id, " . $field . " AS value FROM `" . DB_PREFIX . "product` WHERE ean = ''";
 
 		if ($ids) {
 			$sql .= " AND product_id IN (" . implode(',', array_map('intval', $ids)) . ")";

@@ -78,9 +78,9 @@ a.bps-snav.bps-on, a.bps-snav.bps-on:hover { background: var(--navy); color: #ff
 .bps-note code, .bps code { font-family: "DM Mono", ui-monospace, monospace; font-size: 12.5px; background: var(--tile); color: var(--acc-ink); padding: 2px 7px; border-radius: 8px; border: 0; }
 
 /* address */
-.bps-slug { display: flex; align-items: stretch; border-radius: 14px; overflow: hidden; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
-.bps-slug:focus-within { box-shadow: inset 0 0 0 1.5px var(--acc), 0 0 0 3px rgba(53,88,214,.2); }
-.bps-slug-pre { padding: 0 12px; background: var(--bg); color: var(--mute); font-family: "DM Mono", ui-monospace, monospace; white-space: nowrap; display: flex; align-items: center; }
+.bps-slug { display: flex; align-items: stretch; border-radius: 14px; overflow: hidden; background: var(--surface); border: 1px solid #C4CDE6; }
+.bps-slug:focus-within { border-color: var(--acc); box-shadow: 0 0 0 3px rgba(53,88,214,.2); }
+.bps-slug-pre { padding: 0 12px; border-right: 1px solid #C4CDE6; background: var(--bg); color: var(--mute); font-family: "DM Mono", ui-monospace, monospace; white-space: nowrap; display: flex; align-items: center; }
 .bps .bps-slug .form-control { box-shadow: none; border-radius: 0; font-family: "DM Mono", ui-monospace, monospace; font-weight: 600; flex: 1 1 auto; min-width: 0; }
 .bps-urls { display: flex; flex-direction: column; gap: 8px; }
 .bps-url { display: flex; align-items: center; gap: 10px; }

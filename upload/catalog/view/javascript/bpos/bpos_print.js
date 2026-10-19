@@ -1,4 +1,4 @@
-/* BPOS.print: receipt printing. Browser dialog, or raw ESC/POS over Web Serial, WebUSB or the RawBT app. The choice is stored per browser. */
+/* BPOS.print: receipt printing. Browser dialog, or raw ESC/POS over Web Serial, WebUSB, Web Bluetooth (BLE) or the RawBT app. The choice is stored per browser. */
 (function (w, d, B) {
   var ui = B.ui;
   var KEY = 'bpos.printer';
@@ -10,7 +10,7 @@
 
     try { v = JSON.parse(B.store.get(KEY) || 'null'); } catch (e) { v = null; }
 
-    return Object.assign({ mode: 'dialog', cols: 0, cut: false, usb: null }, v || {});
+    return Object.assign({ mode: 'dialog', cols: 0, cut: false, usb: null, ble: '' }, v || {});
   }
 
   function save() { B.store.set(KEY, JSON.stringify(cfg)); }
@@ -297,7 +297,10 @@
   // Bluetooth serial buffers the data, so the port is closed only after a short pause or the tail of the receipt is lost
   function sendSerial(bytes, ask) {
     return serialPort(false, ask).then(function (port) {
-      return port.open({ baudRate: 9600 }).then(function () { return wait(300); }).then(function () {
+      // On macOS the Bluetooth link finishes after open() resolves, bytes written before that are dropped without an error
+      return port.open({ baudRate: 9600 }).then(function () {
+        return port.setSignals({ dataTerminalReady: true, requestToSend: true }).catch(function () { /* not supported */ });
+      }).then(function () { return wait(1500); }).then(function () {
         var writer = port.writable.getWriter();
 
         return chunks(bytes, 512, function (part) { return writer.write(part); }).then(function () {
@@ -373,6 +376,96 @@
     });
   }
 
+  /* ---------- Web Bluetooth (BLE GATT), for Android where Web Serial cannot reach Bluetooth printers ---------- */
+  var BLE_SERVICES = [
+    '000018f0-0000-1000-8000-00805f9b34fb', 'e7810a71-73ae-499d-8c15-faa9aef0c3f2', '49535343-fe7d-4ae5-8fa9-9fafd205e455',
+    '0000ffe0-0000-1000-8000-00805f9b34fb', '0000ff00-0000-1000-8000-00805f9b34fb', '0000fff0-0000-1000-8000-00805f9b34fb',
+    '0000ae30-0000-1000-8000-00805f9b34fb', '0000fee7-0000-1000-8000-00805f9b34fb', '00001800-0000-1000-8000-00805f9b34fb'
+  ];
+  var bleDev = null;
+
+  function bleDevice(choose, ask) {
+    var nav = w.navigator;
+    if (!nav.bluetooth) { return Promise.reject(new Error(t('pr_no_ble', 'This browser does not support Web Bluetooth. Use Chrome on Android.'))); }
+
+    var request = function () {
+      return nav.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: BLE_SERVICES }).then(function (dev) {
+        bleDev = dev;
+        cfg.ble = dev.id || '';
+        save();
+
+        return dev;
+      });
+    };
+
+    if (choose) { return request(); }
+    if (bleDev) { return Promise.resolve(bleDev); }
+
+    var known = nav.bluetooth.getDevices ? nav.bluetooth.getDevices() : Promise.resolve([]);
+
+    return known.catch(function () { return []; }).then(function (list) {
+      var hit = list.filter(function (x) { return cfg.ble && x.id === cfg.ble; })[0];
+
+      if (hit) { bleDev = hit; return hit; }
+      if (!ask) { throw new Error(t('pr_not_connected', 'No printer is connected. Open Printer in the account menu and choose one.')); }
+
+      return request();
+    });
+  }
+
+  // First characteristic that accepts writes, searched over the known printer services
+  function bleTarget(server) {
+    return server.getPrimaryServices().then(function (services) {
+      var p = Promise.resolve(null);
+
+      services.forEach(function (svc) {
+        p = p.then(function (found) {
+          if (found) { return found; }
+
+          return svc.getCharacteristics().then(function (list) {
+            return list.filter(function (c) { return c.properties.writeWithoutResponse || c.properties.write; })[0] || null;
+          }, function () { return null; });
+        });
+      });
+
+      return p.then(function (c) {
+        if (!c) { throw new Error(t('pr_ble_no_char', 'No writable printer service found. This printer may not support Bluetooth LE.')); }
+
+        return c;
+      });
+    });
+  }
+
+  function bleWrite(ch, part) {
+    if (ch.properties.writeWithoutResponse && ch.writeValueWithoutResponse) { return ch.writeValueWithoutResponse(part); }
+
+    return ch.writeValue(part);
+  }
+
+  function sendBle(bytes, ask) {
+    return bleDevice(false, ask).then(function (dev) {
+      return dev.gatt.connect().then(function (server) {
+        return bleTarget(server).then(function (ch) {
+          var size = 100;
+          var run = function () { return chunks(bytes, size, function (part) { return bleWrite(ch, part).then(function () { return wait(20); }); }); };
+
+          // A very small MTU rejects the first chunk, nothing was printed yet, so retry with 20 byte chunks
+          return run().catch(function (e) {
+            if (size === 20) { throw e; }
+            size = 20;
+
+            return run();
+          });
+        }).then(function () { return wait(400); }).then(function () {
+          if (dev.gatt.connected) { dev.gatt.disconnect(); }
+        }, function (e) {
+          if (dev.gatt.connected) { dev.gatt.disconnect(); }
+          throw e;
+        });
+      });
+    });
+  }
+
   function sendRawbt(bytes) {
     var bin = '';
 
@@ -386,6 +479,7 @@
   function send(bytes, ask) {
     if (cfg.mode === 'serial') { return sendSerial(bytes, ask); }
     if (cfg.mode === 'usb') { return sendUsb(bytes, ask); }
+    if (cfg.mode === 'ble') { return sendBle(bytes, ask); }
 
     return sendRawbt(bytes);
   }
@@ -415,7 +509,7 @@
   // Settings-page test: o = { mode, cols, cut, receipt }. Always lets the browser ask for a printer.
   print.test = function (o) {
     var prev = cfg;
-    var done = function () { var usb = cfg.usb; cfg = prev; cfg.usb = usb; save(); };
+    var done = function () { var usb = cfg.usb; var ble = cfg.ble; cfg = prev; cfg.usb = usb; cfg.ble = ble; save(); };
 
     cfg = Object.assign({}, prev, { mode: o.mode, cols: o.cols, cut: !!o.cut });
 
@@ -431,7 +525,7 @@
     var local = Object.assign({}, cfg);
 
     ui.modal(function (box, close) {
-      var modes = [['dialog', t('pr_mode_dialog', 'Browser print dialog')], ['serial', t('pr_mode_serial', 'ESC/POS via Web Serial (Bluetooth)')], ['usb', t('pr_mode_usb', 'ESC/POS via WebUSB')], ['rawbt', t('pr_mode_rawbt', 'ESC/POS via RawBT app (Android)')]];
+      var modes = [['dialog', t('pr_mode_dialog', 'Browser print dialog')], ['serial', t('pr_mode_serial', 'ESC/POS via Web Serial (Bluetooth)')], ['ble', t('pr_mode_ble', 'ESC/POS via Bluetooth LE (Android)')], ['usb', t('pr_mode_usb', 'ESC/POS via WebUSB')], ['rawbt', t('pr_mode_rawbt', 'ESC/POS via RawBT app (Android)')]];
 
       box.classList.add('pr-box');
       box.innerHTML = '<h2>' + esc(t('pr_title', 'Printer')) + '</h2>' +
@@ -452,7 +546,7 @@
       function sync() {
         local.mode = $('pr-mode').value;
         $('pr-conn').hidden = local.mode === 'dialog';
-        $('pr-choose').hidden = local.mode !== 'serial' && local.mode !== 'usb';
+        $('pr-choose').hidden = local.mode !== 'serial' && local.mode !== 'usb' && local.mode !== 'ble';
         msg('');
       }
 
@@ -460,7 +554,7 @@
       sync();
 
       $('pr-choose').addEventListener('click', function () {
-        var p = local.mode === 'usb' ? usbDevice(true) : serialPort(true);
+        var p = local.mode === 'usb' ? usbDevice(true) : (local.mode === 'ble' ? bleDevice(true) : serialPort(true));
 
         p.then(function () { msg(t('pr_chosen', 'Printer selected.')); }, function (e) { msg(e.message, true); });
       });
@@ -468,7 +562,7 @@
       $('pr-test').addEventListener('click', function () {
         var prev = cfg;
 
-        cfg = Object.assign({}, local, { cols: +$('pr-cols').value, cut: $('pr-cut').checked, usb: cfg.usb });
+        cfg = Object.assign({}, local, { cols: +$('pr-cols').value, cut: $('pr-cut').checked, usb: cfg.usb, ble: cfg.ble });
 
         send(build(sample(), colsFor(sample()), cfg.cut), true).then(function () { msg(t('pr_sent', 'Receipt sent to the printer.')); }, function (e) { msg(e.message, true); }).then(function () { cfg = prev; });
       });

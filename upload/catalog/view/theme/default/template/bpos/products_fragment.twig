@@ -9,7 +9,7 @@
     </div>
     <div class="phr">
       {% if can_edit %}<button class="btn" id="pr-gen" type="button"><i class="bi bi-upc-scan"></i><span>{{ text_gen_missing|e }}</span></button>{% endif %}
-      <button class="btn" id="pr-print" type="button"><i class="bi bi-printer"></i><span>{{ text_print_labels|e }}</span></button>
+      <button class="btn" id="pr-print" type="button" disabled><i class="bi bi-printer"></i><span>{{ text_print_labels|e }}</span></button>
       {% if can_edit %}<button class="btn pri" id="pr-new" type="button"><i class="bi bi-plus-lg"></i><span>{{ text_add_product|e }}</span></button>{% endif %}
     </div>
   </div>
@@ -64,5 +64,6 @@
   </aside>
 
   <script type="application/json" id="pr-data">{{ page_json }}</script>
+  <script src="{{ code128|e }}"></script>
   <script src="{{ script|e }}" data-bp-page></script>
 </div>
