@@ -152,3 +152,9 @@
 .rp-tip { position: absolute; z-index: 2; pointer-events: none; padding: 6px 10px; border-radius: 8px; background: var(--navy); color: #fff; font-size: 12px; white-space: nowrap; display: flex; flex-direction: column; gap: 1px; }
 .rp-tip[hidden] { display: none; }
 .rp-tip span { opacity: .75; }
+
+/* active KPI chip: same look as the active category on Sales */
+.mg .catc.on { background: var(--navy); color: #fff; box-shadow: 0 10px 24px -8px rgba(16,31,69,.55); }
+.mg .catc.on small { color: rgba(255,255,255,.7); }
+.mg .catc.on .ci { background: rgba(255,255,255,.14); color: #fff; }
+:root[data-theme="dark"] .mg .catc.on, :root:not([data-theme="light"]) .mg .catc.on { background: var(--accent); }

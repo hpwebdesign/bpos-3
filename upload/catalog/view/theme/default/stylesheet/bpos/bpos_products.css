@@ -1,7 +1,7 @@
 /* BPOS Products page. Builds on bpos_manage.css (mg-). Prefix pr-. */
 .pr .catc { cursor: pointer; }
-.pr .catc.on { background: var(--soft); box-shadow: inset 0 0 0 1.5px var(--accent); }
 .pr .catc.warn small { color: var(--amber); }
+.pr .catc.warn.on small { color: rgba(255,255,255,.7); }
 
 .pr-fld { position: relative; flex: none; display: inline-flex; }
 .pr-fld > .bi { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--mute); pointer-events: none; font-size: 15px; z-index: 1; }

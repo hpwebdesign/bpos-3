@@ -660,7 +660,7 @@ class ControllerExtensionModuleBpos extends Controller {
 
     if ($result === 'api_down') {
       // License server unreachable: do not penalise the user, show a warning instead
-      $this->error['warning'] = $this->language->get('error_no_internet_access');
+      // $this->error['warning'] = $this->language->get('error_no_internet_access');
       $this->v_d = $this->domain;
     } elseif ($result === true) {
       $this->v_d = $this->domain;

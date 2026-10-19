@@ -112,6 +112,7 @@ $_['text_nav_receipt'] = 'Receipt & printing';
 $_['text_nav_scan'] = 'Barcode & scanner';
 $_['text_nav_terminals'] = 'Terminals';
 $_['text_nav_sync'] = 'Offline & sync';
+$_['text_nav_help'] = 'Help';
 
 // Sections
 $_['text_stock'] = 'Stock';

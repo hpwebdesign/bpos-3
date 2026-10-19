@@ -112,6 +112,7 @@ $_['text_nav_receipt'] = 'Struk & cetak';
 $_['text_nav_scan'] = 'Barcode & scanner';
 $_['text_nav_terminals'] = 'Terminal';
 $_['text_nav_sync'] = 'Offline & sinkronisasi';
+$_['text_nav_help'] = 'Bantuan';
 
 // Sections
 $_['text_stock'] = 'Stok';

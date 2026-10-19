@@ -53,6 +53,7 @@
           <a href="#bps-terminals" data-bps-tab="terminals" class="bps-snav"><i class="fa fa-desktop"></i> {{ text_nav_terminals|e }}</a>
           <a href="#bps-sync" data-bps-tab="sync" class="bps-snav"><i class="fa fa-cloud"></i> {{ text_nav_sync|e }}</a>
           <a href="#bps-maintenance" data-bps-tab="maintenance" class="bps-snav"><i class="fa fa-wrench"></i> {{ text_tab_maintenance|e }}</a>
+          <a href="#bps-help" data-bps-tab="help" class="bps-snav"><i class="fa fa-question-circle"></i> {{ text_nav_help|e }}</a>
         </nav>
 
         <main class="bps-main">
@@ -68,6 +69,12 @@
           <div class="bps-pane" id="bps-scan">{{ tab_scan }}</div>
           <div class="bps-pane" id="bps-terminals">{{ tab_terminals }}</div>
           <div class="bps-pane" id="bps-sync">{{ tab_sync }}</div>
+          <div class="bps-pane" id="bps-help">
+            <div class="bps-card bps-helpcard">
+              <div id="license"></div>
+              <div id="support"></div>
+            </div>
+          </div>
           <div class="bps-pane" id="bps-maintenance">
             <div class="bps-card bps-maint">
               <div class="bps-card-h"><h3>{{ text_maintenance|e }}</h3><span class="bps-pill">{{ text_bpos_version|e }}</span></div>
@@ -96,4 +103,17 @@
 </div>
 <link href="view/stylesheet/bpos/bpos_setting.css?v={{ asset_v|e('url') }}" rel="stylesheet" type="text/css">
 <script src="view/javascript/bpos/bpos_setting.js?v={{ asset_v|e('url') }}"></script>
+<script type="text/javascript">
+(function () {
+  var loaded = false;
+  function loadHelp() {
+    if (loaded) { return; }
+    loaded = true;
+    $('#support').load('index.php?route=common/hp_validate/support&user_token={{ user_token }}');
+    $('#license').load('index.php?route=common/hp_validate/license&user_token={{ user_token }}&code={{ extension_code }}&version={{ version }}');
+  }
+  $(document).on('click', '[data-bps-tab="help"]', loadHelp);
+  if (String(window.location.hash || '') === '#bps-help') { loadHelp(); }
+})();
+</script>
 {{ footer }}
