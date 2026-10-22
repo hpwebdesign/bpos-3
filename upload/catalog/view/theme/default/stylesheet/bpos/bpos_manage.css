@@ -1,5 +1,8 @@
 /* BPOS management pages (orders, customers, reports): toolbar, table, drawer. Prefix mg-; page parts od-, cu-, rp-. */
 .mg { padding-bottom: 12px; }
+.mg .catc.on {
+  color: #fff;
+}
 .mg-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; flex: none; }
 .mg-search { flex: 1 1 220px; max-width: 380px; height: 44px; border-radius: 22px; padding: 0 8px 0 16px; display: flex; align-items: center; gap: 10px; color: var(--mute); background: var(--surface); box-shadow: var(--sh-card); }
 .mg-search:focus-within { box-shadow: 0 0 0 2px var(--accent), var(--sh-card); }
