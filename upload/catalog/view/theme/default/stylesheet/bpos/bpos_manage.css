@@ -1,8 +1,5 @@
 /* BPOS management pages (orders, customers, reports): toolbar, table, drawer. Prefix mg-; page parts od-, cu-, rp-. */
 .mg { padding-bottom: 12px; }
-.mg .catc.on {
-  color: #fff;
-}
 .mg-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; flex: none; }
 .mg-search { flex: 1 1 220px; max-width: 380px; height: 44px; border-radius: 22px; padding: 0 8px 0 16px; display: flex; align-items: center; gap: 10px; color: var(--mute); background: var(--surface); box-shadow: var(--sh-card); }
 .mg-search:focus-within { box-shadow: 0 0 0 2px var(--accent), var(--sh-card); }
@@ -147,9 +144,6 @@
 .mg .catc small { display: block; color: var(--mute); font-size: 12px; white-space: nowrap; }
 .mg .catc small .rp-dl { margin-left: 4px; padding: 0 6px; font-size: 11px; }
 .mg button.catc { cursor: pointer; font: inherit; color: var(--ink); }
-.mg .catc.on { background: var(--soft); box-shadow: inset 0 0 0 1.5px var(--accent); color: var(--ink); }
-.mg .catc.on small { color: var(--mute); }
-.mg .catc.on .ci { background: var(--tile); color: var(--accent-ink); }
 .mg .catc.warn b { color: var(--amber); }
 
 /* daily sales chart (inline SVG) */
@@ -164,14 +158,14 @@
 .rp-tip[hidden] { display: none; }
 .rp-tip span { opacity: .75; }
 
-<<<<<<< HEAD
 /* active KPI chip: same look as the active category on Sales */
 .mg .catc.on { background: var(--navy); color: #fff; box-shadow: 0 10px 24px -8px rgba(16,31,69,.55); }
+.mg .catc.on b { color: #fff; }
 .mg .catc.on small { color: rgba(255,255,255,.7); }
 .mg .catc.on .ci { background: rgba(255,255,255,.14); color: #fff; }
 :root[data-theme="dark"] .mg .catc.on, :root:not([data-theme="light"]) .mg .catc.on { background: var(--accent); }
 #cu-root .catc { flex: none; cursor: pointer; }
-=======
+
 /* Reports redesign */
 .rp-hh { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .rp-sub, .rp-n { color: var(--mute); font-size: 12.5px; }
@@ -211,4 +205,3 @@
 
 /* Lighter weights: Helvetica maps 600 to bold, so mid weight is 500 */
 .mg b, .mg strong { font-weight: 500; }
->>>>>>> c0126c83def3a3c6824c1d5f3b5d5347a3012f6c

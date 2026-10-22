@@ -1,8 +1,5 @@
 /* BPOS Products page. Builds on bpos_manage.css (mg-). Prefix pr-. */
 .pr .catc { cursor: pointer; font: inherit; color: var(--ink); }
-.pr .catc.on { background: var(--soft); box-shadow: inset 0 0 0 1.5px var(--accent); color: #fff; }
-.pr .catc.on small { color: rgba(255,255,255,.65); }
-.pr .catc.on .ci { background: var(--tile); color: var(--accent-ink); }
 .pr .catc.warn b { color: var(--amber); }
 
 .pr-fld { position: relative; flex: none; display: inline-flex; }

@@ -93,6 +93,11 @@
   var drawId = 0;
   var amLoad = null;
   var amThemed = false;
+  var amTmp = null;
+
+  function dropTmp() {
+    if (amTmp) { try { amTmp.dispose(); } catch (e) { /* already gone */ } amTmp = null; }
+  }
 
   function disposeChart() {
     drawId++;
@@ -101,9 +106,15 @@
     donuts = [];
   }
 
+  // A stale or partial bundle on the server must not break the page: every class used below has to exist
+  function amReady() {
+    var ac = w.am4charts;
+    return !!(w.am4core && ac && ac.XYChart && ac.DateAxis && ac.ValueAxis && ac.LineSeries && ac.CircleBullet && ac.XYCursor && ac.PieChart && ac.PieSeries);
+  }
+
   // The amCharts bundle is local and loaded once, on first use
   function loadAm() {
-    if (!(w.am4core && w.am4charts)) {
+    if (!amReady()) {
       if (!amLoad) {
         amLoad = new Promise(function (ok, fail) {
           var s = d.createElement('script');
@@ -116,6 +127,7 @@
     }
 
     return (amLoad || Promise.resolve()).then(function () {
+      if (!amReady()) { throw new Error('amCharts bundle'); }
       if (!amThemed) { w.am4core.useTheme(w.am4themes_animated); amThemed = true; }
     });
   }
@@ -143,6 +155,7 @@
     var line = cssVar('--line', '#E4E9F5');
     var accent = cssVar('--accent', '#3558D6');
     var c = am.create(el, ac.XYChart);
+    amTmp = c;
     var fmt = rows.length > 12 ? 'd MMM' : 'EEE d';
 
     c.fontSize = 11;
@@ -164,6 +177,8 @@
 
     var y = c.yAxes.push(new ac.ValueAxis());
     y.min = 0;
+    y.cursorTooltipEnabled = false;
+    x.cursorTooltipEnabled = false;
     y.numberFormatter.numberFormat = '#.#a';
     amStyle(y, ink, line);
 
@@ -175,7 +190,8 @@
     ser.fill = am.color(accent);
     ser.fillOpacity = 0.12;
     ser.tensionX = 0.8;
-    ser.tooltipText = '[bold]{text}[/]\n{orders}';
+    ser.tooltipText = "[bold]{text}[/]\n{dateX.formatDate('EEE d MMM')} · {orders}";
+    ser.tooltip.pointerOrientation = 'vertical';
     amTip(ser);
 
     var dot = ser.bullets.push(new ac.CircleBullet());
@@ -191,16 +207,32 @@
     c.cursor.lineX.stroke = am.color(line);
 
     chart = c;
+    amTmp = null;
   }
 
   var PALETTE = ['#3558D6', '#12B76A', '#F59E0B', '#E5484D', '#8E4EC6', '#0EA5B7', '#94A3B8'];
 
   function colorOf(i, other) { return other ? '#94A3B8' : PALETTE[i % 6]; }
 
+  // Dependency-free donut, used when amCharts is missing or fails
+  function drawDonutSvg(el, rows) {
+    var C = 2 * Math.PI * 70;
+    var off = 0;
+    var arcs = rows.map(function (r) {
+      var len = C * r.pct / 100;
+      var a = '<circle cx="100" cy="100" r="70" fill="none" stroke="' + r.color + '" stroke-width="36" stroke-dasharray="' + Math.max(0, len - 1.5) + ' ' + (C - Math.max(0, len - 1.5)) + '" stroke-dashoffset="' + (-off) + '" transform="rotate(-90 100 100)"><title>' + esc(r.label + ': ' + r.pct + '% · ' + r.text) + '</title></circle>';
+      off += len;
+      return a;
+    }).join('');
+
+    el.innerHTML = '<svg viewBox="0 0 200 200" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" focusable="false">' + arcs + '</svg>';
+  }
+
   function drawDonutAm(el, rows) {
     var am = w.am4core;
     var ac = w.am4charts;
     var c = am.create(el, ac.PieChart);
+    amTmp = c;
 
     c.fontSize = 11;
     c.innerRadius = am.percent(55);
@@ -224,6 +256,7 @@
     amTip(ser);
 
     donuts.push(c);
+    amTmp = null;
   }
 
   function cssVar(name, fallback) {
@@ -330,11 +363,14 @@
     draw();
     }
 
+    function fallback() {
+      dropTmp();
+      if (mine === drawId && el.isConnected) { el.innerHTML = ''; drawSvg(); }
+    }
+
     loadAm().then(function () {
       if (mine === drawId && el.isConnected) { drawAm(el, rows); }
-    }, function () {
-      if (mine === drawId && el.isConnected) { drawSvg(); }
-    });
+    }).catch(fallback);
   }
 
   // Donut with a legend list below: rows are { label, sub, value, text, pct, color }
@@ -358,11 +394,14 @@
       return '<div class="rp-li"><span class="rp-dot" style="background:' + r.color + '"></span><span class="rp-ln"><b>' + esc(r.label) + '</b>' + (r.sub ? '<small>' + esc(r.sub) + '</small>' : '') + '</span><span class="rp-lv">' + esc(r.text) + '</span><span class="rp-pill">' + r.pct + '%</span></div>';
     }).join('');
 
+    function fallback() {
+      dropTmp();
+      if (mine === drawId && chartEl.isConnected) { chartEl.innerHTML = ''; drawDonutSvg(chartEl, rows); }
+    }
+
     loadAm().then(function () {
       if (mine === drawId && chartEl.isConnected) { drawDonutAm(chartEl, rows); }
-    }, function () {
-      if (mine === drawId) { chartEl.className = ''; chartEl.innerHTML = ''; }
-    });
+    }).catch(fallback);
   }
 
   function renderPayments(r) {

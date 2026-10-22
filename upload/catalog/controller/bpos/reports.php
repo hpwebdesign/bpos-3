@@ -19,7 +19,7 @@ class ControllerBposReports extends Controller {
 			'max'    => self::MAX_DAYS,
 			'own'    => $this->own($user) !== array(),
 			'can'    => array('export' => $bpos->can('export')),
-			'urls'   => array('data' => $out->url('bpos/reports/data'), 'export' => $out->url('bpos/reports/export'), 'am' => $out->asset('javascript/bpos/vendor/amcharts4/amcharts4.min.js'), 'products' => $bpos->can('products') ? $out->url('bpos/products') : '')
+			'urls'   => array('data' => $out->url('bpos/reports/data'), 'export' => $out->url('bpos/reports/export'), 'am' => $out->asset('javascript/bpos/vendor/amcharts4/amcharts4.min.js') . '&b=2', 'products' => $bpos->can('products') ? $out->url('bpos/products') : '')
 		);
 
 		$data = $this->language->all();
