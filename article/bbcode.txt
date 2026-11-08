@@ -1,0 +1,123 @@
+[b]💼 BPOS — Point of Sales for OpenCart[/b]
+BPOS (Barik Point of Sales) turns your OpenCart store into a fast, modern point of sale that runs in the browser, on your own domain. Products, stock, customers, orders, tax, coupons, payments and shipping all come from OpenCart, so there is no second system to keep in sync.
+
+Open your POS address (for example yourstore.com/pos), sign in, and start selling.
+
+[b][color=#a8c700][size=120]◈ TRY THE DEMO[/size][/color][/b]
+[url=https://hpwebdesign.io/demo/bpos][img]https://opencart.id/image/catalog/opencart.com/frontend-demo.jpg[/img][/url]
+
+[b]💬 Who It's For[/b]
+[list]
+[*] Retail stores selling both online and in person
+[*] Boutiques and cafés with cashiers at the counter
+[*] Owners who want one stock count for the shop and the website
+[*] Stores with several branches, each with its own cashiers and terminals
+[/list]
+
+[b]🛒 1. Sell Fast at the Counter[/b]
+[list]
+[*] Search or Scan – Find products by name, model or SKU, or scan a barcode with a USB or Bluetooth scanner. An exact match can be added to the order automatically
+[*] Two Product Layouts – Compact (more products on screen) or Gallery (larger thumbnails), set per terminal
+[*] Low-Stock Warning – Shows "Only N left" at a threshold you choose. Negative stock follows your OpenCart setting
+[*] Discounts, Extra Charges and Coupons – OpenCart coupons work at the counter. A maximum cashier discount keeps pricing under control
+[*] Shipping – Pick any enabled OpenCart shipping method for orders that need delivery
+[*] Customers Without Leaving the Sales Screen – Select, search or create a customer, or sell to a guest
+[*] Currency Switch – Cashiers can change between enabled store currencies (optional, per device)
+[/list]
+
+[b]💳 2. Take Payment Your Way[/b]
+[list]
+[*] Cash – With amount received and change
+[*] OpenCart Payment Methods – Any enabled extension. Offline methods such as bank transfer or COD simply record the order
+[*] Pay Link for Online Gateways – The customer opens a signed link and pays online. The cashier can copy the link
+[/list]
+
+[b]🧾 3. Receipts and Printing[/b]
+[list]
+[*] Print through the browser dialog, a network printer (IP), USB (WebUSB) or Bluetooth
+[*] 58 mm and 80 mm paper, automatic printing after checkout, optional paper cut, and a test-print button
+[*] Choose what the receipt shows: header and footer, logo, address, phone, cashier, terminal, customer, tax breakdown and an order barcode
+[*] Receipt labels can be translated per language, with a live preview in the settings
+[/list]
+
+[b]📦 4. Orders, Refunds and Voids[/b]
+[list]
+[*] Order list with date ranges from 7 days to a custom range, plus KPIs
+[*] Order detail, with refund and void controlled by role permissions. Each action leaves a note on the OpenCart order
+[*] Export orders to CSV or Excel
+[/list]
+
+[b]🏷️ 5. Products and Barcode Labels[/b]
+[list]
+[*] Manage products from the POS: add, edit, show or hide in POS, and filter by category and stock
+[*] Generate barcodes automatically for products that have none (from SKU or Model)
+[*] Print labels on 58 mm / 80 mm rolls or A4 sheets, with columns, margins, label height and barcode width, quick presets and a preview
+[*] Select several products and print their labels in one go
+[/list]
+
+[b]👥 6. Customers[/b]
+[list]
+[*] Customer list with KPIs: total, new in 30 days, repeat and inactive for 30+ days
+[*] Search by name, phone or email, and filter by customer group
+[*] Purchase history, total spent and internal notes for every customer
+[*] Optional: create an OpenCart account for new customers
+[/list]
+
+[b]📊 7. Reports[/b]
+[list]
+[*] KPIs: net sales, transactions, average order, items sold, discounts and refunded + voided, each compared with the previous period
+[*] Daily sales chart, plus payment-method and category breakdowns
+[*] Breakdown by cashier, low-stock list, store comparison, and coupon, shipping and extra-charge figures
+[*] Export reports
+[/list]
+
+[b]🔒 8. Cashiers, Roles and Security[/b]
+[list]
+[*] Four Roles – Cashier, Supervisor, Manager and Owner, each with its own pages
+[*] Permission Matrix – Choose who can apply discounts, add charges, use coupons, refund, void and export
+[*] Sign-In Options – Username and password, a 4–6 digit PIN for quick cashier switching, or an existing OpenCart admin session
+[*] Brute-Force Protection – Accounts lock after repeated failures, and each IP address is rate limited
+[*] Audit log and sliding 12-hour sessions
+[/list]
+
+[b]🏬 9. Multi-Store and Multi-Terminal[/b]
+[list]
+[*] Branches are your OpenCart stores. Each cashier belongs to one store
+[*] Register every counter or tablet as a terminal and see whether it is online or offline
+[*] Printer, product layout and scanner options are set per terminal
+[/list]
+
+[b]🎨 10. Your Brand[/b]
+[list]
+[*] Light and dark themes, adjustable background colors, English and Indonesian
+[*] A custom sign-in page: your own address, logo, headline and description per language, and an optional animated delivery-robot scene
+[/list]
+
+[b]🧩 Built on OpenCart[/b]
+[list]
+[*] Built for OpenCart 3.0.x and installed with an OCMOD package, with the extension's own admin settings page
+[*] POS sales are stored as normal OpenCart orders, so existing reports, emails and stock rules keep working
+[*] Compatible with order statuses mapped to your store (completed, refunded, voided)
+[/list]
+
+[b]🚧 Coming Soon[/b]
+[list]
+[*] Offline Mode – Keep selling without internet and sync when the connection returns
+[/list]
+
+[b]🧰 Included in Package[/b]
+[list]
+[*] Full extension (frontend + admin)
+[*] Easy OCMOD installer
+[*] English documentation
+[*] 1 year of free updates
+[/list]
+
+[b][color=#a8c700][size=120]◈ TRY THE DEMO[/size][/color][/b]
+[url=https://hpwebdesign.io/demo/bpos][img]https://opencart.id/image/catalog/opencart.com/frontend-demo.jpg[/img][/url]
+
+[b][color=#a8c700][size=120]◈ SUPERB TECHNICAL SUPPORT[/size][/color][/b]
+We've got you covered!
+[img]https://image.opencart.com/original/58c341560e92f.jpg[/img]
+[list] ✪ Free Installation
+✪ Free 12 Months Technical Support[/list]
