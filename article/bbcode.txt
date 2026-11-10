@@ -29,7 +29,6 @@ Open your POS address (for example yourstore.com/pos), sign in, and start sellin
 [list]
 [*] Cash – With amount received and change
 [*] OpenCart Payment Methods – Any enabled extension. Offline methods such as bank transfer or COD simply record the order
-[*] Pay Link for Online Gateways – The customer opens a signed link and pays online. The cashier can copy the link
 [/list]
 
 [b]🧾 3. Receipts and Thermal Printing[/b]
