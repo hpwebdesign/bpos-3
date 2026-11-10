@@ -4,7 +4,7 @@
     <code>BPOS</code>
     <version>1.0.0.1</version>
     <author>HP Web Design</author>
-    <link>https://hpwebdesign.io</link>
+    <link>https://bariklabs.com</link>
 
     <!-- Admin menu: inside the shared $hpwd group when system.ocmod.xml provides it -->
     <file path="admin/controller/common/column_left.php">
