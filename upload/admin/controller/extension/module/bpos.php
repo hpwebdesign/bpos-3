@@ -230,7 +230,7 @@ class ControllerExtensionModuleBpos extends Controller {
     $clean = [];
     $errors = [];
 
-    foreach (['module_bpos_status', 'module_bpos_guest', 'module_bpos_login_doodle', 'module_bpos_currency_switch'] as $key) {
+    foreach (['module_bpos_status', 'module_bpos_guest', 'module_bpos_currency_switch'] as $key) {
       $clean[$key] = empty($post[$key]) ? 0 : 1;
     }
 
