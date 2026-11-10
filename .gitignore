@@ -3,9 +3,8 @@ obfuscated/
 /*.txt
 .idea/
 build/
-vendor/
+/vendor/
 distribution/
 .env
-vendor
 composer.json
 composer.lock
