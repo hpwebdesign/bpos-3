@@ -42,7 +42,6 @@ class ControllerBposAuth extends Controller {
 		$data['store_name_upper'] = function_exists('mb_strtoupper') ? mb_strtoupper($store) : strtoupper($store);
 		$data['terminal_hint'] = $bpos->rememberedTerminal();
 		$data['admin_name'] = $admin ? $admin['username'] : '';
-		$data['doodle'] = (string)$this->config->get('module_bpos_login_doodle') === '0' ? '0' : '1';
 		$data['icons'] = $out->asset('javascript/bpos/vendor/bootstrap-icons/bootstrap-icons.css');
 		$data['css'] = $out->asset('theme/default/stylesheet/bpos/bpos_login.css');
 		$data['script'] = $out->asset('javascript/bpos/bpos_login.js');

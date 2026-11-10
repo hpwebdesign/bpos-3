@@ -47,14 +47,6 @@ button { cursor: pointer; border: 0; background: none; }
 #town .tw { animation: tw 4s ease-in-out infinite; }
 #town .neon { animation: neon 7s linear infinite; } #town .neon2 { animation: neon 5s linear infinite; animation-delay: -2s; }
 #town .pulse { animation: pls 6s ease-in-out infinite; } #town .tail { animation: pls 3s ease-in-out infinite; }
-#town .van { animation: drive 15s linear infinite; }
-#town .vbody { animation: bob .55s ease-in-out infinite alternate; }
-#town .flag { transform-box: fill-box; transform-origin: 100% 50%; animation: wave 1.4s ease-in-out infinite alternate; }
-#town .wh { transform-box: fill-box; transform-origin: 50% 50%; animation: spin 1.25s linear infinite; }
-@keyframes drive { from { transform: translateX(-1000px); } to { transform: translateX(1500px); } }
-@keyframes bob { to { transform: translateY(-1.6px); } }
-@keyframes wave { to { transform: skewY(10deg); } }
-@keyframes spin { to { transform: rotate(360deg); } }
 @keyframes tw { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
 @keyframes neon { 0%, 18%, 22%, 62%, 100% { opacity: 1; } 20%, 60% { opacity: .55; } 21% { opacity: .9; } }
 @keyframes pls { 0%, 100% { opacity: .7; } 50% { opacity: 1; } }

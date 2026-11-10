@@ -311,11 +311,6 @@
     }, { passive: true });
   }
 
-  // Delivery robot: the setting turns it off; the scene itself always renders.
-  var doodle = document.body.getAttribute('data-doodle') !== '0';
-  var van = document.querySelector('#town .van');
-  if (!doodle && van) { van.remove(); }
-
   // Long store names shrink to fit the sign
   var st = $('signTxt');
   function fitSign() {

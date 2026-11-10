@@ -338,7 +338,6 @@ class ModelExtensionModuleBpos extends Model {
       'module_bpos_login_logo'  => '',
       'module_bpos_login_head'  => [],
       'module_bpos_login_desc'  => [],
-      'module_bpos_login_doodle' => 1,
       'module_bpos_low_stock'   => 3,
       'module_bpos_max_discount' => 20,
       'module_bpos_payment'     => ['cash'],
