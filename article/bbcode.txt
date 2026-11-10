@@ -1,125 +1,202 @@
 [b]💼 BPOS — Point of Sales for OpenCart[/b]
-BPOS (Barik Point of Sales) turns your OpenCart store into a fast, modern point of sale that runs in the browser, on your own domain. Products, stock, customers, orders, tax, coupons, payments and shipping all come from OpenCart, so there is no second system to keep in sync.
 
-Open your POS address (for example yourstore.com/pos), sign in, and start selling.
+[b]Selling online and in-store? You shouldn't have to manage two separate systems.[/b]
 
-[b][color=#a8c700][size=120]◈ TRY THE DEMO[/size][/color][/b]
-[url=https://hpwebdesign.io/demo/bpos][img]https://opencart.id/image/catalog/opencart.com/frontend-demo.jpg[/img][/url]
+Imagine this:
 
-[b]💬 Who It's For[/b]
+A customer buys the last item from your website. A few minutes later, someone walks into your physical store and asks for the same product.
+
+But your cashier doesn't know it's already sold.
+
+Now you have an oversold product, an unhappy customer, and another problem to fix.
+
+This happens when your online store and physical shop operate separately.
+
+[b]BPOS solves this by turning your existing OpenCart store into a complete Point of Sale system.[/b]
+
+Your website and physical counter use the same products, stock, customers, orders, taxes, coupons, and payment methods. When your cashier completes a sale, it's recorded directly in OpenCart as a normal order.
+
+No second product catalog. No separate inventory to update. No extra system to reconcile.
+
+Simply open your POS address (for example, yourstore.com/pos), sign in, and start selling.
+
+[b][color=#a8c700][size=120]◈ TRY THE LIVE DEMO[/size][/color][/b]
+
+[url=https://demo08.bariklabs.com/index.php?route=bpos/home][img]https://opencart.id/image/catalog/opencart.com/frontend-demo.jpg[/img][/url]
+
+[b]💬 Is BPOS Right for Your Business?[/b]
+
+BPOS is designed for businesses that sell both online and in person.
+
 [list]
-[*] Retail stores selling both online and in person
-[*] Boutiques and cafés with cashiers at the counter
-[*] Owners who want one stock count for the shop and the website
-[*] Stores with several branches, each with its own cashiers and terminals
+[*] Retail stores that want website and counter sales to share the same inventory.
+[*] Boutiques and shops where cashiers need a simple, fast checkout.
+[*] Business owners tired of maintaining products and stock in two different systems.
+[*] Growing businesses with multiple branches, cashiers, and checkout terminals.
 [/list]
 
-[b]🛒 1. Sell Fast at the Counter[/b]
+[b]🛒 1. Get Customers Through Checkout Faster[/b]
+
+Your cashier shouldn't have to navigate several pages just to complete a sale. Find products, manage the cart, and finish checkout from one screen.
+
 [list]
-[*] Search or Scan – Find products by name, model or SKU, or scan a barcode with a USB or Bluetooth scanner. An exact match can be added to the order automatically
-[*] Two Product Layouts – Compact (more products on screen) or Gallery (larger thumbnails), set per terminal
-[*] Low-Stock Warning – Shows "Only N left" at a threshold you choose. Negative stock follows your OpenCart setting
-[*] Discounts, Extra Charges and Coupons – OpenCart coupons work at the counter. A maximum cashier discount keeps pricing under control
-[*] Shipping – Pick any enabled OpenCart shipping method for orders that need delivery
-[*] Customers Without Leaving the Sales Screen – Select, search or create a customer, or sell to a guest
-[*] Currency Switch – Cashiers can change between enabled store currencies (optional, per device)
+[*] [b]Find Products Quickly:[/b] Search by product name, model, or SKU, or scan a barcode using a USB or Bluetooth scanner. Exact barcode matches can be added automatically.
+[*] [b]Choose Your Product View:[/b] Use Compact layout to display more products or Gallery layout for larger thumbnails. Configure each terminal separately.
+[*] [b]Apply Discounts and Coupons:[/b] Use OpenCart coupons, add extra charges, and set maximum discount limits for cashiers.
+[*] [b]Handle Customers Easily:[/b] Search, select, or create customers without leaving the sales screen. Guest checkout is also supported.
+[*] [b]Handle Delivery Orders:[/b] Select any enabled OpenCart shipping method when a customer needs an order delivered.
+[*] [b]Know What's Left:[/b] Display low-stock warnings at your chosen threshold and follow your OpenCart stock settings.
+[*] [b]Switch Currencies:[/b] Allow cashiers to change between enabled store currencies (optional, per device).
 [/list]
 
-[b]💳 2. Take Payment Your Way[/b]
+[b]💳 2. Accept Payments Using Your Existing Methods[/b]
+
+You don't need to configure another payment system just for your physical store.
+
 [list]
-[*] Cash – With amount received and change
-[*] OpenCart Payment Methods – Any enabled extension. Offline methods such as bank transfer or COD simply record the order
+[*] [b]Cash:[/b] Enter the amount received and let BPOS calculate the change.
+[*] [b]OpenCart Payment Extensions:[/b] Use your enabled OpenCart payment methods. Offline methods such as bank transfer and Cash on Delivery simply record the order. Online gateways depend on the extension, so test yours before going live.
 [/list]
 
-[b]🧾 3. Receipts and Thermal Printing[/b]
+[b]🧾 3. Print Receipts That Match Your Store[/b]
+
+Give customers a proper receipt after every sale, using the printer setup that works for your business.
+
 [list]
-[*] Thermal Printer Ready – Sends ESC/POS straight to 58 mm and 80 mm receipt printers over USB (WebUSB or Web Serial), Bluetooth (Web Bluetooth on Android Chrome, or Bluetooth serial), or the RawBT app on Android
-[*] Or Use Any Printer – The browser print dialog works with every printer your computer can print to
-[*] Print the Way a Cashier Needs – Automatic printing after checkout, optional automatic paper cut, and a test-print button in the settings
-[*] Receipt Content You Control – Header and footer, store logo (printed as a black-and-white image), address, phone, cashier, terminal, customer, tax breakdown and an order barcode (Code 39)
-[*] Per Terminal – Paper width, connection and cut options are set for each counter, with a live preview of the receipt
-[*] Receipt labels can be translated per language
-[*] USB and Bluetooth printing needs Chrome or Edge on desktop, or Chrome on Android
+[*] Print through the browser dialog, or send ESC/POS directly to 58 mm and 80 mm thermal printers over USB, Bluetooth, or the RawBT app on Android. USB and Bluetooth printing needs Chrome or Edge (Chrome on Android for Bluetooth).
+[*] Support for standard 58 mm and 80 mm receipt paper.
+[*] Automatically print after checkout, with optional paper cutting and a test-print function.
+[*] Choose what appears on your receipts: logo, store address, phone, cashier, terminal, customer details, tax breakdown, and order barcode.
+[*] Translate receipt labels for each language and preview the result directly in settings.
 [/list]
 
-[b]📦 4. Orders, Refunds and Voids[/b]
+[b]📦 4. Keep Every Sale Accounted For[/b]
+
+Need to check an order, process a refund, or cancel an incorrect transaction? Manage it directly from your POS.
+
 [list]
-[*] Order list with date ranges from 7 days to a custom range, plus KPIs
-[*] Order detail, with refund and void controlled by role permissions. Each action leaves a note on the OpenCart order
-[*] Export orders to CSV or Excel
+[*] Browse orders from the last 7 days or choose a custom date range.
+[*] View order details and sales KPIs.
+[*] Process refunds and void orders according to user permissions.
+[*] Every refund and void action leaves a note on the corresponding OpenCart order.
+[*] Export order records to CSV or Excel.
 [/list]
 
-[b]🏷️ 5. Products and Barcode Labels[/b]
+[b]🏷️ 5. Manage Products and Print Barcode Labels[/b]
+
+Prepare products for checkout without switching to another management tool.
+
 [list]
-[*] Manage products from the POS: add, edit, show or hide in POS, and filter by category and stock
-[*] Generate barcodes automatically for products that have none (from SKU or Model)
-[*] Print labels on 58 mm / 80 mm rolls or A4 sheets, with columns, margins, label height and barcode width, quick presets and a preview
-[*] Select several products and print their labels in one go
+[*] Add and edit products directly from POS.
+[*] Control which products appear in the POS and filter by category or stock.
+[*] Automatically generate missing barcodes using product SKU or Model.
+[*] Print product labels on 58 mm / 80 mm rolls or A4 sheets.
+[*] Adjust label columns, margins, height, and barcode width, with quick presets and print preview.
+[*] Select multiple products and print labels together.
 [/list]
 
-[b]👥 6. Customers[/b]
+[b]👥 6. Know Your Customers Better[/b]
+
+Your customer information and purchase history stay connected to OpenCart.
+
 [list]
-[*] Customer list with KPIs: total, new in 30 days, repeat and inactive for 30+ days
-[*] Search by name, phone or email, and filter by customer group
-[*] Purchase history, total spent and internal notes for every customer
-[*] Optional: create an OpenCart account for new customers
+[*] See total customers, new customers in the last 30 days, repeat customers, and inactive customers.
+[*] Search by name, phone, or email.
+[*] Filter customers by customer group.
+[*] View purchase history, total spending, and internal notes.
+[*] Optionally create an OpenCart account for new customers.
 [/list]
 
-[b]📊 7. Reports[/b]
+[b]📊 7. See How Your Business Is Performing[/b]
+
+Don't just count transactions. Understand where your sales come from and what needs attention.
+
 [list]
-[*] KPIs: net sales, transactions, average order, items sold, discounts and refunded + voided, each compared with the previous period
-[*] Daily sales chart, plus payment-method and category breakdowns
-[*] Breakdown by cashier, low-stock list, store comparison, and coupon, shipping and extra-charge figures
-[*] Export reports
+[*] Track net sales, transactions, average order value, items sold, discounts, refunds, and voids.
+[*] Compare performance with the previous period.
+[*] View daily sales charts and breakdowns by payment method and product category.
+[*] See how much each cashier sells.
+[*] Compare sales between stores and identify products running low on stock.
+[*] Track coupon usage, shipping, and extra-charge figures.
+[*] Export reports for further analysis.
 [/list]
 
-[b]🔒 8. Cashiers, Roles and Security[/b]
+[b]🔒 8. Give Your Team the Right Access[/b]
+
+Not every cashier needs access to every operation. Decide what each person can see and do.
+
 [list]
-[*] Four Roles – Cashier, Supervisor, Manager and Owner, each with its own pages
-[*] Permission Matrix – Choose who can apply discounts, add charges, use coupons, refund, void and export
-[*] Sign-In Options – Username and password, a 4–6 digit PIN for quick cashier switching, or an existing OpenCart admin session
-[*] Brute-Force Protection – Accounts lock after repeated failures, and each IP address is rate limited
-[*] Audit log and sliding 12-hour sessions
+[*] [b]Four User Roles:[/b] Cashier, Supervisor, Manager, and Owner, each with designated pages.
+[*] [b]Adjustable Permissions:[/b] Control who can apply discounts, add charges, use coupons, process refunds, void orders, and export data.
+[*] [b]Quick PIN Sign-In:[/b] Allow cashiers to switch users using a 4–6 digit PIN.
+[*] [b]Multiple Sign-In Options:[/b] Username and password, PIN, or an existing OpenCart admin session.
+[*] [b]Login Protection:[/b] Account lockouts after repeated failed attempts and IP-based rate limiting.
+[*] [b]Activity Records:[/b] Audit log and sliding 12-hour sessions.
 [/list]
 
-[b]🏬 9. Multi-Store and Multi-Terminal[/b]
+[b]🏬 9. Manage Multiple Branches and Checkout Counters[/b]
+
+Expanding to another location shouldn't mean managing another POS system.
+
 [list]
-[*] Branches are your OpenCart stores. Each cashier belongs to one store
-[*] Register every counter or tablet as a terminal and see whether it is online or offline
-[*] Printer, product layout and scanner options are set per terminal
+[*] Use your existing OpenCart stores as branches.
+[*] Assign cashiers to individual stores.
+[*] Register each counter or tablet as a separate terminal.
+[*] Check whether terminals are online or offline.
+[*] Configure printers, product layouts, and barcode scanner options for each terminal.
 [/list]
 
-[b]🎨 10. Your Brand[/b]
+[b]🎨 10. Make It Feel Like Your Own POS[/b]
+
+Keep the checkout experience consistent with your business.
+
 [list]
-[*] Light and dark themes, adjustable background colors, English and Indonesian
-[*] A custom sign-in page: your own address, logo, headline and description per language, and an optional animated delivery-robot scene
+[*] Light and dark themes with adjustable background colors.
+[*] English and Indonesian language support.
+[*] Custom sign-in page with your own address, logo, headline, and description per language.
 [/list]
 
-[b]🧩 Built on OpenCart[/b]
+[b]🧩 Already Running OpenCart? You're Ready to Start.[/b]
+
+BPOS is built around your existing OpenCart installation, so your POS transactions remain part of your store's normal order workflow.
+
 [list]
-[*] Built for OpenCart 3.0.x and installed with an OCMOD package, with the extension's own admin settings page
-[*] POS sales are stored as normal OpenCart orders, so existing reports, emails and stock rules keep working
-[*] Compatible with order statuses mapped to your store (completed, refunded, voided)
+[*] Designed for OpenCart 3.0.x.
+[*] Installed using an OCMOD package.
+[*] Includes its own administration settings page.
+[*] POS sales are stored as normal OpenCart orders.
+[*] Existing stock rules, order emails, and reporting workflows continue to work.
+[*] Supports your configured order statuses for completed, refunded, and voided transactions.
 [/list]
 
 [b]🚧 Coming Soon[/b]
+
 [list]
-[*] Offline Mode – Keep selling without internet and sync when the connection returns
+[*] [b]Offline Mode:[/b] Continue selling without an internet connection and synchronize transactions when connectivity returns.
 [/list]
 
-[b]🧰 Included in Package[/b]
+[b]🧰 What's Included[/b]
+
 [list]
-[*] Full extension (frontend + admin)
-[*] Easy OCMOD installer
-[*] English documentation
-[*] 1 year of free updates
+[*] Complete BPOS extension (frontend + admin).
+[*] Easy OCMOD installation package.
+[*] English documentation.
+[*] 1 year of free updates.
 [/list]
 
-[b][color=#a8c700][size=120]◈ TRY THE DEMO[/size][/color][/b]
-[url=https://hpwebdesign.io/demo/bpos][img]https://opencart.id/image/catalog/opencart.com/frontend-demo.jpg[/img][/url]
+[b]◈ SEE HOW IT WORKS[/b]
 
-[b][color=#a8c700][size=120]◈ SUPERB TECHNICAL SUPPORT[/size][/color][/b]
-We've got you covered!
+Don't just take our word for it. Open the live demo and try the checkout process yourself.
+
+[url=https://demo08.bariklabs.com/index.php?route=bpos/home][img]https://opencart.id/image/catalog/opencart.com/frontend-demo.jpg[/img][/url]
+
+[b][color=#a8c700][size=120]◈ NEED HELP GETTING STARTED?[/size][/color][/b]
+
+We've got you covered. Get assistance with installation and technical questions from the BarikLabs team.
+
 [img]https://image.opencart.com/original/58c341560e92f.jpg[/img]
-[list] ✪ Free Installation
-✪ Free 12 Months Technical Support[/list]
+
+[list]
+[*] Free Installation Assistance
+[*] Free 12 Months Technical Support
+[/list]
