@@ -32,12 +32,15 @@ Open your POS address (for example yourstore.com/pos), sign in, and start sellin
 [*] Pay Link for Online Gateways – The customer opens a signed link and pays online. The cashier can copy the link
 [/list]
 
-[b]🧾 3. Receipts and Printing[/b]
+[b]🧾 3. Receipts and Thermal Printing[/b]
 [list]
-[*] Print through the browser dialog, a network printer (IP), USB (WebUSB) or Bluetooth
-[*] 58 mm and 80 mm paper, automatic printing after checkout, optional paper cut, and a test-print button
-[*] Choose what the receipt shows: header and footer, logo, address, phone, cashier, terminal, customer, tax breakdown and an order barcode
-[*] Receipt labels can be translated per language, with a live preview in the settings
+[*] Thermal Printer Ready – Sends ESC/POS straight to 58 mm and 80 mm receipt printers over USB (WebUSB or Web Serial), Bluetooth (Web Bluetooth on Android Chrome, or Bluetooth serial), or the RawBT app on Android
+[*] Or Use Any Printer – The browser print dialog works with every printer your computer can print to
+[*] Print the Way a Cashier Needs – Automatic printing after checkout, optional automatic paper cut, and a test-print button in the settings
+[*] Receipt Content You Control – Header and footer, store logo (printed as a black-and-white image), address, phone, cashier, terminal, customer, tax breakdown and an order barcode (Code 39)
+[*] Per Terminal – Paper width, connection and cut options are set for each counter, with a live preview of the receipt
+[*] Receipt labels can be translated per language
+[*] USB and Bluetooth printing needs Chrome or Edge on desktop, or Chrome on Android
 [/list]
 
 [b]📦 4. Orders, Refunds and Voids[/b]
