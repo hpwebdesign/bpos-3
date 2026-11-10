@@ -69,6 +69,21 @@
           <div class="bps-pane" id="bps-terminals">{{ tab_terminals }}</div>
           <div class="bps-pane" id="bps-sync">{{ tab_sync }}</div>
           <div class="bps-pane" id="bps-help">
+            <div class="bps-card">
+              <div class="bps-card-h"><h3>{{ text_help_start|e }}</h3><span class="bps-sub">{{ text_help_start_sub|e }}</span></div>
+              <div class="bps-hl-tiles">
+                <a href="#bps-stores" data-bps-tab="stores" class="bps-hl-tile"><span class="bps-hl-n">1</span><span><b>{{ text_help_s1|e }}</b><small>{{ text_help_s1_d|e }}</small></span></a>
+                <a href="#bps-terminals" data-bps-tab="terminals" class="bps-hl-tile"><span class="bps-hl-n">2</span><span><b>{{ text_help_s2|e }}</b><small>{{ text_help_s2_d|e }}</small></span></a>
+                <a href="#bps-receipt" data-bps-tab="receipt" class="bps-hl-tile"><span class="bps-hl-n">3</span><span><b>{{ text_help_s3|e }}</b><small>{{ text_help_s3_d|e }}</small></span></a>
+                <a href="{{ pos_urls[0].url|e('html_attr') }}" target="_blank" rel="noopener" class="bps-hl-tile"><span class="bps-hl-n">4</span><span><b>{{ text_help_s4|e }}</b><small>{{ text_help_s4_d|e }}</small></span></a>
+              </div>
+            </div>
+            <div class="bps-card">
+              <div class="bps-card-h"><h3>{{ text_help_support|e }}</h3><span class="bps-sub">{{ text_help_support_sub|e }}</span></div>
+              <div class="bps-hl-tiles">
+                <a href="{{ ticket_link|e('html_attr') }}" target="_blank" rel="noopener" class="bps-hl-tile"><span class="bps-hl-ico"><i class="fa fa-life-ring"></i></span><span><b>{{ text_help_ticket|e }}</b><small>{{ text_help_ticket_d|e }}</small></span></a>
+              </div>
+            </div>
             <div class="bps-card bps-helpcard">
               <div id="license"></div>
               <div id="support"></div>
