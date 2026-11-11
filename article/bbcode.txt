@@ -22,7 +22,7 @@ Simply open your POS address (for example, yourstore.com/pos), sign in, and star
 
 [b][color=#a8c700][size=120]◈ TRY THE LIVE DEMO[/size][/color][/b]
 
-[url=https://demo08.bariklabs.com/index.php?route=bpos/home][img]https://opencart.id/image/catalog/opencart.com/frontend-demo.jpg[/img][/url]
+[url=https://bariklabs.com/demo/bpos][img]https://opencart.id/image/catalog/opencart.com/frontend-demo.jpg[/img][/url]
 
 [b]Is BPOS Right for Your Business?[/b]
 
@@ -188,7 +188,7 @@ BPOS is built around your existing OpenCart installation, so your POS transactio
 
 Don't just take our word for it. Open the live demo and try the checkout process yourself.
 
-[url=https://demo08.bariklabs.com/index.php?route=bpos/home][img]https://opencart.id/image/catalog/opencart.com/frontend-demo.jpg[/img][/url]
+[url=https://bariklabs.com/demo/bpos][img]https://opencart.id/image/catalog/opencart.com/frontend-demo.jpg[/img][/url]
 
 [b][color=#a8c700][size=120]◈ NEED HELP GETTING STARTED?[/size][/color][/b]
 
