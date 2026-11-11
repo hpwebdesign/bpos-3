@@ -4,7 +4,7 @@ Simply open:
 👉 yourstore.com/pos and start selling.
 
 [b][color=#a8c700][size=120]◈ TRY THE DEMO[/size][/color][/b]
-[url=https://hpwebdesign.io/demo/bpos][img]https://opencart.id/image/catalog/opencart.com/frontend-demo.jpg[/img][/url]
+[url=https://bariklabs.com/demo/bpos][img]https://opencart.id/image/catalog/opencart.com/frontend-demo.jpg[/img][/url]
 
 [b]🛍️ What is BPOS[/b]
 BPOS is a complete POS extension for OpenCart that helps you handle both in-store and online sales in one place.
@@ -74,9 +74,8 @@ It’s built for real retail environments — fast, lightweight, and easy to use
 
 
 [b][color=#a8c700][size=120]◈ TRY THE DEMO[/size][/color][/b]
-[url=https://hpwebdesign.io/demo/bpos][img]https://opencart.id/image/catalog/opencart.com/frontend-demo.jpg[/img][/url]
+[url=https://bariklabs.com/demo/bpos][img]https://opencart.id/image/catalog/opencart.com/frontend-demo.jpg[/img][/url]
 
-[url=https://demo03.hpwebdesign.id/admin/index.php?route=extension/module/hp_advanced_affiliate&user_token=QWyU10boQ2EIv7LvWpMhtT7h8tWweX50][img]https://opencart.id/image/catalog/opencart.com/backend-demo.jpg[/img][/url]
 [b][color=#a8c700][size=120]◈ SUPERB TECHNICAL SUPPORT[/size][/color][/b]
 We've got you covered!
 [img]https://image.opencart.com/original/58c341560e92f.jpg[/img]

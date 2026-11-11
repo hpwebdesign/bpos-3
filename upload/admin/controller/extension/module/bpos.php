@@ -107,8 +107,8 @@ class ControllerExtensionModuleBpos extends Controller {
     $data['text_bpos_version'] = sprintf($this->language->get('text_bpos_version'), $this->version, $data['schema']);
     $data['extension_code'] = $this->extension_code;
     $data['extension_type'] = $this->extension_type;
-    $data['doc_link'] = 'https://hpwebdesign.' . $this->extension_type . '/docs/' . $this->extension_code;
-    $data['ticket_link'] = 'https://hpwebdesign.' . $this->extension_type . '/support';
+    $data['doc_link'] = 'https://bariklabs.' . $this->extension_type . '/docs/' . $this->extension_code;
+    $data['ticket_link'] = 'https://bariklabs.' . $this->extension_type . '/support';
     $data['user_token'] = $token;
 
     $data['breadcrumbs'] = [];

@@ -5,7 +5,7 @@ Notes for working on Barik POS (BPOS, OpenCart 3.0.x).
 ## Branding and URLs
 
 - The website is **bariklabs.com** (it was hpwebdesign.io). Use it in articles, marketplace listings, banner copy, `install.xml` and support links.
-- Old `hpwebdesign.io` / `hpwebdesign.id` links still exist in `article/`, `Product Article/` and `upload/admin/controller/extension/module/bpos.php` (`ticket_link`). Replace them once the exact new demo and support URLs are known.
+- Links now point to bariklabs.com. The support/docs links in the admin Help tab use `https://bariklabs.com/support` and `/docs/bpos`; confirm those paths exist on the site.
 
 ## Packages
 
