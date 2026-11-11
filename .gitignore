@@ -8,3 +8,5 @@ distribution/
 .env
 composer.json
 composer.lock
+RoboFile.php
+vendor
