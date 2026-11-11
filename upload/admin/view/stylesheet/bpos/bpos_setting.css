@@ -317,3 +317,13 @@ html body #container { overflow: clip; }
 .bps #support .support-card .support-text { color: var(--mute); font-size: 13px; margin-bottom: 12px; }
 .bps #support .support-card .btn-lg { width: 100%; }
 .bps #support .support-image { max-width: 160px; height: auto; border-radius: 12px; }
+
+/* accordion sections */
+.bps-acc-h { cursor: pointer; user-select: none; }
+.bps-acc-h:focus-visible { outline: 2px solid var(--acc-ink); outline-offset: -2px; border-radius: 22px; }
+.bps-chev { margin-left: 10px; align-self: center; color: var(--mute); font-size: 20px; line-height: 1; transition: transform .15s; }
+.bps-nopill .bps-chev { margin-left: auto; }
+.bps-card.bps-fold > :not(.bps-card-h) { display: none; }
+.bps-card.bps-fold > .bps-card-h { padding-bottom: 18px; }
+.bps-card.bps-fold .bps-chev { transform: rotate(-90deg); }
+.bps-acc-h:hover .bps-chev { color: var(--ink); }

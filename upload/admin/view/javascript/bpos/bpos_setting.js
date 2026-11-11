@@ -36,6 +36,61 @@
   }
   $root.on('click', '[data-bps-tab]', function (e) { e.preventDefault(); showTab($(this).data('bps-tab')); });
 
+
+  // Accordion: a tab with more than one section keeps one section open; the first one starts open.
+  // Per-terminal cards (.bps-dev) count as one section so the choice survives a terminal switch.
+  var accGroups = {};
+
+  function accSet(key, open) {
+    accGroups[key].$cards.toggleClass('bps-fold', !open).children('.bps-card-h').attr('aria-expanded', open ? 'true' : 'false');
+  }
+
+  function accOpen(key) {
+    var pane = accGroups[key].pane;
+    $.each(accGroups, function (k, g) { if (g.pane === pane) { accSet(k, k === key); } });
+  }
+
+  function accOpenFor($el) {
+    var $c = $el.closest('.bps-card');
+    if ($c.length && $c.data('bps-fold')) { accOpen($c.data('bps-fold')); }
+  }
+
+  function initAccordion() {
+    $root.find('.bps-pane').each(function () {
+      var pane = this.id, keys = [], n = 0;
+
+      $(this).find('.bps-card').each(function () {
+        var $c = $(this);
+        if (!$c.children('.bps-card-h').length || $c.closest('.bps-col-side').length || $c.parent().closest('.bps-card').length) { return; }
+        var key = pane + ':' + ($c.closest('.bps-dev').length ? 'dev' : 'c' + (n++));
+        if (!accGroups[key]) { accGroups[key] = { pane: pane, $cards: $() }; keys.push(key); }
+        accGroups[key].$cards = accGroups[key].$cards.add($c);
+        $c.data('bps-fold', key);
+      });
+
+      if (keys.length < 2) { $.each(keys, function (i, k) { accGroups[k].$cards.data('bps-fold', null); delete accGroups[k]; }); return; }
+
+      $.each(keys, function (i, k) {
+        accGroups[k].$cards.each(function () {
+          var $h = $(this).children('.bps-card-h');
+          $h.addClass('bps-acc-h').attr({ tabindex: 0, role: 'button' });
+          if (!$h.children('.bps-scope, .bps-pill').length) { $h.addClass('bps-nopill'); }
+          $h.append('<i class="fa fa-angle-down bps-chev" aria-hidden="true"></i>');
+        });
+        accSet(k, i === 0);
+      });
+    });
+  }
+
+  $root.on('click', '.bps-acc-h', function (e) {
+    if ($(e.target).closest('a, button, input, select, label').length) { return; }
+    var key = $(this).parent().data('bps-fold');
+    if (accGroups[key].$cards.first().hasClass('bps-fold')) { accOpen(key); } else { accSet(key, false); }
+  });
+  $root.on('keydown', '.bps-acc-h', function (e) {
+    if ((e.which === 13 || e.which === 32) && e.target === this) { e.preventDefault(); $(this).trigger('click'); }
+  });
+
   // Language switch inside the Text card
   var curLang = $('#bps-lang-seg button.bps-on').data('bps-lang');
   function showLang(code) {
@@ -172,6 +227,7 @@
     if (first) {
       var $pane = first.closest('.bps-pane');
       if ($pane.length) { showTab($pane.attr('id').replace('bps-', '')); }
+      accOpenFor(first);
       var $lp = first.closest('.bps-lang-pane');
       if ($lp.length) { showLang($lp.data('bps-lang-pane')); }
       var $rp = first.closest('.bps-rlang-pane');
@@ -560,6 +616,7 @@
     }).then(function () { $btn.prop('disabled', false); });
   });
 
+  initAccordion();
   preview();
   baseline = flat();
   syncDirty();
